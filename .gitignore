@@ -1,0 +1,15 @@
+### PDF-Files ###
+*.pdf
+
+### Log-Files ###
+log/
+
+### Database-Files ###
+/database/
+*.db
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
