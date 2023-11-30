@@ -1,20 +1,54 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-//TODO: replace this class with a correct ApplicationUser Entity implementation
-public class ApplicationUser {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
+import java.time.LocalDateTime;
+
+@Entity
+public class ApplicationUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false, unique = true, length = 255)
     private String email;
-    private String password;
+    @Column(nullable = false)
+    private String passwordEncoded;
+    @Column(nullable = false, unique = true, length = 255)
     private String nickname;
-    private Boolean admin;
+    @Column(nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime updatedAt;
+
 
     public ApplicationUser() {
     }
 
-    public ApplicationUser(String email, String password, Boolean admin) {
+    public ApplicationUser(String email, String passwordEncoded) {
         this.email = email;
-        this.password = password;
-        this.admin = admin;
+        this.passwordEncoded = passwordEncoded;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     public String getEmail() {
@@ -26,12 +60,12 @@ public class ApplicationUser {
         return this;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordEncoded() {
+        return passwordEncoded;
     }
 
-    public ApplicationUser setPassword(String password) {
-        this.password = password;
+    public ApplicationUser setPasswordEncoded(String password) {
+        this.passwordEncoded = password;
         return this;
     }
 
@@ -44,12 +78,11 @@ public class ApplicationUser {
         return this;
     }
 
-    public Boolean getAdmin() {
-        return admin;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public ApplicationUser setAdmin(Boolean admin) {
-        this.admin = admin;
-        return this;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }
