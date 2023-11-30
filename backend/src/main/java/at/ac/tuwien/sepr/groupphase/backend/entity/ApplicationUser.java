@@ -5,6 +5,7 @@ public class ApplicationUser {
 
     private String email;
     private String password;
+    private String nickname;
     private Boolean admin;
 
     public ApplicationUser() {
@@ -20,23 +21,35 @@ public class ApplicationUser {
         return email;
     }
 
-    public void setEmail(String email) {
+    public ApplicationUser setEmail(String email) {
         this.email = email;
+        return this;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public ApplicationUser setPassword(String password) {
         this.password = password;
+        return this;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public ApplicationUser setNickname(String nickname) {
+        this.nickname = nickname;
+        return this;
     }
 
     public Boolean getAdmin() {
         return admin;
     }
 
-    public void setAdmin(Boolean admin) {
+    public ApplicationUser setAdmin(Boolean admin) {
         this.admin = admin;
+        return this;
     }
 }
