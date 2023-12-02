@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserNotFoundException;
 
 /**
@@ -25,6 +27,8 @@ public interface UserService {
      * @throws UserNotFoundException if the provided nickname does not match any user entry
      */
     ApplicationUser getUserByNickname(String nickname) throws UserNotFoundException;
+
+    ApplicationUser update(ApplicationUser applicationUser) throws UserNotFoundException, ValidationException, ConflictException;
 
     // TODO: createUser, updateUser, deleteUser
 }

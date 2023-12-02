@@ -1,9 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.validation.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +20,12 @@ public class JpaUserService implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final UserRepository userRepository;
+    private final UserValidator validator;
 
     @Autowired
-    public JpaUserService(UserRepository userRepository) {
+    public JpaUserService(UserRepository userRepository, UserValidator validator) {
         this.userRepository = userRepository;
+        this.validator = validator;
     }
 
     @Override
@@ -47,5 +52,16 @@ public class JpaUserService implements UserService {
         }
 
         return user;
+    }
+
+    @Override
+    public ApplicationUser update(ApplicationUser applicationUser) throws UserNotFoundException, ValidationException, ConflictException {
+        LOGGER.trace("update({})", applicationUser);
+        validator.validateForUpdate(applicationUser);
+
+        //TODO Add Conflict and NotFound Handling
+        ApplicationUser updatedUser = userRepository.save(applicationUser);
+
+        return updatedUser;
     }
 }
