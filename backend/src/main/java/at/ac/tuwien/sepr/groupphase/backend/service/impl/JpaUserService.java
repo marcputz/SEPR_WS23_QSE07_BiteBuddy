@@ -30,7 +30,7 @@ public class JpaUserService implements UserService {
 
     @Override
     public ApplicationUser getUserByEmail(String email) throws UserNotFoundException {
-        LOGGER.trace("getUserByEmail(" + email + ")");
+        LOGGER.trace("getUserByEmail({})", email);
 
         ApplicationUser user = userRepository.findByEmailIgnoreCase(email);
         if (user == null) {
@@ -43,7 +43,7 @@ public class JpaUserService implements UserService {
 
     @Override
     public ApplicationUser getUserByNickname(String nickname) throws UserNotFoundException {
-        LOGGER.trace("getUserByUsername(" + nickname + ")");
+        LOGGER.trace("getUserByUsername({})", nickname);
 
         ApplicationUser user = userRepository.findByNickname(nickname);
         if (user == null) {

@@ -30,7 +30,7 @@ public class DataGenerator {
 
     private void generateUserData() {
         if (userRepository.findAll().size() > 0) {
-           userRepository.deleteAll();
+            userRepository.deleteAll();
         }
 
         LOGGER.debug("generating default test users");
