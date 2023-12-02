@@ -4,14 +4,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
-public class UserLoginDto {
+public class LoginDto {
 
     @NotNull(message = "Email must not be null")
     @Email
     private String email;
 
     @NotNull(message = "Password must not be null")
-    private String password;
+    private String passwordEncoded;
 
     public String getEmail() {
         return email;
@@ -21,12 +21,12 @@ public class UserLoginDto {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordEncoded() {
+        return passwordEncoded;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordEncoded(String passwordEncoded) {
+        this.passwordEncoded = passwordEncoded;
     }
 
     @Override
@@ -34,23 +34,23 @@ public class UserLoginDto {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof UserLoginDto userLoginDto)) {
+        if (!(o instanceof LoginDto userLoginDto)) {
             return false;
         }
         return Objects.equals(email, userLoginDto.email)
-            && Objects.equals(password, userLoginDto.password);
+            && Objects.equals(passwordEncoded, userLoginDto.passwordEncoded);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, password);
+        return Objects.hash(email, passwordEncoded);
     }
 
     @Override
     public String toString() {
         return "UserLoginDto{"
             + "email='" + email + '\''
-            + ", password='" + password + '\''
+            + ", passwordEncoded='" + passwordEncoded + '\''
             + '}';
     }
 
@@ -76,10 +76,10 @@ public class UserLoginDto {
             return this;
         }
 
-        public UserLoginDto build() {
-            UserLoginDto userLoginDto = new UserLoginDto();
+        public LoginDto build() {
+            LoginDto userLoginDto = new LoginDto();
             userLoginDto.setEmail(email);
-            userLoginDto.setPassword(password);
+            userLoginDto.setPasswordEncoded(password);
             return userLoginDto;
         }
     }

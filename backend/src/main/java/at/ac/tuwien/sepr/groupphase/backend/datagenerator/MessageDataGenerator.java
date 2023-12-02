@@ -11,7 +11,7 @@ import jakarta.annotation.PostConstruct;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 
-@Profile("generateData")
+//@Profile("generateData")
 @Component
 public class MessageDataGenerator {
 

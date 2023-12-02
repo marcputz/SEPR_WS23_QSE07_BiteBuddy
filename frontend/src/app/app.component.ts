@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'SE PR Group Phase';
+  title = 'BiteBuddy (SE PR QSE Gruppe 07)';
 }

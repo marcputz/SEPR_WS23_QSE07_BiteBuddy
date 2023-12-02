@@ -9,11 +9,16 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "users")
 public class ApplicationUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -51,6 +56,8 @@ public class ApplicationUser {
         updatedAt = LocalDateTime.now();
     }
 
+    public long getId() { return id; }
+
     public String getEmail() {
         return email;
     }
@@ -73,9 +80,16 @@ public class ApplicationUser {
         return nickname;
     }
 
-    public ApplicationUser setNickname(String nickname) {
-        this.nickname = nickname;
+    public ApplicationUser setNickname(String username) {
+        this.nickname = username;
         return this;
+    }
+
+    public boolean checkPasswordMatch(String passwordEncoded) {
+        if (passwordEncoded == null) {
+            return false;
+        }
+        return passwordEncoded.equals(this.passwordEncoded);
     }
 
     public LocalDateTime getCreatedAt() {

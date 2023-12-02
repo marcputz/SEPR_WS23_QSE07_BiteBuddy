@@ -3,7 +3,7 @@ import {MessageService} from '../../services/message.service';
 import {Message} from '../../dtos/message';
 import {NgbModal, NgbPaginationConfig} from '@ng-bootstrap/ng-bootstrap';
 import {UntypedFormBuilder, NgForm} from '@angular/forms';
-import {AuthService} from '../../services/auth.service';
+import {UserService} from '../../services/user.service';
 
 @Component({
   selector: 'app-message',
@@ -25,7 +25,7 @@ export class MessageComponent implements OnInit {
               private ngbPaginationConfig: NgbPaginationConfig,
               private formBuilder: UntypedFormBuilder,
               private cd: ChangeDetectorRef,
-              private authService: AuthService,
+              private authService: UserService,
               private modalService: NgbModal) {
   }
 
@@ -37,7 +37,7 @@ export class MessageComponent implements OnInit {
    * Returns true if the authenticated user is an admin
    */
   isAdmin(): boolean {
-    return this.authService.getUserRole() === 'ADMIN';
+    return false; //return this.authService.getUserRole() === 'ADMIN';
   }
 
   openAddModal(messageAddModal: TemplateRef<any>) {

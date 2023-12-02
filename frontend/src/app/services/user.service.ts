@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {AuthRequest} from '../dtos/auth-request';
+import {LoginDto} from '../dtos/loginDto';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
@@ -9,7 +9,7 @@ import {Globals} from '../global/globals';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class UserService {
 
   private authBaseUri: string = this.globals.backendUri + '/authentication';
 
@@ -21,8 +21,9 @@ export class AuthService {
    *
    * @param authRequest User data
    */
-  loginUser(authRequest: AuthRequest): Observable<string> {
-    return this.httpClient.post(this.authBaseUri, authRequest, {responseType: 'text'})
+  loginUser(authRequest: LoginDto): Observable<string> {
+    console.debug("url: ", this.authBaseUri + "/login");
+    return this.httpClient.post(this.authBaseUri + "/login", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
       );
@@ -43,22 +44,6 @@ export class AuthService {
 
   getToken() {
     return localStorage.getItem('authToken');
-  }
-
-  /**
-   * Returns the user role based on the current token
-   */
-  getUserRole() {
-    if (this.getToken() != null) {
-      const decoded: any = jwtDecode(this.getToken());
-      const authInfo: string[] = decoded.rol;
-      if (authInfo.includes('ROLE_ADMIN')) {
-        return 'ADMIN';
-      } else if (authInfo.includes('ROLE_USER')) {
-        return 'USER';
-      }
-    }
-    return 'UNDEFINED';
   }
 
   private setToken(authResponse: string) {

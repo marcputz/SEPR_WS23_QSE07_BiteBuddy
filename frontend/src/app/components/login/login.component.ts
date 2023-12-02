@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {AuthService} from '../../services/auth.service';
-import {AuthRequest} from '../../dtos/auth-request';
+import {UserService} from '../../services/user.service';
+import {LoginDto} from '../../dtos/loginDto';
 
 
 @Component({
@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
   error = false;
   errorMessage = '';
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private router: Router) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]]
@@ -27,13 +27,13 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Form validation will start after the method is called, additionally an AuthRequest will be sent
+   * Form validation will start after the method is called, additionally an LoginDto will be sent
    */
   loginUser() {
     this.submitted = true;
     if (this.loginForm.valid) {
-      const authRequest: AuthRequest = new AuthRequest(this.loginForm.controls.username.value, this.loginForm.controls.password.value);
-      this.authenticateUser(authRequest);
+      const loginDto: LoginDto = new LoginDto(this.loginForm.controls.username.value, this.loginForm.controls.password.value);
+      this.authenticateUser(loginDto);
     } else {
       console.log('Invalid input');
     }
@@ -44,11 +44,11 @@ export class LoginComponent implements OnInit {
    *
    * @param authRequest authentication data from the user login form
    */
-  authenticateUser(authRequest: AuthRequest) {
-    console.log('Try to authenticate user: ' + authRequest.email);
+  authenticateUser(authRequest: LoginDto) {
+    console.log('Try to authenticate user: ' + authRequest.email + ' with encoded password ' + authRequest.passwordEncoded);
     this.authService.loginUser(authRequest).subscribe({
-      next: () => {
-        console.log('Successfully logged in user: ' + authRequest.email);
+      next: (data) => {
+        console.log('Successfully logged in user: ' + authRequest.email, data);
         this.router.navigate(['/message']);
       },
       error: error => {
