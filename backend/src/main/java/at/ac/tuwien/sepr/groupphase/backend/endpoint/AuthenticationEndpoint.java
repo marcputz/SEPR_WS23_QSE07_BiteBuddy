@@ -4,11 +4,11 @@ import at.ac.tuwien.sepr.groupphase.backend.auth.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.auth.SessionManager;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserNotFoundException;
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -41,15 +41,14 @@ public class AuthenticationEndpoint {
 
         try {
             // Look for user
-            ApplicationUser user = userService.getUserByEmail(userLoginDto.getEmail());
-
             // Check if password exists
             if (userLoginDto.getPassword() == null) {
                 throw new AuthenticationException("No password provided");
             }
-
             // encode password
             String encodedPassword = PasswordEncoder.encode(userLoginDto.getPassword(), userLoginDto.getEmail());
+
+            ApplicationUser user = userService.getUserByEmail(userLoginDto.getEmail());
 
             // Check password data
             if (user.checkPasswordMatch(encodedPassword)) {
@@ -73,6 +72,18 @@ public class AuthenticationEndpoint {
             // login email not found
             throw new AuthenticationException("User '" + userLoginDto.getEmail() + "' does not exist");
         }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody UserRegisterDto registerDto) throws AuthenticationException {
+        LOGGER.trace("register({})", registerDto);
+        String encodedPassword = PasswordEncoder.encode(registerDto.getPasswordEncoded(), registerDto.getEmail());
+        LoginDto loginDto = new LoginDto();
+        loginDto.setPassword(registerDto.getPasswordEncoded());
+        loginDto.setEmail(registerDto.getEmail());
+        registerDto.setPasswordEncoded(encodedPassword);
+        userService.create(registerDto);
+        return login(loginDto);
     }
 
     @PostMapping("/logout")
