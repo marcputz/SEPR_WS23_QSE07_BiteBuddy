@@ -45,7 +45,9 @@ public class LoginEndpoint {
                 String authToken = AuthTokenUtils.createToken(user.getId(), user.getNickname());
 
                 // Register user session
-                SessionManager.startUserSession(user.getId(), authToken);
+                if (!SessionManager.getInstance().startUserSession(user.getId(), authToken)) {
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to start user session");
+                }
 
                 // Return jwt auth token
                 return new ResponseEntity<String>(authToken, HttpStatus.OK);
@@ -56,7 +58,7 @@ public class LoginEndpoint {
             }
         } catch (UserNotFoundException e) {
             // login email not found
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with email '" + userLoginDto.getEmail() + "' does not exist", e);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User with email '" + userLoginDto.getEmail() + "' does not exist", e);
         }
     }
 }
