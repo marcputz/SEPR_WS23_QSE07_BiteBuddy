@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -64,4 +65,15 @@ public class JpaUserService implements UserService {
 
         return updatedUser;
     }
+
+    @Override
+    public ApplicationUser create(UserRegisterDto registerDto) {
+        LOGGER.trace("create({})", registerDto);
+        //validator.validateForCreate(registerDto);
+        ApplicationUser applicationUser = new ApplicationUser(registerDto.getEmail(), registerDto.getPasswordEncoded());
+        applicationUser.setNickname(registerDto.getName());
+        return userRepository.save(applicationUser);
+    }
+
+
 }
