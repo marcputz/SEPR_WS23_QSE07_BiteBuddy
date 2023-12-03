@@ -82,12 +82,12 @@ public class FileKeyService implements KeyService {
             String key = Files.readString(file.toPath(), Charset.defaultCharset());
 
             // remove headers
-            String privateKeyPEM = key
+            String privateKeyPem = key
                 .replace("-----BEGIN PRIVATE KEY-----", "")
                 .replaceAll(System.lineSeparator(), "")
                 .replace("-----END PRIVATE KEY-----", "");
 
-            byte[] encoded = Base64.decodeBase64(privateKeyPEM);
+            byte[] encoded = Base64.decodeBase64(privateKeyPem);
 
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
@@ -133,12 +133,12 @@ public class FileKeyService implements KeyService {
             String key = Files.readString(file.toPath(), Charset.defaultCharset());
 
             // remove headers
-            String publicKeyPEM = key
+            String publicKeyPem = key
                 .replace("-----BEGIN PUBLIC KEY-----", "")
                 .replaceAll(System.lineSeparator(), "")
                 .replace("-----END PUBLIC KEY-----", "");
 
-            byte[] encoded = Base64.decodeBase64(publicKeyPEM);
+            byte[] encoded = Base64.decodeBase64(publicKeyPem);
 
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);

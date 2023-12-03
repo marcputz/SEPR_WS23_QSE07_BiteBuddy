@@ -3,7 +3,11 @@ package at.ac.tuwien.sepr.groupphase.backend.auth;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.KeyService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.FileKeyService;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import java.security.interfaces.RSAPrivateKey;
