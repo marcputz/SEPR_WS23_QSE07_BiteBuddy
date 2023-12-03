@@ -16,30 +16,33 @@ export class LoginComponent implements OnInit {
   loginForm: UntypedFormGroup;
   // After first submission attempt, form validation will start
   submitted = false;
-  // Error flag
-  error = false;
-  errorMessage = '';
+
+  // Authentication Error
+  authenticationError: boolean = false;
+  authenticationErrorMessage: string | null;
 
   constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router) {
     this.loginForm = this.formBuilder.group({
-      username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(8)]]
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]]
     });
   }
 
   /**
    * Form validation will start after the method is called, additionally an LoginDto will be sent
    */
-  loginUser() {
+  onSubmitLogin() {
     this.submitted = true;
     if (this.loginForm.valid) {
-      const username: string = <string> this.loginForm.controls.username.value;
+      const email: string = <string> this.loginForm.controls.email.value;
       const password: string = <string> this.loginForm.controls.password.value;
       const encodedPassword = this.passwordEncoder.encodePassword(password);
-      const loginDto: LoginDto = new LoginDto(username, encodedPassword);
+
+      const loginDto: LoginDto = new LoginDto(email, encodedPassword);
+
       this.authenticateUser(loginDto);
     } else {
-      console.log('Invalid input');
+      console.log('Invalid login form input');
     }
   }
 
@@ -49,20 +52,18 @@ export class LoginComponent implements OnInit {
    * @param authRequest authentication data from the user login form
    */
   authenticateUser(authRequest: LoginDto) {
-    console.log('Try to authenticate user: ' + authRequest.email + ' with encoded password ' + authRequest.password);
     this.authService.loginUser(authRequest).subscribe({
       next: (data) => {
-        console.log('Successfully logged in user: ' + authRequest.email, data);
+        console.log('Logged in as ' + authRequest.email);
         this.router.navigate(['/message']);
       },
       error: error => {
-        console.log('Could not log in due to:');
-        console.log(error);
-        this.error = true;
+        console.warn('Could not log in', error)
+        this.authenticationError = true;
         if (typeof error.error === 'object') {
-          this.errorMessage = error.error.error;
+          this.authenticationErrorMessage = error.error.error;
         } else {
-          this.errorMessage = error.error;
+          this.authenticationErrorMessage = error.error;
         }
       }
     });
@@ -71,8 +72,9 @@ export class LoginComponent implements OnInit {
   /**
    * Error flag will be deactivated, which clears the error message
    */
-  vanishError() {
-    this.error = false;
+  vanishAuthenticationError() {
+    this.authenticationError = false;
+    this.authenticationErrorMessage = null;
   }
 
   ngOnInit() {

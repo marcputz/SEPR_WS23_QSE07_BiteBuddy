@@ -76,9 +76,24 @@ public class AuthenticationEndpoint {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader HttpHeaders headers) {
-        System.out.println(headers);
+    public ResponseEntity<Boolean> logout(@RequestHeader HttpHeaders headers) {
 
-        throw new NotImplementedException();
+        // retrieve token from authorization header
+        String authToken = headers.getFirst("authorization");
+        if (authToken == null) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // check token validity
+        if (!AuthTokenUtils.isValid(authToken)) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // stop user session
+        if (!SessionManager.getInstance().stopUserSession(authToken)) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to stop user session");
+        }
+
+        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
 }

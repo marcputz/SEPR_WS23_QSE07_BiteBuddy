@@ -17,7 +17,7 @@ import java.util.Date;
 public class AuthTokenUtils {
 
     private static final String TOKEN_PREFIX = "Token ";
-    private static final int TOKEN_VALID_DURATION_IN_MINUTES = 15;
+    private static final int TOKEN_VALID_DURATION_IN_MINUTES = 120;
     private static final byte[] TOKEN_SECRET = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
 
     private static KeyService keyService = new FileKeyService();
