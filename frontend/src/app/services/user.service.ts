@@ -5,6 +5,8 @@ import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
+import {RegisterComponent} from "../components/register/register.component";
+import {RegisterDto} from "../dtos/registerDto";
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +26,14 @@ export class UserService {
   loginUser(authRequest: LoginDto): Observable<string> {
     console.debug("Logging in as '" + authRequest.email + "'");
     return this.httpClient.post(this.authBaseUri + "/login", authRequest, {responseType: 'text'})
+      .pipe(
+        tap((authResponse: string) => this.setToken(authResponse))
+      );
+  }
+
+  registerUser(authRequest: RegisterDto): Observable<string> {
+    console.debug("Registering as '" + authRequest.email + "'" + authRequest.name + "'" + authRequest.passwordEncoded);
+    return this.httpClient.post(this.authBaseUri + "/register", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
       );
