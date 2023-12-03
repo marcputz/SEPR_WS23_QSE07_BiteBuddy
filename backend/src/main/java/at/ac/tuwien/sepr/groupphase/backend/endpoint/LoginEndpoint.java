@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.auth.AuthToken;
+import at.ac.tuwien.sepr.groupphase.backend.auth.AuthTokenUtils;
+import at.ac.tuwien.sepr.groupphase.backend.auth.SessionManager;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -41,9 +42,10 @@ public class LoginEndpoint {
             if (user.checkPasswordMatch(userLoginDto.getPasswordEncoded())) {
 
                 // Create jwt token
-                String authToken = AuthToken.createToken(user.getId(), user.getNickname());
+                String authToken = AuthTokenUtils.createToken(user.getId(), user.getNickname());
 
-                // TODO: Register user session
+                // Register user session
+                SessionManager.startUserSession(user.getId(), authToken);
 
                 // Return jwt auth token
                 return new ResponseEntity<String>(authToken, HttpStatus.OK);

@@ -4,6 +4,8 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * UserRepository interface for handling ApplicationUser entities.
  * This interface extends JpaRepository, providing standard methods
@@ -11,6 +13,14 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserRepository extends JpaRepository<ApplicationUser, Long> {
+
+    /**
+     * Retrieves all users which have an ID less than the specified value.
+     *
+     * @param id the ID number to compare to
+     * @return a list of users which have IDs less than {@code id}
+     */
+    List<ApplicationUser> findByIdLessThan(long id);
 
     /**
      * Retrieves an ApplicationUser by their email.

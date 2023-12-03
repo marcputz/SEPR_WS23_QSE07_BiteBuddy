@@ -62,6 +62,11 @@ public class ApplicationUser {
         this.id = id;
     }
 
+    public ApplicationUser setId(long id) {
+        this.id = id;
+        return this;
+    }
+
     public String getEmail() {
         return email;
     }
