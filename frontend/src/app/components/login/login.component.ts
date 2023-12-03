@@ -3,6 +3,7 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {UserService} from '../../services/user.service';
 import {LoginDto} from '../../dtos/loginDto';
+import {PasswordEncoder} from "../../utils/passwordEncoder";
 
 
 @Component({
@@ -19,7 +20,7 @@ export class LoginComponent implements OnInit {
   error = false;
   errorMessage = '';
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(8)]]
@@ -32,7 +33,10 @@ export class LoginComponent implements OnInit {
   loginUser() {
     this.submitted = true;
     if (this.loginForm.valid) {
-      const loginDto: LoginDto = new LoginDto(this.loginForm.controls.username.value, this.loginForm.controls.password.value);
+      const username: string = <string> this.loginForm.controls.username.value;
+      const password: string = <string> this.loginForm.controls.password.value;
+      const encodedPassword = this.passwordEncoder.encodePassword(password);
+      const loginDto: LoginDto = new LoginDto(username, encodedPassword);
       this.authenticateUser(loginDto);
     } else {
       console.log('Invalid input');
@@ -45,7 +49,7 @@ export class LoginComponent implements OnInit {
    * @param authRequest authentication data from the user login form
    */
   authenticateUser(authRequest: LoginDto) {
-    console.log('Try to authenticate user: ' + authRequest.email + ' with encoded password ' + authRequest.passwordEncoded);
+    console.log('Try to authenticate user: ' + authRequest.email + ' with encoded password ' + authRequest.password);
     this.authService.loginUser(authRequest).subscribe({
       next: (data) => {
         console.log('Successfully logged in user: ' + authRequest.email, data);

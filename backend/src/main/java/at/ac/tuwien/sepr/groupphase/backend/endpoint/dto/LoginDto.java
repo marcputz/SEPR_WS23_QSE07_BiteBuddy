@@ -11,7 +11,7 @@ public class LoginDto {
     private String email;
 
     @NotNull(message = "Password must not be null")
-    private String passwordEncoded;
+    private String password;
 
     public String getEmail() {
         return email;
@@ -21,12 +21,12 @@ public class LoginDto {
         this.email = email;
     }
 
-    public String getPasswordEncoded() {
-        return passwordEncoded;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordEncoded(String passwordEncoded) {
-        this.passwordEncoded = passwordEncoded;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
@@ -38,19 +38,19 @@ public class LoginDto {
             return false;
         }
         return Objects.equals(email, userLoginDto.email)
-            && Objects.equals(passwordEncoded, userLoginDto.passwordEncoded);
+            && Objects.equals(password, userLoginDto.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, passwordEncoded);
+        return Objects.hash(email, password);
     }
 
     @Override
     public String toString() {
         return "UserLoginDto{"
             + "email='" + email + '\''
-            + ", passwordEncoded='" + passwordEncoded + '\''
+            + ", password='" + password + '\''
             + '}';
     }
 
@@ -79,7 +79,7 @@ public class LoginDto {
         public LoginDto build() {
             LoginDto userLoginDto = new LoginDto();
             userLoginDto.setEmail(email);
-            userLoginDto.setPasswordEncoded(password);
+            userLoginDto.setPassword(password);
             return userLoginDto;
         }
     }
