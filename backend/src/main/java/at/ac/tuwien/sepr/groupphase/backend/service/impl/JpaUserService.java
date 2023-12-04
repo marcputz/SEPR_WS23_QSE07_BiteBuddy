@@ -6,7 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

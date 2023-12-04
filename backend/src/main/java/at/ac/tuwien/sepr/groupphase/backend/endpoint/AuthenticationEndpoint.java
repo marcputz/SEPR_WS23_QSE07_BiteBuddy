@@ -8,7 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -52,6 +51,8 @@ public class AuthenticationEndpoint {
 
         try {
             // Look for user
+            ApplicationUser user = userService.getUserByEmail(userLoginDto.getEmail());
+
             // Check if password exists
             if (userLoginDto.getPassword() == null) {
                 throw new AuthenticationException("No password provided");
@@ -59,13 +60,11 @@ public class AuthenticationEndpoint {
             // encode password
             String encodedPassword = PasswordEncoder.encode(userLoginDto.getPassword(), userLoginDto.getEmail());
 
-            ApplicationUser user = userService.getUserByEmail(userLoginDto.getEmail());
-
             // Check password data
             if (user.checkPasswordMatch(encodedPassword)) {
 
                 // Create jwt token
-                String authToken = AuthTokenUtils.createToken(user.getId(), user.getNickname());
+                String authToken = AuthTokenUtils.createToken(user);
 
                 // Register user session
                 if (!SessionManager.getInstance().startUserSession(user.getId(), authToken)) {
@@ -110,12 +109,12 @@ public class AuthenticationEndpoint {
         // retrieve token from authorization header
         String authToken = headers.getFirst("authorization");
         if (authToken == null) {
-            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
 
         // check token validity
         if (!AuthTokenUtils.isValid(authToken)) {
-            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
 
         // stop user session
@@ -123,6 +122,6 @@ public class AuthenticationEndpoint {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to stop user session");
         }
 
-        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 }

@@ -4,7 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.service.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 
 /**
  * UserService interface to handle data storage for users.
@@ -32,6 +32,4 @@ public interface UserService {
     ApplicationUser update(ApplicationUser applicationUser) throws UserNotFoundException, ValidationException, ConflictException;
 
     ApplicationUser create(UserRegisterDto registerDto);
-
-    // TODO: createUser, updateUser, deleteUser
 }

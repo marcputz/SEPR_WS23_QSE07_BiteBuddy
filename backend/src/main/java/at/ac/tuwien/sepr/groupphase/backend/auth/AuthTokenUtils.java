@@ -1,14 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.auth;
 
-
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.KeyService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.FileKeyService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +26,9 @@ public class AuthTokenUtils {
 
     private static final String TOKEN_PREFIX = "Token ";
     private static final int TOKEN_VALID_DURATION_IN_MINUTES = 120;
-    private static final byte[] TOKEN_SECRET = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
 
-    private static KeyService keyService = new FileKeyService();
+    private static final KeyService keyService = new FileKeyService();
+
     /**
      * Creates a new JWT authentication token, assigned to a specific user identified by ID and nickname.
      * The JWT token is signed with RSA keys, meaning it is signed with the server's private key and can
@@ -44,6 +42,9 @@ public class AuthTokenUtils {
      * @param user the ApplicationUser object of the correlating user. Uses ID and nickname for token creation.
      * @return the JWT authentication token as a string.
      */
+    public static String createToken(ApplicationUser user) {
+        return createToken(user.getId(), user.getNickname());
+    }
 
     /**
      * Creates a new JWT authentication token, assigned to a specific user identified by ID and nickname.
@@ -92,18 +93,20 @@ public class AuthTokenUtils {
      * @return {@code true}, if token valid. {@code false}, if token data, format or signature invalid
      */
     public static boolean isValid(String authToken) {
-        Claims claims = parseToken(authToken).getPayload();
         LOGGER.trace("isValid({})", authToken);
 
+        try {
+            Claims claims = parseToken(authToken).getPayload();
 
-        // validate parsed token
-        if (claims.getAudience().contains("BiteBuddy-App")) {
-            if (claims.getIssuer().equals("BiteBuddy-Server")) {
-                return true;
+            // validate parsed token
+            if (claims.getAudience().contains("BiteBuddy-App")) {
+                return claims.getIssuer().equals("BiteBuddy-Server");
             }
-        }
 
-        return false;
+            return false;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     /**
@@ -113,9 +116,13 @@ public class AuthTokenUtils {
      * @return the token's expiration date. NULL if token invalid or has no expiration date
      */
     public static Date getExpirationDate(String authToken) {
-        return parseToken(authToken).getPayload().getExpiration();
         LOGGER.trace("getExpirationDate({})", authToken);
 
+        try {
+            return parseToken(authToken).getPayload().getExpiration();
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     /**

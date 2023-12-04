@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Class to handle user sessions and manage authentication tokens
@@ -36,14 +35,12 @@ public final class SessionManager {
         return INSTANCE;
     }
 
-    private final SessionCleaner cleanerThread;
-
     private final ConcurrentHashMap<String, Long> activeAuthentications = new ConcurrentHashMap<>();
     private final List<Long> activeUsers = Collections.synchronizedList(new ArrayList<>());
     private final ConcurrentHashMap<Date, List<String>> tokenExpirationTimes = new ConcurrentHashMap<>();
 
     private SessionManager() {
-        cleanerThread = new SessionCleaner(this);
+        SessionCleaner cleanerThread = new SessionCleaner(this);
         cleanerThread.start();
     }
 
@@ -125,7 +122,7 @@ public final class SessionManager {
         LOGGER.trace("stopUserSession({})", authToken);
 
         Date expirationDate = AuthTokenUtils.getExpirationDate(authToken);
-        if (tokenExpirationTimes.containsKey(expirationDate)) {
+        if (expirationDate != null && tokenExpirationTimes.containsKey(expirationDate)) {
             List<String> currentTokens = tokenExpirationTimes.get(expirationDate);
             List<String> newTokens = new ArrayList<>();
             for (String curr : currentTokens) {
