@@ -1,7 +1,9 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.exception;
+package at.ac.tuwien.sepr.groupphase.backend.exception;
 
 /**
  * Exception to be thrown by user-related classes when failing to retrieve user data.
+ *
+ * @author Marc Putz
  */
 public class UserNotFoundException extends Exception {
     public UserNotFoundException() {

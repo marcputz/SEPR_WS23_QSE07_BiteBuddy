@@ -4,6 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
+/**
+ * DTO used for transmitting login data
+ */
 public class LoginDto {
 
     @NotNull(message = "Email must not be null")

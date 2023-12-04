@@ -13,7 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * This class handles and saves all current user sessions.
+ * Class to handle user sessions and manage authentication tokens
+ *
+ * @author Marc Putz
  */
 public final class SessionManager {
 
@@ -21,6 +23,12 @@ public final class SessionManager {
 
     private static SessionManager INSTANCE = null;
 
+    /**
+     * Gets the simpleton SessionManager instance.
+     *
+     * @author Marc Putz
+     * @return the instance of SessionManager.
+     */
     public static SessionManager getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new SessionManager();
@@ -39,6 +47,15 @@ public final class SessionManager {
         cleanerThread.start();
     }
 
+    /**
+     * Registers a new user session.
+     * Maps an authentication token to it's corresponding user.
+     *
+     * @author Marc Putz
+     * @param userId the ID of the user to create a new session for.
+     * @param authToken an authentication token to map to the specified user.
+     * @return {@code true} if session was created successfully, {@code false} if something went wrong
+     */
     public boolean startUserSession(long userId, String authToken) {
         // check if user already has session
         if (activeUsers.contains(userId)) {
@@ -64,10 +81,24 @@ public final class SessionManager {
         return true;
     }
 
+    /**
+     * Retrives the corresponding user of an authentication token.
+     *
+     * @author Marc Putz
+     * @param authToken the authentication token of the user
+     * @return the ID of the corresponding user
+     */
     public Long getUserFromAuthToken(String authToken) {
         return activeAuthentications.getOrDefault(authToken, null);
     }
 
+    /**
+     * Retrieves the corresponding authentication token of a user
+     *
+     * @author Marc Putz
+     * @param userId the ID of the user
+     * @return the corresponding authentication token of the user
+     */
     public String getAuthTokenForUser(long userId) {
         for (Map.Entry<String, Long> entry : activeAuthentications.entrySet()) {
             if (entry.getValue() == userId) {
@@ -77,6 +108,13 @@ public final class SessionManager {
         return null;
     }
 
+    /**
+     * Stops a user session. Removes mapped user ID of the specified authentication token
+     *
+     * @author Marc Putz
+     * @param authToken the authentication token of the session to stop.
+     * @return {@code true} if session was stopped successfully, {@code false} if something went wrong
+     */
     public boolean stopUserSession(String authToken) {
         Date expirationDate = AuthTokenUtils.getExpirationDate(authToken);
         if (tokenExpirationTimes.containsKey(expirationDate)) {
@@ -101,6 +139,12 @@ public final class SessionManager {
         return true;
     }
 
+    /**
+     * Cleaner thread for SessionManager.
+     * Periodically removes all expired sessions (in interval of {@value SessionCleaner#CLEANUP_INTERVAL_IN_MINUTES} minutes).
+     *
+     * @author Marc Putz
+     */
     private static class SessionCleaner extends Thread {
 
         private static final long CLEANUP_INTERVAL_IN_MINUTES = 10;

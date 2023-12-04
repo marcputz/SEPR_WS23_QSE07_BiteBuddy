@@ -22,6 +22,11 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+/**
+ * Implementation of {@link KeyService} using files.
+ *
+ * @author Marc Putz
+ */
 public class FileKeyService implements KeyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

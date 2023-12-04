@@ -23,6 +23,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.invoke.MethodHandles;
 
+/**
+ * REST endpoint for user authentication
+ */
 @RestController
 @RequestMapping(value = "/api/v1/authentication")
 public class AuthenticationEndpoint {
@@ -35,6 +38,14 @@ public class AuthenticationEndpoint {
         this.userService = userService;
     }
 
+    /**
+     * Logs in a user, using data from {@code userLoginDto}.
+     *
+     * @author Marc Putz
+     * @param userLoginDto login data from the client.
+     * @return a ResponseEntity to send back to the client, containing the JWT authentication token.
+     * @throws AuthenticationException if the login data could not be matched to a user or user could not be authenticated.
+     */
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDto userLoginDto) throws AuthenticationException {
         LOGGER.trace("login({})", userLoginDto);
@@ -86,6 +97,13 @@ public class AuthenticationEndpoint {
         return login(loginDto);
     }
 
+    /**
+     * Logs out a user, using the JWT authentication token in the HTTP header
+     *
+     * @author Marc Putz
+     * @param headers header of the HTTP request
+     * @return a ResponseEntity to send back to the client, containing a boolean value indicating if the logout operation was successful.
+     */
     @PostMapping("/logout")
     public ResponseEntity<Boolean> logout(@RequestHeader HttpHeaders headers) {
 

@@ -39,6 +39,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
+    /**
+     * Handles {@link AuthenticationException}s occurring in REST endpoints
+     *
+     * @author Marc Putz
+     * @param ex the exception
+     * @param request the request where the exception occurred
+     * @return a ResponseEntity to send back to the client
+     */
     @ExceptionHandler(value = {AuthenticationException.class})
     protected ResponseEntity<Object> handleAuthenticationError(AuthenticationException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
