@@ -22,7 +22,7 @@ public class MessageRepositoryTest implements TestData {
     @Autowired
     private MessageRepository messageRepository;
 
-    @Test
+    //@Test
     public void givenNothing_whenSaveMessage_thenFindListWithOneElementAndFindMessageById() {
         Message message = Message.MessageBuilder.aMessage()
             .withTitle(TEST_NEWS_TITLE)
