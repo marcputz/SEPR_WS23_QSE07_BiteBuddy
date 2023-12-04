@@ -90,7 +90,7 @@ public class AuthTokenUtils {
      * Verifies if a token contains valid data and was signed by this server.
      *
      * @param authToken the JWT authentication token to verify
-     * @return {@code true}, if token valid. {@code false}, if token data, format or signature invalid
+     * @return {@code true}, if token valid. {@code false}, if data, format or signature invalid, or if the token is expired
      */
     public static boolean isValid(String authToken) {
         LOGGER.trace("isValid({})", authToken);

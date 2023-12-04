@@ -56,6 +56,10 @@ public final class SessionManager {
     public boolean startUserSession(long userId, String authToken) {
         LOGGER.trace("startUserSession({},{})", userId, authToken);
 
+        if (authToken == null || authToken.isEmpty()) {
+            throw new IllegalArgumentException("AuthToken is NULL or empty string");
+        }
+
         // check if user already has session
         if (activeUsers.contains(userId)) {
             String oldToken = getAuthTokenForUser(userId);
@@ -66,12 +70,14 @@ public final class SessionManager {
         }
 
         Date expirationDate = AuthTokenUtils.getExpirationDate(authToken);
-        if (tokenExpirationTimes.containsKey(expirationDate)) {
-            List<String> tokens = tokenExpirationTimes.get(expirationDate);
-            tokens.add(authToken);
-            tokenExpirationTimes.put(expirationDate, tokens);
-        } else {
-            tokenExpirationTimes.put(expirationDate, List.of(authToken));
+        if (expirationDate != null) {
+            if (tokenExpirationTimes.containsKey(expirationDate)) {
+                List<String> tokens = tokenExpirationTimes.get(expirationDate);
+                tokens.add(authToken);
+                tokenExpirationTimes.put(expirationDate, tokens);
+            } else {
+                tokenExpirationTimes.put(expirationDate, List.of(authToken));
+            }
         }
 
         activeUsers.add(userId);
