@@ -72,11 +72,13 @@ public final class SessionManager {
         Date expirationDate = AuthTokenUtils.getExpirationDate(authToken);
         if (expirationDate != null) {
             if (tokenExpirationTimes.containsKey(expirationDate)) {
-                List<String> tokens = tokenExpirationTimes.get(expirationDate);
-                tokens.add(authToken);
+                List<String> tokens = Collections.synchronizedList(new ArrayList<>());
+                for (String t : tokenExpirationTimes.get(expirationDate)) {
+                    tokens.add(authToken);
+                }
                 tokenExpirationTimes.put(expirationDate, tokens);
             } else {
-                tokenExpirationTimes.put(expirationDate, List.of(authToken));
+                tokenExpirationTimes.put(expirationDate, Collections.synchronizedList(List.of(authToken)));
             }
         }
 
