@@ -1,17 +1,19 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
-import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 
 
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
@@ -21,22 +23,17 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.lang.invoke.MethodHandles;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 
 @Profile("generateData")
 @Component
 public class JsonFileReader {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private static final String DEFAULT_KEY_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/FoodDataFiles";
-
     private static final String PRIVATE_KEY_FILENAME_RECIPES = "Recipes.json";
     private static final String PRIVATE_KEY_FILENAME_INGREDIENTS = "Ingredients.json";
     private static final String PRIVATE_KEY_FILENAME_ALLERGENES = "Allergenes.json";
@@ -65,64 +62,52 @@ public class JsonFileReader {
         try {
             File fileIngredients = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_INGREDIENTS);
             File fileAllergenes = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_ALLERGENES);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            LOGGER.info("putting FoodData into Database from File");
-
-
-            Ingredient[] ingredients = objectMapper.readValue(fileIngredients, Ingredient[].class);
-            if (ingredientRepository.count() == 0) {
-                LOGGER.info("putting ingredients");
-                ingredientRepository.saveAll(Arrays.asList(ingredients));
-            }
-            Allergene[] allergenes = objectMapper.readValue(fileAllergenes, Allergene[].class);
-            if (allergeneRepository.count() == 0) {
-                LOGGER.info("putting allergenes");
-                allergeneRepository.saveAll(Arrays.asList(allergenes));
-            }
             File fileRecepies = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_RECIPES);
-            Recipe[] recipes = objectMapper.readValue(fileRecepies, Recipe[].class);
-            if (recipeRepository.count() == 0) {
-                LOGGER.info("putting recipes");
-                recipeRepository.saveAll(Arrays.asList(recipes));
-            }
             File fileAllergeneIngredients = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_ALLERGENEINGREDIENTS);
             File fileRecipeIngredients = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_RECIPEINGREDIENTS);
 
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            Allergene[] allergenes = objectMapper.readValue(fileAllergenes, Allergene[].class);
+            Ingredient[] ingredients = objectMapper.readValue(fileIngredients, Ingredient[].class);
+            Recipe[] recipes = objectMapper.readValue(fileRecepies, Recipe[].class);
             AllergeneIngredientString[] allergeneIngredients = objectMapper.readValue(fileAllergeneIngredients, AllergeneIngredientString[].class);
+            RecipeIngredientString[] recipeIngredients = objectMapper.readValue(fileRecipeIngredients, RecipeIngredientString[].class);
+
+            if (ingredientRepository.count() == 0) {
+                ingredientRepository.saveAll(Arrays.asList(ingredients));
+            }
+            if (allergeneRepository.count() == 0) {
+                allergeneRepository.saveAll(Arrays.asList(allergenes));
+            }
+            if (recipeRepository.count() == 0) {
+                recipeRepository.saveAll(Arrays.asList(recipes));
+            }
             if (allergeneRepository.count() == 0) {
                 for (AllergeneIngredientString allergeneIngredient : allergeneIngredients) {
-                    LOGGER.info("putting allergeneIngredients");
-                    AllergeneIngredient a = new AllergeneIngredient().setId(allergeneIngredient.getId());
-                    //a.setAllergene(allergeneRepository.getById(allergeneIngredient.getAllergene()));
-                    //a.setIngredient(ingredientRepository.getById(allergeneIngredient.getIngredient()));
-                    //LOGGER.info("putting allergeneIngredients ingredient: " + a.getIngredient());
+                    AllergeneIngredient a = new AllergeneIngredient();
+                    a.setId(allergeneIngredient.getId());
+                    a.setAllergene(allergeneRepository.getById(allergeneIngredient.getAllergene()));
+                    a.setIngredient(ingredientRepository.getById(allergeneIngredient.getIngredient()));
                     allergeneIngredientRepository.save(a);
                 }
             }
-            RecipeIngredientString[] recipeIngredients = objectMapper.readValue(fileRecipeIngredients, RecipeIngredientString[].class);
             if (recipeIngredientRepository.count() == 0) {
                 for (RecipeIngredientString recipeIngredientString : recipeIngredients) {
-                    LOGGER.info("putting recipeIngredients");
-                    RecipeIngredient r = new RecipeIngredient().setId(recipeIngredientString.id);
-                    //r.setRecipe(recipeRepository.getById(recipeIngredientString.getRecipe()));
-                    //r.setIngredient(ingredientRepository.getById(recipeIngredientString.getIngredient()));
+                    RecipeIngredient r = new RecipeIngredient();
+                    r.setId(recipeIngredientString.id);
+                    r.setRecipe(recipeRepository.getById(recipeIngredientString.getRecipe()));
+                    r.setIngredient(ingredientRepository.getById(recipeIngredientString.getIngredient()));
                     r.setAmount(recipeIngredientString.amount);
                     recipeIngredientRepository.save(r);
-
                 }
             }
-            /*
-             */
         } catch (IOException e) {
             LOGGER.error("Error reading JSON file", e);
         }
-
     }
 
     public static class RecipeIngredientString {
-
         private Long id;
         private Long recipe;
         private Long ingredient;

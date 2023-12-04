@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import java.util.Objects;
+
 @Entity
 public class RecipeIngredient {
     @Id
@@ -27,35 +29,60 @@ public class RecipeIngredient {
         return id;
     }
 
-    public RecipeIngredient setId(Long id) {
+    public void setId(Long id) {
         this.id = id;
-        return this;
     }
 
     public Recipe getRecipe() {
         return recipe;
     }
 
-    public RecipeIngredient setRecipe(Recipe recipe) {
+    public void setRecipe(Recipe recipe) {
         this.recipe = recipe;
-        return this;
     }
 
     public String getAmount() {
         return amount;
     }
 
-    public RecipeIngredient setAmount(String amount) {
+    public void setAmount(String amount) {
         this.amount = amount;
-        return this;
     }
 
     public Ingredient getIngredient() {
         return ingredient;
     }
 
-    public RecipeIngredient setIngredient(Ingredient ingredient) {
+    public void setIngredient(Ingredient ingredient) {
         this.ingredient = ingredient;
-        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RecipeIngredient recipeIngredient)) {
+            return false;
+        }
+        return Objects.equals(id, recipeIngredient.id)
+            && Objects.equals(recipe, recipeIngredient.recipe)
+            && Objects.equals(ingredient, recipeIngredient.ingredient)
+            && Objects.equals(amount, recipeIngredient.amount);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, recipe, ingredient, amount);
+    }
+
+    @Override
+    public String toString() {
+        return "RecipeIngredient{"
+            + "id=" + id
+            + "recipe=" + recipe
+            + "ingredient=" + ingredient
+            + "amount=" + amount
+            + '}';
     }
 }
