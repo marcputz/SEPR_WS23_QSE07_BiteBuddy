@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.auth;
 
 import com.google.common.hash.Hashing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -10,6 +13,9 @@ import java.nio.charset.StandardCharsets;
  * @author Marc Putz
  */
 public class PasswordEncoder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private PasswordEncoder() {}
 
     /**
@@ -22,6 +28,8 @@ public class PasswordEncoder {
      * @return the encoded password
      */
     public static String encode(String password, String email) {
+        LOGGER.trace("encode({},{})", password, email);
+
         // add email as salt to the password
         String saltedPassword = password + email;
         // hash the password

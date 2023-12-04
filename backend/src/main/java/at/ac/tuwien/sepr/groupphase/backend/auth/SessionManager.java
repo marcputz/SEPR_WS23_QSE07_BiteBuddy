@@ -57,6 +57,8 @@ public final class SessionManager {
      * @return {@code true} if session was created successfully, {@code false} if something went wrong
      */
     public boolean startUserSession(long userId, String authToken) {
+        LOGGER.trace("startUserSession({},{})", userId, authToken);
+
         // check if user already has session
         if (activeUsers.contains(userId)) {
             String oldToken = getAuthTokenForUser(userId);
@@ -89,6 +91,8 @@ public final class SessionManager {
      * @return the ID of the corresponding user
      */
     public Long getUserFromAuthToken(String authToken) {
+        LOGGER.trace("getUserFromAuthToken({})", authToken);
+
         return activeAuthentications.getOrDefault(authToken, null);
     }
 
@@ -100,6 +104,8 @@ public final class SessionManager {
      * @return the corresponding authentication token of the user
      */
     public String getAuthTokenForUser(long userId) {
+        LOGGER.trace("getAuthTokenForUser({})", userId);
+
         for (Map.Entry<String, Long> entry : activeAuthentications.entrySet()) {
             if (entry.getValue() == userId) {
                 return entry.getKey();
@@ -116,6 +122,8 @@ public final class SessionManager {
      * @return {@code true} if session was stopped successfully, {@code false} if something went wrong
      */
     public boolean stopUserSession(String authToken) {
+        LOGGER.trace("stopUserSession({})", authToken);
+
         Date expirationDate = AuthTokenUtils.getExpirationDate(authToken);
         if (tokenExpirationTimes.containsKey(expirationDate)) {
             List<String> currentTokens = tokenExpirationTimes.get(expirationDate);
@@ -147,6 +155,8 @@ public final class SessionManager {
      */
     private static class SessionCleaner extends Thread {
 
+        private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
         private static final long CLEANUP_INTERVAL_IN_MINUTES = 10;
 
         private final SessionManager manager;
@@ -159,6 +169,8 @@ public final class SessionManager {
 
         @Override
         public void run() {
+            LOGGER.trace("run()");
+
             while (!this.isInterrupted()) {
                 try {
                     LocalDateTime nextCheckTime = lastChecked.plusMinutes(CLEANUP_INTERVAL_IN_MINUTES);

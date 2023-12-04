@@ -9,7 +9,10 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
@@ -20,6 +23,8 @@ import java.util.Date;
  * @author Marc Putz
  */
 public class AuthTokenUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String TOKEN_PREFIX = "Token ";
     private static final int TOKEN_VALID_DURATION_IN_MINUTES = 120;
@@ -55,6 +60,7 @@ public class AuthTokenUtils {
      * @return the JWT authentication token as a string.
      */
     public static String createToken(long userId, String nickname) {
+        LOGGER.trace("createToken({},{})", userId, nickname);
 
         RSAPrivateKey privateKey = keyService.getPrivateKey();
 
@@ -62,6 +68,7 @@ public class AuthTokenUtils {
         Date expiration = new Date();
         expiration.setTime(now.getTime() + (TOKEN_VALID_DURATION_IN_MINUTES * 60 * 1000));
 
+        LOGGER.debug("Creating JWT token for '" + nickname + "' (ID: " + userId + ")");
         String jwt = Jwts.builder()
             .signWith(privateKey)
             .header()
@@ -86,6 +93,8 @@ public class AuthTokenUtils {
      */
     public static boolean isValid(String authToken) {
         Claims claims = parseToken(authToken).getPayload();
+        LOGGER.trace("isValid({})", authToken);
+
 
         // validate parsed token
         if (claims.getAudience().contains("BiteBuddy-App")) {
@@ -105,6 +114,8 @@ public class AuthTokenUtils {
      */
     public static Date getExpirationDate(String authToken) {
         return parseToken(authToken).getPayload().getExpiration();
+        LOGGER.trace("getExpirationDate({})", authToken);
+
     }
 
     /**
@@ -117,6 +128,7 @@ public class AuthTokenUtils {
      * @throws IllegalArgumentException if authToken is NULL, empty or only whitespace
      */
     private static Jws<Claims> parseToken(String authToken) {
+        LOGGER.trace("parsetoken({})", authToken);
 
         // Remove prefix
         authToken = authToken.substring(TOKEN_PREFIX.length());
