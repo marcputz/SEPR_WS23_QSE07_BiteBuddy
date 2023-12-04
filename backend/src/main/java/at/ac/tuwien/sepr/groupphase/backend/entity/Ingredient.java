@@ -12,7 +12,7 @@ public class Ingredient {
     @Id
     @GeneratedValue
     private Long id;
-
+    private String name;
     @OneToMany(mappedBy = "ingredient")
     private Set<RecipeIngredient> recipeIngredients;
 
@@ -23,6 +23,15 @@ public class Ingredient {
     public Ingredient setId(Long id) {
         this.id = id;
         return this;
+    }
+
+    public Ingredient setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Set<RecipeIngredient> getRecipeIngredients() {

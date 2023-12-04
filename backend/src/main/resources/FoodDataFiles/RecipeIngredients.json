@@ -1,0 +1,84 @@
+[{
+  "id": "1",
+  "recipe": "1L",
+  "ingredient": "1L",
+  "amount": "100 g"
+},
+{
+"id": "2",
+"recipe": "1L",
+"ingredient": "2L",
+"amount": "400 g"
+},
+{
+"id": "3",
+"recipe": "1L",
+"ingredient": "3",
+"amount": "1 cup"
+},
+{
+"id": "4",
+"recipe": "1",
+"ingredient": "4",
+"amount": "2 kg"
+},
+{
+"id": "5",
+"recipe": "2",
+"ingredient": "5",
+"amount": "1/2 litre"
+},
+{
+"id": "6",
+"recipe": "2",
+"ingredient": "6",
+"amount": "450 g"
+},
+{
+"id": "7",
+"recipe": "2",
+"ingredient": "7",
+"amount": "50 g"
+},
+{
+"id": "8",
+"recipe": "2",
+"ingredient": "8",
+"amount": "1 tablespoon"
+},
+{
+"id": "9",
+"recipe": "2",
+"ingredient": "2",
+"amount": "3 teaspoons"
+},
+{
+"id": "10",
+"recipe": "2",
+"ingredient": "4",
+"amount": "1 pound"
+},
+{
+"id": "11",
+"recipe": "3",
+"ingredient": "9",
+"amount": "300 ml"
+},
+{
+"id": "12",
+"recipe": "3",
+"ingredient": "10",
+"amount": "1/4 kg"
+},
+{
+"id": "13",
+"recipe": "3",
+"ingredient": "11",
+"amount": "200 g"
+},
+{
+"id": "14",
+"recipe": "3",
+"ingredient": "12",
+"amount": "250 g"
+}]
