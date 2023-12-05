@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -29,21 +30,23 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public RecipeListDto searchRecipes(RecipeSearchDto searchParams) {
+    public List<RecipeListDto> searchRecipes(RecipeSearchDto searchParams) {
         LOGGER.debug("search recipes");
 
-        List<Recipe> recipes = this.recipeRepository.findAll();
+        // TODO validating searchParams
 
         // TODO filtering
 
-        ArrayList<RecipeDto> recipeDtos = new ArrayList<>();
+        List<Recipe> recipes = this.recipeRepository.findAll();
+
+        ArrayList<RecipeListDto> recipeDtos = new ArrayList<>();
         for (Recipe recipe : recipes) {
             // adding recipes when maxCount -1, or we don't reach maxCount yet
-            if ((searchParams.maxCount() > 0 && recipeDtos.size() < searchParams.maxCount()) || (searchParams.maxCount() == -1)) {
-                recipeDtos.add(new RecipeDto(recipe.getId(), null, null, recipe.getName(), recipe.getInstructions()));
+            if ((searchParams != null && searchParams.maxCount() > 0 && recipeDtos.size() < searchParams.maxCount()) || (searchParams.maxCount() == -1)) {
+                recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId()));
             }
         }
 
-        return new RecipeListDto(recipeDtos);
+        return recipeDtos;
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = RecipeEndpoint.BASE_PATH)
@@ -29,9 +30,10 @@ public class RecipeEndpoint {
         this.recipeService = recipeService;
     }
 
-    @GetMapping
-    public RecipeListDto searchRecipes(@RequestBody RecipeSearchDto searchParams) {
+    @GetMapping()
+    public List<RecipeListDto> searchRecipes(@RequestBody RecipeSearchDto searchParams) {
         LOGGER.info("GET " + BASE_PATH);
+        LOGGER.debug("request body: {}", searchParams);
         return this.recipeService.searchRecipes(searchParams);
     }
 
