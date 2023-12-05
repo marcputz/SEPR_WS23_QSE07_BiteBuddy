@@ -1,18 +1,18 @@
 [{
   "id": "1",
-  "recipe": "1L",
-  "ingredient": "1L",
+  "recipe": "1",
+  "ingredient": "1",
   "amount": "100 g"
 },
 {
 "id": "2",
-"recipe": "1L",
-"ingredient": "2L",
+"recipe": "1",
+"ingredient": "2",
 "amount": "400 g"
 },
 {
 "id": "3",
-"recipe": "1L",
+"recipe": "1",
 "ingredient": "3",
 "amount": "1 cup"
 },
