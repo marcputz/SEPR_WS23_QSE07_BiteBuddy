@@ -1,7 +1,6 @@
 export interface RecipeSearch {
   creator?: string;
   name?: string;
-  maxCount?: number;
 }
 
 export interface RecipeIngredientDto {

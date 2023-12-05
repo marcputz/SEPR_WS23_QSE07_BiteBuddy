@@ -27,18 +27,16 @@
     <thead>
     <tr>
       <th>Name</th>
-      <th>Creator</th>
       <th class="min-width">Actions</th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let recipe of recipes" class="center-td">
       <td>{{recipe.name}}</td>
-      <td>{{recipe.creator}}</td>
       <td>
         <div class="btn-group">
           <a class="btn btn-sm responsive-info-button"
-             [routerLink]="['recipes/details/', recipe.id]"
+             [routerLink]="['recipes', recipe.id]"
              aria-label="Show recipe details">
             <i class="bi bi-info-lg"></i>
           </a>

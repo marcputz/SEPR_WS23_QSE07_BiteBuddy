@@ -14,7 +14,6 @@ export class RecipeListComponent {
   searchParams: RecipeSearch = {
     creator: "",
     name: "",
-    maxCount: 5
   };
 
   constructor(

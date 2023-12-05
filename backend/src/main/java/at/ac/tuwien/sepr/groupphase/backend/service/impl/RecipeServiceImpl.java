@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.hibernate.query.spi.Limit;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -33,18 +34,21 @@ public class RecipeServiceImpl implements RecipeService {
     public List<RecipeListDto> searchRecipes(RecipeSearchDto searchParams) {
         LOGGER.debug("search recipes");
 
-        // TODO validating searchParams
+        String name = "";
+        String creator = "";
 
-        // TODO filtering
+        // checking searchParams
+        if (searchParams != null) {
+            name = !searchParams.name().trim().isEmpty() ? searchParams.name() : "";
+            creator = !searchParams.creator().trim().isEmpty() ? searchParams.creator() : "";
+        }
 
-        List<Recipe> recipes = this.recipeRepository.findAll();
+        List<Recipe> recipes = this.recipeRepository.findByNameContainingIgnoreCase(name);
 
         ArrayList<RecipeListDto> recipeDtos = new ArrayList<>();
         for (Recipe recipe : recipes) {
             // adding recipes when maxCount -1, or we don't reach maxCount yet
-            if ((searchParams != null && searchParams.maxCount() > 0 && recipeDtos.size() < searchParams.maxCount()) || (searchParams.maxCount() == -1)) {
-                recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId()));
-            }
+            recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId()));
         }
 
         return recipeDtos;

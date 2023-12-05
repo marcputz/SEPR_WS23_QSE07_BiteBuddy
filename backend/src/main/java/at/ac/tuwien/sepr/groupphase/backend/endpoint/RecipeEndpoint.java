@@ -30,7 +30,7 @@ public class RecipeEndpoint {
         this.recipeService = recipeService;
     }
 
-    @GetMapping()
+    @PostMapping()
     public List<RecipeListDto> searchRecipes(@RequestBody RecipeSearchDto searchParams) {
         LOGGER.info("GET " + BASE_PATH);
         LOGGER.debug("request body: {}", searchParams);
