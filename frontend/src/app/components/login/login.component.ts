@@ -58,23 +58,20 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/message']);
       },
       error: error => {
-        console.warn('Could not log in', error)
+        console.warn('Could not log in', error);
+
         this.authenticationError = true;
         if (typeof error.error === 'object') {
           this.authenticationErrorMessage = error.error.error;
         } else {
-          this.authenticationErrorMessage = error.error;
+          let status = error.status;
+          switch (status) {
+            case 401: this.authenticationErrorMessage = error.error; break;
+            default: this.authenticationErrorMessage = "Error while logging in, try again later."; break;
+          }
         }
       }
     });
-  }
-
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
-  vanishAuthenticationError() {
-    this.authenticationError = false;
-    this.authenticationErrorMessage = null;
   }
 
   ngOnInit() {
