@@ -10,10 +10,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
- * This class handles and saves all current user sessions.
+ * Class to handle user sessions and manage authentication tokens
+ *
+ * @author Marc Putz
  */
 public final class SessionManager {
 
@@ -21,6 +22,12 @@ public final class SessionManager {
 
     private static SessionManager INSTANCE = null;
 
+    /**
+     * Gets the simpleton SessionManager instance.
+     *
+     * @author Marc Putz
+     * @return the instance of SessionManager.
+     */
     public static SessionManager getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new SessionManager();
@@ -28,18 +35,31 @@ public final class SessionManager {
         return INSTANCE;
     }
 
-    private final SessionCleaner cleanerThread;
-
     private final ConcurrentHashMap<String, Long> activeAuthentications = new ConcurrentHashMap<>();
     private final List<Long> activeUsers = Collections.synchronizedList(new ArrayList<>());
     private final ConcurrentHashMap<Date, List<String>> tokenExpirationTimes = new ConcurrentHashMap<>();
 
     private SessionManager() {
-        cleanerThread = new SessionCleaner(this);
+        SessionCleaner cleanerThread = new SessionCleaner(this);
         cleanerThread.start();
     }
 
+    /**
+     * Registers a new user session.
+     * Maps an authentication token to it's corresponding user.
+     *
+     * @author Marc Putz
+     * @param userId the ID of the user to create a new session for.
+     * @param authToken an authentication token to map to the specified user.
+     * @return {@code true} if session was created successfully, {@code false} if something went wrong
+     */
     public boolean startUserSession(long userId, String authToken) {
+        LOGGER.trace("startUserSession({},{})", userId, authToken);
+
+        if (authToken == null || authToken.isEmpty()) {
+            throw new IllegalArgumentException("AuthToken is NULL or empty string");
+        }
+
         // check if user already has session
         if (activeUsers.contains(userId)) {
             String oldToken = getAuthTokenForUser(userId);
@@ -50,12 +70,16 @@ public final class SessionManager {
         }
 
         Date expirationDate = AuthTokenUtils.getExpirationDate(authToken);
-        if (tokenExpirationTimes.containsKey(expirationDate)) {
-            List<String> tokens = tokenExpirationTimes.get(expirationDate);
-            tokens.add(authToken);
-            tokenExpirationTimes.put(expirationDate, tokens);
-        } else {
-            tokenExpirationTimes.put(expirationDate, List.of(authToken));
+        if (expirationDate != null) {
+            if (tokenExpirationTimes.containsKey(expirationDate)) {
+                List<String> tokens = Collections.synchronizedList(new ArrayList<>());
+                for (String t : tokenExpirationTimes.get(expirationDate)) {
+                    tokens.add(authToken);
+                }
+                tokenExpirationTimes.put(expirationDate, tokens);
+            } else {
+                tokenExpirationTimes.put(expirationDate, Collections.synchronizedList(List.of(authToken)));
+            }
         }
 
         activeUsers.add(userId);
@@ -64,11 +88,29 @@ public final class SessionManager {
         return true;
     }
 
+    /**
+     * Retrives the corresponding user of an authentication token.
+     *
+     * @author Marc Putz
+     * @param authToken the authentication token of the user
+     * @return the ID of the corresponding user
+     */
     public Long getUserFromAuthToken(String authToken) {
+        LOGGER.trace("getUserFromAuthToken({})", authToken);
+
         return activeAuthentications.getOrDefault(authToken, null);
     }
 
+    /**
+     * Retrieves the corresponding authentication token of a user
+     *
+     * @author Marc Putz
+     * @param userId the ID of the user
+     * @return the corresponding authentication token of the user
+     */
     public String getAuthTokenForUser(long userId) {
+        LOGGER.trace("getAuthTokenForUser({})", userId);
+
         for (Map.Entry<String, Long> entry : activeAuthentications.entrySet()) {
             if (entry.getValue() == userId) {
                 return entry.getKey();
@@ -77,9 +119,18 @@ public final class SessionManager {
         return null;
     }
 
+    /**
+     * Stops a user session. Removes mapped user ID of the specified authentication token
+     *
+     * @author Marc Putz
+     * @param authToken the authentication token of the session to stop.
+     * @return {@code true} if session was stopped successfully, {@code false} if something went wrong
+     */
     public boolean stopUserSession(String authToken) {
+        LOGGER.trace("stopUserSession({})", authToken);
+
         Date expirationDate = AuthTokenUtils.getExpirationDate(authToken);
-        if (tokenExpirationTimes.containsKey(expirationDate)) {
+        if (expirationDate != null && tokenExpirationTimes.containsKey(expirationDate)) {
             List<String> currentTokens = tokenExpirationTimes.get(expirationDate);
             List<String> newTokens = new ArrayList<>();
             for (String curr : currentTokens) {
@@ -101,7 +152,15 @@ public final class SessionManager {
         return true;
     }
 
+    /**
+     * Cleaner thread for SessionManager.
+     * Periodically removes all expired sessions (in interval of {@value SessionCleaner#CLEANUP_INTERVAL_IN_MINUTES} minutes).
+     *
+     * @author Marc Putz
+     */
     private static class SessionCleaner extends Thread {
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
         private static final long CLEANUP_INTERVAL_IN_MINUTES = 10;
 
@@ -115,6 +174,8 @@ public final class SessionManager {
 
         @Override
         public void run() {
+            LOGGER.trace("run()");
+
             while (!this.isInterrupted()) {
                 try {
                     LocalDateTime nextCheckTime = lastChecked.plusMinutes(CLEANUP_INTERVAL_IN_MINUTES);

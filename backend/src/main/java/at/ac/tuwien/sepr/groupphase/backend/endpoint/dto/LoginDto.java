@@ -4,6 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
+/**
+ * DTO used for transmitting login data
+ */
 public class LoginDto {
 
     @NotNull(message = "Email must not be null")
@@ -55,23 +58,23 @@ public class LoginDto {
     }
 
 
-    public static final class UserLoginDtoBuilder {
+    public static final class LoginDtobuilder {
         private String email;
         private String password;
 
-        private UserLoginDtoBuilder() {
+        private LoginDtobuilder() {
         }
 
-        public static UserLoginDtoBuilder anUserLoginDto() {
-            return new UserLoginDtoBuilder();
+        public static LoginDtobuilder anLoginDto() {
+            return new LoginDtobuilder();
         }
 
-        public UserLoginDtoBuilder withEmail(String email) {
+        public LoginDtobuilder withEmail(String email) {
             this.email = email;
             return this;
         }
 
-        public UserLoginDtoBuilder withPassword(String password) {
+        public LoginDtobuilder withPassword(String password) {
             this.password = password;
             return this;
         }

@@ -94,6 +94,13 @@ public class ApplicationUser {
         return this;
     }
 
+    /**
+     * checks if a specified password matches the user's password.
+     *
+     * @author Marc Putz
+     * @param passwordEncoded the password to check against.
+     * @return {@code true} if specified password matches user password.
+     */
     public boolean checkPasswordMatch(String passwordEncoded) {
         if (passwordEncoded == null) {
             return false;

@@ -15,14 +15,6 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<ApplicationUser, Long> {
 
     /**
-     * Retrieves all users which have an ID less than the specified value.
-     *
-     * @param id the ID number to compare to
-     * @return a list of users which have IDs less than {@code id}
-     */
-    List<ApplicationUser> findByIdLessThan(long id);
-
-    /**
      * Retrieves an ApplicationUser by their email.
      * This method returns an ApplicationUser whose email matches the provided value.
      * If no user is found with the given email, this method returns null.

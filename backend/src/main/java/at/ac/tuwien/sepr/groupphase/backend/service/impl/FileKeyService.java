@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.KeyService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,6 +23,12 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+/**
+ * Implementation of {@link KeyService} using files.
+ *
+ * @author Marc Putz
+ */
+@Service
 public class FileKeyService implements KeyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -40,7 +47,7 @@ public class FileKeyService implements KeyService {
     public FileKeyService(File keyFolder) {
         LOGGER.debug("Using key folder at '" + keyFolder.getAbsolutePath() + "'");
 
-        if (keyFolder == null || !keyFolder.exists()) {
+        if (!keyFolder.exists()) {
             throw new IllegalArgumentException("Key folder does not exist or is NULL value");
         }
 
@@ -61,7 +68,7 @@ public class FileKeyService implements KeyService {
 
         File file = new File(this.keyFolder.getAbsolutePath() + "/" + PRIVATE_KEY_FILENAME);
 
-        if (file == null || !file.exists()) {
+        if (!file.exists()) {
             LOGGER.error("private key file does not exist");
             return null;
         }
@@ -112,7 +119,7 @@ public class FileKeyService implements KeyService {
 
         File file = new File(this.keyFolder.getAbsolutePath() + "/" + PUBLIC_KEY_FILENAME);
 
-        if (file == null || !file.exists()) {
+        if (!file.exists()) {
             LOGGER.error("Public key file does not exist");
             return null;
         }
