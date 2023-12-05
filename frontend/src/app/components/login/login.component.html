@@ -6,48 +6,41 @@
 </div>
 
 <div class="pt-5">
-  <div class="row">
-    <div class="col-md-6 mx-auto">
-      <span class="anchor" id="formLogin"></span>
+<div class="row">
+  <div class="col-lg-6 col-md-8 col-sm-10 mx-auto">
 
-      <div class="card rounded-0">
-        <div class="card-header">
-          <h3 class="mb-0">BiteBuddy Login</h3>
-        </div>
+    <div class="bitebuddy-card">
+      <div class="bitebuddy-login-box">
+        <header>BiteBuddy - Login</header>
 
-        <div class="card-body">
-          <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
+        <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
 
-            <div class="form-group">
-              <label for="inputEmail">Email</label>
-              <input type="text" name="email" formControlName="email" class="form-control" id="inputEmail"
-                     aria-describedby="emailHelp" placeholder="Enter Email">
-              <div *ngIf="submitted && loginForm.controls.email.errors" class="error">
-                <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.required">Email is required
-                </small>
-                <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.email">Not a valid email
-                </small>
-              </div>
+          <div class="form-group">
+            <input type="text" name="email" formControlName="email" class="bitebuddy-input-textfield" id="inputEmail"
+                   aria-describedby="emailHelp" placeholder="Enter Email">
+            <div *ngIf="submitted && loginForm.controls.email.errors" class="error">
+              <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.required">Email is required
+              </small>
+              <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.email">Not a valid email
+              </small>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label for="password">Password</label>
-              <input type="password" name="password" formControlName="password" class="form-control" id="password"
-                     placeholder="Password">
-              <div *ngIf="submitted && loginForm.controls.password.errors" class="error">
-                <small class="form-text text-danger" *ngIf="loginForm.controls.password.errors.required">Password is required
-                </small>
-              </div>
+          <div class="form-group">
+            <input type="password" name="password" formControlName="password" class="bitebuddy-input-textfield" id="password"
+                   placeholder="Password">
+            <div *ngIf="submitted && loginForm.controls.password.errors" class="error">
+              <small class="form-text text-danger" *ngIf="loginForm.controls.password.errors.required">Password is required
+              </small>
             </div>
+          </div>
 
-            <br>
-            <button type="button" name="loginButton" (click)="onSubmitLogin()" class="btn btn-success float-end">Login</button>
+          <button type="button" name="loginButton" (click)="onSubmitLogin()" class="bitebuddy-button-big">Login</button>
 
-          </form>
-        </div>
-
+        </form>
       </div>
-
     </div>
+
   </div>
+</div>
 </div>
