@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.auth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,8 +26,8 @@ public final class SessionManager {
     /**
      * Gets the simpleton SessionManager instance.
      *
-     * @author Marc Putz
      * @return the instance of SessionManager.
+     * @author Marc Putz
      */
     public static SessionManager getInstance() {
         if (INSTANCE == null) {
@@ -48,10 +49,10 @@ public final class SessionManager {
      * Registers a new user session.
      * Maps an authentication token to it's corresponding user.
      *
-     * @author Marc Putz
-     * @param userId the ID of the user to create a new session for.
+     * @param userId    the ID of the user to create a new session for.
      * @param authToken an authentication token to map to the specified user.
      * @return {@code true} if session was created successfully, {@code false} if something went wrong
+     * @author Marc Putz
      */
     public boolean startUserSession(long userId, String authToken) {
         LOGGER.trace("startUserSession({},{})", userId, authToken);
@@ -63,7 +64,7 @@ public final class SessionManager {
         // check if user already has session
         if (activeUsers.contains(userId)) {
             String oldToken = getAuthTokenForUser(userId);
-            if (!this.stopUserSession(oldToken)) {
+            if (oldToken != null || !this.stopUserSession(oldToken)) {
                 // could not stop old user session
                 return false;
             }
@@ -91,9 +92,9 @@ public final class SessionManager {
     /**
      * Retrives the corresponding user of an authentication token.
      *
-     * @author Marc Putz
      * @param authToken the authentication token of the user
      * @return the ID of the corresponding user, NULL if no session registered
+     * @author Marc Putz
      */
     public Long getUserFromAuthToken(String authToken) {
         LOGGER.trace("getUserFromAuthToken({})", authToken);
@@ -104,9 +105,9 @@ public final class SessionManager {
     /**
      * Retrieves the corresponding authentication token of a user
      *
-     * @author Marc Putz
      * @param userId the ID of the user
      * @return the corresponding authentication token of the user, NULL if no session registered
+     * @author Marc Putz
      */
     public String getAuthTokenForUser(long userId) {
         LOGGER.trace("getAuthTokenForUser({})", userId);
@@ -122,9 +123,9 @@ public final class SessionManager {
     /**
      * Stops a user session. Removes mapped user ID of the specified authentication token
      *
-     * @author Marc Putz
      * @param authToken the authentication token of the session to stop.
      * @return {@code true} if session was stopped successfully, {@code false} if something went wrong
+     * @author Marc Putz
      */
     public boolean stopUserSession(String authToken) {
         LOGGER.trace("stopUserSession({})", authToken);
