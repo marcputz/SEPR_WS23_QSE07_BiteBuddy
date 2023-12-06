@@ -20,3 +20,9 @@ export interface RecipeListDto {
   name: string;
   id: number;
 }
+
+export interface RecipeDetailsDto {
+  name: string;
+  description: string;
+  id: number;
+}

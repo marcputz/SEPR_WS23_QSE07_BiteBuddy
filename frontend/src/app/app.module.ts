@@ -13,6 +13,7 @@ import {MessageComponent} from './components/message/message.component';
 import {RecipeListComponent} from './components/recipe-list/recipe-list.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
+import { RecipeDetailComponent } from './components/recipe-detail/recipe-detail.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import {httpInterceptorProviders} from './interceptors';
     LoginComponent,
     MessageComponent,
     RecipeListComponent,
+    RecipeDetailComponent,
   ],
   imports: [
     BrowserModule,
