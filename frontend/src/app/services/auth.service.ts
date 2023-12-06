@@ -51,7 +51,7 @@ export class AuthService {
     }
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${authToken}`
+      'Authorization': `${authToken}`
     });
 
     return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`, { headers });

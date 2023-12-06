@@ -132,20 +132,22 @@ public class AuthenticationEndpoint {
     }
 
     @GetMapping("/settings")
-    public ResponseEntity<UserSettingsDto> getSettings(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<UserSettingsDto> getSettings(@RequestHeader HttpHeaders headers) throws AuthenticationException {
         LOGGER.trace("getSettings()");
+
+        authenticationService.verifyAuthenticated(headers);
+
         try {
+
             // retrieve token from authorization header
             String authToken = headers.getFirst("authorization");
-
-            if (authToken == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
+            // TODO: Nimm bitte nicht den Session Manager dafür
+            // TODO: Die UserID ist im Token selbst abgespeichert
+            // TODO: Der SessionManager braucht weit mehr Ressourcen als der JSON Parser in AuthTokenUtils
+            // TODO: Befehl ist - AuthTokenUtils.getUserId(authToken);
+            // TODO: Ich änder das jetzt nicht weil sonst mach ichs noch kaputt
+            // TODO:               -- Marc
             Long currentUserId = SessionManager.getInstance().getUserFromAuthToken(authToken);
-            if (currentUserId == null) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
 
             // Fetch user details and convert to DTO
             ApplicationUser currentUser = userService.getUserById(currentUserId);

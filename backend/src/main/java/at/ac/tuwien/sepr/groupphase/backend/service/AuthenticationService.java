@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 /**
@@ -135,8 +136,26 @@ public class AuthenticationService {
      * @throws AuthenticationException if token is not registered as an open session
      */
     public void verifyAuthenticated(String authToken) throws AuthenticationException {
-        if (SessionManager.getInstance().getUserFromAuthToken(authToken) != null) {
+        Long userId = SessionManager.getInstance().getUserFromAuthToken(authToken);
+        if (userId == null) {
             throw new AuthenticationException("Token not authenticated");
         }
+    }
+
+    /**
+     * Verifies if a http header contains valid authentication data
+     *
+     * @author Marc Putz
+     * @param headers the http headers of the request to authenticate
+     * @throws AuthenticationException if the headers do contain no or invalid authentication data
+     */
+    public void verifyAuthenticated(HttpHeaders headers) throws AuthenticationException {
+        String authToken = headers.getFirst("authorization");
+
+        if (authToken == null) {
+            throw new AuthenticationException("Session not authenticated. Please log in.");
+        }
+
+        verifyAuthenticated(authToken);
     }
 }

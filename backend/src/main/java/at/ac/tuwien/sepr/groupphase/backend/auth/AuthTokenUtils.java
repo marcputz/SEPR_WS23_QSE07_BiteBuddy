@@ -125,6 +125,18 @@ public class AuthTokenUtils {
         }
     }
 
+    public static Long getUserId(String authToken) {
+        LOGGER.trace("getUserId({})", authToken);
+
+        try {
+            String idString = parseToken(authToken).getPayload().getId();
+            return Long.parseLong(idString);
+        } catch (NumberFormatException ex) {
+            // id not a number
+            return null;
+        }
+    }
+
     /**
      * Parses a (signed) JWT string to the corresponding signed JWT (called JWS) class.
      * Does not accept non-signed JWTs or encrypted JWTs (called JWEs).
