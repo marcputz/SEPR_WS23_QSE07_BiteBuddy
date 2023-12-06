@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+@import url("https://fonts.googleapis.com/css?family=Jost:500,400,700|Roboto:400|Open+Sans:400");
+
 :root {
   --app-background-color: rgb(241, 241, 221);
 
@@ -12,6 +15,8 @@
 
   --link-color: rgba(50, 50, 50, 1);
   --link-color-hover: rgba(200,150,0,1);
+
+  -webkit-font-smoothing: antialiased;
 }
 
 * {

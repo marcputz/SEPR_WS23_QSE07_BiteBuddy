@@ -18,6 +18,10 @@ import { RegisterComponent } from './components/authentication/register/register
 import { RequestPasswordResetComponent } from './components/authentication/request-password-reset/request-password-reset.component';
 import { PasswordResetComponent } from './components/authentication/password-reset/password-reset.component';
 import { RecipeDetailComponent } from './components/recipe-detail/recipe-detail.component';
+import { LandingPageComponent } from './components/landing-page/landing-page.component';
+import { LandingLayoutComponent } from './layouts/landing-layout/landing-layout.component';
+import { LandingHeaderComponent } from './components/landing-header/landing-header.component';
+import { LandingFooterComponent } from './components/landing-footer/landing-footer.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +37,10 @@ import { RecipeDetailComponent } from './components/recipe-detail/recipe-detail.
     PasswordResetComponent,
     RecipeListComponent,
     RecipeDetailComponent,
+    LandingPageComponent,
+    LandingLayoutComponent,
+    LandingHeaderComponent,
+    LandingFooterComponent,
   ],
   imports: [
     BrowserModule,
