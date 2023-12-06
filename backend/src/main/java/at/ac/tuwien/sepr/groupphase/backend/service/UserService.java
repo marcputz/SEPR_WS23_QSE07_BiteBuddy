@@ -55,5 +55,5 @@ public interface UserService {
      */
     ApplicationUser update(UserUpdateDto userUpdateDto, Long currentUserId) throws UserNotFoundException, ValidationException, ConflictException;
 
-    ApplicationUser create(UserRegisterDto registerDto);
+    ApplicationUser create(UserRegisterDto registerDto) throws ValidationException;
 }
