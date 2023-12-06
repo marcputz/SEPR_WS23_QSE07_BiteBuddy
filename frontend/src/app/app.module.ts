@@ -10,12 +10,14 @@ import {FooterComponent} from './components/footer/footer.component';
 import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/authentication/login/login.component';
 import {MessageComponent} from './components/message/message.component';
+import {RecipeListComponent} from './components/recipe-list/recipe-list.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
 import { RegisterComponent } from './components/authentication/register/register.component';
 import { RequestPasswordResetComponent } from './components/authentication/request-password-reset/request-password-reset.component';
 import { PasswordResetComponent } from './components/authentication/password-reset/password-reset.component';
+import { RecipeDetailComponent } from './components/recipe-detail/recipe-detail.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,8 @@ import { PasswordResetComponent } from './components/authentication/password-res
     UserSettingsComponent,
     RequestPasswordResetComponent,
     PasswordResetComponent,
+    RecipeListComponent,
+    RecipeDetailComponent,
   ],
   imports: [
     BrowserModule,
