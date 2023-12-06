@@ -73,6 +73,9 @@ public class RecipeServiceImpl implements RecipeService {
             RecipeDetailsDto detailsDto = new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions());
             return detailsDto;
         }
+        /*TODO: make dtos for allergenes and ingredients, which contain the information needed to display them in details, when the database is working.
+           Ingredients require name and amount, allergenes only the name (and id additionally for both if acces would be required in the future).
+           Transform data into those dtos and add a list of both to the recipedetails dto*/
         /*if(recipe.isEmpty()){
             throw new NotFoundException("The searched for recipe does not exist in the database anymore.");
         }
@@ -83,9 +86,9 @@ public class RecipeServiceImpl implements RecipeService {
                 throw new NotFoundException("The searched for recipe does not have any ingredients");
             }
             else{
-                ArrayList<AllergeneIngredientsDTO> recipeDtos = new ArrayList<>();
+                ArrayList<AllergeneIngredient> allergenes = new ArrayList<>();
                 for(RecipeIngredient recipeIngredient : ingredients){
-                    this.allergeneIngredientRepository.findByIngredient(recipeIngredient.getIngredient());
+                    allergenes.add(this.allergeneIngredientRepository.findByIngredient(recipeIngredient.getIngredient()));
                 }
 
             }
