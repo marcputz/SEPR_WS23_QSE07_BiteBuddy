@@ -10,7 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -32,7 +36,9 @@ public class SessionManagerTest {
 
     @Test
     public void testStartSessionWithNoTokenThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> {SessionManager.getInstance().startUserSession(TESTUSER.getId(), null); });
+        assertThrows(IllegalArgumentException.class, () -> {
+            SessionManager.getInstance().startUserSession(TESTUSER.getId(), null);
+        });
     }
 
     @Test

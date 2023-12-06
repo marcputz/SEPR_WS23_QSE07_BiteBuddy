@@ -1,12 +1,14 @@
 import {Injectable} from '@angular/core';
 import {LoginDto} from '../dtos/loginDto';
 import {Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
 import {RegisterComponent} from "../components/register/register.component";
 import {RegisterDto} from "../dtos/registerDto";
+import {UserSettingsDto} from '../dtos/userSettingsDto';
+import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +39,28 @@ export class UserService {
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
       );
+  }
+
+  getUser(): Observable<UserSettingsDto> {
+    console.debug("Retrieving current user settings");
+
+    const authToken = this.getToken();
+    if (!authToken) {
+      throw new Error('Authorization token not found');
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+
+    return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`, { headers });
+  }
+
+  updateUser(updateUserSettingsDto: UpdateUserSettingsDto): Observable<UserSettingsDto> {
+    return this.httpClient.put<UserSettingsDto>(
+      this.authBaseUri + "/settings",
+      updateUserSettingsDto
+    );
   }
 
   logoutUser() {

@@ -58,11 +58,7 @@ public class ApplicationUser {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public ApplicationUser setId(long id) {
+    public ApplicationUser setId(Long id) {
         this.id = id;
         return this;
     }
@@ -89,17 +85,17 @@ public class ApplicationUser {
         return nickname;
     }
 
-    public ApplicationUser setNickname(String username) {
-        this.nickname = username;
+    public ApplicationUser setNickname(String nickname) {
+        this.nickname = nickname;
         return this;
     }
 
     /**
      * checks if a specified password matches the user's password.
      *
-     * @author Marc Putz
      * @param passwordEncoded the password to check against.
      * @return {@code true} if specified password matches user password.
+     * @author Marc Putz
      */
     public boolean checkPasswordMatch(String passwordEncoded) {
         if (passwordEncoded == null) {

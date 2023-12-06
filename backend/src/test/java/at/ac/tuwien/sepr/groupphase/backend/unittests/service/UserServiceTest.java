@@ -13,7 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -48,7 +51,8 @@ public class UserServiceTest {
         assertAll(
             () -> assertEquals("maxmuster", user.getNickname(), "nickname not matching"),
             () -> assertEquals("max.mustermann@test.at", user.getEmail(), "email not matching"),
-            () -> assertEquals("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7", user.getPasswordEncoded(), "password not matching"),
+            () -> assertEquals("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7", user.getPasswordEncoded(),
+                "password not matching"),
             () -> assertNotNull(user.getCreatedAt(), "entity does not have create date"),
             () -> assertNotNull(user.getUpdatedAt(), "entity does not have update date")
         );
@@ -56,7 +60,9 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserByEmailNotFound() {
-        assertThrows(UserNotFoundException.class, () -> { userService.getUserByEmail("test@shouldnotexist.at"); });
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.getUserByEmail("test@shouldnotexist.at");
+        });
     }
 
     @Test
@@ -66,7 +72,8 @@ public class UserServiceTest {
         assertAll(
             () -> assertEquals("maxmuster", user.getNickname(), "nickname not matching"),
             () -> assertEquals("max.mustermann@test.at", user.getEmail(), "email not matching"),
-            () -> assertEquals("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7", user.getPasswordEncoded(), "password not matching"),
+            () -> assertEquals("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7", user.getPasswordEncoded(),
+                "password not matching"),
             () -> assertNotNull(user.getCreatedAt(), "entity does not have create date"),
             () -> assertNotNull(user.getUpdatedAt(), "entity does not have update date")
         );
@@ -74,6 +81,8 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserByNicknameNotFound() {
-        assertThrows(UserNotFoundException.class, () -> { userService.getUserByNickname("shouldNotExist"); });
+        assertThrows(UserNotFoundException.class, () -> {
+            userService.getUserByNickname("shouldNotExist");
+        });
     }
 }
