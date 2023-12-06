@@ -63,7 +63,7 @@
   margin-left: auto; /* Pushes buttons-group-2 to the right */
 }
 
-.header .button {
+.header .button, .button-2 {
   display: flex;
   width: 165px;
   align-items: center;
@@ -149,12 +149,6 @@
 .header .text-wrapper-2 {
   font-family: "Jost-Medium", Helvetica;
   font-weight: 500;
-}
-
-.header .icon-jam-icons {
-  position: relative;
-  width: 24px;
-  height: 24px;
 }
 
 i, .text-inside-btn {
