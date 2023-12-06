@@ -58,9 +58,13 @@ export class AuthService {
   }
 
   updateUser(updateUserSettingsDto: UpdateUserSettingsDto): Observable<UserSettingsDto> {
+    const headers = new HttpHeaders({
+      'Authorization': `${this.getToken()}`
+    });
     return this.httpClient.put<UserSettingsDto>(
       this.authBaseUri + "/settings",
-      updateUserSettingsDto
+      updateUserSettingsDto,
+      { headers }
     );
   }
 

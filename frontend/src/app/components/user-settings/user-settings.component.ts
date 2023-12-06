@@ -82,11 +82,11 @@ export class UserSettingsComponent {
       this.authService.updateUser(updateUserSettingsDto).subscribe({
         next: (response) => {
           console.log('User settings updated successfully');
-          // Handle successful update here, e.g., navigate to a different page or show a success message
+          // Handle successful update, e.g., navigate to a different page or show a success message
         },
         error: error => {
           console.error('Error updating user settings', error);
-          // Handle errors here, e.g., show an error message
+          // Handle errors, e.g., show an error message
         }
       });
     } else if (this.settingsForm.controls.password.value !== this.settingsForm.controls.password2.value) {
