@@ -9,6 +9,9 @@
 
   --input-field-background-color: rgba(0,0,0, 0.04);
   --input-field-background-color-error: rgba(200, 0, 0, 0.14);
+
+  --link-color: rgba(50, 50, 50, 1);
+  --link-color-hover: rgba(200,150,0,1);
 }
 
 * {
@@ -31,7 +34,22 @@ body {
   background-size: cover;
 }
 
-.bitebuddy-card {
+.bb-link {
+  cursor: pointer;
+
+  color: var(--link-color) !important;
+
+  text-decoration-line: underline !important;
+  text-decoration-style: solid !important;
+
+  font-weight: 500;
+}
+
+.bb-link:hover {
+  color: var(--link-color-hover) !important;
+}
+
+.bb-card {
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -47,7 +65,7 @@ body {
   box-shadow: rgba(0,0,0, 0.15) 1px 1px 10px;
 }
 
-.bitebuddy-input-textfield {
+.bb-input-textfield {
   display: block;
   width: 100%;
   padding: 0.4rem 0.75rem;
@@ -62,15 +80,15 @@ body {
   background-color: var(--input-field-background-color);
 }
 
-.bitebuddy-input-textfield:focus {
+.bb-input-textfield:focus {
   background-color: ghostwhite;
 }
 
-.bitebuddy-input-textfield-error {
+.bb-input-textfield-error {
   background-color: var(--input-field-background-color-error);
 }
 
-.bitebuddy-button-big {
+.bb-button-big {
   display: inline-block;
   width: 100%;
 
@@ -90,11 +108,11 @@ body {
   user-select: none;
 }
 
-.bitebuddy-button-big:hover {
+.bb-button-big:hover {
   background-color: var(--button-background-color-hover)
 }
 
-.bitebuddy-message-box {
+.bb-message-box {
   margin: 1rem 0rem;
   padding: 1rem;
 
@@ -102,7 +120,7 @@ body {
   border-radius: 4px;
 }
 
-.bitebuddy-message-box-error {
+.bb-message-box-error {
   border: red solid 2px;
   background-color: rgba(250, 40, 20, 0.5);
 }

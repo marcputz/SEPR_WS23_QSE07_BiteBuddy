@@ -4,16 +4,21 @@ import at.ac.tuwien.sepr.groupphase.backend.auth.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.auth.SessionManager;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +43,15 @@ public class AuthenticationEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final UserService userService;
+
     private final UserMapper userMapper;
 
-    public AuthenticationEndpoint(UserService userService, UserMapper userMapper) {
+    private final PasswordResetService passwordResetService;
+
+    public AuthenticationEndpoint(UserService userService, PasswordResetService passwordResetService, UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
+        this.passwordResetService = passwordResetService;
     }
 
     /**
@@ -198,6 +207,36 @@ public class AuthenticationEndpoint {
         if (!SessionManager.getInstance().stopUserSession(authToken)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to stop user session");
         }
+
+        return new ResponseEntity<>(true, HttpStatus.OK);
+    }
+
+    @PostMapping("/request_password_reset")
+    public ResponseEntity<Boolean> requestPasswordReset(@RequestBody String requestBody) throws Exception {
+        LOGGER.trace("requestPasswordReset({})", requestBody);
+
+        // check if request contains email
+        Object requestEmail = JsonParserFactory.getJsonParser().parseMap(requestBody).get("email");
+        if (requestEmail instanceof String email) {
+
+            try {
+                passwordResetService.requestPasswordReset(email);
+
+                return new ResponseEntity<>(true, HttpStatus.OK);
+            } catch (UserNotFoundException ex) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User '" + email + "' does not exist");
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request does not contain email");
+        }
+
+    }
+
+    @PostMapping("/password_reset")
+    public ResponseEntity<Boolean> resetPassword(@RequestBody ResetPasswordDto dto) throws ValidationException {
+        LOGGER.trace("resetPassword({})", dto);
+
+        passwordResetService.resetPassword(dto);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }

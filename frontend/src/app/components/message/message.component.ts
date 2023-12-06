@@ -3,7 +3,7 @@ import {MessageService} from '../../services/message.service';
 import {Message} from '../../dtos/message';
 import {NgbModal, NgbPaginationConfig} from '@ng-bootstrap/ng-bootstrap';
 import {UntypedFormBuilder, NgForm} from '@angular/forms';
-import {UserService} from '../../services/user.service';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-message',
@@ -25,7 +25,7 @@ export class MessageComponent implements OnInit {
               private ngbPaginationConfig: NgbPaginationConfig,
               private formBuilder: UntypedFormBuilder,
               private cd: ChangeDetectorRef,
-              private authService: UserService,
+              private authService: AuthService,
               private modalService: NgbModal) {
   }
 

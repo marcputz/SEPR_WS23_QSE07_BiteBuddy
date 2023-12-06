@@ -1,9 +1,9 @@
 import {Component} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
-import {UserService} from "../../services/user.service";
+import {AuthService} from "../../../services/auth.service";
 import {Router} from "@angular/router";
-import {RegisterDto} from "../../dtos/registerDto";
-import {PasswordEncoder} from "../../utils/passwordEncoder";
+import {RegisterDto} from "../../../dtos/registerDto";
+import {PasswordEncoder} from "../../../utils/passwordEncoder";
 
 
 @Component({
@@ -20,7 +20,7 @@ export class RegisterComponent {
   error = false;
   errorMessage = '';
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router) {
     this.registerForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       email: ['', [Validators.required]],

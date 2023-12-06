@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {UserService} from '../../services/user.service';
-import {LoginDto} from '../../dtos/loginDto';
-import {PasswordEncoder} from "../../utils/passwordEncoder";
+import {AuthService} from '../../../services/auth.service';
+import {LoginDto} from '../../../dtos/loginDto';
+import {PasswordEncoder} from "../../../utils/passwordEncoder";
 
 
 @Component({
@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
   authenticationError: boolean = false;
   authenticationErrorMessage: string | null;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]]

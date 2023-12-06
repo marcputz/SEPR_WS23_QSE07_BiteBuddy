@@ -8,12 +8,14 @@ import {AppComponent} from './app.component';
 import {HeaderComponent} from './components/header/header.component';
 import {FooterComponent} from './components/footer/footer.component';
 import {HomeComponent} from './components/home/home.component';
-import {LoginComponent} from './components/login/login.component';
+import {LoginComponent} from './components/authentication/login/login.component';
 import {MessageComponent} from './components/message/message.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
-import { RegisterComponent } from './components/register/register.component';
 import { UserSettingsComponent } from './components/user-settings/user-settings.component';
+import { RegisterComponent } from './components/authentication/register/register.component';
+import { RequestPasswordResetComponent } from './components/authentication/request-password-reset/request-password-reset.component';
+import { PasswordResetComponent } from './components/authentication/password-reset/password-reset.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,8 @@ import { UserSettingsComponent } from './components/user-settings/user-settings.
     MessageComponent,
     RegisterComponent,
     UserSettingsComponent,
+    RequestPasswordResetComponent,
+    PasswordResetComponent,
   ],
   imports: [
     BrowserModule,

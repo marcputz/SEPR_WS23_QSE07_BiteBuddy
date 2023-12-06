@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
 import { Router } from '@angular/router';
-import {UserService} from '../services/user.service';
+import {AuthService} from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard  {
 
-  constructor(private userService: UserService,
+  constructor(private userService: AuthService,
               private router: Router) {}
 
   canActivate(): boolean {

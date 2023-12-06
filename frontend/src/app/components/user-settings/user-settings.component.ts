@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
-import {UserService} from '../../services/user.service';
 import {PasswordEncoder} from '../../utils/passwordEncoder';
 import {Router} from '@angular/router';
 import {UserSettingsDto} from '../../dtos/userSettingsDto';
 import {UpdateUserSettingsDto} from '../../dtos/updateUserSettingsDto';
+import {AuthService} from "../../services/auth.service";
 
 @Component({
   selector: 'app-user-settings',
@@ -22,7 +22,7 @@ export class UserSettingsComponent {
 
   originalUserSettings: UserSettingsDto;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router) {
     this.settingsForm = this.formBuilder.group({
       username: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],

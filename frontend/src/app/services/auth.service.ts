@@ -5,15 +5,16 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
-import {RegisterComponent} from "../components/register/register.component";
+import {RegisterComponent} from "../components/authentication/register/register.component";
 import {RegisterDto} from "../dtos/registerDto";
 import {UserSettingsDto} from '../dtos/userSettingsDto';
 import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';
+import {ResetPasswordDto} from "../dtos/resetPasswordDto";
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class AuthService {
 
   private authBaseUri: string = this.globals.backendUri + '/authentication';
 
@@ -80,6 +81,15 @@ export class UserService {
         }
       })
     localStorage.removeItem('authToken');
+  }
+
+  requestPasswordReset(userEmail: string): Observable<any> {
+    console.debug("Requesting password reset for '" + userEmail + "' from server");
+    return this.httpClient.post(this.authBaseUri + "/request_password_reset", "{\"email\":\"" + userEmail + "\"}", {responseType: 'text'})
+  }
+
+  resetPassword(dto: ResetPasswordDto): Observable<any> {
+    return this.httpClient.post(this.authBaseUri + "/password_reset", dto, {responseType: 'text'});
   }
 
   /**

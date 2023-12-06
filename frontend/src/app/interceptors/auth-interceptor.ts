@@ -1,22 +1,22 @@
 import {Injectable} from '@angular/core';
 import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
-import {UserService} from '../services/user.service';
+import {AuthService} from '../services/auth.service';
 import {Observable} from 'rxjs';
 import {Globals} from '../global/globals';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
-  constructor(private authService: UserService, private globals: Globals) {
+  constructor(private authService: AuthService, private globals: Globals) {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const authUri = this.globals.backendUri + '/authentication/login';
-    const authUri2 = this.globals.backendUri + '/authentication/register';
 
+    const authBaseUri = this.globals.backendUri + '/authentication';
+    const logoutUri = authBaseUri + '/logout';
 
     // Do not intercept authentication (login) requests
-    if (req.url === authUri || req.url === authUri2) {
+    if (req.url.startsWith(authBaseUri) && req.url != logoutUri) {
       return next.handle(req);
     }
 
