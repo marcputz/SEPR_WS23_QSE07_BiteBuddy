@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -19,7 +20,6 @@ import org.eclipse.angus.mail.util.MailConnectException;
 import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 import java.util.Properties;
@@ -151,7 +151,11 @@ public class JpaPasswordResetService implements PasswordResetService {
 
             // save new password to user
             userToChange.setPasswordEncoded(newPasswordEncoded);
-            userService.update(userToChange);
+            UserUpdateDto updateDto = new UserUpdateDto();
+            updateDto.setNickname(userToChange.getNickname());
+            updateDto.setEmail(userToChange.getEmail());
+            updateDto.setPassword(userToChange.getPasswordEncoded());
+            userService.update(updateDto, userToChange.getId());
 
         } catch (LazyInitializationException ex) {
             // could not fetch request entry from data store

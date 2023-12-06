@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
@@ -218,4 +219,57 @@ public class AuthenticationEndpointTest {
         //TODO Additional assertions to verify the updated user data
     }
 
+    @Test
+    public void testRegister_withValidData_isOk() throws Exception {
+        // Login to get the token
+        HttpHeaders registerHeaders = new HttpHeaders();
+        registerHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        registerHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        UserRegisterDto registerDto = new UserRegisterDto();
+        registerDto.setName("testName");
+        registerDto.setEmail("testEmail@email.com");
+        registerDto.setPasswordEncoded("testPassword");
+        MvcResult registerResult = this.mockMvc.perform(post("/api/v1/authentication/register")
+                .content(new ObjectMapper().writeValueAsString(registerDto))
+                .headers(registerHeaders))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String authToken = registerResult.getResponse().getContentAsString();
+        assertNotNull(authToken);
+    }
+
+    @Test
+    public void testRegisterTwiceWithSameName_isBadRequest() throws Exception {
+        // Login to get the token
+        HttpHeaders registerHeaders = new HttpHeaders();
+        registerHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        registerHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        UserRegisterDto registerDto = new UserRegisterDto();
+        registerDto.setName("testName");
+        registerDto.setEmail("testEmail@email.com");
+        registerDto.setPasswordEncoded("testPassword");
+        MvcResult registerResult = this.mockMvc.perform(post("/api/v1/authentication/register")
+                .content(new ObjectMapper().writeValueAsString(registerDto))
+                .headers(registerHeaders))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String authToken = registerResult.getResponse().getContentAsString();
+        assertNotNull(authToken);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization",  authToken);
+
+        UserRegisterDto registerDto2 = new UserRegisterDto();
+        registerDto2.setName("testName");
+        registerDto2.setEmail("testEmail@email2.com");
+        registerDto2.setPasswordEncoded("testPassword2");
+        MvcResult registerResult2 = this.mockMvc.perform(post("/api/v1/authentication/register")
+                .content(new ObjectMapper().writeValueAsString(registerDto2))
+                .headers(registerHeaders))
+            .andExpect(status().isUnauthorized())
+            .andReturn();
+    }
 }
