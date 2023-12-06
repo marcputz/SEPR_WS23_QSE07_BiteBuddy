@@ -1,25 +1,25 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.GeneratedValue;
 
 
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
-public class Ingredient {
+public class Allergene {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, length = 100)
+    @Column
     private String name;
-    /*
-    @OneToMany(mappedBy = "ingredient")
-    private Set<RecipeIngredient> recipeIngredients; */
+    @OneToMany(mappedBy = "allergene")
+    private Set<AllergeneIngredient> allergeneIngredients;
 
     public Long getId() {
         return id;
@@ -29,12 +29,20 @@ public class Ingredient {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
+    public Set<AllergeneIngredient> getIngredients() {
+        return allergeneIngredients;
+    }
+
+    public void setIngredients(Set<AllergeneIngredient> ingredients) {
+        this.allergeneIngredients = ingredients;
     }
 
     @Override
@@ -42,10 +50,11 @@ public class Ingredient {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Ingredient ingredient)) {
+        if (!(o instanceof Allergene allergene)) {
             return false;
         }
-        return Objects.equals(id, ingredient.id) && Objects.equals(name, ingredient.name);
+        return Objects.equals(id, allergene.id)
+            && Objects.equals(name, allergene.name);
     }
 
     @Override
@@ -55,20 +64,9 @@ public class Ingredient {
 
     @Override
     public String toString() {
-        return "Ingredient{"
+        return "Allergene{"
             + "id=" + id
             + "name=" + name
             + '}';
     }
-
-
-
-    /*public Set<RecipeIngredient> getRecipeIngredients() {
-        return recipeIngredients;
-    }
-
-    public Ingredient setRecipeIngredients(Set<RecipeIngredient> recipeIngredients) {
-        this.recipeIngredients = recipeIngredients;
-        return this;
-    } */
 }
