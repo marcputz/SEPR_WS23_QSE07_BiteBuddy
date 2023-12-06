@@ -24,7 +24,7 @@ public class AuthTokenUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String TOKEN_PREFIX = "Token ";
+    private static final String TOKEN_PREFIX = "Bearer ";
     private static final int TOKEN_VALID_DURATION_IN_MINUTES = 120;
 
     private static final KeyService keyService = new FileKeyService();

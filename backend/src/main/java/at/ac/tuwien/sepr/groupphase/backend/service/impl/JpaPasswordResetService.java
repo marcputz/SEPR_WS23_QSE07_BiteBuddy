@@ -17,6 +17,7 @@ import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import org.eclipse.angus.mail.util.MailConnectException;
+import org.h2.engine.User;
 import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -146,15 +147,12 @@ public class JpaPasswordResetService implements PasswordResetService {
             // fetch user from request
             ApplicationUser userToChange = resetRequest.getUser();
 
-            // apply hashing to new password
-            String newPasswordEncoded = PasswordEncoder.encode(dto.getNewPassword(), userToChange.getEmail());
-
             // save new password to user
-            userToChange.setPasswordEncoded(newPasswordEncoded);
-            UserUpdateDto updateDto = new UserUpdateDto();
-            updateDto.setNickname(userToChange.getNickname());
-            updateDto.setEmail(userToChange.getEmail());
-            updateDto.setPassword(userToChange.getPasswordEncoded());
+            UserUpdateDto updateDto = UserUpdateDto.UserUpdateDtoBuilder.anUserUpdateDto()
+                    .withPassword(dto.getNewPassword())
+                    .withEmail(userToChange.getEmail())
+                    .withName(userToChange.getNickname())
+                    .build();
             userService.update(updateDto, userToChange.getId());
 
         } catch (LazyInitializationException ex) {

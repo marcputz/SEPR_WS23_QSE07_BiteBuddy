@@ -93,7 +93,7 @@ public final class SessionManager {
      *
      * @author Marc Putz
      * @param authToken the authentication token of the user
-     * @return the ID of the corresponding user
+     * @return the ID of the corresponding user, NULL if no session registered
      */
     public Long getUserFromAuthToken(String authToken) {
         LOGGER.trace("getUserFromAuthToken({})", authToken);
@@ -106,7 +106,7 @@ public final class SessionManager {
      *
      * @author Marc Putz
      * @param userId the ID of the user
-     * @return the corresponding authentication token of the user
+     * @return the corresponding authentication token of the user, NULL if no session registered
      */
     public String getAuthTokenForUser(long userId) {
         LOGGER.trace("getAuthTokenForUser({})", userId);

@@ -12,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
@@ -45,14 +46,17 @@ public class AuthenticationEndpoint {
 
     private final UserService userService;
 
+    private final AuthenticationService authenticationService;
+
     private final UserMapper userMapper;
 
     private final PasswordResetService passwordResetService;
 
-    public AuthenticationEndpoint(UserService userService, PasswordResetService passwordResetService, UserMapper userMapper) {
+    public AuthenticationEndpoint(UserService userService, AuthenticationService authService, PasswordResetService passwordResetService, UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.passwordResetService = passwordResetService;
+        this.authenticationService = authService;
     }
 
     /**
@@ -67,39 +71,9 @@ public class AuthenticationEndpoint {
     public ResponseEntity<String> login(@RequestBody LoginDto userLoginDto) throws AuthenticationException {
         LOGGER.trace("login({})", userLoginDto);
 
-        try {
-            // Look for user
-            ApplicationUser user = userService.getUserByEmail(userLoginDto.getEmail());
+        String authToken = authenticationService.loginUser(userLoginDto);
 
-            // Check if password exists
-            if (userLoginDto.getPassword() == null) {
-                throw new AuthenticationException("No password provided");
-            }
-            // encode password
-            String encodedPassword = PasswordEncoder.encode(userLoginDto.getPassword(), userLoginDto.getEmail());
-
-            // Check password data
-            if (user.checkPasswordMatch(encodedPassword)) {
-
-                // Create jwt token
-                String authToken = AuthTokenUtils.createToken(user);
-
-                // Register user session
-                if (!SessionManager.getInstance().startUserSession(user.getId(), authToken)) {
-                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to start user session");
-                }
-
-                // Return jwt auth token
-                return new ResponseEntity<String>(authToken, HttpStatus.OK);
-
-            } else {
-                // wrong password
-                throw new AuthenticationException("Wrong Password");
-            }
-        } catch (UserNotFoundException e) {
-            // login email not found
-            throw new AuthenticationException("User '" + userLoginDto.getEmail() + "' does not exist");
-        }
+        return new ResponseEntity<>(authToken, HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -195,7 +169,7 @@ public class AuthenticationEndpoint {
      * @author Marc Putz
      */
     @PostMapping("/logout")
-    public ResponseEntity<Boolean> logout(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Boolean> logout(@RequestHeader HttpHeaders headers) throws AuthenticationException {
 
         // retrieve token from authorization header
         String authToken = headers.getFirst("authorization");
@@ -203,15 +177,7 @@ public class AuthenticationEndpoint {
             return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
         }
 
-        // check token validity
-        if (!AuthTokenUtils.isValid(authToken)) {
-            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
-        }
-
-        // stop user session
-        if (!SessionManager.getInstance().stopUserSession(authToken)) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to stop user session");
-        }
+        authenticationService.logoutUser(authToken);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
