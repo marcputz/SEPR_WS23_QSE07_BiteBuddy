@@ -15,6 +15,16 @@ import java.util.regex.Pattern;
 public class UserValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+
+    public void validateForCreate(ApplicationUser applicationUser) throws ValidationException {
+        LOGGER.trace("validateForCreate({})", applicationUser);
+        List<String> validationErrors = new ArrayList<>();
+        basicValidation(applicationUser, validationErrors);
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Validation of ApplicationUser for create failed", validationErrors);
+        }
+    }
+
     public void validateForUpdate(ApplicationUser applicationUser) throws ValidationException {
         LOGGER.trace("validateForUpdate({})", applicationUser);
         List<String> validationErrors = new ArrayList<>();

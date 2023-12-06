@@ -15,6 +15,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +110,11 @@ public class AuthenticationEndpoint {
         loginDto.setPassword(registerDto.getPasswordEncoded());
         loginDto.setEmail(registerDto.getEmail());
         registerDto.setPasswordEncoded(encodedPassword);
-        userService.create(registerDto);
+        try {
+            userService.create(registerDto);
+        } catch (ValidationException e) {
+            throw new AuthenticationException(e.summary());
+        }
         return login(loginDto);
     }
 

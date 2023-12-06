@@ -68,11 +68,23 @@ public class JpaUserService implements UserService {
 
 
     @Override
-    public ApplicationUser create(UserRegisterDto registerDto) {
+    public ApplicationUser create(UserRegisterDto registerDto) throws ValidationException {
         LOGGER.trace("create({})", registerDto);
-        //validator.validateForCreate(registerDto);
         ApplicationUser applicationUser = new ApplicationUser(registerDto.getEmail(), registerDto.getPasswordEncoded());
         applicationUser.setNickname(registerDto.getName());
+        validator.validateForCreate(applicationUser);
+        ApplicationUser existingUser1 = userRepository.findByEmailIgnoreCase(applicationUser.getEmail());
+        ApplicationUser existingUser2 = userRepository.findByNickname(applicationUser.getNickname());
+        List<String> validationErrors = new ArrayList<>();
+        if (existingUser1 != null) {
+            LOGGER.info("existingUser1({})", existingUser1);
+            throw new ValidationException("User with this Email already exists", validationErrors);
+        }
+        if (existingUser2 != null) {
+            LOGGER.info("existingUser2({})", existingUser2);
+            throw new ValidationException("User with this Name already exists", validationErrors);
+        }
+        LOGGER.info("existingUserAfter({})", existingUser2);
         return userRepository.save(applicationUser);
     }
 
