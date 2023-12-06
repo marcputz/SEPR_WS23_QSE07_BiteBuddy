@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.auth.SessionManager;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
@@ -11,12 +10,10 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
-import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +49,8 @@ public class AuthenticationEndpoint {
 
     private final PasswordResetService passwordResetService;
 
-    public AuthenticationEndpoint(UserService userService, AuthenticationService authService, PasswordResetService passwordResetService, UserMapper userMapper) {
+    public AuthenticationEndpoint(UserService userService, AuthenticationService authService, PasswordResetService passwordResetService,
+                                  UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.passwordResetService = passwordResetService;
@@ -112,7 +110,7 @@ public class AuthenticationEndpoint {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
 
-            Long currentUserId = SessionManager.getInstance().getUserFromAuthToken(authToken);
+            Long currentUserId = AuthTokenUtils.getUserId(authToken);
             if (currentUserId == null) {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
@@ -141,13 +139,7 @@ public class AuthenticationEndpoint {
 
             // retrieve token from authorization header
             String authToken = headers.getFirst("authorization");
-            // TODO: Nimm bitte nicht den Session Manager dafür
-            // TODO: Die UserID ist im Token selbst abgespeichert
-            // TODO: Der SessionManager braucht weit mehr Ressourcen als der JSON Parser in AuthTokenUtils
-            // TODO: Befehl ist - AuthTokenUtils.getUserId(authToken);
-            // TODO: Ich änder das jetzt nicht weil sonst mach ichs noch kaputt
-            // TODO:               -- Marc
-            Long currentUserId = SessionManager.getInstance().getUserFromAuthToken(authToken);
+            Long currentUserId = AuthTokenUtils.getUserId(authToken);
 
             // Fetch user details and convert to DTO
             ApplicationUser currentUser = userService.getUserById(currentUserId);
