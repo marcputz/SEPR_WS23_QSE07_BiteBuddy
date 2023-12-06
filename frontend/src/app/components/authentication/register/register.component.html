@@ -1,0 +1,80 @@
+<div *ngIf="error" class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Authentication problems!</strong> {{ errorMessage }}
+  <button type="button" (click)="vanishError()" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="pt-5">
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <span class="anchor" id="formRegister"></span>
+
+      <div class="card rounded-0">
+        <div class="card-header">
+          <h3 class="mb-0">Register</h3>
+        </div>
+
+        <div class="card-body">
+          <form class="form" [formGroup]="registerForm" (ngSubmit)="registerUser()">
+            <div class="form-group">
+              <label for="inputUsername">Username</label>
+              <input type="text" name="username" formControlName="username" class="form-control" id="inputUsername"
+                     aria-describedby="usernameHelp" placeholder="Enter username">
+              <div *ngIf="submitted && registerForm.controls.username.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.username.errors.required">Your username is
+                  required!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputEmail">Email</label>
+              <input type="text" name="email" formControlName="email" class="form-control" id="inputEmail"
+                     aria-describedby="emailHelp" placeholder="Enter email">
+              <div *ngIf="submitted && registerForm.controls.email.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.email.errors.required">Your email is
+                  required!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" name="password" formControlName="password" class="form-control" id="password"
+                     placeholder="Enter Password">
+              <div *ngIf="submitted && registerForm.controls.password.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.password.errors.required">Your password
+                  is
+                  required!
+                </small>
+                <small class="form-text text-warning" *ngIf="registerForm.controls.password.errors.minlength">Your password
+                  must be at least 8 characters long!
+                </small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password2">Confirm Password</label>
+              <input type="password" name="password2" formControlName="password2" class="form-control" id="password2"
+                     placeholder="Re-enter Password">
+              <div *ngIf="submitted && registerForm.controls.password2.errors" class="error">
+                <small class="form-text text-warning" *ngIf="registerForm.controls.password2.errors.required">Your password
+                  is
+                  required!
+                </small>
+                <small class="form-text text-warning" *ngIf="registerForm.controls.password2.errors.minlength">Your password
+                  must be at least 8 characters long!
+                </small>
+              </div>
+            </div>
+
+            <button type="button" (click)="registerUser()" class="btn btn-success float-right">Register</button>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
