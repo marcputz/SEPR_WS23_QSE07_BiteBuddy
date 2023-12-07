@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {PasswordEncoder} from '../../utils/passwordEncoder';
 import {Router} from '@angular/router';
@@ -6,17 +6,16 @@ import {UserSettingsDto} from '../../dtos/userSettingsDto';
 import {UpdateUserSettingsDto} from '../../dtos/updateUserSettingsDto';
 import {AuthService} from "../../services/auth.service";
 
+
 @Component({
   selector: 'app-user-settings',
   templateUrl: './user-settings.component.html',
   styleUrls: ['./user-settings.component.scss']
 })
-export class UserSettingsComponent {
+export class UserSettingsComponent implements OnInit {
 
   settingsForm: UntypedFormGroup;
-  // After first submission attempt, form validation will start
   submitted = false;
-  // Error flag
   error = false;
   errorMessage = '';
 
@@ -24,16 +23,13 @@ export class UserSettingsComponent {
 
   constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router) {
     this.settingsForm = this.formBuilder.group({
-      username: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      password2: ['', [Validators.required, Validators.minLength(8)]]
+      currentPassword: ['', [Validators.required]],
+      password: ['', [Validators.minLength(8)]],
+      password2: ['', [Validators.minLength(8)]]
     });
   }
 
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
   vanishError() {
     this.error = false;
   }
@@ -46,47 +42,40 @@ export class UserSettingsComponent {
     this.authService.getUser().subscribe({
       next: (settings: UserSettingsDto) => {
         this.originalUserSettings = settings;
-
-        // Set form controls with the loaded data
-        this.settingsForm.controls['username'].setValue(settings.nickname);
         this.settingsForm.controls['email'].setValue(settings.email);
-
-        this.settingsForm.controls['password'].setValue('');
-        this.settingsForm.controls['password2'].setValue('');
+        // Don't set values for password fields
       },
       error: error => {
         console.error(`Error loading user settings`, error);
         this.error = true;
-        if (typeof error.error === 'object') {
-          this.errorMessage = error.error.error;
-        } else {
-          this.errorMessage = error.error;
-        }
+        this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
       },
-      complete: () => {
-        // Any additional actions on completion
-      }
+      complete: () => { }
     });
   }
 
   public updateUserSettings() {
     this.submitted = true;
-    if (this.settingsForm.valid && this.settingsForm.controls.password.value === this.settingsForm.controls.password2.value) {
-      const nickname: string = this.settingsForm.controls.username.value;
+    if (this.settingsForm.valid && (!this.settingsForm.controls.password.value || this.settingsForm.controls.password.value === this.settingsForm.controls.password2.value)) {
       const email: string = this.settingsForm.controls.email.value;
-      const password: string = this.passwordEncoder.encodePassword(this.settingsForm.controls.password.value);
+      const currentPassword: string = this.passwordEncoder.encodePassword(this.settingsForm.controls.currentPassword.value);
+      let newPassword: string = '';
+      if(this.settingsForm.controls.password.value) {
+        newPassword = this.passwordEncoder.encodePassword(this.settingsForm.controls.password.value);
+      }
 
-      // Create DTO for update operation
-      const updateUserSettingsDto: UpdateUserSettingsDto = new UpdateUserSettingsDto(email, nickname, password);
+      const updateUserSettingsDto: UpdateUserSettingsDto = new UpdateUserSettingsDto(
+        email, currentPassword, newPassword
+      );
 
       this.authService.updateUser(updateUserSettingsDto).subscribe({
-        next: (response) => {
+        next: () => {
           console.log('User settings updated successfully');
-          // Handle successful update, e.g., navigate to a different page or show a success message
+          // Handle successful update here
         },
         error: error => {
           console.error('Error updating user settings', error);
-          // Handle errors, e.g., show an error message
+          // Handle errors here
         }
       });
     } else if (this.settingsForm.controls.password.value !== this.settingsForm.controls.password2.value) {
