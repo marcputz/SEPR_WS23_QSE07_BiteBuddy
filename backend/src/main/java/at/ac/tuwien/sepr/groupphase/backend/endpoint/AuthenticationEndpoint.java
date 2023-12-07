@@ -104,7 +104,7 @@ public class AuthenticationEndpoint {
         LOGGER.trace("update({})", userUpdateDto);
         try {
             // retrieve token from authorization header
-            String authToken = headers.getFirst("authorization");
+            String authToken = headers.getFirst("Authorization");
 
             if (authToken == null) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -115,19 +115,30 @@ public class AuthenticationEndpoint {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
 
+            // Check if the old password is correct
+            if (!authenticationService.checkCredentials(currentUserId, userUpdateDto.getCurrentPassword())) {
+                throw new AuthenticationException("Current password is incorrect.");
+            }
+
             // Perform the update operation for the authenticated user
             ApplicationUser updatedUser = userService.update(userUpdateDto, currentUserId);
             UserSettingsDto userSettingsDto = userMapper.toUserSettingsDto(updatedUser);
 
             return ResponseEntity.ok(userSettingsDto);
 
+        } catch (UserNotFoundException e) {
+            LOGGER.error("User not found: ", e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (AuthenticationException e) {
+            LOGGER.error("Authentication exception: ", e);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
-            // Handle exceptions, such as authorization failure or other errors
+            // Handle other exceptions
             LOGGER.error("Error in update: ", e);
-            //TODO Correct Exception Handling
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error during update: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @GetMapping("/settings")
     public ResponseEntity<UserSettingsDto> getSettings(@RequestHeader HttpHeaders headers) throws AuthenticationException {

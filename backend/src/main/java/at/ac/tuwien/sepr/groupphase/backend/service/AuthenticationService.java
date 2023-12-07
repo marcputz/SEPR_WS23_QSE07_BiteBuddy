@@ -82,6 +82,26 @@ public class AuthenticationService {
     }
 
     /**
+     * Verifies whether the provided user ID and password correspond to valid credentials.
+     * This method can be used for operations where a user's current password needs to be confirmed,
+     * such as before changing user settings.
+     *
+     * @param id       The ID of the user whose credentials are to be checked.
+     * @param password The password to validate against the user's stored password.
+     * @return true if the user's ID and password are correct; false otherwise.
+     * @throws UserNotFoundException if no user is found with the provided ID.
+     */
+    public boolean checkCredentials(Long id, String password) throws UserNotFoundException {
+        ApplicationUser user = userService.getUserById(id);
+
+        // Encode the provided password to compare with the stored password hash
+        String encodedPassword = PasswordEncoder.encode(password, user.getEmail());
+
+        // Return true if the passwords match, false otherwise
+        return user.checkPasswordMatch(encodedPassword);
+    }
+
+    /**
      * Logs out a user by stopping their session
      *
      * @author Marc Putz

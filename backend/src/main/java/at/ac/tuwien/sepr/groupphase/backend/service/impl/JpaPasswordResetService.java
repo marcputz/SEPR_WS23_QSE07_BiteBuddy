@@ -11,13 +11,18 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import jakarta.mail.*;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import org.eclipse.angus.mail.util.MailConnectException;
-import org.h2.engine.User;
 import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,16 +113,16 @@ public class JpaPasswordResetService implements PasswordResetService {
 
             String msg =
                 "<html><body><p>" +
-                "A password reset was requested for '" + recipientEmail + "'.<br>" +
-                "<br>" +
-                "If this was not you, ignore this email and check your account.<br>" +
-                "<br>" +
-                "<strong>Follow this link to reset your password: </strong><br>" +
-                "<a src='" + resetLink + "'>Reset Password</a><br>" +
-                "<br>" +
-                "If this link does not work for you, try using this link: <br>" +
-                "<a src='" + resetLink + "'>" + resetLink + "</a><br>" +
-                "</p></body></html>";
+                    "A password reset was requested for '" + recipientEmail + "'.<br>" +
+                    "<br>" +
+                    "If this was not you, ignore this email and check your account.<br>" +
+                    "<br>" +
+                    "<strong>Follow this link to reset your password: </strong><br>" +
+                    "<a src='" + resetLink + "'>Reset Password</a><br>" +
+                    "<br>" +
+                    "If this link does not work for you, try using this link: <br>" +
+                    "<a src='" + resetLink + "'>" + resetLink + "</a><br>" +
+                    "</p></body></html>";
 
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
             mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
@@ -149,10 +154,10 @@ public class JpaPasswordResetService implements PasswordResetService {
 
             // save new password to user
             UserUpdateDto updateDto = UserUpdateDto.UserUpdateDtoBuilder.anUserUpdateDto()
-                    .withPassword(dto.getNewPassword())
-                    .withEmail(userToChange.getEmail())
-                    .withName(userToChange.getNickname())
-                    .build();
+                .withNewPassword(dto.getNewPassword())
+                .withEmail(userToChange.getEmail())
+                .withCurrentPassword(userToChange.getNickname())
+                .build();
             userService.update(updateDto, userToChange.getId());
 
         } catch (LazyInitializationException ex) {

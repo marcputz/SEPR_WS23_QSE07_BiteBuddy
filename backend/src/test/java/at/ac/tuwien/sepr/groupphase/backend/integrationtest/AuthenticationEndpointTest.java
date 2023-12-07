@@ -197,8 +197,8 @@ public class AuthenticationEndpointTest {
         // Prepare update data
         UserUpdateDto updateDto = UserUpdateDto.UserUpdateDtoBuilder.anUserUpdateDto()
             .withEmail("newemail@authEndpoint.at")
-            .withName("newNickname")
-            .withPassword("newPassword")
+            .withCurrentPassword("newNickname")
+            .withNewPassword("newPassword")
             .build();
 
         HttpHeaders updateHeaders = new HttpHeaders();
@@ -260,7 +260,7 @@ public class AuthenticationEndpointTest {
         String authToken = registerResult.getResponse().getContentAsString();
         assertNotNull(authToken);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization",  authToken);
+        headers.add("Authorization", authToken);
 
         UserRegisterDto registerDto2 = new UserRegisterDto();
         registerDto2.setName("testName");

@@ -2,45 +2,44 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 public class UserUpdateDto {
     String email;
-    String nickname;
-    String password;
+    String currentPassword;
+    String newPassword;
 
-    public String getNickname() {
-        return nickname;
+    public String getCurrentPassword() {
+        return currentPassword;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getNewPassword() {
+        return newPassword;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 
     @Override
     public String toString() {
         return "UserUpdateDto{"
             + "email='" + email + '\''
-            + ", name='" + nickname + '\''
             + '}';
     }
 
     public static final class UserUpdateDtoBuilder {
         private String email;
-        private String nickname;
-        private String password;
+        private String currentPassword;
+        private String newPassword;
 
         private UserUpdateDtoBuilder() {
         }
@@ -54,21 +53,21 @@ public class UserUpdateDto {
             return this;
         }
 
-        public UserUpdateDtoBuilder withName(String name) {
-            this.nickname = name;
+        public UserUpdateDtoBuilder withCurrentPassword(String name) {
+            this.currentPassword = name;
             return this;
         }
 
-        public UserUpdateDtoBuilder withPassword(String password) {
-            this.password = password;
+        public UserUpdateDtoBuilder withNewPassword(String password) {
+            this.newPassword = password;
             return this;
         }
 
         public UserUpdateDto build() {
             UserUpdateDto userUpdateDto = new UserUpdateDto();
             userUpdateDto.setEmail(email);
-            userUpdateDto.setNickname(nickname);
-            userUpdateDto.setPassword(password);
+            userUpdateDto.setCurrentPassword(currentPassword);
+            userUpdateDto.setNewPassword(newPassword);
             return userUpdateDto;
         }
     }

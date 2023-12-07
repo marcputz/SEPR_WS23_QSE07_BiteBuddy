@@ -96,14 +96,25 @@ public class JpaUserService implements UserService {
         ApplicationUser existingUser = userRepository.findById(currentUserId)
             .orElseThrow(() -> new UserNotFoundException("User with Id '" + currentUserId + "' could not be found"));
 
-        List<String> conflictErrors = checkUniqueConstraints(userUpdateDto, existingUser.getId());
-        if (!conflictErrors.isEmpty()) {
-            throw new ConflictException("Conflicts in ApplicationUser update", conflictErrors);
+        List<String> validationErrors = new ArrayList<>();
+        if (!userUpdateDto.getEmail().equals(existingUser.getEmail())) {
+            List<String> conflictErrors = checkUniqueConstraints(userUpdateDto, existingUser.getId());
+            if (!conflictErrors.isEmpty()) {
+                throw new ConflictException("Conflicts in ApplicationUser update", conflictErrors);
+            }
+        } else if (userUpdateDto.getNewPassword().isEmpty()) {
+            validationErrors.add("Nothing Changed");
         }
-
-        String encodedPassword = PasswordEncoder.encode(userUpdateDto.getPassword(), userUpdateDto.getEmail());
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Validation of ApplicationUser for create failed", validationErrors);
+        }
+        String encodedPassword;
+        if (userUpdateDto.getNewPassword().isEmpty()) {
+            encodedPassword = PasswordEncoder.encode(userUpdateDto.getCurrentPassword(), userUpdateDto.getEmail());
+        } else {
+            encodedPassword = PasswordEncoder.encode(userUpdateDto.getNewPassword(), userUpdateDto.getEmail());
+        }
         existingUser.setEmail(userUpdateDto.getEmail())
-            .setNickname(userUpdateDto.getNickname())
             .setPasswordEncoded(encodedPassword);
 
         validator.validateForUpdate(existingUser);
@@ -128,9 +139,9 @@ public class JpaUserService implements UserService {
         }
 
         // Nickname conflict check
-        ApplicationUser userWithSameNickname = userRepository.findByNickname(userUpdateDto.getNickname());
+        ApplicationUser userWithSameNickname = userRepository.findByNickname(userUpdateDto.getCurrentPassword());
         if (userWithSameNickname != null && !userWithSameNickname.getId().equals(userId)) {
-            conflictErrors.add("Nickname '" + userUpdateDto.getNickname() + "' is already in use by another user");
+            conflictErrors.add("Nickname '" + userUpdateDto.getCurrentPassword() + "' is already in use by another user");
         }
 
         return conflictErrors;
