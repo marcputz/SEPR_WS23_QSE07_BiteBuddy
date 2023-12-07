@@ -104,9 +104,9 @@ public class AuthenticationService {
     /**
      * Logs out a user by stopping their session
      *
-     * @author Marc Putz
      * @param user the user to logout
      * @throws AuthenticationException if user not logged in
+     * @author Marc Putz
      */
     public void logoutUser(ApplicationUser user) throws AuthenticationException {
         String authTokenToLogOut = SessionManager.getInstance().getAuthTokenForUser(user.getId());
@@ -121,9 +121,9 @@ public class AuthenticationService {
     /**
      * Logs out a user by stopping the token session.
      *
-     * @author Marc Putz
      * @param authToken the authentication token to logout
      * @throws AuthenticationException if token invalid or not logged in
+     * @author Marc Putz
      */
     public void logoutUser(String authToken) throws AuthenticationException {
         // check token validity
@@ -140,8 +140,8 @@ public class AuthenticationService {
     /**
      * Verifies if an authentication token is really authenticated (meaning, token has an open session registered).
      *
-     * @author Marc Putz
      * @param authToken the authentication token to check
+     * @author Marc Putz
      * @returns {@code true}, if authenticated. {@code false}, if no session found
      */
     public boolean isAuthenticated(String authToken) {
@@ -151,9 +151,9 @@ public class AuthenticationService {
     /**
      * Verifies if an authentication token is really authenticated (meaning, token has an open session registered).
      *
-     * @author Marc Putz
      * @param authToken the authentication token to check
      * @throws AuthenticationException if token is not registered as an open session
+     * @author Marc Putz
      */
     public void verifyAuthenticated(String authToken) throws AuthenticationException {
         Long userId = SessionManager.getInstance().getUserFromAuthToken(authToken);
@@ -165,9 +165,9 @@ public class AuthenticationService {
     /**
      * Verifies if a http header contains valid authentication data
      *
-     * @author Marc Putz
      * @param headers the http headers of the request to authenticate
      * @throws AuthenticationException if the headers do contain no or invalid authentication data
+     * @author Marc Putz
      */
     public void verifyAuthenticated(HttpHeaders headers) throws AuthenticationException {
         String authToken = headers.getFirst("authorization");
