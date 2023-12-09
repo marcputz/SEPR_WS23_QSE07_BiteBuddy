@@ -10,6 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver;
 
 import java.lang.invoke.MethodHandles;
 
@@ -75,18 +77,17 @@ public class AuthenticationEndpoint {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserRegisterDto registerDto) throws AuthenticationException {
+    public ResponseEntity<String> register(@RequestBody UserRegisterDto registerDto) throws AuthenticationException, ValidationException {
         LOGGER.trace("register({})", registerDto);
+
         String encodedPassword = PasswordEncoder.encode(registerDto.getPasswordEncoded(), registerDto.getEmail());
         LoginDto loginDto = new LoginDto();
         loginDto.setPassword(registerDto.getPasswordEncoded());
         loginDto.setEmail(registerDto.getEmail());
         registerDto.setPasswordEncoded(encodedPassword);
-        try {
-            userService.create(registerDto);
-        } catch (ValidationException e) {
-            throw new AuthenticationException(e.summary());
-        }
+
+        userService.create(registerDto);
+
         return login(loginDto);
     }
 
@@ -100,25 +101,23 @@ public class AuthenticationEndpoint {
      */
     @PutMapping("/settings")
     public ResponseEntity<UserSettingsDto> updateSettings(@RequestBody UserUpdateDto userUpdateDto,
-                                                          @RequestHeader HttpHeaders headers) {
+                                                          @RequestHeader HttpHeaders headers) throws AuthenticationException, ValidationException, ConflictException {
         LOGGER.trace("update({})", userUpdateDto);
+
+        this.authenticationService.verifyAuthenticated(headers);
+
         try {
             // retrieve token from authorization header
             String authToken = headers.getFirst("Authorization");
-
-            if (authToken == null) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-
             Long currentUserId = AuthTokenUtils.getUserId(authToken);
+
             if (currentUserId == null) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+                LOGGER.warn("Update user did not find ID in token");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             }
 
             // Check if the old password is correct
-            if (!authenticationService.checkCredentials(currentUserId, userUpdateDto.getCurrentPassword())) {
-                throw new AuthenticationException("Current password is incorrect.");
-            }
+            authenticationService.verifyUserPassword(currentUserId, userUpdateDto.getCurrentPassword());
 
             // Perform the update operation for the authenticated user
             ApplicationUser updatedUser = userService.update(userUpdateDto, currentUserId);
@@ -127,15 +126,8 @@ public class AuthenticationEndpoint {
             return ResponseEntity.ok(userSettingsDto);
 
         } catch (UserNotFoundException e) {
-            LOGGER.error("User not found: ", e);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (AuthenticationException e) {
-            LOGGER.error("Authentication exception: ", e);
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } catch (Exception e) {
-            // Handle other exceptions
-            LOGGER.error("Error in update: ", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            LOGGER.warn("User for update not found: ", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found", e);
         }
     }
 
@@ -149,7 +141,7 @@ public class AuthenticationEndpoint {
         try {
 
             // retrieve token from authorization header
-            String authToken = headers.getFirst("authorization");
+            String authToken = this.authenticationService.getAuthToken(headers);
             Long currentUserId = AuthTokenUtils.getUserId(authToken);
 
             // Fetch user details and convert to DTO
@@ -158,11 +150,9 @@ public class AuthenticationEndpoint {
 
             return ResponseEntity.ok(userSettingsDto);
 
-        } catch (Exception e) {
-            // Handle exceptions, such as user not found, authorization failure, or other errors
-            LOGGER.error("Error in getSettings: ", e);
-            //TODO Correct Exception Handling
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error retrieving user settings: " + e.getMessage());
+        } catch (UserNotFoundException e) {
+            LOGGER.warn("User not found: ", e);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found", e);
         }
     }
 
@@ -176,12 +166,10 @@ public class AuthenticationEndpoint {
     @PostMapping("/logout")
     public ResponseEntity<Boolean> logout(@RequestHeader HttpHeaders headers) throws AuthenticationException {
 
-        // retrieve token from authorization header
-        String authToken = headers.getFirst("authorization");
-        if (authToken == null) {
-            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
-        }
+        this.authenticationService.verifyAuthenticated(headers);
 
+        // retrieve token from authorization header
+        String authToken = this.authenticationService.getAuthToken(headers);
         authenticationService.logoutUser(authToken);
 
         return new ResponseEntity<>(true, HttpStatus.OK);

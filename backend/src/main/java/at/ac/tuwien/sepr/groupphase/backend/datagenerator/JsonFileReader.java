@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
-@Profile("generateData")
+@Profile("readJsonData")
 @Component
 public class JsonFileReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

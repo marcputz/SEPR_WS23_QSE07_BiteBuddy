@@ -32,6 +32,7 @@ public class AuthenticationService {
      * @param loginDto the DTO containing login data (email and password)
      * @return an authentication token for the user's session
      * @throws AuthenticationException if the login data is invalid or the session cannot be started
+     * @author Marc Putz
      */
     public String loginUser(LoginDto loginDto) throws AuthenticationException {
         try {
@@ -68,6 +69,7 @@ public class AuthenticationService {
      * @param user the user to login
      * @return an authentication token for the user's session
      * @throws AuthenticationException if the session cannot be started
+     * @author Marc Putz
      */
     private String loginUser(ApplicationUser user) throws AuthenticationException {
         // Create jwt token
@@ -82,23 +84,25 @@ public class AuthenticationService {
     }
 
     /**
-     * Verifies whether the provided user ID and password correspond to valid credentials.
-     * This method can be used for operations where a user's current password needs to be confirmed,
-     * such as before changing user settings.
+     * Verifies if a given password matches the password for user with given ID.
+     * This method can be used for operations where a user's password needs to be confirmed,
+     * such as before changing user settings or logging in.
      *
      * @param id       The ID of the user whose credentials are to be checked.
      * @param password The password to validate against the user's stored password.
-     * @return true if the user's ID and password are correct; false otherwise.
      * @throws UserNotFoundException if no user is found with the provided ID.
+     * @throws AuthenticationException if the provided password is invalid for the given user
      */
-    public boolean checkCredentials(Long id, String password) throws UserNotFoundException {
+    public void verifyUserPassword(Long id, String password) throws UserNotFoundException, AuthenticationException {
         ApplicationUser user = userService.getUserById(id);
 
         // Encode the provided password to compare with the stored password hash
         String encodedPassword = PasswordEncoder.encode(password, user.getEmail());
 
         // Return true if the passwords match, false otherwise
-        return user.checkPasswordMatch(encodedPassword);
+        if (!user.checkPasswordMatch(encodedPassword)) {
+            throw new AuthenticationException("Password not valid");
+        }
     }
 
     /**
@@ -152,12 +156,17 @@ public class AuthenticationService {
      * Verifies if an authentication token is really authenticated (meaning, token has an open session registered).
      *
      * @param authToken the authentication token to check
-     * @throws AuthenticationException if token is not registered as an open session
+     * @throws AuthenticationException if token is not registered as an open session or token data, format or signature are invalid
      * @author Marc Putz
      */
     public void verifyAuthenticated(String authToken) throws AuthenticationException {
-        Long userId = SessionManager.getInstance().getUserFromAuthToken(authToken);
-        if (userId == null) {
+        // verify token valid
+        if (!AuthTokenUtils.isValid(authToken)) {
+            throw new AuthenticationException("Invalid token");
+        }
+
+        // check if token is currently authenticated
+        if (!isAuthenticated(authToken)) {
             throw new AuthenticationException("Token not authenticated");
         }
     }
@@ -170,12 +179,23 @@ public class AuthenticationService {
      * @author Marc Putz
      */
     public void verifyAuthenticated(HttpHeaders headers) throws AuthenticationException {
-        String authToken = headers.getFirst("authorization");
+        String authToken = this.getAuthToken(headers);
 
         if (authToken == null) {
             throw new AuthenticationException("Session not authenticated. Please log in.");
         }
 
         verifyAuthenticated(authToken);
+    }
+
+    /**
+     * Retrieves the authentication token from http headers
+     *
+     * @param headers the HTTP headers containing the auth token
+     * @return the auth token as a string representation, NULL if headers don't contain token
+     * @author Marc Putz
+     */
+    public String getAuthToken(HttpHeaders headers) {
+        return headers.getFirst("authorization");
     }
 }
