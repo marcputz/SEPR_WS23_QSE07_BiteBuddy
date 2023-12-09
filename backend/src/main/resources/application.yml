@@ -1,3 +1,12 @@
+bitebuddy:
+  email:
+    address: "mail.bitebuddy@gmail.com"
+    smtp:
+      host: "smtp.gmail.com"
+      port: 587
+      username: "mail.bitebuddy@gmail.com"
+      password: "nuem wfjl fhnz zrvd"
+
 logging:
   level:
     root: INFO

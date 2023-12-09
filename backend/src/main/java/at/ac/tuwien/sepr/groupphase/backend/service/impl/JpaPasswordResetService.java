@@ -5,10 +5,12 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
+import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import jakarta.mail.Authenticator;
@@ -31,23 +33,24 @@ import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.Random;
 
+/**
+ * @author Marc Putz
+ */
 @Service
 public class JpaPasswordResetService implements PasswordResetService {
 
-    private static final String EMAIL_ADDRESS = "mail.bitebuddy@gmail.com";
-    private static final String EMAIL_SMTP_HOST = "smtp.gmail.com";
-    private static final int EMAIL_SMTP_PORT = 587;
-    private static final String EMAIL_SMTP_USERNAME = "mail.bitebuddy@gmail.com";
-    private static final String EMAIL_SMTP_PASSWORD = "nuem wfjl fhnz zrvd";
     private static final String RESET_LINK = "http://localhost:4200/password_reset";
 
     private final UserService userService;
 
+    private final EmailService emailService;
+
     private final PasswordResetRequestRepository requestRepository;
 
     @Autowired
-    public JpaPasswordResetService(UserService userService, PasswordResetRequestRepository requestRepository) {
+    public JpaPasswordResetService(UserService userService, EmailService emailService, PasswordResetRequestRepository requestRepository) {
         this.userService = userService;
+        this.emailService = emailService;
         this.requestRepository = requestRepository;
     }
 
@@ -57,8 +60,7 @@ public class JpaPasswordResetService implements PasswordResetService {
         requestPasswordReset(user);
     }
 
-    @Override
-    public void requestPasswordReset(ApplicationUser user) throws MessagingException {
+    protected void requestPasswordReset(ApplicationUser user) throws MessagingException {
 
         // generate random request ID
         StringBuilder requestIdBuilder = new StringBuilder();
@@ -83,63 +85,42 @@ public class JpaPasswordResetService implements PasswordResetService {
         requestRepository.save(resetRequest);
 
         // send email to user with password reset link (attaching the ID as url parameter)
-        sendEmail(user.getEmail(), requestId, requestExpirationTime);
+        sendResetRequestEmail(user.getEmail(), requestId, requestExpirationTime);
     }
 
-    private void sendEmail(String recipientEmail, String requestId, LocalDateTime expirationTime) throws MessagingException {
-        try {
-            Properties prop = new Properties();
-            prop.put("mail.smtp.auth", true);
-            prop.put("mail.smtp.starttls.enable", "true");
-            prop.put("mail.smtp.host", EMAIL_SMTP_HOST);
-            prop.put("mail.smtp.port", EMAIL_SMTP_PORT);
-            prop.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+    /**
+     * Sends a request confirmation email to a recipient
+     *
+     * @param recipient the email address of the recipient
+     * @param requestId the reset request ID (not encoded)
+     * @param expirationTime the expiration time of the reset request
+     * @throws MessagingException if something went wrong while sending the email
+     */
+    protected void sendResetRequestEmail(String recipient, String requestId, LocalDateTime expirationTime) throws MessagingException {
 
-            Session session = Session.getInstance(prop, new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(EMAIL_SMTP_USERNAME, EMAIL_SMTP_PASSWORD);
-                }
-            });
+        String mailSubject = "Reset Password Confirmation";
 
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(EMAIL_ADDRESS));
-            message.setRecipients(
-                Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
-            message.setSubject("Reset Password Confirmation");
+        String resetLink = RESET_LINK + "?id=" + requestId
+            + "&exp=" + expirationTime.getYear() + "-" + expirationTime.getDayOfYear() + "T" + expirationTime.getHour() + "." + expirationTime.getMinute();
 
-            String resetLink = RESET_LINK + "?id=" + requestId +
-                "&exp=" + expirationTime.getYear() + "-" + expirationTime.getDayOfYear() + "T" + expirationTime.getHour() + "." + expirationTime.getMinute();
+        String content = "<html><body><p>"
+            + "A password reset was requested for '" + recipient + "'.<br>"
+            + "<br>"
+            + "If this was not you, ignore this email and check your account.<br>"
+            + "<br>"
+            + "<strong>Follow this link to reset your password: </strong><br>"
+            + "<a href='" + resetLink + "'>Reset Password</a><br>"
+            + "<br>"
+            + "If this link does not work for you, try using this link: <br>"
+            + "<a href='" + resetLink + "'>" + resetLink + "</a><br>"
+            + "</p></body></html>";
 
-            String msg =
-                "<html><body><p>" +
-                    "A password reset was requested for '" + recipientEmail + "'.<br>" +
-                    "<br>" +
-                    "If this was not you, ignore this email and check your account.<br>" +
-                    "<br>" +
-                    "<strong>Follow this link to reset your password: </strong><br>" +
-                    "<a src='" + resetLink + "'>Reset Password</a><br>" +
-                    "<br>" +
-                    "If this link does not work for you, try using this link: <br>" +
-                    "<a src='" + resetLink + "'>" + resetLink + "</a><br>" +
-                    "</p></body></html>";
+        this.emailService.sendEmail(recipient, mailSubject, content, true);
 
-            MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
-
-            Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(mimeBodyPart);
-
-            message.setContent(multipart);
-
-            Transport.send(message);
-        } catch (MailConnectException ex) {
-            throw new MessagingException(ex.getMessage(), ex);
-        }
     }
 
     @Override
-    public void resetPassword(ResetPasswordDto dto) throws ValidationException {
+    public void resetPassword(ResetPasswordDto dto) throws AuthenticationException, ValidationException {
 
         try {
 

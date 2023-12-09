@@ -16,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JsonParserFactory;
@@ -30,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver;
 
 import java.lang.invoke.MethodHandles;
 
@@ -175,8 +175,15 @@ public class AuthenticationEndpoint {
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
+    /**
+     * Requests a password reset for a certain user, identified by their email
+     *
+     * @param requestBody a json body containing the user's email address
+     * @return a ResponseEntity to send back to the client, containing a boolean value indicating if the request was successful.
+     * @throws Exception
+     */
     @PostMapping("/request_password_reset")
-    public ResponseEntity<Boolean> requestPasswordReset(@RequestBody String requestBody) throws Exception {
+    public ResponseEntity<Boolean> requestPasswordReset(@RequestBody String requestBody) {
         LOGGER.trace("requestPasswordReset({})", requestBody);
 
         // check if request contains email
@@ -185,10 +192,14 @@ public class AuthenticationEndpoint {
 
             try {
                 passwordResetService.requestPasswordReset(email);
-
                 return new ResponseEntity<>(true, HttpStatus.OK);
+
             } catch (UserNotFoundException ex) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User '" + email + "' does not exist");
+
+            } catch (MessagingException ex) {
+                // this occurs when the server cannot send an email
+                throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Can not send a reset email at this current time. Try again later");
             }
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request does not contain email");
@@ -196,11 +207,22 @@ public class AuthenticationEndpoint {
 
     }
 
+    /**
+     * Resets the password of a user. Needs correct authorization given in the DTO object
+     *
+     * @param dto the reset dto containing valid identification and data
+     * @return a ResponseEntity to send back to the client, containing a boolean value indicating if the reset was successful.
+     * @throws ValidationException if the new password does not match the validation requirements
+     */
     @PostMapping("/password_reset")
-    public ResponseEntity<Boolean> resetPassword(@RequestBody ResetPasswordDto dto) throws ValidationException {
+    public ResponseEntity<Boolean> resetPassword(@RequestBody ResetPasswordDto dto) throws ValidationException, AuthenticationException {
         LOGGER.trace("resetPassword({})", dto);
 
-        passwordResetService.resetPassword(dto);
+        try {
+            passwordResetService.resetPassword(dto);
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+        }
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
