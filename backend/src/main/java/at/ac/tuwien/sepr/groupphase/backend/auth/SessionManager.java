@@ -64,7 +64,7 @@ public final class SessionManager {
         // check if user already has session
         if (activeUsers.contains(userId)) {
             String oldToken = getAuthTokenForUser(userId);
-            if (oldToken != null || !this.stopUserSession(oldToken)) {
+            if (oldToken != null && !this.stopUserSession(oldToken)) {
                 // could not stop old user session
                 return false;
             }
