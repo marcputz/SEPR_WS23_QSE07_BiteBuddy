@@ -5,10 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
-import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.*;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
@@ -25,11 +22,14 @@ import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import org.eclipse.angus.mail.util.MailConnectException;
+import org.hibernate.JDBCException;
 import org.hibernate.LazyInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
@@ -101,7 +101,7 @@ public class JpaPasswordResetService implements PasswordResetService {
         String mailSubject = "Reset Password Confirmation";
 
         String resetLink = RESET_LINK + "?id=" + requestId
-            + "&exp=" + expirationTime.getYear() + "-" + expirationTime.getDayOfYear() + "T" + expirationTime.getHour() + "." + expirationTime.getMinute();
+            + "&exp=" + expirationTime.getYear() + "-" + expirationTime.getMonthValue() + "-" + expirationTime.getDayOfMonth() + "T" + expirationTime.getHour() + "." + expirationTime.getMinute();
 
         String content = "<html><body><p>"
             + "A password reset was requested for '" + recipient + "'.<br>"
@@ -128,7 +128,11 @@ public class JpaPasswordResetService implements PasswordResetService {
             String encodedId = PasswordEncoder.encode(dto.getResetId(), "password_reset");
             PasswordResetRequest resetRequest = this.requestRepository.getReferenceById(encodedId);
 
-            // TODO: check if request not expired (using resetRequest timestamp)
+            LocalDateTime requestTimestamp = resetRequest.getRequestTime();
+            if (requestTimestamp.isAfter(LocalDateTime.now())) {
+                // request has expired
+                throw new AuthenticationException("Password Reset Request is expired");
+            }
 
             // fetch user from request
             ApplicationUser userToChange = resetRequest.getUser();
@@ -141,15 +145,15 @@ public class JpaPasswordResetService implements PasswordResetService {
                 .build();
             userService.update(updateDto, userToChange.getId());
 
-        } catch (LazyInitializationException ex) {
+        } catch (LazyInitializationException | JDBCException ex) {
             // could not fetch request entry from data store
-            // TODO: throw error
+            throw new DataStoreException("Could not access request data", ex);
         } catch (UserNotFoundException ex) {
             // this should NEVER happen
-            // TODO: throw error
+            throw new AuthenticationException("Could not find user");
         } catch (ConflictException ex) {
             // this should NEVER happen
-            // TODO: throw errors
+            throw new ValidationException("Data not valid", List.of("New data resulted in a conflict"));
         }
     }
 }

@@ -180,7 +180,7 @@ public class AuthenticationEndpoint {
      *
      * @param requestBody a json body containing the user's email address
      * @return a ResponseEntity to send back to the client, containing a boolean value indicating if the request was successful.
-     * @throws Exception
+     * @author Marc Putz
      */
     @PostMapping("/request_password_reset")
     public ResponseEntity<Boolean> requestPasswordReset(@RequestBody String requestBody) {
@@ -213,16 +213,13 @@ public class AuthenticationEndpoint {
      * @param dto the reset dto containing valid identification and data
      * @return a ResponseEntity to send back to the client, containing a boolean value indicating if the reset was successful.
      * @throws ValidationException if the new password does not match the validation requirements
+     * @author Marc Putz
      */
     @PostMapping("/password_reset")
     public ResponseEntity<Boolean> resetPassword(@RequestBody ResetPasswordDto dto) throws ValidationException, AuthenticationException {
         LOGGER.trace("resetPassword({})", dto);
 
-        try {
-            passwordResetService.resetPassword(dto);
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        }
+        passwordResetService.resetPassword(dto);
 
         return new ResponseEntity<>(true, HttpStatus.OK);
     }
