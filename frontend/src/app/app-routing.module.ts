@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {mapToCanActivate, RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from './components/home/home.component';
-import {LoginComponent} from './components/authentication/login/login.component';
+import {LoginComponent} from './components/dialogs/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
 import {MessageComponent} from './components/message/message.component';
 import {UserSettingsComponent} from './components/user-settings/user-settings.component';
@@ -13,11 +13,19 @@ import {PasswordResetComponent} from "./components/authentication/password-reset
 import {RecipeListComponent} from "./components/recipe-list/recipe-list.component";
 import {RecipeDetailComponent} from "./components/recipe-detail/recipe-detail.component";
 import {LandingLayoutComponent} from "./layouts/landing-layout/landing-layout.component";
+import {DialogLayoutComponent} from "./layouts/dialog-layout/dialog-layout.component";
 
 const routes: Routes = [
   //{path: '', component: HomeComponent},
-  {path: '', component: LandingLayoutComponent},
-  {path: 'login', component: LoginComponent},
+
+  {path: '*', redirectTo: ''}, // Redirection for unknown paths
+
+  {path: '', component: LandingLayoutComponent}, // Landing Page
+  {path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
+      {path: 'login', component: LoginComponent}, // Login Page
+  ]},
+
+  // {path: 'login', component: LoginComponent},
   {path: 'request_password_reset', component: RequestPasswordResetComponent},
   {path: 'password_reset', component: PasswordResetComponent},
   {path: 'register', component: RegisterComponent},
@@ -27,7 +35,6 @@ const routes: Routes = [
       {path: '', component: RecipeListComponent},
       {path: ':id', component: RecipeDetailComponent}
   ]},
-  {path: '*', redirectTo: ''}
 ];
 
 @NgModule({

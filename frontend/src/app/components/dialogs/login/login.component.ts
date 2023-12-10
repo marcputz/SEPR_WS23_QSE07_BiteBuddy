@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {AuthService} from '../../../services/auth.service';
 import {LoginDto} from '../../../dtos/loginDto';
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
-
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-login',
@@ -17,11 +17,14 @@ export class LoginComponent implements OnInit {
   // After first submission attempt, form validation will start
   submitted = false;
 
-  // Authentication Error
-  authenticationError: boolean = false;
-  authenticationErrorMessage: string | null;
+  errorEmailNotFound: boolean = false;
+  errorPasswordWrong: boolean = false;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder,
+              private authService: AuthService,
+              private passwordEncoder: PasswordEncoder,
+              private router: Router,
+              private notification: ToastrService) {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]]
@@ -58,18 +61,38 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/message']);
       },
       error: error => {
-        console.warn('Could not log in', error);
+        console.error('Could not log in', error);
 
-        this.authenticationError = true;
+        let errorObject;
         if (typeof error.error === 'object') {
-          this.authenticationErrorMessage = error.error.error;
+          errorObject = error.error;
         } else {
-          let status = error.status;
-          switch (status) {
-            case 401: this.authenticationErrorMessage = error.error; break;
-            default: this.authenticationErrorMessage = "Error while logging in, try again later."; break;
-          }
+          errorObject = error;
         }
+
+        let message: string = errorObject.error;
+        let status = errorObject.status;
+
+        switch (status) {
+          case 401:
+            if (message.indexOf("does not exist") >= 0) {
+              // user does not exist
+              console.warn("User does not exist");
+              this.loginForm.controls['email'].setErrors({userNotFound: true});
+              break;
+            }
+            if (message.indexOf("Wrong Password") >= 0) {
+              // password wrong error
+              console.warn("Wrong password");
+              this.loginForm.controls['password'].setErrors({wrongPassword: true});
+              break;
+            }
+            // other type of authentication error
+            this.notification.error(message); break;
+
+          default: this.notification.error("Error while logging in, try again later."); break;
+        }
+
       }
     });
   }
@@ -78,3 +101,4 @@ export class LoginComponent implements OnInit {
   }
 
 }
+

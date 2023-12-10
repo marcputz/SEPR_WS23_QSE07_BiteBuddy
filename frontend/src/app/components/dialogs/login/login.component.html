@@ -1,0 +1,51 @@
+<div style="padding: 20px;">
+  <!-- DIALOG HEADER -->
+  <span class="bb-dialog-box-header">Login</span>
+
+  <!-- FORM INPUTS -->
+  <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
+
+    <!-- EMAIL INPUT -->
+    <div class="form-group">
+      <input type="text" name="email" formControlName="email"
+             class="bb-input-textfield"
+             [class.bb-input-textfield-error]="submitted && loginForm.controls.email.errors"
+             id="inputEmail"
+             aria-describedby="emailHelp"
+             placeholder="Enter Email">
+      <div *ngIf="submitted && loginForm.controls.email.errors" class="error">
+        <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.required">Email is required
+        </small>
+        <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.email">Not a valid email
+        </small>
+        <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.userNotFound">No account found
+        </small>
+      </div>
+    </div>
+
+    <!-- PASSWORD INPUT -->
+    <div class="form-group">
+      <input type="password" name="password" formControlName="password"
+             class="bb-input-textfield"
+             [class.bb-input-textfield-error]="submitted && loginForm.controls.password.errors"
+             id="password"
+             placeholder="Enter Password">
+      <div *ngIf="submitted && loginForm.controls.password.errors" class="error">
+        <small class="form-text text-danger" *ngIf="loginForm.controls.password.errors.required">Password is required
+        </small>
+        <small class="form-text text-danger" *ngIf="loginForm.controls.password.errors.wrongPassword">Wrong password
+        </small>
+      </div>
+    </div>
+
+    <!-- FORGOT PASSWORD LINK -->
+    <div id="forgotPasswordContainer">
+      Forgot password? Click <a class="bb-link" style="font-weight: bold;" routerLink="/request_password_reset">here</a>
+    </div>
+
+    <!-- LOGIN BUTTON -->
+    <button type="submit" name="loginButton" class="bb-button-big">Login</button>
+
+  </form>
+
+</div>

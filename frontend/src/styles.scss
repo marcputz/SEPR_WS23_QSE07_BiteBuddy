@@ -39,6 +39,10 @@ body {
   background-size: cover;
 }
 
+.bb-selectable {
+  user-select: text;
+}
+
 .bb-link {
   cursor: pointer;
 
