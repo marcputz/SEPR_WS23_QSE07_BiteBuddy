@@ -8,7 +8,7 @@ import {UserSettingsComponent} from './components/user-settings/user-settings.co
 import {RegisterComponent} from "./components/authentication/register/register.component";
 import {
   RequestPasswordResetComponent
-} from "./components/authentication/request-password-reset/request-password-reset.component";
+} from "./components/dialogs/request-password-reset/request-password-reset.component";
 import {PasswordResetComponent} from "./components/authentication/password-reset/password-reset.component";
 import {RecipeListComponent} from "./components/recipe-list/recipe-list.component";
 import {RecipeDetailComponent} from "./components/recipe-detail/recipe-detail.component";
@@ -23,10 +23,10 @@ const routes: Routes = [
   {path: '', component: LandingLayoutComponent}, // Landing Page
   {path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
       {path: 'login', component: LoginComponent}, // Login Page
+      {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
   ]},
 
   // {path: 'login', component: LoginComponent},
-  {path: 'request_password_reset', component: RequestPasswordResetComponent},
   {path: 'password_reset', component: PasswordResetComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: UserSettingsComponent},

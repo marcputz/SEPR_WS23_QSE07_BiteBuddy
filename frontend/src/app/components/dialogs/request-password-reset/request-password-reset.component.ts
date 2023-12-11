@@ -4,6 +4,7 @@ import {AuthService} from "../../../services/auth.service";
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {Router} from "@angular/router";
 import {isBoolean} from "lodash";
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-request-password-reset',
@@ -17,13 +18,16 @@ export class RequestPasswordResetComponent implements OnInit {
 
   protected requestSent: boolean = false;
   protected requestSuccess: boolean = false;
-  protected requestError: boolean = false;
 
   protected email: string | null;
 
   protected errorMessage: string | null;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router) {
+  constructor(private formBuilder: UntypedFormBuilder,
+              private authService: AuthService,
+              private passwordEncoder: PasswordEncoder,
+              private router: Router,
+              private notifications: ToastrService) {
     this.emailForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
     });
@@ -46,24 +50,31 @@ export class RequestPasswordResetComponent implements OnInit {
         },
         error: error => {
           console.error("Error requesting password reset", error);
-          this.requestError = true;
 
-          let status = 500;
-          let message: string | null;
+          let errorObject;
           if (typeof error.error === 'object') {
-            status = error.error.status;
-            message = error.error.message;
+            errorObject = error.error;
           } else {
-            status = error.status;
-            message = error.message;
+            errorObject = error;
           }
+
+          let status = errorObject.status;
+          let message = errorObject.error;
 
           switch (status) {
-            case 404: this.errorMessage = message; break;
-            case 401: this.errorMessage = message; break;
-            default: this.errorMessage = "Something went wrong on our side, sorry! Please try again later."; break;
+            case 404:
+              // user with email does not exist
+              this.emailForm.controls['email'].setErrors({userNotFound: true});
+              this.notifications.error("Account '" + this.email + "' does not exist");
+              break;
+            case 503:
+              // something wrong with password reset service
+              console.warn("Server can not send password reset email");
+              this.notifications.error("Could not send email. Try again later!");
+              break;
+            default: this.notifications.error("Something went wrong on our side, sorry! Please try again later."); break;
           }
-
+          this.requestSent = false;
         }
       })
     }
