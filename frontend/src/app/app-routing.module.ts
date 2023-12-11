@@ -9,7 +9,7 @@ import {RegisterComponent} from "./components/authentication/register/register.c
 import {
   RequestPasswordResetComponent
 } from "./components/dialogs/request-password-reset/request-password-reset.component";
-import {PasswordResetComponent} from "./components/authentication/password-reset/password-reset.component";
+import {PasswordResetComponent} from "./components/dialogs/password-reset/password-reset.component";
 import {RecipeListComponent} from "./components/recipe-list/recipe-list.component";
 import {RecipeDetailComponent} from "./components/recipe-detail/recipe-detail.component";
 import {LandingLayoutComponent} from "./layouts/landing-layout/landing-layout.component";
@@ -24,10 +24,10 @@ const routes: Routes = [
   {path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
       {path: 'login', component: LoginComponent}, // Login Page
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
+      {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
   ]},
 
   // {path: 'login', component: LoginComponent},
-  {path: 'password_reset', component: PasswordResetComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: UserSettingsComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
