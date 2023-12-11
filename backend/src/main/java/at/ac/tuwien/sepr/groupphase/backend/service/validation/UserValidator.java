@@ -28,30 +28,26 @@ public class UserValidator {
     public void validateForUpdate(ApplicationUser applicationUser) throws ValidationException {
         LOGGER.trace("validateForUpdate({})", applicationUser);
         List<String> validationErrors = new ArrayList<>();
-
         if (applicationUser.getId() == null) {
             validationErrors.add("No ID given");
         }
-
         basicValidation(applicationUser, validationErrors);
-
         if (!validationErrors.isEmpty()) {
             throw new ValidationException("Validation of ApplicationUser for update failed", validationErrors);
         }
     }
 
     private void basicValidation(ApplicationUser applicationUser, List<String> validationErrors) {
-        //TODO Complete Validation
         if (applicationUser.getEmail() == null || applicationUser.getEmail().trim().isEmpty()) {
             validationErrors.add("Email is required");
-        } else if (!isValidEmail(applicationUser.getEmail())) {
+        } else if (!isPossibleEmail(applicationUser.getEmail())) {
             validationErrors.add("Invalid email format");
+        } else if (applicationUser.getEmail().length() > 255) {
+            validationErrors.add("Email cannot be longer than 255 characters");
         }
 
         if (applicationUser.getPasswordEncoded() == null || applicationUser.getPasswordEncoded().trim().isEmpty()) {
             validationErrors.add("Password is required");
-        } else if (applicationUser.getPasswordEncoded().length() < 8) { // Assuming minimum 8 characters for password
-            validationErrors.add("Password must be at least 8 characters long");
         }
 
         if (applicationUser.getNickname() == null || applicationUser.getNickname().trim().isEmpty()) {
@@ -61,9 +57,9 @@ public class UserValidator {
         }
     }
 
-    public boolean isValidEmail(String email) {
+    public boolean isPossibleEmail(String email) {
         // Simple regex for email validation.
-        Pattern pattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$");
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
         return pattern.matcher(email).matches();
     }
 }
