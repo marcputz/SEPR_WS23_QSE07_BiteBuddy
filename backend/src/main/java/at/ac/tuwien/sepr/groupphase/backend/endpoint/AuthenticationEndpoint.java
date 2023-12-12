@@ -77,7 +77,7 @@ public class AuthenticationEndpoint {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserRegisterDto registerDto) throws AuthenticationException, ValidationException {
+    public ResponseEntity<String> register(@RequestBody UserRegisterDto registerDto) throws AuthenticationException {
         LOGGER.trace("register({})", registerDto);
 
         String encodedPassword = PasswordEncoder.encode(registerDto.getPasswordEncoded(), registerDto.getEmail());
@@ -85,10 +85,12 @@ public class AuthenticationEndpoint {
         loginDto.setPassword(registerDto.getPasswordEncoded());
         loginDto.setEmail(registerDto.getEmail());
         registerDto.setPasswordEncoded(encodedPassword);
-
-        userService.create(registerDto);
-
-        return login(loginDto);
+        try{
+            userService.create(registerDto);
+            return login(loginDto);
+        } catch (ValidationException e){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     /**
