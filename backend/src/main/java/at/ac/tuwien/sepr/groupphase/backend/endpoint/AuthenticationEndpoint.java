@@ -6,7 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserSettingsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
@@ -92,64 +92,66 @@ public class AuthenticationEndpoint {
     }
 
     /**
-     * Updates user profile data.
-     * Requires a valid JWT in the request header for authentication.
+     * Updates the email and/or password of a user's profile.
+     * Requires a valid JWT in the request header for authentication. The current password of the user is verified before
+     * updating the email and/or password. The method allows updating either the email, password, or both.
      *
-     * @param userUpdateDto DTO containing updated user information.
-     * @param headers       HTTP headers from the request, containing the JWT token.
-     * @return ResponseEntity indicating the outcome of the operation.
+     * @param userUpdateEmailAndPasswordDto DTO containing the new email and/or password along with the current password for verification.
+     * @param headers                       HTTP headers from the request, containing the JWT token.
+     * @return ResponseEntity<UserSettingsDto> indicating the outcome of the operation. The updated user settings are returned in the response body.
+     * @throws AuthenticationException if the authentication fails due to invalid token or incorrect current password.
+     * @throws ValidationException     if the provided new email or password fails validation checks.
+     * @throws ConflictException       if the new email conflicts with another user's email.
+     * @throws UserNotFoundException   if no user is found with the provided ID in the JWT token.
      */
     @PutMapping("/settings")
-    public ResponseEntity<UserSettingsDto> updateSettings(@RequestBody UserUpdateDto userUpdateDto,
-                                                          @RequestHeader HttpHeaders headers) throws AuthenticationException, ValidationException, ConflictException {
-        LOGGER.trace("update({})", userUpdateDto);
+    public ResponseEntity<UserSettingsDto> updateEmailAndPasswordSettings(@RequestBody UserUpdateEmailAndPasswordDto userUpdateEmailAndPasswordDto,
+                                                                          @RequestHeader HttpHeaders headers)
+        throws AuthenticationException, ValidationException, ConflictException, UserNotFoundException {
+        LOGGER.trace("update({})", userUpdateEmailAndPasswordDto);
 
         this.authenticationService.verifyAuthenticated(headers);
+        // Retrieve token from authorization header
+        String authToken = headers.getFirst("Authorization");
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
 
-        try {
-            // retrieve token from authorization header
-            String authToken = headers.getFirst("Authorization");
-            Long currentUserId = AuthTokenUtils.getUserId(authToken);
-
-            if (currentUserId == null) {
-                LOGGER.warn("Update user did not find ID in token");
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-            }
-
-            // Check if the old password is correct
-            authenticationService.verifyUserPassword(currentUserId, userUpdateDto.getCurrentPassword());
-
-            // Perform the update operation for the authenticated user
-            ApplicationUser updatedUser = userService.update(userUpdateDto, currentUserId);
-            UserSettingsDto userSettingsDto = userMapper.toUserSettingsDto(updatedUser);
-
-            return ResponseEntity.ok(userSettingsDto);
-
-        } catch (UserNotFoundException e) {
-            LOGGER.warn("User for update not found: ", e);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found", e);
+        if (currentUserId == null) {
+            LOGGER.warn("Update user did not find ID in token");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
+
+        // Check if the current password is correct
+        authenticationService.verifyUserPassword(currentUserId, userUpdateEmailAndPasswordDto.getCurrentPassword());
+
+        // Update the authenticated user
+        ApplicationUser updatedUser = userService.updateEmailAndPassword(userUpdateEmailAndPasswordDto, currentUserId);
+        UserSettingsDto userSettingsDto = userMapper.toUserSettingsDto(updatedUser);
+
+        return ResponseEntity.ok(userSettingsDto);
     }
 
-
+    /**
+     * Retrieves the settings of the currently authenticated user.
+     * The method requires a valid JWT in the request header for authentication.
+     * It fetches the user details based on the user ID extracted from the JWT and returns them as a UserSettingsDto.
+     *
+     * @param headers HTTP headers from the request, containing the JWT token.
+     * @return ResponseEntity containing the UserSettingsDto of the authenticated user.
+     * @throws AuthenticationException if the user is not authenticated or the authentication token is invalid.
+     * @throws UserNotFoundException   if the user corresponding to the ID in the JWT token is not found.
+     */
     @GetMapping("/settings")
     public ResponseEntity<UserSettingsDto> getSettings(@RequestHeader HttpHeaders headers) throws AuthenticationException {
         LOGGER.trace("getSettings()");
 
         authenticationService.verifyAuthenticated(headers);
-
         try {
-
-            // retrieve token from authorization header
+            // Retrieve token from authorization header
             String authToken = this.authenticationService.getAuthToken(headers);
             Long currentUserId = AuthTokenUtils.getUserId(authToken);
-
-            // Fetch user details and convert to DTO
             ApplicationUser currentUser = userService.getUserById(currentUserId);
             UserSettingsDto userSettingsDto = userMapper.toUserSettingsDto(currentUser);
-
             return ResponseEntity.ok(userSettingsDto);
-
         } catch (UserNotFoundException e) {
             LOGGER.warn("User not found: ", e);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found", e);

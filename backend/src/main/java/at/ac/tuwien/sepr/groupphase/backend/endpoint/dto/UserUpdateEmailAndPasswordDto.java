@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
-public class UserUpdateDto {
+public class UserUpdateEmailAndPasswordDto {
     String email;
     String currentPassword;
     String newPassword;
@@ -53,8 +53,8 @@ public class UserUpdateDto {
             return this;
         }
 
-        public UserUpdateDtoBuilder withCurrentPassword(String name) {
-            this.currentPassword = name;
+        public UserUpdateDtoBuilder withCurrentPassword(String currentPassword) {
+            this.currentPassword = currentPassword;
             return this;
         }
 
@@ -63,12 +63,12 @@ public class UserUpdateDto {
             return this;
         }
 
-        public UserUpdateDto build() {
-            UserUpdateDto userUpdateDto = new UserUpdateDto();
-            userUpdateDto.setEmail(email);
-            userUpdateDto.setCurrentPassword(currentPassword);
-            userUpdateDto.setNewPassword(newPassword);
-            return userUpdateDto;
+        public UserUpdateEmailAndPasswordDto build() {
+            UserUpdateEmailAndPasswordDto userUpdateEmailAndPasswordDto = new UserUpdateEmailAndPasswordDto();
+            userUpdateEmailAndPasswordDto.setEmail(email);
+            userUpdateEmailAndPasswordDto.setCurrentPassword(currentPassword);
+            userUpdateEmailAndPasswordDto.setNewPassword(newPassword);
+            return userUpdateEmailAndPasswordDto;
         }
     }
 }

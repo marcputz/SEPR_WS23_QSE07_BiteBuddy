@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
@@ -89,38 +89,33 @@ public class JpaUserService implements UserService {
     }
 
     @Override
-    public ApplicationUser update(UserUpdateDto userUpdateDto, Long currentUserId)
+    public ApplicationUser updateEmailAndPassword(UserUpdateEmailAndPasswordDto userUpdateEmailAndPasswordDto, Long currentUserId)
         throws UserNotFoundException, ValidationException, ConflictException {
-        LOGGER.trace("update({})", userUpdateDto);
+        LOGGER.trace("updateEmailAndPassword({})", userUpdateEmailAndPasswordDto);
 
         ApplicationUser existingUser = userRepository.findById(currentUserId)
             .orElseThrow(() -> new UserNotFoundException("User with Id '" + currentUserId + "' could not be found"));
-
-        List<String> validationErrors = new ArrayList<>();
-        if (!userUpdateDto.getEmail().equals(existingUser.getEmail())) {
-            List<String> conflictErrors = checkUniqueConstraints(userUpdateDto, existingUser.getId());
-            if (!conflictErrors.isEmpty()) {
-                throw new ConflictException("Conflicts in ApplicationUser update", conflictErrors);
-            }
-        } else if (userUpdateDto.getNewPassword().isEmpty()) {
-            validationErrors.add("Nothing Changed");
+        if (!userUpdateEmailAndPasswordDto.getEmail().isEmpty() && !userUpdateEmailAndPasswordDto.getEmail().equals(existingUser.getEmail())) {
+            existingUser.setEmail(userUpdateEmailAndPasswordDto.getEmail());
         }
-        if (!validationErrors.isEmpty()) {
-            throw new ValidationException("Validation of ApplicationUser for create failed", validationErrors);
-        }
-        String encodedPassword;
-        if (userUpdateDto.getNewPassword().isEmpty()) {
-            encodedPassword = PasswordEncoder.encode(userUpdateDto.getCurrentPassword(), userUpdateDto.getEmail());
-        } else {
-            encodedPassword = PasswordEncoder.encode(userUpdateDto.getNewPassword(), userUpdateDto.getEmail());
-        }
-        existingUser.setEmail(userUpdateDto.getEmail())
-            .setPasswordEncoded(encodedPassword);
+        String newPassword = userUpdateEmailAndPasswordDto.getNewPassword().isEmpty()
+            ? userUpdateEmailAndPasswordDto.getCurrentPassword()
+            : userUpdateEmailAndPasswordDto.getNewPassword();
+        existingUser.setPasswordEncoded(PasswordEncoder.encode(newPassword, existingUser.getEmail()));
+        return updateApplicationUser(existingUser);
+    }
 
-        validator.validateForUpdate(existingUser);
-
+    @Override
+    public ApplicationUser updateApplicationUser(ApplicationUser userToUpdate)
+        throws UserNotFoundException, ValidationException, ConflictException {
+        LOGGER.trace("updateApplicationUser({})", userToUpdate);
+        if (!userRepository.existsById(userToUpdate.getId())) {
+            throw new UserNotFoundException("User with Id '" + userToUpdate.getId() + "' could not be found");
+        }
+        validator.validateForUpdate(userToUpdate);
+        checkUniqueConstraints(userToUpdate);
         try {
-            return userRepository.save(existingUser);
+            return userRepository.save(userToUpdate);
         } catch (DataIntegrityViolationException e) {
             LOGGER.error("DataIntegrityViolationException occurred during update: ", e);
             throw new ConflictException("An unexpected error occurred while updating the user, try again", new ArrayList<>());
@@ -128,22 +123,23 @@ public class JpaUserService implements UserService {
     }
 
 
-    private List<String> checkUniqueConstraints(UserUpdateDto userUpdateDto, Long userId) {
-        LOGGER.trace("checkUniqueConstraints({},{})", userUpdateDto, userId);
+    private void checkUniqueConstraints(ApplicationUser userToUpdate) throws ConflictException {
+        LOGGER.trace("checkUniqueConstraints({})", userToUpdate);
         List<String> conflictErrors = new ArrayList<>();
 
         // Email conflict check
-        ApplicationUser userWithSameEmail = userRepository.findByEmailIgnoreCase(userUpdateDto.getEmail());
-        if (userWithSameEmail != null && !userWithSameEmail.getId().equals(userId)) {
-            conflictErrors.add("Email '" + userUpdateDto.getEmail() + "' is already in use by another user");
+        ApplicationUser userWithSameEmail = userRepository.findByEmailIgnoreCase(userToUpdate.getEmail());
+        if (userWithSameEmail != null && !userWithSameEmail.getId().equals(userToUpdate.getId())) {
+            conflictErrors.add("Email '" + userToUpdate.getEmail() + "' is already in use by another user");
         }
 
         // Nickname conflict check
-        ApplicationUser userWithSameNickname = userRepository.findByNickname(userUpdateDto.getCurrentPassword());
-        if (userWithSameNickname != null && !userWithSameNickname.getId().equals(userId)) {
-            conflictErrors.add("Nickname '" + userUpdateDto.getCurrentPassword() + "' is already in use by another user");
+        ApplicationUser userWithSameNickname = userRepository.findByNickname(userToUpdate.getNickname());
+        if (userWithSameNickname != null && !userWithSameNickname.getId().equals(userToUpdate.getId())) {
+            conflictErrors.add("Nickname '" + userToUpdate.getNickname() + "' is already in use by another user");
         }
-
-        return conflictErrors;
+        if (!conflictErrors.isEmpty()) {
+            throw new ConflictException("Conflicts in ApplicationUser update", conflictErrors);
+        }
     }
 }
