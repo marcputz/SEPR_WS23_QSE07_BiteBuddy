@@ -3,7 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserSettingsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -176,7 +177,7 @@ public class AuthenticationEndpointTest {
     }
 
     @Test
-    public void testUpdateAfterLogin_withValidData_isOk() throws Exception {
+    public void testUpdateEmailAndPassword_withValidData_isSuccessful() throws Exception {
         // Login to get the token
         HttpHeaders loginHeaders = new HttpHeaders();
         loginHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -195,9 +196,9 @@ public class AuthenticationEndpointTest {
         assertNotNull(authToken);
 
         // Prepare update data
-        UserUpdateDto updateDto = UserUpdateDto.UserUpdateDtoBuilder.anUserUpdateDto()
+        UserUpdateEmailAndPasswordDto updateDto = UserUpdateEmailAndPasswordDto.UserUpdateDtoBuilder.anUserUpdateDto()
             .withEmail("newemail@authEndpoint.at")
-            .withCurrentPassword("newNickname")
+            .withCurrentPassword("password")
             .withNewPassword("newPassword")
             .build();
 
@@ -216,7 +217,78 @@ public class AuthenticationEndpointTest {
         // Verify the response
         MockHttpServletResponse updateResponse = updateResult.getResponse();
         assertEquals(HttpStatus.OK.value(), updateResponse.getStatus());
-        //TODO Additional assertions to verify the updated user data
+        UserSettingsDto updatedUserSettings = objectMapper.readValue(updateResponse.getContentAsString(), UserSettingsDto.class);
+        assertEquals("newemail@authEndpoint.at", updatedUserSettings.getEmail());
+    }
+
+    @Test
+    public void testUpdateEmailAndPasswordAndReLogin_withValidCredentials_isSuccessful() throws Exception {
+        // Login to get the token
+        HttpHeaders loginHeaders = new HttpHeaders();
+        loginHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        loginHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+                .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
+                    .withEmail(TESTUSER.getEmail())
+                    .withPassword("password")
+                    .build()))
+                .headers(loginHeaders))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String authToken = loginResult.getResponse().getContentAsString();
+        assertNotNull(authToken);
+
+        String newEmail = "newemail@authEndpoint.at";
+        String newPassword = "newPassword";
+        // Prepare update data
+        UserUpdateEmailAndPasswordDto updateDto = UserUpdateEmailAndPasswordDto.UserUpdateDtoBuilder.anUserUpdateDto()
+            .withEmail(newEmail)
+            .withCurrentPassword("password")
+            .withNewPassword(newPassword)
+            .build();
+
+        HttpHeaders updateHeaders = new HttpHeaders();
+        updateHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        updateHeaders.setContentType(MediaType.APPLICATION_JSON);
+        updateHeaders.set("Authorization", authToken);
+
+        // Perform update request
+        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings")
+                .content(new ObjectMapper().writeValueAsString(updateDto))
+                .headers(updateHeaders))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Verify the response
+        MockHttpServletResponse updateResponse = updateResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), updateResponse.getStatus());
+
+        // Logout
+        HttpHeaders logoutHeaders = new HttpHeaders();
+        logoutHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        logoutHeaders.setContentType(MediaType.APPLICATION_JSON);
+        logoutHeaders.set("Authorization", authToken);
+
+        MvcResult logoutResult = this.mockMvc.perform(post("/api/v1/authentication/logout")
+                .headers(logoutHeaders))
+            .andExpect(status().isOk())
+            .andReturn();
+        assertEquals(HttpStatus.OK.value(), logoutResult.getResponse().getStatus());
+
+        // Perform another login with the new data
+        MvcResult secondLoginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+                .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
+                    .withEmail(newEmail) // Use the new email for the second login
+                    .withPassword(newPassword) // Use the new password for the second login
+                    .build()))
+                .headers(loginHeaders))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String secondAuthToken = secondLoginResult.getResponse().getContentAsString();
+        assertNotNull(secondAuthToken);
     }
 
     @Test
