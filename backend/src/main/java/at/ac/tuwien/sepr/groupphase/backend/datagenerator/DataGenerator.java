@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
@@ -51,13 +52,13 @@ public class DataGenerator {
         LOGGER.debug("generating default test users");
 
         ApplicationUser user1 = new ApplicationUser().setId(-1L).setEmail("max.mustermann@test.at")
-            .setPasswordEncoded("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7") // "password"
+            .setPasswordEncoded(PasswordEncoder.encode("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", "max.mustermann@test.at")) // "password"
             .setNickname("maxmuster");
         LOGGER.debug("saving user '" + user1.getNickname() + "'");
         userRepository.save(user1);
 
         ApplicationUser user2 = new ApplicationUser().setId(-2L).setEmail("mail@marcputz.at")
-            .setPasswordEncoded("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7") // "password"
+            .setPasswordEncoded(PasswordEncoder.encode("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", "mail@marcputz.at")) // "password"
             .setNickname("marcputz");
         LOGGER.debug("saving user '" + user2.getNickname() + "'");
         userRepository.save(user2);

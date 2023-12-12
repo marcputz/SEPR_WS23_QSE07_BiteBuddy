@@ -87,7 +87,7 @@ public class AuthenticationEndpointTest {
 
         String authToken = response.getContentAsString();
         assertNotNull(authToken);
-        assertEquals("Token ", authToken.substring(0, 6));
+        assertEquals("Bearer ", authToken.substring(0, 7));
     }
 
     @Test
@@ -172,7 +172,7 @@ public class AuthenticationEndpointTest {
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
     }
 
