@@ -4,11 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
-import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.*;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
@@ -110,7 +106,7 @@ public class JpaPasswordResetService implements PasswordResetService {
     }
 
     @Override
-    public void resetPassword(ResetPasswordDto dto) throws AuthenticationException, ValidationException {
+    public void resetPassword(ResetPasswordDto dto) throws NotFoundException, AuthenticationException, ValidationException {
 
         try {
 
@@ -119,7 +115,8 @@ public class JpaPasswordResetService implements PasswordResetService {
             PasswordResetRequest resetRequest = this.requestRepository.getReferenceById(encodedId);
 
             LocalDateTime requestTimestamp = resetRequest.getRequestTime();
-            if (requestTimestamp.isAfter(LocalDateTime.now())) {
+            LocalDateTime expiredTime = requestTimestamp.plusHours(24);
+            if (expiredTime.isBefore(LocalDateTime.now())) {
                 // request has expired
                 throw new AuthenticationException("Password Reset Request is expired");
             }
@@ -133,7 +130,7 @@ public class JpaPasswordResetService implements PasswordResetService {
 
         } catch (LazyInitializationException | JDBCException ex) {
             // could not fetch request entry from data store
-            throw new DataStoreException("Could not access request data", ex);
+            throw new NotFoundException("Request ID invalid or not found");
         } catch (UserNotFoundException ex) {
             // this should NEVER happen
             throw new AuthenticationException("Could not find user");

@@ -1,17 +1,27 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserSettingsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.AuthenticationEndpoint;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
+import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
+import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.SmtpEmailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.util.Json;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,6 +57,9 @@ public class AuthenticationEndpointTest {
     private UserRepository userRepository;
 
     @Autowired
+    private PasswordResetRequestRepository passwordResetRequestRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private ApplicationUser TESTUSER = new ApplicationUser()
@@ -57,12 +71,13 @@ public class AuthenticationEndpointTest {
     private long testUserId;
 
     @BeforeEach
-    public void beforeEach() {
+    public void beforeEach() throws UserNotFoundException, MessagingException {
         testUserId = userRepository.save(TESTUSER).getId();
     }
 
     @AfterEach
     public void afterEach() {
+        passwordResetRequestRepository.deleteByUser(TESTUSER.setId(testUserId));
         userRepository.deleteById(testUserId);
     }
 
@@ -343,5 +358,130 @@ public class AuthenticationEndpointTest {
                 .headers(registerHeaders))
             .andExpect(status().isUnauthorized())
             .andReturn();
+    }
+
+    @Test
+    void testRequestPasswordReset_WithValidEmail_IsOk() throws Exception {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/request_password_reset")
+                .content("{\"email\":\"" + TESTUSER.getEmail() +  "\"}")
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
+    @Test
+    void testRequestPasswordReset_WithInvalidEmail_IsNotFound() throws Exception {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/request_password_reset")
+                .content("{\"email\":\"" + "thisEmailShouldNotExist@asdf.org" +  "\"}")
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+    }
+
+    @Test
+    void testPasswordReset_WithValidRequest_IsOk() throws Exception {
+        // given
+        final String REQUEST_ID = "abcdefghijklmnop";
+        final String REQUEST_ID_ENCODED = PasswordEncoder.encode(REQUEST_ID, "password_reset");
+        PasswordResetRequest resetRequest = new PasswordResetRequest();
+        resetRequest.setRequestTime(LocalDateTime.now());
+        resetRequest.setId(REQUEST_ID_ENCODED);
+        resetRequest.setUser(TESTUSER.setId(testUserId));
+        passwordResetRequestRepository.save(resetRequest);
+
+        // when
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        ResetPasswordDto resetDto = new ResetPasswordDto();
+        resetDto.setResetId(REQUEST_ID);
+        resetDto.setNewPassword("newPassword");
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/password_reset")
+                .content((new ObjectMapper()).writeValueAsString(resetDto))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        // then
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        ApplicationUser updatedUser = userRepository.getReferenceById(testUserId);
+        assertEquals(PasswordEncoder.encode("newPassword", TESTUSER.getEmail()), updatedUser.getPasswordEncoded());
+    }
+
+    @Test
+    void testPasswordReset_WithInvalidRequestID_IsNotFound() throws Exception {
+        // given
+        final String REQUEST_ID = "abcdefghijklmnop";
+        final String REQUEST_ID_ENCODED = PasswordEncoder.encode(REQUEST_ID, "password_reset");
+        PasswordResetRequest resetRequest = new PasswordResetRequest();
+        resetRequest.setRequestTime(LocalDateTime.now());
+        resetRequest.setId(REQUEST_ID_ENCODED);
+        resetRequest.setUser(TESTUSER.setId(testUserId));
+        passwordResetRequestRepository.save(resetRequest);
+
+        // when
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        ResetPasswordDto resetDto = new ResetPasswordDto();
+        resetDto.setResetId("wrongrequestid");
+        resetDto.setNewPassword("newPassword");
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/password_reset")
+                .content((new ObjectMapper()).writeValueAsString(resetDto))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        // then
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+    }
+
+    @Test
+    void testPasswordReset_WithExpiredDate_IsUnauthorized() throws Exception {
+        // given
+        final String REQUEST_ID = "abcdefghijklmnop";
+        final String REQUEST_ID_ENCODED = PasswordEncoder.encode(REQUEST_ID, "password_reset");
+        PasswordResetRequest resetRequest = new PasswordResetRequest();
+        resetRequest.setRequestTime(LocalDateTime.now().minusDays(10));
+        resetRequest.setId(REQUEST_ID_ENCODED);
+        resetRequest.setUser(TESTUSER.setId(testUserId));
+        passwordResetRequestRepository.save(resetRequest);
+
+        // when
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        ResetPasswordDto resetDto = new ResetPasswordDto();
+        resetDto.setResetId(REQUEST_ID);
+        resetDto.setNewPassword("newPassword");
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/password_reset")
+                .content((new ObjectMapper()).writeValueAsString(resetDto))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        // then
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
     }
 }
