@@ -56,7 +56,7 @@ export class RecipeListComponent {
       }
 
       const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
-      const dataUrl = `data:image/png;base64,${base64Image}`;
+      const dataUrl = `data:image/png;base64,${imageBytes}`;
       return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
     } catch (error) {
       console.error('Error sanitizing image:', error);

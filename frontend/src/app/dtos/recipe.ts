@@ -27,4 +27,7 @@ export interface RecipeDetailsDto {
   name: string;
   description: string;
   id: number;
+  ingredients: string[];
+  allergens: string[];
+  picture: number[];
 }
