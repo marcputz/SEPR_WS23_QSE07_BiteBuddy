@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.annotation.Secured;
 
 import jakarta.validation.Valid;
 import java.lang.invoke.MethodHandles;
@@ -38,7 +37,6 @@ public class MessageEndpoint {
         this.messageMapper = messageMapper;
     }
 
-    @Secured("ROLE_USER")
     @GetMapping
     @Operation(summary = "Get list of messages without details", security = @SecurityRequirement(name = "apiKey"))
     public List<SimpleMessageDto> findAll() {
@@ -46,7 +44,6 @@ public class MessageEndpoint {
         return messageMapper.messageToSimpleMessageDto(messageService.findAll());
     }
 
-    @Secured("ROLE_USER")
     @GetMapping(value = "/{id}")
     @Operation(summary = "Get detailed information about a specific message", security = @SecurityRequirement(name = "apiKey"))
     public DetailedMessageDto find(@PathVariable Long id) {
@@ -54,7 +51,6 @@ public class MessageEndpoint {
         return messageMapper.messageToDetailedMessageDto(messageService.findOne(id));
     }
 
-    @Secured("ROLE_ADMIN")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     @Operation(summary = "Publish a new message", security = @SecurityRequirement(name = "apiKey"))

@@ -1,10 +1,15 @@
 import {Injectable} from '@angular/core';
-import {AuthRequest} from '../dtos/auth-request';
+import {LoginDto} from '../dtos/loginDto';
 import {Observable} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
+import {RegisterComponent} from "../components/authentication/register/register.component";
+import {RegisterDto} from "../dtos/registerDto";
+import {UserSettingsDto} from '../dtos/userSettingsDto';
+import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';
+import {ResetPasswordDto} from "../dtos/resetPasswordDto";
 
 @Injectable({
   providedIn: 'root'
@@ -21,13 +26,75 @@ export class AuthService {
    *
    * @param authRequest User data
    */
-  loginUser(authRequest: AuthRequest): Observable<string> {
-    return this.httpClient.post(this.authBaseUri, authRequest, {responseType: 'text'})
+  loginUser(authRequest: LoginDto): Observable<string> {
+    console.debug("Logging in as '" + authRequest.email + "'");
+    return this.httpClient.post(this.authBaseUri + "/login", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
       );
   }
 
+  registerUser(authRequest: RegisterDto): Observable<string> {
+    console.debug("Registering as '" + authRequest.email + "'" + authRequest.name + "'" + authRequest.passwordEncoded);
+    return this.httpClient.post(this.authBaseUri + "/register", authRequest, {responseType: 'text'})
+      .pipe(
+        tap((authResponse: string) => this.setToken(authResponse))
+      );
+  }
+
+  getUser(): Observable<UserSettingsDto> {
+    console.debug("Retrieving current user settings");
+
+    const authToken = this.getToken();
+    if (!authToken) {
+      throw new Error('Authorization token not found');
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `${authToken}`
+    });
+
+    return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`, { headers });
+  }
+
+  updateUser(updateUserSettingsDto: UpdateUserSettingsDto): Observable<UserSettingsDto> {
+    const headers = new HttpHeaders({
+      'Authorization': `${this.getToken()}`
+    });
+    return this.httpClient.put<UserSettingsDto>(
+      this.authBaseUri + "/settings",
+      updateUserSettingsDto,
+      { headers }
+    );
+  }
+
+  logoutUser() {
+    console.debug("Logging out");
+
+    this.httpClient.post(this.authBaseUri + "/logout", this.getToken())
+      .subscribe({
+        next: success => {
+          if (success) {
+            console.log("Logged out from backend");
+          } else {
+            console.warn("Backend denied logout, rely on client-side logout only");
+          }
+        },
+        error: error => {
+          console.warn("Could not log out from backend, rely on client-side logout only", error);
+        }
+      })
+    localStorage.removeItem('authToken');
+  }
+
+  requestPasswordReset(userEmail: string): Observable<any> {
+    console.debug("Requesting password reset for '" + userEmail + "' from server");
+    return this.httpClient.post(this.authBaseUri + "/request_password_reset", "{\"email\":\"" + userEmail + "\"}", {responseType: 'text'})
+  }
+
+  resetPassword(dto: ResetPasswordDto): Observable<any> {
+    return this.httpClient.post(this.authBaseUri + "/password_reset", dto, {responseType: 'text'});
+  }
 
   /**
    * Check if a valid JWT token is saved in the localStorage
@@ -36,29 +103,8 @@ export class AuthService {
     return !!this.getToken() && (this.getTokenExpirationDate(this.getToken()).valueOf() > new Date().valueOf());
   }
 
-  logoutUser() {
-    console.log('Logout');
-    localStorage.removeItem('authToken');
-  }
-
   getToken() {
     return localStorage.getItem('authToken');
-  }
-
-  /**
-   * Returns the user role based on the current token
-   */
-  getUserRole() {
-    if (this.getToken() != null) {
-      const decoded: any = jwtDecode(this.getToken());
-      const authInfo: string[] = decoded.rol;
-      if (authInfo.includes('ROLE_ADMIN')) {
-        return 'ADMIN';
-      } else if (authInfo.includes('ROLE_USER')) {
-        return 'USER';
-      }
-    }
-    return 'UNDEFINED';
   }
 
   private setToken(authResponse: string) {

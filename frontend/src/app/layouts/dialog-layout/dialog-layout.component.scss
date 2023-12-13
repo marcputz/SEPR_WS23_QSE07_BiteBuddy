@@ -1,0 +1,40 @@
+.bb-dialog-layout-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+
+  align-content: center;
+  align-items: center;
+  vertical-align: center;
+  justify-content: center;
+}
+
+.bb-dialog-box {
+  position: relative;
+
+  min-height: 200px;
+  min-width: 200px;
+  max-height: 800px;
+  max-width: 8000px;
+  width: available;
+
+  background-color: whitesmoke;
+
+  padding: 30px;
+
+  border-radius: 20px;
+  box-shadow: rgba(0,0,0, 0.15) 1px 1px 10px;
+
+  word-wrap: break-word;
+
+  height: available;
+}
+
+::ng-deep .bb-dialog-box-header {
+  font-weight: bold;
+  font-size: 1.8rem;
+}

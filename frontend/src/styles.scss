@@ -1,4 +1,154 @@
 /* You can add global styles to this file, and also import other style files */
+
+@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+@import url("https://fonts.googleapis.com/css?family=Jost:500,400,700|Roboto:400|Open+Sans:400");
+
+:root {
+  --app-background-color: rgb(241, 241, 221);
+
+  --button-background-color: rgba(80, 50, 5, 1);
+  --button-background-color-hover: rgba(60, 30, 4, 1);
+  --button-color: whitesmoke;
+
+  --input-field-background-color: rgba(0,0,0, 0.04);
+  --input-field-background-color-error: rgba(200, 0, 0, 0.14);
+
+  --link-color: rgba(50, 50, 50, 1);
+  --link-color-hover: rgba(200,150,0,1);
+
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  user-select: none;
+}
+
+body::before {
+  position: fixed;
+  top: 0; left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: green;
+}
+
 body {
+  background: var(--app-background-color) url(/assets/images/background.svg);
+  background-repeat: no-repeat;
+  background-position: left;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.bb-selectable {
+  user-select: text;
+}
+
+.bb-link {
+  cursor: pointer;
+
+  color: var(--link-color) !important;
+
+  text-decoration-line: underline !important;
+  text-decoration-style: solid !important;
+
+  font-weight: 500;
+}
+
+.bb-link:hover {
+  color: var(--link-color-hover) !important;
+}
+
+.bb-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+
   background-color: whitesmoke;
+
+  padding: 30px;
+
+  border: none;
+  border-radius: 14px;
+
+  box-shadow: rgba(0,0,0, 0.15) 1px 1px 10px;
+}
+
+.bb-input-textfield {
+  display: block;
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+
+  font-size: 1rem;
+  line-height: 1.5;
+
+  border: none;
+  border-bottom: lightgray solid 2px;
+  border-radius: 0;
+
+  background-color: var(--input-field-background-color);
+}
+
+.bb-input-textfield:focus {
+  background-color: ghostwhite;
+}
+
+.bb-input-textfield-error {
+  background-color: var(--input-field-background-color-error);
+}
+
+.bb-button {
+  display: inline-block;
+
+  background-color: var(--button-background-color);
+  color: var(--button-color);
+
+  padding: 0.5rem 1.2rem;
+
+  border: none;
+  border-radius: 4px;
+
+  text-decoration: none;
+  text-align: center;
+  vertical-align: middle;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.bb-button-big {
+  display: inline-block;
+  width: 100%;
+
+  background-color: var(--button-background-color);
+  color: var(--button-color);
+
+  padding: 0.5rem 10px;
+
+  border: none;
+  border-radius: 4px;
+
+  text-decoration: none;
+  text-align: center;
+  vertical-align: middle;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.bb-button-big:hover {
+  background-color: var(--button-background-color-hover)
+}
+
+.bb-message-box {
+  margin: 1rem 0rem;
+  padding: 1rem;
+
+  border: none;
+  border-radius: 4px;
+}
+
+.bb-message-box-error {
+  border: red solid 2px;
+  background-color: rgba(250, 40, 20, 0.5);
 }

@@ -1,0 +1,71 @@
+<div *ngIf="error" class="bb-message-box bb-message-box-error">
+  {{ errorMessage }}
+</div>
+
+<div class="pt-5">
+  <div class="row">
+    <div class="col-lg-6 col-md-8 col-sm-10 mx-auto">
+
+      <div class="bb-card">
+        <div style="padding: 0.8rem;">
+          <div class="bb-login-box">
+            <header>Change User Settings</header>
+            <div class="user-nickname">
+              <h5 class="nickname">For User: {{originalUserSettings?.nickname}}</h5>
+            </div>
+            <form class="form" [formGroup]="settingsForm" (ngSubmit)="updateUserSettings()">
+
+              <div class="form-group">
+                <input type="email" name="email" formControlName="email"
+                       class="bb-input-textfield"
+                       [class.bb-input-textfield-error]="submitted && settingsForm.controls.email.errors"
+                       id="inputEmail"
+                       placeholder="Email">
+
+                <div *ngIf="submitted && settingsForm.controls.email.errors" class="error">
+                  <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.required">
+                    Email is required.
+                  </small>
+                  <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.email">
+                    Not a valid email.
+                  </small>
+                </div>
+              </div>
+
+
+              <div class="form-group">
+                <input type="password" name="currentPassword" formControlName="currentPassword"
+                       class="bb-input-textfield"
+                       [class.bb-input-textfield-error]="submitted && settingsForm.controls.currentPassword.errors"
+                       id="currentPassword"
+                       placeholder="Current Password">
+                <!-- Current Password Error Messages -->
+              </div>
+
+              <div class="form-group">
+                <input type="password" name="password" formControlName="password"
+                       class="bb-input-textfield"
+                       [class.bb-input-textfield-error]="submitted && settingsForm.controls.password.errors"
+                       id="password"
+                       placeholder="New Password">
+                <!-- New Password Error Messages -->
+              </div>
+
+              <div class="form-group">
+                <input type="password" name="password2" formControlName="password2"
+                       class="bb-input-textfield"
+                       [class.bb-input-textfield-error]="submitted && settingsForm.controls.password2.errors"
+                       id="password2"
+                       placeholder="Confirm New Password">
+                <!-- Confirm New Password Error Messages -->
+              </div>
+
+              <button type="button" (click)="updateUserSettings()" class="bb-button-big">Save</button>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
