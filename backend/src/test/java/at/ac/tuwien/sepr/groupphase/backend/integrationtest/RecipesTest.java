@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,6 +102,50 @@ public class RecipesTest {
             .contains(
                 tuple(1L, "Thai Spicy Basil Chicken Fried Rice", null)
             );
+    }
+
+    @Test
+    public void getRecipeDetails() throws Exception {
+        // creating request
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .get("/api/v1/recipes/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                    "name": "",
+                    "description": "",
+                    "ingredients": "",
+                    "allergens": "",
+                    "picture": ""
+                    }
+                    """)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsByteArray();
+
+        // mapping
+        List<RecipeDetailsDto> recipeDetails = objectMapper.readerFor(RecipeDetailsDto.class).<RecipeDetailsDto>readValues(body).readAll();
+
+        // asserting test
+        assertNotNull(recipeDetails.get(0));
+
+        assertThat(recipeDetails.get(0).name())
+            .contains(
+                "Thai Spicy Basil Chicken Fried Rice"
+            );
+        assertThat(recipeDetails.get(0).description())
+            .contains(
+                "Instructions1"
+            );
+        assertThat(recipeDetails.get(0).ingredients())
+            .hasSize(4)
+            .contains(
+                "Basil: 100 g", "Chicken: 400 g", "Cilantro: 1 cup", "Garlic: 2 kg"
+            );
+        assertThat(recipeDetails.get(0).allergens())
+            .isEmpty();
+
     }
 }
 
