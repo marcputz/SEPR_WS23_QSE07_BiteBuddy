@@ -55,8 +55,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         ArrayList<RecipeListDto> recipeDtos = new ArrayList<>();
         for (Recipe recipe : recipes) {
-            // adding recipes when maxCount -1, or we don't reach maxCount yet
-            recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId()));
+            recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId(), recipe.getPicture()));
         }
 
         return recipeDtos;

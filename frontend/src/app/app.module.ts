@@ -22,6 +22,7 @@ import { LandingPageComponent } from './components/landing-page/landing-page.com
 import { LandingLayoutComponent } from './layouts/landing-layout/landing-layout.component';
 import { LandingHeaderComponent } from './components/landing-header/landing-header.component';
 import { LandingFooterComponent } from './components/landing-footer/landing-footer.component';
+import {NgOptimizedImage} from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -42,14 +43,15 @@ import { LandingFooterComponent } from './components/landing-footer/landing-foot
     LandingHeaderComponent,
     LandingFooterComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    NgbModule,
-    FormsModule,
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        NgbModule,
+        FormsModule,
+        NgOptimizedImage,
+    ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]
 })

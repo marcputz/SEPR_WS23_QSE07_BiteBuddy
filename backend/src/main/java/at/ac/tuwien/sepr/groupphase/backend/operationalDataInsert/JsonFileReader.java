@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 @Profile("addJsonData")
@@ -145,15 +146,14 @@ public class JsonFileReader {
                 }
             }
 
+            */
             // get all the pictures from the recipes and save them in RecipePictures
             for (long i = 1; i < 4; i++) {
                 byte[] picture = recipeRepository.getById(i).getPicture();
-                Path path2 = Paths.get(DEFAULT_PICTURE_FOLDER + "/PicFromDB " + i + ".png");
+                Path path2 = Paths.get(DEFAULT_PICTURE_FOLDER + "/PicFromDB/ " + i + ".png");
                 LOGGER.info("Path where picture is saved: " + path2);
                 Files.write(path2, picture);
             }
-            */
-
 
         } catch (IOException e) {
             LOGGER.error("Error reading JSON file", e);
