@@ -1,10 +1,21 @@
 logging:
-  file.name: ./log/backend.log
   level:
     root: INFO
+    at.ac.tuwien.sepr.groupphase.backend.*: DEBUG
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
+  charset:
+    console: 'utf-8'
+    file: 'utf-8'
+  file:
+    name: ./log/backend.log
   pattern:
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} | %clr(%5p) | %clr(%-35.35logger{35}){yellow} %clr(---){faint} %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSSXXX} r=%X{r} ip=%X{ip} | %5p | [%clr(${PID:- }){magenta}] [%thread] %logger{45}: %msg%n'
     level: r=%X{r} ip=%X{ip} u=%X{u} %5p
+  logback:
+    rollingpolicy:
+      clean-history-on-start: false
+      max-file-size: 100MB
 
 spring:
   datasource:
