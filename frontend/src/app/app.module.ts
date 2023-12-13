@@ -25,6 +25,7 @@ import { LandingFooterComponent } from './components/landing-footer/landing-foot
 import { DialogLayoutComponent } from './layouts/dialog-layout/dialog-layout.component';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ToastrModule} from "ngx-toastr";
+import { SettingsLayoutComponent } from './layouts/settings-layout/settings-layout.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import {ToastrModule} from "ngx-toastr";
     LandingHeaderComponent,
     LandingFooterComponent,
     DialogLayoutComponent,
+    SettingsLayoutComponent,
   ],
   imports: [
     BrowserModule,

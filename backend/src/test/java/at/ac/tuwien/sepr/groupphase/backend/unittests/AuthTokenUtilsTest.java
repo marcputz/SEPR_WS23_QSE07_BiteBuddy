@@ -24,7 +24,7 @@ public class AuthTokenUtilsTest {
 
     @Test
     public void testCreateTokenIsValid() throws Exception {
-        String authToken = AuthTokenUtils.createToken(TESTUSER.getId(), TESTUSER.getNickname());
+        String authToken = AuthTokenUtils.createToken(TESTUSER.getId(), TESTUSER.getNickname(), TESTUSER.getEmail());
         assertTrue(AuthTokenUtils.isValid(authToken));
     }
 
@@ -41,7 +41,7 @@ public class AuthTokenUtilsTest {
 
     @Test
     public void testGetExpirationDate() {
-        String authToken = AuthTokenUtils.createToken(TESTUSER.getId(), TESTUSER.getNickname());
+        String authToken = AuthTokenUtils.createToken(TESTUSER.getId(), TESTUSER.getNickname(), TESTUSER.getEmail());
         Assertions.assertNotNull(AuthTokenUtils.getExpirationDate(authToken));
     }
 

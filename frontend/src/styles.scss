@@ -10,11 +10,18 @@
   --button-background-color-hover: rgba(60, 30, 4, 1);
   --button-color: whitesmoke;
 
+  --button-danger-background-color: rgba(200, 0, 0, 1);
+  --button-danger-background-color-hover: rgba(150, 0, 0, 1);
+
   --input-field-background-color: rgba(0,0,0, 0.04);
   --input-field-background-color-error: rgba(200, 0, 0, 0.14);
 
   --link-color: rgba(50, 50, 50, 1);
   --link-color-hover: rgba(200,150,0,1);
+
+  --settings-navbar-link-color: rgba(100, 100, 100, 1);
+  --settings-navbar-link-color-hover: rgba(200, 150, 0, 1);
+  --settings-navbar-link-color-active: rgba(0,0,0, 1);
 
   -webkit-font-smoothing: antialiased;
 }
@@ -138,6 +145,14 @@ body {
 
 .bb-button-big:hover {
   background-color: var(--button-background-color-hover)
+}
+
+.bb-button-danger {
+  background-color: var(--button-danger-background-color);
+}
+
+.bb-button-danger:hover {
+  background-color: var(--button-danger-background-color-hover);
 }
 
 .bb-message-box {
