@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../../services/auth.service";
 import {ActivatedRoute, NavigationEnd, Router, RouterState} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
+import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
 
 @Component({
   selector: 'app-settings-layout',
@@ -13,9 +14,16 @@ export class SettingsLayoutComponent implements OnInit {
   accountEmail: string | null;
   accountUsername: string | null;
 
+  isTablet: boolean = false;
+  isPhone: boolean = false;
+
   activeNavItem: string = 'account';
 
-  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute, private notification: ToastrService) {
+  constructor(private authService: AuthService,
+              private router: Router,
+              private route: ActivatedRoute,
+              private notification: ToastrService,
+              private responsive: BreakpointObserver) {
     this.accountEmail = null;
     this.accountUsername = null;
   }
@@ -47,6 +55,14 @@ export class SettingsLayoutComponent implements OnInit {
         }
       }
     });
+
+    this.responsive.observe(Breakpoints.Small).subscribe(state => {
+      this.isTablet = state.matches;
+    })
+    this.responsive.observe(Breakpoints.XSmall).subscribe(state => {
+      this.isPhone = state.matches;
+    })
+
   }
 
   setActiveNavItem(itemLabel: string) {

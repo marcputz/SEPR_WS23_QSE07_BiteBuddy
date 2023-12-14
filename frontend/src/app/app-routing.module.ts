@@ -29,8 +29,7 @@ const routes: Routes = [
   ]},
   {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'settings', component: SettingsLayoutComponent, children: [
-      {path: '', component: LoginComponent},
-      //{path: '', pathMatch: 'full', redirectTo: 'account'},
+      {path: '', pathMatch: 'full', redirectTo: 'account'},
       {path: 'account', component: UserSettingsComponent},
       {path: 'password', component: UserSettingsComponent},
       {path: 'system', component: LoginComponent},

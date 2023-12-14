@@ -1,41 +1,41 @@
 <div class="bb-settings-layout-container">
   <div class="row" style="position: relative; width: 95%; height: 80%; max-width: 1200px; max-height: 600px;">
-    <div class="col-lg-11 col-md-11 col-sm-10 mx-auto" style="height: 100%;">
+    <div class="col-lg-11 col-md-11 col-sm-12 mx-auto" style="height: 100%;">
 
-      <!-- desktop -->
+      <!-- desktop (medium and large screens) -->
 
-      <div class="bb-settings-layout-desktop">
+      <div *ngIf="!this.isTablet && !this.isPhone" class="bb-settings-layout-desktop">
 
         <!-- Sidebar Container -->
-        <div class="bb-settings-layout-box" id="settings-sidebar-container">
+        <div class="bb-settings-layout-box" id="settings-sidebar-desktop">
 
           <!-- Account -->
-          <div id="settings-sidebar-account-container">
+          <div id="settings-sidebar-account-desktop">
             <img src="/assets/icons/user_default.png" alt="Account Image">
             <div>
-              <p id="sidebar-username">{{ this.accountUsername }}</p>
-              <p *ngIf="this.accountEmail.length < 40" id="sidebar-email">{{ this.accountEmail }}</p>
+              <p id="sidebar-username" class="bb-selectable">{{ this.accountUsername }}</p>
+              <p *ngIf="this.accountEmail.length < 40" class="bb-selectable" id="sidebar-email">{{ this.accountEmail }}</p>
             </div>
           </div>
 
           <!-- Navbar -->
-          <div id="settings-sidebar-navbar-container">
-            <ul class="bb-settings-navbar-list">
-              <li class="bb-settings-navbar-list-item" [class.active]="activeNavItem == 'account'">
+          <div id="settings-sidebar-navbar-desktop">
+            <ul class="bb-settings-navbar-desktop-list">
+              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'account'">
                 <i class="bi-person-badge"></i>
                 <a routerLink="/settings/account">Account</a>
               </li>
-              <li class="bb-settings-navbar-list-item" [class.active]="activeNavItem == 'password'">
+              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'password'">
                 <i class="bi-key"></i>
                 <a routerLink="/settings/password">Password</a>
               </li>
-              <li class="bb-settings-navbar-list-item" [class.active]="activeNavItem == 'system'">
+              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'system'">
                 <i class="bi-gear"></i>
                 <a routerLink="/settings/system">System</a>
               </li>
             </ul>
 
-            <ul class="bb-settings-navbar-list">
+            <ul class="bb-settings-navbar-desktop-list">
               <button class="bb-button-big" (click)="onClickDashboard()">
                 <i class="bi-house" style="margin-right: 0.3rem;"></i>
                 Back to Dashboard
@@ -57,10 +57,68 @@
         </div>
       </div>
 
-      <!-- mobile -->
+      <!-- tablet (small screens) -->
 
-      <div class="bb-settings-layout-mobile">
-        OUTLET MOBILE
+      <div *ngIf="this.isTablet" class="bb-settings-layout-tablet">
+
+        <!-- Header bar -->
+        <div class="bb-settings-headerbar-tablet">
+
+          <!-- Account info -->
+          <div class="bb-settings-layout-box bb-settings-headerbar-account-tablet">
+            <img src="/assets/icons/user_default.png" alt="Account Image">
+            <div>
+              <p id="sidebar-username" class="bb-selectable">{{ this.accountUsername }}</p>
+              <p *ngIf="this.accountEmail.length < 40" class="bb-selectable" id="sidebar-email">{{ this.accountEmail }}</p>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <div class="bb-settings-layout-box bb-settings-headerbar-navigation-tablet">
+            <ul class="bb-settings-navbar-tablet-list">
+              <li [routerLink]="['/settings/account']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem == 'account'">
+                <div>
+                  <i class="bi-person-badge"></i>
+                  <a>Account</a>
+                </div>
+              </li>
+              <li [routerLink]="['/settings/password']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem == 'password'">
+                <div>
+                  <i class="bi-key"></i>
+                  <a>Password</a>
+                </div>
+              </li>
+              <li [routerLink]="['/settings/system']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem == 'system'">
+                <div>
+                  <i class="bi-gear"></i>
+                  <a>System</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Content Container -->
+        <div class="bb-settings-layout-box" id="settings-content-container">
+          <router-outlet></router-outlet>
+        </div>
+
+      </div>
+
+      <!-- phone (small screens) -->
+
+      <div *ngIf="this.isPhone" class="bb-settings-layout-phone">
+
+        <!-- Header bar -->
+        <div class="bb-settings-mobile-headerbar" id="settings-headerbar-container">
+          PHONE HEADER
+        </div>
+
+        <!-- Content Container -->
+        <div class="bb-settings-layout-box" id="settings-content-container">
+          <router-outlet></router-outlet>
+        </div>
 
       </div>
 

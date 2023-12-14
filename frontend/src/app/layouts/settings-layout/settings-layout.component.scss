@@ -13,47 +13,6 @@
   justify-content: center;
 }
 
-.bb-settings-layout-desktop {
-  display: flex;
-  position: relative;
-
-  flex-direction: row;
-  justify-content: space-between;
-
-  height: 100%;
-  min-height: 200px;
-}
-
-.bb-settings-layout-mobile {
-  display: none;
-  position: relative;
-
-  flex-direction: column;
-  justify-content: space-between;
-
-  height: 100%;
-}
-
-@media only screen and (max-width: 767px) {
-  .bb-settings-layout-mobile {
-    display: flex;
-  }
-  .bb-settings-layout-desktop {
-    display: none;
-  }
-}
-
-#settings-sidebar-container {
-  display: flex;
-  flex-direction: column;
-
-  min-width: 280px;
-  max-width: 280px;
-  width: 280px;
-
-  margin-right: 30px;
-}
-
 #settings-content-container {
   min-width: 350px;
 
@@ -75,7 +34,40 @@
   height: 100%;
 }
 
-#settings-sidebar-navbar-container {
+#sidebar-username {
+  font-weight: 600;
+}
+
+#sidebar-email {
+  font-weight: 300;
+  font-size: 0.7rem;
+}
+
+/* DESKTOP */
+
+.bb-settings-layout-desktop {
+  display: flex;
+  position: relative;
+
+  flex-direction: row;
+  justify-content: space-between;
+
+  height: 100%;
+  min-height: 200px;
+}
+
+#settings-sidebar-desktop {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 280px;
+  max-width: 280px;
+  width: 280px;
+
+  margin-right: 30px;
+}
+
+#settings-sidebar-navbar-desktop {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -83,7 +75,7 @@
   height: 100%;
 }
 
-ul.bb-settings-navbar-list {
+ul.bb-settings-navbar-desktop-list {
   margin: 0;
   padding: 0.6rem 0 1.2rem;
 
@@ -91,12 +83,12 @@ ul.bb-settings-navbar-list {
   align-items: center;
 }
 
-ul.bb-settings-navbar-list button {
+ul.bb-settings-navbar-desktop-list button {
   width: 80%;
   margin: 1rem 10% 0 10%;
 }
 
-li.bb-settings-navbar-list-item {
+li.bb-settings-navbar-desktop-list-item {
   position: relative;
 
   display: flex;
@@ -106,13 +98,13 @@ li.bb-settings-navbar-list-item {
   box-sizing: border-box;
 }
 
-li.bb-settings-navbar-list-item i {
+li.bb-settings-navbar-desktop-list-item i {
   font-size: 1.2rem;
 
   margin-right: 0.8rem;
 }
 
-li.bb-settings-navbar-list-item a {
+li.bb-settings-navbar-desktop-list-item a {
   text-decoration: none;
   color: var(--settings-navbar-link-color);
   font-weight: 500;
@@ -121,29 +113,29 @@ li.bb-settings-navbar-list-item a {
   width: 100%;
 }
 
-li.bb-settings-navbar-list-item:hover {
+li.bb-settings-navbar-desktop-list-item:hover {
   cursor: pointer;
 }
 
-li.bb-settings-navbar-list-item:hover a {
+li.bb-settings-navbar-desktop-list-item:hover a {
   color: var(--settings-navbar-link-color-hover);
 }
 
-li.bb-settings-navbar-list-item:hover i {
+li.bb-settings-navbar-desktop-list-item:hover i {
   color: var(--settings-navbar-link-color-hover);
 }
 
-li.bb-settings-navbar-list-item.active a {
+li.bb-settings-navbar-desktop-list-item.active a {
   font-weight: bolder;
   color: var(--settings-navbar-link-color-active);
 }
 
-li.bb-settings-navbar-list-item.active i {
+li.bb-settings-navbar-desktop-list-item.active i {
   font-weight: bolder;
   color: var(--settings-navbar-link-color-active);
 }
 
-#settings-sidebar-account-container {
+#settings-sidebar-account-desktop {
   position: relative;
   width: 100%;
   padding: 1rem 1rem;
@@ -157,18 +149,18 @@ li.bb-settings-navbar-list-item.active i {
   border-bottom: rgba(0,0,0, 0.08) solid 1px;
 }
 
-#settings-sidebar-account-container img {
+#settings-sidebar-account-desktop img {
   width: 22%;
   height: fit-content;
   margin-right: 5%;
 }
 
-#settings-sidebar-account-container p {
+#settings-sidebar-account-desktop p {
   margin: 0;
   overflow: hidden;
 }
 
-#settings-sidebar-account-container > div {
+#settings-sidebar-account-desktop > div {
   display: flex;
   flex-direction: column;
 
@@ -180,11 +172,134 @@ li.bb-settings-navbar-list-item.active i {
   transform: translateY(-50%);
 }
 
-#settings-sidebar-account-container #sidebar-username {
-  font-weight: 600;
+/* TABLET (Small Screens) */
+
+.bb-settings-layout-mobile {
+  display: flex;
+  position: relative;
+
+  flex-direction: column;
+  justify-content: space-between;
+
+  height: 100%;
 }
 
-#settings-sidebar-account-container #sidebar-email {
-  font-weight: 300;
-  font-size: 0.7rem;
+.bb-settings-headerbar-tablet {
+  display: flex;
+  flex-direction: row;
+
+  margin-bottom: 1.2rem;
+  padding: 0;
+
+  position: relative;
 }
+
+.bb-settings-headerbar-account-tablet {
+  margin-right: 1.2rem !important;
+
+  min-height: 50px;
+  max-width: 220px;
+  width: fit-content;
+
+  display: flex;
+  flex-direction: row;
+}
+
+.bb-settings-headerbar-account-tablet img {
+  width: 20%;
+  height: fit-content;
+
+  margin: 10%;
+}
+
+.bb-settings-headerbar-account-tablet p {
+  padding: 0;
+  margin: 0;
+}
+
+.bb-settings-headerbar-account-tablet > div {
+  display: flex;
+  flex-direction: column;
+
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 35%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.bb-settings-headerbar-navigation-tablet {
+  height: auto;
+}
+
+ul.bb-settings-navbar-tablet-list {
+  display: flex;
+  flex-direction: row;
+
+  margin: 0;
+  padding: 0;
+
+  position: relative;
+  height: 100%;
+}
+
+ul > li.bb-settings-navbar-tablet-list-item {
+  width: auto;
+  height: 100%;
+
+  flex-grow: 1;
+  padding: 10px;
+  cursor: pointer;
+}
+
+ul > li.bb-settings-navbar-tablet-list-item > div {
+  display: flex;
+  flex-direction: column;
+
+  align-content: center;
+  align-items: center;
+  text-align: center;
+
+  border-radius: 10px;
+}
+
+ul > li.bb-settings-navbar-tablet-list-item:hover > div {
+  background-color: rgba(0,0,0, 0.05);
+}
+
+ul > li.bb-settings-navbar-tablet-list-item.active > div {
+  background-color: var(--settings-navbar-link-background-color-active);
+}
+
+ul > li.bb-settings-navbar-tablet-list-item + li {
+  border-left: rgba(0,0,0, 0.1) solid 2px;
+}
+
+ul > li.bb-settings-navbar-tablet-list-item i {
+  font-size: 28px;
+  color: var(--settings-navbar-link-color);
+}
+
+ul > li.bb-settings-navbar-tablet-list-item a {
+  font-size: 16px;
+  text-decoration: none;
+  color: var(--settings-navbar-link-color);
+}
+
+ul > li.bb-settings-navbar-tablet-list-item:hover i {
+  color: var(--settings-navbar-link-color-hover);
+}
+ul > li.bb-settings-navbar-tablet-list-item:hover a {
+  color: var(--settings-navbar-link-color-hover);
+}
+
+ul > li.bb-settings-navbar-tablet-list-item.active i {
+  color: var(--settings-navbar-link-color-active);
+}
+ul > li.bb-settings-navbar-tablet-list-item.active a {
+  color: var(--settings-navbar-link-color-active);
+}
+
+
+/* PHONE (X-Small Screens) */
