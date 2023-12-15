@@ -122,9 +122,54 @@
 
       <div *ngIf="this.isPhone" class="bb-settings-layout-phone">
 
+        <!-- Button Bar -->
+        <div class="bb-settings-buttonbar-phone">
+          <button class="bb-button bb-button-danger" (click)="onClickLogout()">
+            <i class="bi-box-arrow-left" style="margin-right: 0.3rem;"></i>
+            Logout
+          </button>
+          <button class="bb-button" (click)="onClickDashboard()">
+            <i class="bi-house" style="margin-right: 0.3rem;"></i>
+            Back to Dashboard
+          </button>
+        </div>
+
         <!-- Header bar -->
-        <div class="bb-settings-mobile-headerbar" id="settings-headerbar-container">
-          PHONE HEADER
+        <div class="bb-settings-headerbar-phone bb-settings-layout-box">
+
+          <!-- Account and button bar -->
+          <div class="bb-settings-headerbar-account-phone">
+            <img src="/assets/icons/user_default.png" alt="Account Image">
+            <div>
+              <p id="sidebar-username" class="bb-selectable">{{ this.accountUsername }}</p>
+              <p *ngIf="this.accountEmail.length < 40" class="bb-selectable" id="sidebar-email">{{ this.accountEmail }}</p>
+            </div>
+          </div>
+
+          <!-- Navigation bar -->
+          <div class="bb-settings-headerbar-navigation-phone">
+            <ul class="bb-settings-navbar-phone-list">
+              <li [routerLink]="['/settings/account']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem == 'account'">
+                <div>
+                  <i class="bi-person-badge"></i>
+                  <a>Account</a>
+                </div>
+              </li>
+              <li [routerLink]="['/settings/password']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem == 'password'">
+                <div>
+                  <i class="bi-key"></i>
+                  <a>Password</a>
+                </div>
+              </li>
+              <li [routerLink]="['/settings/system']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem == 'system'">
+                <div>
+                  <i class="bi-gear"></i>
+                  <a>System</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+
         </div>
 
         <!-- Content Container -->
