@@ -1,6 +1,6 @@
 <div class="bb-settings-layout-container">
-  <div class="row" style="position: relative; width: 95%; height: 80%; max-width: 1200px; max-height: 600px;">
-    <div class="col-lg-11 col-md-11 col-sm-12 mx-auto" style="height: 100%;">
+  <div class="row">
+    <div class="col-lg-11 col-md-11 col-sm-12 mx-auto" style="height: 100%; position: relative;">
 
       <!-- desktop (medium and large screens) -->
 
@@ -59,7 +59,7 @@
 
       <!-- tablet (small screens) -->
 
-      <div *ngIf="this.isTablet" class="bb-settings-layout-tablet">
+      <div *ngIf="this.isTablet" class="bb-settings-layout-tablet" style="height: 100%;">
 
         <!-- Header bar -->
         <div class="bb-settings-headerbar-tablet">
