@@ -124,6 +124,10 @@ body {
   user-select: none;
 }
 
+.bb-button:hover {
+  background-color: var(--button-background-color-hover);
+}
+
 .bb-button-big {
   display: inline-block;
   width: 100%;
