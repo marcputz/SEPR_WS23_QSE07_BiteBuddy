@@ -56,10 +56,10 @@ export class SettingsLayoutComponent implements OnInit {
       }
     });
 
-    this.responsive.observe(Breakpoints.Small).subscribe(state => {
+    this.responsive.observe(['(max-width: 991px) and (min-width: 576px)']).subscribe(state => {
       this.isTablet = state.matches;
     })
-    this.responsive.observe(Breakpoints.XSmall).subscribe(state => {
+    this.responsive.observe(['(max-width: 575px)']).subscribe(state => {
       this.isPhone = state.matches;
     })
 
