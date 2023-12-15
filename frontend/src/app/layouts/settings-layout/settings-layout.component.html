@@ -61,6 +61,18 @@
 
       <div *ngIf="this.isTablet" class="bb-settings-layout-tablet" style="height: 100%;">
 
+        <!-- Button Bar -->
+        <div class="bb-settings-buttonbar-tablet">
+          <button class="bb-button bb-button-danger" (click)="onClickLogout()">
+            <i class="bi-box-arrow-left" style="margin-right: 0.3rem;"></i>
+            Logout
+          </button>
+          <button class="bb-button" (click)="onClickDashboard()">
+            <i class="bi-house" style="margin-right: 0.3rem;"></i>
+            Back to Dashboard
+          </button>
+        </div>
+
         <!-- Header bar -->
         <div class="bb-settings-headerbar-tablet">
 

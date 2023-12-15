@@ -206,6 +206,17 @@ li.bb-settings-navbar-desktop-list-item.active i {
   height: 100%;
 }
 
+.bb-settings-buttonbar-tablet {
+  margin-bottom: 1rem;
+
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.bb-settings-buttonbar-tablet button {
+  margin-left: 1.1rem;
+}
+
 .bb-settings-headerbar-tablet {
   display: flex;
   flex-direction: row;
