@@ -1,27 +1,22 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.AuthenticationEndpoint;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserSettingsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
-import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
-import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
-import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.SmtpEmailService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.core.util.Json;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,23 +57,34 @@ public class AuthenticationEndpointTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private ApplicationUser TESTUSER = new ApplicationUser()
+    private final String testUserPassword = "password";
+    private final ApplicationUser TESTUSER = new ApplicationUser()
         .setId(-100L)
         .setNickname("authEndpointTest")
         .setEmail("test@authEndpoint.at")
-        .setPasswordEncoded(PasswordEncoder.encode("password", "test@authEndpoint.at"));
+        .setPasswordEncoded(PasswordEncoder.encode(testUserPassword, "test@authEndpoint.at"));
+
+
+    private final ApplicationUser TESTUSER2 = new ApplicationUser()
+        .setId(-101L)
+        .setNickname("secondTestUser")
+        .setEmail("secondTest@authEndpoint.at")
+        .setPasswordEncoded(PasswordEncoder.encode("password2", "secondTest@authEndpoint.at"));
 
     private long testUserId;
+
+    private long testUserId2;
 
     @BeforeEach
     public void beforeEach() throws UserNotFoundException, MessagingException {
         testUserId = userRepository.save(TESTUSER).getId();
+        testUserId2 = userRepository.save(TESTUSER2).getId();
     }
 
     @AfterEach
     public void afterEach() {
         passwordResetRequestRepository.deleteByUser(TESTUSER.setId(testUserId));
-        userRepository.deleteById(testUserId);
+        userRepository.deleteAll();
     }
 
     @Test
@@ -90,7 +96,7 @@ public class AuthenticationEndpointTest {
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(TESTUSER.getEmail())
-                    .withPassword("password")
+                    .withPassword(testUserPassword)
                     .build()))
                 .headers(requestHeaders))
             .andDo(print())
@@ -114,7 +120,7 @@ public class AuthenticationEndpointTest {
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail("doesNotExist@shouldFail.net")
-                    .withPassword("password")
+                    .withPassword(testUserPassword)
                     .build()))
                 .headers(requestHeaders))
             .andDo(print())
@@ -154,7 +160,7 @@ public class AuthenticationEndpointTest {
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(TESTUSER.getEmail())
-                    .withPassword("password")
+                    .withPassword(testUserPassword)
                     .build()))
                 .headers(requestHeaders))
             .andDo(print())
@@ -201,7 +207,7 @@ public class AuthenticationEndpointTest {
         MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(TESTUSER.getEmail())
-                    .withPassword("password")
+                    .withPassword(testUserPassword)
                     .build()))
                 .headers(loginHeaders))
             .andExpect(status().isOk())
@@ -213,7 +219,7 @@ public class AuthenticationEndpointTest {
         // Prepare update data
         UserUpdateEmailAndPasswordDto updateDto = UserUpdateEmailAndPasswordDto.UserUpdateDtoBuilder.anUserUpdateDto()
             .withEmail("newemail@authEndpoint.at")
-            .withCurrentPassword("password")
+            .withCurrentPassword(testUserPassword)
             .withNewPassword("newPassword")
             .build();
 
@@ -246,7 +252,7 @@ public class AuthenticationEndpointTest {
         MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(TESTUSER.getEmail())
-                    .withPassword("password")
+                    .withPassword(testUserPassword)
                     .build()))
                 .headers(loginHeaders))
             .andExpect(status().isOk())
@@ -260,7 +266,7 @@ public class AuthenticationEndpointTest {
         // Prepare update data
         UserUpdateEmailAndPasswordDto updateDto = UserUpdateEmailAndPasswordDto.UserUpdateDtoBuilder.anUserUpdateDto()
             .withEmail(newEmail)
-            .withCurrentPassword("password")
+            .withCurrentPassword(testUserPassword)
             .withNewPassword(newPassword)
             .build();
 
@@ -304,6 +310,44 @@ public class AuthenticationEndpointTest {
 
         String secondAuthToken = secondLoginResult.getResponse().getContentAsString();
         assertNotNull(secondAuthToken);
+    }
+
+    @Test
+    public void testUpdateEmailAndPassword_withEmailInUse_isConflict() throws Exception {
+        // Login to get the token for TESTUSER
+        HttpHeaders loginHeaders = new HttpHeaders();
+        loginHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        loginHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+                .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
+                    .withEmail(TESTUSER.getEmail())
+                    .withPassword(testUserPassword)
+                    .build()))
+                .headers(loginHeaders))
+            .andExpect(status().isOk())
+            .andReturn();
+        String authToken = loginResult.getResponse().getContentAsString();
+        assertNotNull(authToken);
+        UserUpdateEmailAndPasswordDto updateDto = UserUpdateEmailAndPasswordDto.UserUpdateDtoBuilder.anUserUpdateDto()
+            .withEmail(TESTUSER2.getEmail()) // Email already in use by secondTestUser
+            .withCurrentPassword(testUserPassword)
+            .withNewPassword("newPassword")
+            .build();
+        HttpHeaders updateHeaders = new HttpHeaders();
+        updateHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        updateHeaders.setContentType(MediaType.APPLICATION_JSON);
+        updateHeaders.set("Authorization", authToken);
+
+        // Perform update request
+        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings")
+                .content(new ObjectMapper().writeValueAsString(updateDto))
+                .headers(updateHeaders))
+            .andReturn();
+
+        // Verify the response
+        MockHttpServletResponse updateResponse = updateResult.getResponse();
+        assertEquals(HttpStatus.CONFLICT.value(), updateResponse.getStatus());
     }
 
     @Test
@@ -356,7 +400,7 @@ public class AuthenticationEndpointTest {
         MvcResult registerResult2 = this.mockMvc.perform(post("/api/v1/authentication/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto2))
                 .headers(registerHeaders))
-            .andExpect(status().isUnauthorized())
+            .andExpect(status().isBadRequest())
             .andReturn();
     }
 
@@ -367,7 +411,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/request_password_reset")
-                .content("{\"email\":\"" + TESTUSER.getEmail() +  "\"}")
+                .content("{\"email\":\"" + TESTUSER.getEmail() + "\"}")
                 .headers(requestHeaders))
             .andDo(print())
             .andReturn();
@@ -383,7 +427,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/request_password_reset")
-                .content("{\"email\":\"" + "thisEmailShouldNotExist@asdf.org" +  "\"}")
+                .content("{\"email\":\"" + "thisEmailShouldNotExist@asdf.org" + "\"}")
                 .headers(requestHeaders))
             .andDo(print())
             .andReturn();
