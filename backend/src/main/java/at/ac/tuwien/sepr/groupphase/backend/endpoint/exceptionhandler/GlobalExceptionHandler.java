@@ -69,6 +69,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Handles {@link ConflictException}s occurring in REST endpoints.
+     *
+     * @param ex      the exception
+     * @param request the request where the exception occurred
+     * @return a ResponseEntity to send back to the client
+     */
+    @ExceptionHandler(value = {ConflictException.class})
+    protected ResponseEntity<Object> handleConflictError(ConflictException ex, WebRequest request) {
+        LOGGER.warn("Conflict detected: {}", ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    /**
+     * Handles {@link ValidationException}s occurring in REST endpoints.
+     *
+     * @param ex      the exception
+     * @param request the request where the exception occurred
+     * @return a ResponseEntity to send back to the client
+     */
+    @ExceptionHandler(value = {ValidationException.class})
+    protected ResponseEntity<Object> handleValidationError(ValidationException ex, WebRequest request) {
+        LOGGER.warn("Validation error: {}", ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
+    }
+
+    /**
      * Override methods from ResponseEntityExceptionHandler to send a customized HTTP response for a know exception
      * from e.g. Spring
      */
