@@ -21,7 +21,7 @@ public class UserValidator {
         List<String> validationErrors = new ArrayList<>();
         basicValidation(applicationUser, validationErrors);
         if (!validationErrors.isEmpty()) {
-            throw new ValidationException("Validation of ApplicationUser for create failed", validationErrors);
+            throw new ValidationException("Your account could not be created", validationErrors);
         }
     }
 
@@ -33,7 +33,7 @@ public class UserValidator {
         }
         basicValidation(applicationUser, validationErrors);
         if (!validationErrors.isEmpty()) {
-            throw new ValidationException("Validation of ApplicationUser for update failed", validationErrors);
+            throw new ValidationException("Your account details couldn't be updated", validationErrors);
         }
     }
 

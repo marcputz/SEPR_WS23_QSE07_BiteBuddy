@@ -109,37 +109,40 @@ public class JpaUserService implements UserService {
     public ApplicationUser updateApplicationUser(ApplicationUser userToUpdate)
         throws UserNotFoundException, ValidationException, ConflictException {
         LOGGER.trace("updateApplicationUser({})", userToUpdate);
-        if (!userRepository.existsById(userToUpdate.getId())) {
+        if (userToUpdate.getId() == null || !userRepository.existsById(userToUpdate.getId())) {
             throw new UserNotFoundException("User with Id '" + userToUpdate.getId() + "' could not be found");
         }
         validator.validateForUpdate(userToUpdate);
-        checkUniqueConstraints(userToUpdate);
+        checkUniqueConstraints(userToUpdate, true);
         try {
             return userRepository.save(userToUpdate);
         } catch (DataIntegrityViolationException e) {
             LOGGER.error("DataIntegrityViolationException occurred during update: ", e);
-            throw new ConflictException("An unexpected error occurred while updating the user, try again", new ArrayList<>());
+            throw new ConflictException("We encountered an unexpected issue while updating your account. Please try again", new ArrayList<>());
         }
     }
 
 
-    private void checkUniqueConstraints(ApplicationUser userToUpdate) throws ConflictException {
-        LOGGER.trace("checkUniqueConstraints({})", userToUpdate);
+    private void checkUniqueConstraints(ApplicationUser user, boolean isUpdate) throws ConflictException {
+        LOGGER.trace("checkUniqueConstraints({})", user);
         List<String> conflictErrors = new ArrayList<>();
 
         // Email conflict check
-        ApplicationUser userWithSameEmail = userRepository.findByEmailIgnoreCase(userToUpdate.getEmail());
-        if (userWithSameEmail != null && !userWithSameEmail.getId().equals(userToUpdate.getId())) {
-            conflictErrors.add("Email '" + userToUpdate.getEmail() + "' is already in use by another user");
+        ApplicationUser userWithSameEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
+        if (userWithSameEmail != null && (!isUpdate || !userWithSameEmail.getId().equals(user.getId()))) {
+            String operation = isUpdate ? "updating" : "creating";
+            conflictErrors.add("Email '" + user.getEmail() + "' is already in use");
         }
 
         // Nickname conflict check
-        ApplicationUser userWithSameNickname = userRepository.findByNickname(userToUpdate.getNickname());
-        if (userWithSameNickname != null && !userWithSameNickname.getId().equals(userToUpdate.getId())) {
-            conflictErrors.add("Nickname '" + userToUpdate.getNickname() + "' is already in use by another user");
+        ApplicationUser userWithSameNickname = userRepository.findByNickname(user.getNickname());
+        if (userWithSameNickname != null && (!isUpdate || !userWithSameNickname.getId().equals(user.getId()))) {
+            String operation = isUpdate ? "updating" : "creating";
+            conflictErrors.add("Nickname '" + user.getNickname() + "' is already in use");
         }
         if (!conflictErrors.isEmpty()) {
-            throw new ConflictException("Conflicts in ApplicationUser update", conflictErrors);
+            String operation = isUpdate ? "update" : "creation";
+            throw new ConflictException("User " + operation + " failed due to data conflicts", conflictErrors);
         }
     }
 }
