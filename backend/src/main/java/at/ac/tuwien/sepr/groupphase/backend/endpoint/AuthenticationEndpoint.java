@@ -35,7 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.lang.invoke.MethodHandles;
 
 /**
- * REST endpoint for user authentication
+ * REST endpoint for user authentication.
  */
 @RestController
 @RequestMapping(value = "/api/v1/authentication")
@@ -85,10 +85,10 @@ public class AuthenticationEndpoint {
         loginDto.setPassword(registerDto.getPasswordEncoded());
         loginDto.setEmail(registerDto.getEmail());
         registerDto.setPasswordEncoded(encodedPassword);
-        try{
+        try {
             userService.create(registerDto);
             return login(loginDto);
-        } catch (ValidationException e){
+        } catch (ValidationException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
@@ -100,7 +100,7 @@ public class AuthenticationEndpoint {
      *
      * @param userUpdateEmailAndPasswordDto DTO containing the new email and/or password along with the current password for verification.
      * @param headers                       HTTP headers from the request, containing the JWT token.
-     * @return ResponseEntity<UserSettingsDto> indicating the outcome of the operation. The updated user settings are returned in the response body.
+     * @return a ResponseEntity indicating the outcome of the operation. The updated user settings are returned in the response body.
      * @throws AuthenticationException if the authentication fails due to invalid token or incorrect current password.
      * @throws ValidationException     if the provided new email or password fails validation checks.
      * @throws ConflictException       if the new email conflicts with another user's email.
@@ -138,7 +138,7 @@ public class AuthenticationEndpoint {
      * It fetches the user details based on the user ID extracted from the JWT and returns them as a UserSettingsDto.
      *
      * @param headers HTTP headers from the request, containing the JWT token.
-     * @return ResponseEntity containing the UserSettingsDto of the authenticated user.
+     * @return a ResponseEntity containing the UserSettingsDto of the authenticated user.
      * @throws AuthenticationException if the user is not authenticated or the authentication token is invalid.
      * @throws UserNotFoundException   if the user corresponding to the ID in the JWT token is not found.
      */
@@ -161,7 +161,7 @@ public class AuthenticationEndpoint {
     }
 
     /**
-     * Logs out a user, using the JWT authentication token in the HTTP header
+     * Logs out a user, using the JWT authentication token in the HTTP header.
      *
      * @param headers header of the HTTP request
      * @return a ResponseEntity to send back to the client, containing a boolean value indicating if the logout operation was successful.
@@ -180,7 +180,7 @@ public class AuthenticationEndpoint {
     }
 
     /**
-     * Requests a password reset for a certain user, identified by their email
+     * Requests a password reset for a certain user, identified by their email.
      *
      * @param requestBody a json body containing the user's email address
      * @return a ResponseEntity to send back to the client, containing a boolean value indicating if the request was successful.
