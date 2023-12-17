@@ -48,9 +48,9 @@ export class SettingsLayoutComponent implements OnInit {
       if (e instanceof NavigationEnd) {
         // route changed
         switch (e.url) {
-          case '/settings/account': this.setActiveNavItem('account'); break;
+          case '/settings/user': this.setActiveNavItem('user'); break;
+          case '/settings/email': this.setActiveNavItem('email'); break;
           case '/settings/password': this.setActiveNavItem('password'); break;
-          case '/settings/system': this.setActiveNavItem('system'); break;
           default: this.setActiveNavItem(e.url.substring(e.url.lastIndexOf(('/')) + 1, e.url.length)); break;
         }
       }

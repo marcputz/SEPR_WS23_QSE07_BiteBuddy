@@ -31,11 +31,10 @@ const routes: Routes = [
   ]},
   {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
-      {path: '', pathMatch: 'full', redirectTo: 'account'},
-      {path: 'account', canActivate: mapToCanActivate([AuthGuard]), component: ChangeSettingsComponent},
+      {path: '', pathMatch: 'full', redirectTo: 'user'},
+      {path: 'user', canActivate: mapToCanActivate([AuthGuard]), component: ChangeSettingsComponent},
       {path: 'email', canActivate: mapToCanActivate([AuthGuard]), component: ChangeEmailComponent},
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
-      {path: 'system', canActivate: mapToCanActivate([AuthGuard]), component: ChangeSettingsComponent}, // TODO: Replace with actual system settings
   ]},
 
   {path: 'register', component: RegisterComponent},
