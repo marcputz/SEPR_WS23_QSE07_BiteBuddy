@@ -95,13 +95,16 @@ public class JpaUserService implements UserService {
 
         ApplicationUser existingUser = userRepository.findById(currentUserId)
             .orElseThrow(() -> new UserNotFoundException("User with Id '" + currentUserId + "' could not be found"));
-        if (!userUpdateEmailAndPasswordDto.getEmail().isEmpty() && !userUpdateEmailAndPasswordDto.getEmail().equals(existingUser.getEmail())) {
+        if (userUpdateEmailAndPasswordDto.getEmail() != null && !userUpdateEmailAndPasswordDto.getEmail().isEmpty() && !userUpdateEmailAndPasswordDto.getEmail()
+            .equals(existingUser.getEmail())) {
             existingUser.setEmail(userUpdateEmailAndPasswordDto.getEmail());
         }
-        String newPassword = userUpdateEmailAndPasswordDto.getNewPassword().isEmpty()
+        String newPassword = userUpdateEmailAndPasswordDto.getNewPassword() == null || userUpdateEmailAndPasswordDto.getNewPassword().isEmpty()
             ? userUpdateEmailAndPasswordDto.getCurrentPassword()
             : userUpdateEmailAndPasswordDto.getNewPassword();
-        existingUser.setPasswordEncoded(PasswordEncoder.encode(newPassword, existingUser.getEmail()));
+        if (newPassword != null) {
+            existingUser.setPasswordEncoded(PasswordEncoder.encode(newPassword, existingUser.getEmail()));
+        }
         return updateApplicationUser(existingUser);
     }
 
@@ -130,14 +133,12 @@ public class JpaUserService implements UserService {
         // Email conflict check
         ApplicationUser userWithSameEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
         if (userWithSameEmail != null && (!isUpdate || !userWithSameEmail.getId().equals(user.getId()))) {
-            String operation = isUpdate ? "updating" : "creating";
             conflictErrors.add("Email '" + user.getEmail() + "' is already in use");
         }
 
         // Nickname conflict check
         ApplicationUser userWithSameNickname = userRepository.findByNickname(user.getNickname());
         if (userWithSameNickname != null && (!isUpdate || !userWithSameNickname.getId().equals(user.getId()))) {
-            String operation = isUpdate ? "updating" : "creating";
             conflictErrors.add("Nickname '" + user.getNickname() + "' is already in use");
         }
         if (!conflictErrors.isEmpty()) {
