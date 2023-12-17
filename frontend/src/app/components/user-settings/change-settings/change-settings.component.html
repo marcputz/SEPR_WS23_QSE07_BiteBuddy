@@ -1,0 +1,28 @@
+<div *ngIf="error" class="bb-message-box bb-message-box-error">
+  {{ errorMessage }}
+</div>
+
+<div style="padding: 0.8rem;">
+  <div class="bb-login-box">
+    <header>Change User Settings</header>
+    <form class="form" [formGroup]="settingsForm" (ngSubmit)="updateUserSettings()">
+
+      <div class="form-group">
+        <input type="text" name="nickname" formControlName="nickname"
+               class="bb-input-textfield"
+               [class.bb-input-textfield-error]="submitted && settingsForm.controls.nickname.errors"
+               id="inputNickname"
+               placeholder="Nickname">
+
+        <div *ngIf="submitted && settingsForm.controls.nickname.errors" class="error">
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.nickname.errors.required">
+            Nickname is required.
+          </small>
+        </div>
+      </div>
+
+      <button type="button" (click)="updateUserSettings()" class="bb-button-big">Save</button>
+
+    </form>
+  </div>
+</div>
