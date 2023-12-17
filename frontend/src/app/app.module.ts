@@ -29,6 +29,7 @@ import {ToastrModule} from "ngx-toastr";
 import {ChangeEmailComponent} from './components/user-settings/change-email/change-email.component';
 import {ChangePasswordComponent} from './components/user-settings/change-password/change-password.component';
 import {ChangeSettingsComponent} from './components/user-settings/change-settings/change-settings.component';
+import { SettingsLayoutComponent } from './layouts/settings-layout/settings-layout.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import {ChangeSettingsComponent} from './components/user-settings/change-setting
     ChangeEmailComponent,
     ChangePasswordComponent,
     ChangeSettingsComponent,
+    SettingsLayoutComponent,
   ],
   imports: [
     BrowserModule,

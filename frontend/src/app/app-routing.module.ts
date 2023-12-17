@@ -16,26 +16,29 @@ import {DialogLayoutComponent} from "./layouts/dialog-layout/dialog-layout.compo
 import {ChangeSettingsComponent} from './components/user-settings/change-settings/change-settings.component';
 import {ChangeEmailComponent} from './components/user-settings/change-email/change-email.component';
 import {ChangePasswordComponent} from './components/user-settings/change-password/change-password.component';
+import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout.component";
 
 const routes: Routes = [
   //{path: '', component: HomeComponent},
 
   {path: '*', redirectTo: ''}, // Redirection for unknown paths
 
-  {path: '', component: LandingLayoutComponent}, // Landing Page
-  {
-    path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
+  {path: '', canActivate: mapToCanActivate([AuthGuard]), component: LandingLayoutComponent}, // Landing Page
+  {path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
       {path: 'login', component: LoginComponent}, // Login Page
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
       {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
-    ]
-  },
+  ]},
+  {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
+  {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
+      {path: '', pathMatch: 'full', redirectTo: 'account'},
+      {path: 'account', canActivate: mapToCanActivate([AuthGuard]), component: ChangeSettingsComponent},
+      {path: 'email', canActivate: mapToCanActivate([AuthGuard]), component: ChangeEmailComponent},
+      {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
+      {path: 'system', canActivate: mapToCanActivate([AuthGuard]), component: ChangeSettingsComponent}, // TODO: Replace with actual system settings
+  ]},
 
-  // {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
-  {path: 'account', component: ChangeSettingsComponent},
-  {path: 'email', component: ChangeEmailComponent},
-  {path: 'password', component: ChangePasswordComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {
     path: 'recipes', children: [

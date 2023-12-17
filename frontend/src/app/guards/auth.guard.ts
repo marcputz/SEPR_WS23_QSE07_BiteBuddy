@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import { Router } from '@angular/router';
+import {ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
 import {AuthService} from '../services/auth.service';
 
 @Injectable({
@@ -8,12 +8,24 @@ import {AuthService} from '../services/auth.service';
 export class AuthGuard  {
 
   constructor(private userService: AuthService,
-              private router: Router) {}
+              private router: Router,
+              private activatedRoute: ActivatedRoute) {}
 
-  canActivate(): boolean {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    var wantedRoute = state.url;
+
     if (this.userService.isLoggedIn()) {
+      if (wantedRoute == '/') {
+        this.router.navigate(['/dashboard']);
+        return false;
+      }
+
       return true;
     } else {
+      if (wantedRoute == '/') {
+        return true;
+      }
+
       this.router.navigate(['/login']);
       return false;
     }

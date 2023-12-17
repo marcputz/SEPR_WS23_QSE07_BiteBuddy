@@ -123,4 +123,14 @@ export class AuthService {
     return date;
   }
 
+  public getTokenUsername(token: string): string | null {
+    const decoded: any = jwtDecode(token);
+    return decoded.username ? decoded.username : null;
+  }
+
+  public getTokenEmail(token: string): string | null {
+    const decoded: any = jwtDecode(token);
+    return decoded.email ? decoded.email : null;
+  }
+
 }
