@@ -4,18 +4,16 @@
 
 <div style="padding: 0.8rem;">
   <div class="bb-login-box">
-    <header>Change User Settings</header>
-    <div class="user-nickname">
-      <h5 class="nickname">For User: {{originalUserSettings?.nickname}}</h5>
-    </div>
+    <header>Change Email</header>
     <form class="form" [formGroup]="settingsForm" (ngSubmit)="updateUserSettings()">
 
       <div class="form-group">
+        <label for="inputEmail">Email:</label>
         <input type="email" name="email" formControlName="email"
                class="bb-input-textfield"
                [class.bb-input-textfield-error]="submitted && settingsForm.controls.email.errors"
                id="inputEmail"
-               placeholder="Email">
+               placeholder="Enter new Email">
 
         <div *ngIf="submitted && settingsForm.controls.email.errors" class="error">
           <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.required">
@@ -29,12 +27,12 @@
 
 
       <div class="form-group">
+        <label for="currentPassword">Password:</label>
         <input type="password" name="currentPassword" formControlName="currentPassword"
                class="bb-input-textfield"
                [class.bb-input-textfield-error]="submitted && settingsForm.controls.currentPassword.errors"
                id="currentPassword"
-               placeholder="Current Password">
-        <!-- Current Password Error Messages -->
+               placeholder="Enter Password">
       </div>
 
       <button type="button" (click)="updateUserSettings()" class="bb-button-big">Save</button>

@@ -7,7 +7,14 @@
     <header>Change User Settings</header>
     <form class="form" [formGroup]="settingsForm" (ngSubmit)="updateUserSettings()">
 
+
+      <!--
       <div class="form-group">
+        <label for="inputPicture">Profile Picture:</label>
+      </div>
+      -->
+      <div class="form-group">
+        <label for="inputNickname">Nickname:</label>
         <input type="text" name="nickname" formControlName="nickname"
                class="bb-input-textfield"
                [class.bb-input-textfield-error]="submitted && settingsForm.controls.nickname.errors"
