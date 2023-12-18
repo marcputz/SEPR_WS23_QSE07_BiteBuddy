@@ -1,13 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.config.FilePathsProperties;
 import at.ac.tuwien.sepr.groupphase.backend.service.KeyService;
 import at.ac.tuwien.sepr.groupphase.backend.utils.ResourceFileUtils;
-import jakarta.annotation.PostConstruct;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -31,30 +29,32 @@ import java.util.Optional;
  * @author Marc Putz
  */
 @Service
-@Scope("singleton")
 public class FileKeyService implements KeyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Value("${file-paths.key-security-folder}")
+    private final FilePathsProperties filePathsProperties;
+
     private String keyFolder;
-
-    @Value("${file-paths.private-key-filename}")
     private String privateKeyFilename;
-
-    @Value("${file-paths.public-key-filename}")
     private String publicKeyFilename;
 
     private File keyFolderFile = null;
 
     private ResourceFileUtils resourceFileUtils;
 
-    public FileKeyService() {}
+    public FileKeyService(FilePathsProperties filePathsProperties) {
+        this.filePathsProperties = filePathsProperties;
+
+        this.keyFolder = filePathsProperties.getKeySecurityFolder();
+        this.privateKeyFilename = filePathsProperties.getPrivateKeyFilename();
+        this.publicKeyFilename = filePathsProperties.getPublicKeyFilename();
+        initKeyFolder();
+    }
 
     @Override
     public RSAPrivateKey getPrivateKey() {
         LOGGER.trace("getPrivateKey()");
         try {
-            initKeyFolder();
             File file = resourceFileUtils.getResourceFile(this.privateKeyFilename);
             return readPrivateKeyFromFile(file);
         } catch (FileNotFoundException e) {
@@ -66,7 +66,6 @@ public class FileKeyService implements KeyService {
     public RSAPublicKey getPublicKey() {
         LOGGER.trace("getPublicKey()");
         try {
-            initKeyFolder();
             File file = resourceFileUtils.getResourceFile(this.publicKeyFilename);
             return readPublicKeyFromFile(file);
         } catch (FileNotFoundException e) {
@@ -78,7 +77,7 @@ public class FileKeyService implements KeyService {
         LOGGER.trace("initKeyFolder()");
         try {
             resourceFileUtils = new ResourceFileUtils(keyFolder, Optional.empty());
-            this.keyFolderFile = resourceFileUtils.getResourceFile(keyFolder);
+            this.keyFolderFile = resourceFileUtils.getResourceFile(null);
 
             LOGGER.debug("Using key folder at {}", this.keyFolderFile.getAbsolutePath());
 

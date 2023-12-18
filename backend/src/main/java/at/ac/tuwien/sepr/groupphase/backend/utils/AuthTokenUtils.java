@@ -2,13 +2,13 @@ package at.ac.tuwien.sepr.groupphase.backend.utils;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.KeyService;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.FileKeyService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.security.interfaces.RSAPrivateKey;
@@ -20,6 +20,7 @@ import java.util.Date;
  *
  * @author Marc Putz
  */
+@Component
 public class AuthTokenUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -27,7 +28,11 @@ public class AuthTokenUtils {
     private static final String TOKEN_PREFIX = "Bearer ";
     private static final int TOKEN_VALID_DURATION_IN_MINUTES = 120;
 
-    private static final KeyService keyService = new FileKeyService();
+    private static KeyService keyService;
+
+    public AuthTokenUtils(KeyService keyService) {
+        this.keyService = keyService;
+    }
 
     /**
      * Creates a new JWT authentication token, assigned to a specific user identified by ID and nickname.
