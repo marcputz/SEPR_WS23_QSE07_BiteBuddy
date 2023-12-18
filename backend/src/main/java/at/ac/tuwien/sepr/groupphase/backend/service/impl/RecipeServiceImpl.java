@@ -66,10 +66,9 @@ public class RecipeServiceImpl implements RecipeService {
         // TODO check if ID is valid (not null)
         LOGGER.trace("details({})", id);
         Optional<Recipe> recipe = this.recipeRepository.findById(id);
-        if(recipe.isEmpty()){
+        if (recipe.isEmpty()) {
             throw new NotFoundException("The searched for recipe does not exist in the database anymore.");
-        }
-        else{
+        } else {
             RecipeDetailsDto detailsDto = new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions());
             return detailsDto;
         }

@@ -12,7 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 /**
- * Service class to handle user authentication
+ * Service class to handle user authentication.
  *
  * @author Marc Putz
  */
@@ -27,7 +27,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Logs in a user (checks for correct email and password)
+     * Logs in a user (checks for correct email and password).
      *
      * @param loginDto the DTO containing login data (email and password)
      * @return an authentication token for the user's session
@@ -64,7 +64,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Logs in a user (WARNING: does not authenticate, only authorizes)
+     * Logs in a user (WARNING: does not authenticate, only authorizes).
      *
      * @param user the user to login
      * @return an authentication token for the user's session
@@ -106,7 +106,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Logs out a user by stopping their session
+     * Logs out a user by stopping their session.
      *
      * @param user the user to logout
      * @throws AuthenticationException if user not logged in
@@ -172,7 +172,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Verifies if a http header contains valid authentication data
+     * Verifies if a http header contains valid authentication data.
      *
      * @param headers the http headers of the request to authenticate
      * @throws AuthenticationException if the headers do contain no or invalid authentication data
@@ -189,7 +189,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Retrieves the authentication token from http headers
+     * Retrieves the authentication token from http headers.
      *
      * @param headers the HTTP headers containing the auth token
      * @return the auth token as a string representation, NULL if headers don't contain token

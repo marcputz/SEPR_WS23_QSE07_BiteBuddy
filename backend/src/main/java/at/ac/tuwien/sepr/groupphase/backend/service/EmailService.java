@@ -3,12 +3,12 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import jakarta.mail.MessagingException;
 
 /**
- * Service class to handle sending emails
+ * Service class to handle sending emails.
  */
 public interface EmailService {
 
     /**
-     * Sends an email with specified subject line and content to a recipient
+     * Sends an email with specified subject line and content to a recipient.
      *
      * @param recipient the email address of the recipient
      * @param mailSubject the mail's subject line

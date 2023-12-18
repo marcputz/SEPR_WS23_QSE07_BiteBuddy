@@ -68,7 +68,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 return false;
             }*/
 
-            return superClassAllows;
+        return superClassAllows;
         //}
     }
 

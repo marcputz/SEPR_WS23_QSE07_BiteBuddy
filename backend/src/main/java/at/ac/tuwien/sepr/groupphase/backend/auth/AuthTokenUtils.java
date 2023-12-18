@@ -16,7 +16,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 
 /**
- * Utility class for JWT authentication tokens
+ * Utility class for JWT authentication tokens.
  *
  * @author Marc Putz
  */
@@ -33,10 +33,11 @@ public class AuthTokenUtils {
      * Creates a new JWT authentication token, assigned to a specific user identified by ID and nickname.
      * The JWT token is signed with RSA keys, meaning it is signed with the server's private key and can
      * later be verified by using the server's public key.
-     *
+     * <p>
      * The JWT uses a time interval of {@value AuthTokenUtils#TOKEN_VALID_DURATION_IN_MINUTES} minutes to calculate the expiration date.
-     *
+     * </p><p>
      * Tokens are also automatically prefixed by a string specified in {@link AuthTokenUtils#TOKEN_PREFIX}.
+     * </p>
      *
      * @author Marc Putz
      * @param user the ApplicationUser object of the correlating user. Uses ID and nickname for token creation.
@@ -50,10 +51,11 @@ public class AuthTokenUtils {
      * Creates a new JWT authentication token, assigned to a specific user identified by ID and nickname.
      * The JWT token is signed with RSA keys, meaning it is signed with the server's private key and can
      * later be verified by using the server's public key.
-     *
+     * <p>
      * The JWT uses a time interval of {@value AuthTokenUtils#TOKEN_VALID_DURATION_IN_MINUTES} minutes to calculate the expiration date.
-     *
+     * </p><p>
      * Tokens are also automatically prefixed by a string specified in {@link AuthTokenUtils#TOKEN_PREFIX}.
+     * </p>
      *
      * @author Marc Putz
      * @param userId the User ID of the correlating user

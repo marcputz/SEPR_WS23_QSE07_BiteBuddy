@@ -42,17 +42,17 @@ public class RecipeEndpoint {
     }
 
     @GetMapping("/{id}")
-     public RecipeDetailsDto getDetailedRecipe(@PathVariable long id) {
-         LOGGER.info("GET " + BASE_PATH + id);
-         try{
-             return this.recipeService.getDetailedRecipe(id);
-         } catch(NotFoundException e){
-             HttpStatus status = HttpStatus.NOT_FOUND;
-             logClientError(status, "Horse to update not found", e);
-             throw new ResponseStatusException(status, e.getMessage(), e);
-         }
+    public RecipeDetailsDto getDetailedRecipe(@PathVariable long id) {
+        LOGGER.info("GET " + BASE_PATH + id);
+        try {
+            return this.recipeService.getDetailedRecipe(id);
+        } catch (NotFoundException e) {
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            logClientError(status, "Horse to update not found", e);
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        }
 
-     }
+    }
 
     private void logClientError(HttpStatus status, String message, Exception e) {
         LOGGER.warn("{} {}: {}: {}", status.value(), message, e.getClass().getSimpleName(), e.getMessage());

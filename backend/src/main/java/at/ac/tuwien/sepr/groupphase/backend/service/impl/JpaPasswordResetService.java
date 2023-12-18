@@ -4,7 +4,11 @@ import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
-import at.ac.tuwien.sepr.groupphase.backend.exception.*;
+import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
@@ -20,6 +24,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * Implementation of PasswordResetService using JPA.
+ *
  * @author Marc Putz
  */
 @Service
@@ -75,7 +81,7 @@ public class JpaPasswordResetService implements PasswordResetService {
     }
 
     /**
-     * Sends a request confirmation email to a recipient
+     * Sends a request confirmation email to a recipient.
      *
      * @param recipient the email address of the recipient
      * @param requestId the reset request ID (not encoded)

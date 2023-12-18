@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Class to handle user sessions and manage authentication tokens
+ * Class to handle user sessions and manage authentication tokens.
  *
  * @author Marc Putz
  */
@@ -103,7 +103,7 @@ public final class SessionManager {
     }
 
     /**
-     * Retrieves the corresponding authentication token of a user
+     * Retrieves the corresponding authentication token of a user.
      *
      * @param userId the ID of the user
      * @return the corresponding authentication token of the user, NULL if no session registered

@@ -1,7 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -42,8 +48,12 @@ public class PasswordResetRequest {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         PasswordResetRequest that = (PasswordResetRequest) o;
         return Objects.equals(id, that.id) && Objects.equals(user, that.user) && Objects.equals(requestTime, that.requestTime);
     }
@@ -55,10 +65,10 @@ public class PasswordResetRequest {
 
     @Override
     public String toString() {
-        return "PasswordChangeRequest{" +
-            "id=" + id +
-            ", user=" + user +
-            ", requestTime=" + requestTime +
-            '}';
+        return "PasswordChangeRequest{"
+            + "id=" + id
+            + ", user=" + user
+            + ", requestTime=" + requestTime
+            + '}';
     }
 }

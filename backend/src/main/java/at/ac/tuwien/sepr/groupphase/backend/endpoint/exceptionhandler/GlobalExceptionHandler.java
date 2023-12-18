@@ -41,7 +41,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Handles {@link AuthenticationException}s occurring in REST endpoints
+     * Handles {@link AuthenticationException}s occurring in REST endpoints.
      *
      * @author Marc Putz
      * @param ex the exception
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Handles {@link DataStoreException}s occurring in REST endpoints
+     * Handles {@link DataStoreException}s occurring in REST endpoints.
      *
      * @author Marc Putz
      * @param ex the exception

@@ -31,8 +31,12 @@ public class ResetPasswordDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ResetPasswordDto that = (ResetPasswordDto) o;
         return Objects.equals(resetId, that.resetId) && Objects.equals(newPassword, that.newPassword);
     }
@@ -44,9 +48,9 @@ public class ResetPasswordDto {
 
     @Override
     public String toString() {
-        return "ResetPasswordDto{" +
-            "resetId='" + resetId + '\'' +
-            ", newPassword='" + newPassword + '\'' +
-            '}';
+        return "ResetPasswordDto{"
+            + "resetId='" + resetId + '\''
+            + ", newPassword='" + newPassword + '\''
+            + '}';
     }
 }

@@ -8,7 +8,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Utility class to provide password encoding
+ * Utility class to provide password encoding.
  *
  * @author Marc Putz
  */

@@ -31,7 +31,6 @@ public class SmtpEmailService implements EmailService {
     @Override
     public boolean sendEmail(String recipient, String mailSubject, String mailContent, boolean contentIsHtml) throws MessagingException {
 
-        String emailAddress = config.getEmail().getAddress();
         String smtpHost = config.getEmail().getSmtp().getHost();
         int smtpPort = config.getEmail().getSmtp().getPort();
         String smtpUsername = config.getEmail().getSmtp().getUsername();
@@ -50,6 +49,8 @@ public class SmtpEmailService implements EmailService {
                 return new PasswordAuthentication(smtpUsername, smtpPassword);
             }
         });
+
+        String emailAddress = config.getEmail().getAddress();
 
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(emailAddress));

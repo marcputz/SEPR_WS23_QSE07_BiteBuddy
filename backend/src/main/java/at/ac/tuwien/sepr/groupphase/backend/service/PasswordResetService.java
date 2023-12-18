@@ -8,7 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import jakarta.mail.MessagingException;
 
 /**
- * Service class to handle password resets
+ * Service class to handle password resets.
  *
  * @author Marc Putz
  */
