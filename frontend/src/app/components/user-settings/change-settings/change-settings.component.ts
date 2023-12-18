@@ -56,6 +56,7 @@ export class ChangeSettingsComponent {
     this.submitted = true;
     if (this.settingsForm.valid) {
       const nickname: string = this.settingsForm.controls.nickname.value;
+      this.notifications.error('Not yet implemented');
       //const updateUserSettingsDto: UpdateUserSettingsDto = new UpdateNicknameDto(
       //  nickname
       //);

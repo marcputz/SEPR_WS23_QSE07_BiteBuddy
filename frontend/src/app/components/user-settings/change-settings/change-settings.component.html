@@ -8,11 +8,11 @@
     <form class="form" [formGroup]="settingsForm" (ngSubmit)="updateUserSettings()">
 
 
-      <!--
       <div class="form-group">
-        <label for="inputPicture">Profile Picture:</label>
+        <label>Profile Picture:</label>
+        <img src="/assets/icons/user_default.png" alt="Account Image"
+             style="width: 100px; height: 100px;display: block;">
       </div>
-      -->
       <div class="form-group">
         <label for="inputNickname">Nickname:</label>
         <input type="text" name="nickname" formControlName="nickname"
