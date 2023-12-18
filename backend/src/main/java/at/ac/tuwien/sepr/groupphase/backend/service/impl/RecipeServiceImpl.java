@@ -126,6 +126,12 @@ public class RecipeServiceImpl implements RecipeService {
         return matchingIngredients;
     }
 
+    @Override
+    public void createRating(long recipeID, long userID, int rating) {
+        LOGGER.trace("createRating({})({})", recipeID, userID);
+    }
+
+
     public RecipeDetailsDto getDetailedRecipe(long id) {
         // TODO check if ID is valid (not null)
         LOGGER.trace("details({})", id);
