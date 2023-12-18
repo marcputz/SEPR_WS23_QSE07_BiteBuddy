@@ -54,8 +54,8 @@ public class FileKeyService implements KeyService {
     public RSAPrivateKey getPrivateKey() {
         LOGGER.trace("getPrivateKey()");
         try {
-            File file = resourceFileUtils.getResourceFile(this.privateKeyFilename);
             initKeyFolder();
+            File file = resourceFileUtils.getResourceFile(this.privateKeyFilename);
             return readPrivateKeyFromFile(file);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -66,8 +66,8 @@ public class FileKeyService implements KeyService {
     public RSAPublicKey getPublicKey() {
         LOGGER.trace("getPublicKey()");
         try {
-            File file = resourceFileUtils.getResourceFile(this.publicKeyFilename);
             initKeyFolder();
+            File file = resourceFileUtils.getResourceFile(this.publicKeyFilename);
             return readPublicKeyFromFile(file);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
