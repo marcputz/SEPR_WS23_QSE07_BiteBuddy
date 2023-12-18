@@ -67,33 +67,11 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public void createRecipe(RecipeDetailsDto recipe) throws ConflictException {
-        // TODO throw Error
         LOGGER.debug("createRecipe");
 
         // check ingredients exist
         Set<RecipeIngredient> ingredients = new HashSet<>();
         ArrayList<String> conflictList = new ArrayList<>();
-
-        // checking that each recipe actually exists
-        // (later when amount and everything is implemented the validation needs to be more complex and broad)
-        for (String ingredient : recipe.ingredients()) {
-            List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient);
-
-            if (!queriedResults.isEmpty()) {
-                RecipeIngredient ing = new RecipeIngredient();
-                ing.setAmount("");
-                ing.setIngredient(queriedResults.get(0));
-                // TODO set the recipe for the ingredient
-                // ing.setRecipe();
-                ingredients.add(ing);
-            } else {
-                conflictList.add("Ingredient " + ingredient + "does not exist");
-            }
-        }
-
-        if (!conflictList.isEmpty()) {
-            throw new ConflictException("Ingredients do not match with the database", conflictList);
-        }
 
         // creating database entry
         Recipe newRecipe = new Recipe();
@@ -117,14 +95,20 @@ public class RecipeServiceImpl implements RecipeService {
                 ing.setIngredient(queriedResults.get(0));
                 ing.setRecipe(queriedRecipe);
                 ingredients.add(ing);
+                this.recipeIngredientRepository.save(ing);
             } else {
                 conflictList.add("Ingredient " + ingredient + "does not exist");
             }
         }
 
+        // checking that each recipe actually exists
+        // (later when amount and everything is implemented the validation needs to be more complex and broad)
+        if (!conflictList.isEmpty()) {
+            this.recipeRepository.delete(queriedRecipe);
+            throw new ConflictException("Ingredients do not match with the database", conflictList);
+        }
+
         this.recipeRepository.updateIngredients(queriedRecipe.getId(), ingredients);
-        queriedRecipe = this.recipeRepository.findByNameContainingIgnoreCase(recipe.name()).get(0);
-        System.out.println("");
     }
 
     @Override
