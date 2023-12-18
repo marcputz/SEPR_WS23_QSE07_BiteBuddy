@@ -5,7 +5,6 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
-import {RegisterComponent} from "../components/authentication/register/register.component";
 import {RegisterDto} from "../dtos/registerDto";
 import {UserSettingsDto} from '../dtos/userSettingsDto';
 import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';

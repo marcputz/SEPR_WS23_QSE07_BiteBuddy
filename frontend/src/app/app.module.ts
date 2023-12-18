@@ -13,7 +13,7 @@ import {MessageComponent} from './components/message/message.component';
 import {RecipeListComponent} from './components/recipe-list/recipe-list.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
-import {RegisterComponent} from './components/authentication/register/register.component';
+import {RegisterComponent} from './components/dialogs/register/register.component';
 import {
   RequestPasswordResetComponent
 } from './components/dialogs/request-password-reset/request-password-reset.component';

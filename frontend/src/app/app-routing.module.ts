@@ -1,10 +1,9 @@
 import {NgModule} from '@angular/core';
 import {mapToCanActivate, RouterModule, Routes} from '@angular/router';
-import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/dialogs/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
 import {MessageComponent} from './components/message/message.component';
-import {RegisterComponent} from "./components/authentication/register/register.component";
+import {RegisterComponent} from "./components/dialogs/register/register.component";
 import {
   RequestPasswordResetComponent
 } from "./components/dialogs/request-password-reset/request-password-reset.component";
@@ -28,7 +27,8 @@ const routes: Routes = [
       {path: 'login', component: LoginComponent}, // Login Page
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
       {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
-  ]},
+      {path: 'register', component: RegisterComponent},
+    ]},
   {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
       {path: '', pathMatch: 'full', redirectTo: 'user'},
@@ -37,7 +37,6 @@ const routes: Routes = [
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
   ]},
 
-  {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {
     path: 'recipes', children: [
