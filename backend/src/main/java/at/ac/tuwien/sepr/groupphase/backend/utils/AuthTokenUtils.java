@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.auth;
+package at.ac.tuwien.sepr.groupphase.backend.utils;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.service.KeyService;

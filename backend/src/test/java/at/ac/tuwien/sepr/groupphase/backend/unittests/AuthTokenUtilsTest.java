@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
-import at.ac.tuwien.sepr.groupphase.backend.auth.AuthTokenUtils;
+import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

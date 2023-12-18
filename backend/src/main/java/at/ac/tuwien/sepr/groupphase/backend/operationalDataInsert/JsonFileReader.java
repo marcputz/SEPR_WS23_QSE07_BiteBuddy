@@ -14,6 +14,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 
+import at.ac.tuwien.sepr.groupphase.backend.utils.ResourceFileUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
@@ -23,53 +24,77 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Profile("addJsonData")
 @Component
 public class JsonFileReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String DEFAULT_KEY_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/FoodDataFiles";
-    private static final String DEFAULT_PICTURE_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/RecipePictures";
-    private static final String PRIVATE_KEY_FILENAME_RECIPES = "Recipes.json";
-    private static final String PRIVATE_KEY_FILENAME_INGREDIENTS = "Ingredients.json";
-    private static final String PRIVATE_KEY_FILENAME_ALLERGENES = "Allergenes.json";
-    private static final String PRIVATE_KEY_FILENAME_ALLERGENEINGREDIENTS = "AllergeneIngredients.json";
-    private static final String PRIVATE_KEY_FILENAME_RECIPEINGREDIENTS = "RecipeIngredients.json";
+
+    @Value("${file-paths.data.folder}")
+    private String dataFolder;
+
+    @Value("${file-paths.pictures.recipe-folder}")
+    private String picturesFolder;
+
+    @Value("${file-paths.data.filename.recipe}")
+    private String recipeFilename;
+    @Value("${file-paths.data.filename.ingredient}")
+    private String ingredientFilename;
+    @Value("${file-paths.data.filename.allergen}")
+    private String allergeneFilename;
+    @Value("${file-paths.data.filename.allergen-ingredient}")
+    private String allergeneIngredientFilename;
+    @Value("${file-paths.data.filename.recipe-ingredient}")
+    private String recipeIngredientFilename;
+
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
     private final AllergeneRepository allergeneRepository;
     private final AllergeneIngredientRepository allergeneIngredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
 
+    private ResourceFileUtils resourceFileUtils = null;
+    private ResourceLoader resourceLoader = null;
+
     public JsonFileReader(RecipeRepository recipeRepository, IngredientRepository ingredientRepository,
                           AllergeneRepository allergeneRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                          RecipeIngredientRepository recipeIngredientRepository) {
+                          RecipeIngredientRepository recipeIngredientRepository, ResourceLoader resourceLoader) {
         this.recipeRepository = recipeRepository;
         this.ingredientRepository = ingredientRepository;
         this.allergeneRepository = allergeneRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
+        this.resourceLoader = resourceLoader;
     }
 
     @PostConstruct
     public void putFoodDataInDataBase() {
         LOGGER.info("called putting FoodData into Database from File");
 
+        //here in order to be called after the annotations are processed
+        resourceFileUtils = new ResourceFileUtils(dataFolder, Optional.of(picturesFolder));
         try {
-            File fileIngredients = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_INGREDIENTS);
-            File fileAllergenes = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_ALLERGENES);
-            File fileRecepies = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_RECIPES);
-            File fileAllergeneIngredients = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_ALLERGENEINGREDIENTS);
-            File fileRecipeIngredients = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_RECIPEINGREDIENTS);
+            File fileIngredients = resourceFileUtils.getResourceFile(ingredientFilename);
+            File fileAllergenes = resourceFileUtils.getResourceFile(allergeneFilename);
+            File fileRecepies = resourceFileUtils.getResourceFile(recipeFilename);
+            File fileAllergeneIngredients = resourceFileUtils.getResourceFile(allergeneIngredientFilename);
+            File fileRecipeIngredients = resourceFileUtils.getResourceFile(recipeIngredientFilename);
 
             ObjectMapper objectMapper = new ObjectMapper();
 
@@ -89,10 +114,14 @@ public class JsonFileReader {
             int pictureCount = 1;
             if (recipeRepository.count() == 0) {
                 for (Recipe recipe : recipes) {
-                    Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".png");
-                    LOGGER.info("Path where picture is gotten: " + path);
-                    recipe.setPicture(Files.readAllBytes(path));
-                    recipeRepository.save(recipe);
+                    String filename = pictureCount + ".png";
+                    Resource resource = resourceFileUtils.getResourceLoader(resourceLoader, filename);
+                    LOGGER.info("Resource where picture is gotten: {}", resource);
+
+                    try (InputStream inputStream = resource.getInputStream()) {
+                        recipe.setPicture(inputStream.readAllBytes());
+                        recipeRepository.save(recipe);
+                    }
                     pictureCount++;
                 }
             }
@@ -148,15 +177,27 @@ public class JsonFileReader {
 
             */
             // get all the pictures from the recipes and save them in RecipePictures
-            for (long i = 1; i < 4; i++) {
-                byte[] picture = recipeRepository.getById(i).getPicture();
-                Path path2 = Paths.get(DEFAULT_PICTURE_FOLDER + "/" + i + "saved.png");
-                LOGGER.info("Path where picture is saved: " + path2);
-                Files.write(path2, picture);
-            }
+            saveRecipePictures();
 
         } catch (IOException e) {
             LOGGER.error("Error reading JSON file", e);
+        }
+    }
+
+    private void saveRecipePictures() throws IOException {
+        for (long i = 1; i < 4; i++) {
+            // Load picture from resources
+            Resource resource = resourceFileUtils.getResourceLoader(resourceLoader,  i + ".png");
+            byte[] picture = Files.readAllBytes(resource.getFile().toPath());
+
+            // Save picture to a different location
+            Path destinationPath = Paths.get(picturesFolder, i + "saved.png");
+
+            // Create the target directory if it doesn't exist
+            Files.createDirectories(destinationPath.getParent());
+
+            LOGGER.info("Path where picture is saved: " + destinationPath);
+            Files.write(destinationPath, picture, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
     }
 

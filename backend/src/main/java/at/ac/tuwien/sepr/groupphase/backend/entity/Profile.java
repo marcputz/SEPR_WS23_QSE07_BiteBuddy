@@ -34,6 +34,7 @@ public class Profile {
     @Column(nullable = false, length = 255)
     private String userName;
 
+    /*
     @ElementCollection
     @CollectionTable(name = "allergene", joinColumns = @JoinColumn(name = "id"))
     @Enumerated(EnumType.STRING)
@@ -45,4 +46,5 @@ public class Profile {
     @Enumerated(EnumType.STRING)
     @Column(name = "food_preference", nullable = false)
     private Set<FoodPreference> foodPreferences;
+     */
 }

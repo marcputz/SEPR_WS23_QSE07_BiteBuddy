@@ -1,27 +1,29 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.KeyService;
+import at.ac.tuwien.sepr.groupphase.backend.utils.ResourceFileUtils;
+import jakarta.annotation.PostConstruct;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Optional;
 
 /**
  * Implementation of {@link KeyService} using files.
@@ -29,62 +31,90 @@ import java.security.spec.X509EncodedKeySpec;
  * @author Marc Putz
  */
 @Service
+@Scope("singleton")
 public class FileKeyService implements KeyService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String DEFAULT_KEY_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/security";
+    @Value("${file-paths.key-security-folder}")
+    private String keyFolder;
 
-    private static final String PRIVATE_KEY_FILENAME = "private.pem";
-    private static final String PUBLIC_KEY_FILENAME = "public.pem";
+    @Value("${file-paths.private-key-filename}")
+    private String privateKeyFilename;
 
-    private File keyFolder = null;
+    @Value("${file-paths.public-key-filename}")
+    private String publicKeyFilename;
 
-    public FileKeyService() {
-        this(new File(DEFAULT_KEY_FOLDER));
-    }
+    private File keyFolderFile = null;
 
-    public FileKeyService(File keyFolder) {
-        LOGGER.debug("Using key folder at '" + keyFolder.getAbsolutePath() + "'");
+    private ResourceFileUtils resourceFileUtils;
 
-        if (!keyFolder.exists()) {
-            throw new IllegalArgumentException("Key folder does not exist or is NULL value");
-        }
-
-        if (!keyFolder.canRead()) {
-            throw new IllegalArgumentException("Application has no permission to read key folder at '" + keyFolder.getAbsolutePath() + "'");
-        }
-
-        if (!keyFolder.isDirectory()) {
-            throw new IllegalArgumentException("Specified key folder is not a directory");
-        }
-
-        this.keyFolder = keyFolder;
-    }
+    public FileKeyService() {}
 
     @Override
     public RSAPrivateKey getPrivateKey() {
         LOGGER.trace("getPrivateKey()");
-
-        File file = new File(this.keyFolder.getAbsolutePath() + "/" + PRIVATE_KEY_FILENAME);
-
-        if (!file.exists()) {
-            LOGGER.error("private key file does not exist");
-            return null;
-        }
-
-        if (!file.canRead()) {
-            LOGGER.error("Application has no read permission on private key file");
-            return null;
-        }
-
-        if (!file.isFile()) {
-            LOGGER.error("Specified private key filepath is not a file");
-            return null;
-        }
-
         try {
+            File file = resourceFileUtils.getResourceFile(this.privateKeyFilename);
+            initKeyFolder();
+            return readPrivateKeyFromFile(file);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    @Override
+    public RSAPublicKey getPublicKey() {
+        LOGGER.trace("getPublicKey()");
+        try {
+            File file = resourceFileUtils.getResourceFile(this.publicKeyFilename);
+            initKeyFolder();
+            return readPublicKeyFromFile(file);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void initKeyFolder() {
+        LOGGER.trace("initKeyFolder()");
+        try {
+            resourceFileUtils = new ResourceFileUtils(keyFolder, Optional.empty());
+            this.keyFolderFile = resourceFileUtils.getResourceFile(keyFolder);
+
+            LOGGER.debug("Using key folder at {}", this.keyFolderFile.getAbsolutePath());
+
+            if (!keyFolderFile.exists()) {
+                throw new IllegalArgumentException("Key folder does not exist or is NULL value");
+            }
+
+            if (!keyFolderFile.canRead()) {
+                throw new IllegalArgumentException("Application has no permission to read key folder at {}" + keyFolderFile.getAbsolutePath());
+            }
+
+            if (!keyFolderFile.isDirectory()) {
+                throw new IllegalArgumentException("Specified key folder is not a directory");
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private RSAPrivateKey readPrivateKeyFromFile(File file) {
+        LOGGER.trace("readPrivateKeyFromFile({})", file.getAbsolutePath());
+        try {
+            if (!file.exists()) {
+                LOGGER.error("private key file does not exist");
+                return null;
+            }
+
+            if (!file.canRead()) {
+                LOGGER.error("Application has no read permission on private key file");
+                return null;
+            }
+
+            if (!file.isFile()) {
+                LOGGER.error("Specified private key filepath is not a file");
+                return null;
+            }
             // read file content
             String key = Files.readString(file.toPath(), Charset.defaultCharset());
 
@@ -113,28 +143,23 @@ public class FileKeyService implements KeyService {
         }
     }
 
-    @Override
-    public RSAPublicKey getPublicKey() {
-        LOGGER.trace("getPublicKey()");
-
-        File file = new File(this.keyFolder.getAbsolutePath() + "/" + PUBLIC_KEY_FILENAME);
-
-        if (!file.exists()) {
-            LOGGER.error("Public key file does not exist");
-            return null;
-        }
-
-        if (!file.canRead()) {
-            LOGGER.error("Application has no read permission on public key file");
-            return null;
-        }
-
-        if (!file.isFile()) {
-            LOGGER.error("Specified public key filepath is not a file");
-            return null;
-        }
-
+    private RSAPublicKey readPublicKeyFromFile(File file) {
+        LOGGER.trace("readPublicKeyFromFile({})", file.getAbsolutePath());
         try {
+            if (!file.exists()) {
+                LOGGER.error("Public key file does not exist");
+                return null;
+            }
+
+            if (!file.canRead()) {
+                LOGGER.error("Application has no read permission on public key file");
+                return null;
+            }
+
+            if (!file.isFile()) {
+                LOGGER.error("Specified public key filepath is not a file");
+                return null;
+            }
 
             // read file content
             String key = Files.readString(file.toPath(), Charset.defaultCharset());
@@ -151,7 +176,6 @@ public class FileKeyService implements KeyService {
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
 
             return (RSAPublicKey) keyFactory.generatePublic(keySpec);
-
         } catch (IOException ex) {
             LOGGER.error("Could not read public key file: " + ex.getMessage());
             return null;

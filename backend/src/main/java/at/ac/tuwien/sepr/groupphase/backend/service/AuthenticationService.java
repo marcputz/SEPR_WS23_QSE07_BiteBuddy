@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.auth.AuthTokenUtils;
+import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.auth.SessionManager;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
