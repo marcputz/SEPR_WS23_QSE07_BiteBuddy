@@ -21,15 +21,15 @@
           <!-- Navbar -->
           <div id="settings-sidebar-navbar-desktop">
             <ul class="bb-settings-navbar-desktop-list">
-              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'account'">
+              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem === 'account'">
                 <i class="bi-person-badge"></i>
                 <a routerLink="/settings/account">Account</a>
               </li>
-              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'password'">
+              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem === 'password'">
                 <i class="bi-key"></i>
                 <a routerLink="/settings/password">Password</a>
               </li>
-              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'system'">
+              <li class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem === 'system'">
                 <i class="bi-gear"></i>
                 <a routerLink="/settings/system">System</a>
               </li>
@@ -88,19 +88,19 @@
           <!-- Navigation -->
           <div class="bb-settings-layout-box bb-settings-headerbar-navigation-tablet">
             <ul class="bb-settings-navbar-tablet-list">
-              <li [routerLink]="['/settings/account']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem == 'account'">
+              <li [routerLink]="['/settings/account']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem === 'account'">
                 <div>
                   <i class="bi-person-badge"></i>
                   <a>Account</a>
                 </div>
               </li>
-              <li [routerLink]="['/settings/password']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem == 'password'">
+              <li [routerLink]="['/settings/password']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem === 'password'">
                 <div>
                   <i class="bi-key"></i>
                   <a>Password</a>
                 </div>
               </li>
-              <li [routerLink]="['/settings/system']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem == 'system'">
+              <li [routerLink]="['/settings/system']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem === 'system'">
                 <div>
                   <i class="bi-gear"></i>
                   <a>System</a>
@@ -149,19 +149,19 @@
           <!-- Navigation bar -->
           <div class="bb-settings-headerbar-navigation-phone">
             <ul class="bb-settings-navbar-phone-list">
-              <li [routerLink]="['/settings/account']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem == 'account'">
+              <li [routerLink]="['/settings/account']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem === 'account'">
                 <div>
                   <i class="bi-person-badge"></i>
                   <a>Account</a>
                 </div>
               </li>
-              <li [routerLink]="['/settings/password']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem == 'password'">
+              <li [routerLink]="['/settings/password']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem === 'password'">
                 <div>
                   <i class="bi-key"></i>
                   <a>Password</a>
                 </div>
               </li>
-              <li [routerLink]="['/settings/system']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem == 'system'">
+              <li [routerLink]="['/settings/system']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem === 'system'">
                 <div>
                   <i class="bi-gear"></i>
                   <a>System</a>
