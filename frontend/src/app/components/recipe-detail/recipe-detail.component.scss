@@ -1,0 +1,16 @@
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.recipe-name {
+  font-size: calc(0.5rem + 1vw);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.start-additional-info {
+  margin-top: 1.5rem;
+}

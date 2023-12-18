@@ -7,6 +7,7 @@ public record RecipeDto(
     LocalDateTime creationDate,
     String creator,
     String name,
-    String instructions
+    String instructions,
+    byte[] picture
 ) {
 }

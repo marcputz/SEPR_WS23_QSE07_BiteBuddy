@@ -2,23 +2,37 @@
 
 <form #form="ngForm" >
   <div class="row">
-    <!-- Start name and date of birth row -->
-    <div class="mb-2 col-lg-6">
-      <!-- When nesting rows, always make row > col-* > row. The Bootstrap classes do not work right when an element is both col* and row -->
-      <div class="row">
-        <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-          Name:
-        </label>
-        <div class="col-md-10 col-lg-8"
-        >
-          {{recipeDetails.name}}
-        </div>
+    <div class="center">
+      <div class="recipe-name">
+        {{recipeDetails.name}}
       </div>
     </div>
   </div>
   <div class="row">
-    <!-- Start instructions row -->
-    <div class="mb-2 col-lg-6">
+    <div class="center">
+      <img [src]="sanitizeImage(recipeDetails.picture)">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="start-additional-info">
+    <div class="mb-2 col-lg-10">
+      <div class="row">
+        <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+          Ingredients:
+        </label>
+        <div class="col-md-10 col-lg-8"
+        >
+          <div class="model" *ngFor="let ingredient of recipeDetails.ingredients">
+            {{ingredient + ", "}}
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="mb-2 col-lg-10">
       <div class="row">
         <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
           Instructions:
@@ -26,6 +40,24 @@
         <div class="col-md-10 col-lg-8"
         >
           {{recipeDetails.description}}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="mb-2 col-lg-10">
+      <div class="row">
+        <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+          Allergens:
+        </label>
+        <div class="col-md-10 col-lg-8"
+        >
+          <ng-container *ngIf="recipeDetails.allergens !== null">
+            <div class="model"
+                 *ngFor="let allergene of recipeDetails.allergens">
+              {{allergene + ", "}}
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
