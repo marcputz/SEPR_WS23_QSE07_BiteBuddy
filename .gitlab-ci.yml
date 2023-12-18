@@ -9,18 +9,17 @@ cache:
         - .m2/
 
 stages:          # List of stages for jobs, and their order of execution
-  - backend
-  - frontend
+  - test
 
 test-backend:
-    stage: backend
+    stage: test
     script:
         - cd backend
         - mvn -B clean install
 
 test-frontend:
     image: node:18
-    stage: frontend
+    stage: test
     script:
         - cd frontend
         - npm ci
