@@ -3,12 +3,9 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
@@ -30,22 +27,15 @@ public class ProfileServiceImpl implements ProfileService {
     private final ProfileRepository profileRepository;
     private final ProfileMapper profileMapper;
     private final ProfileValidator profileValidator;
-
     private final AllergeneRepository allergeneRepository;
-    private final AllergeneMapper allergeneMapper;
-
     private final IngredientRepository ingredientRepository;
-    private final IngredientMapper ingredientMapper;
 
     public ProfileServiceImpl(ProfileRepository profileRepository, AllergeneRepository allergeneRepository,
-                              ProfileMapper profileMapper, AllergeneMapper allergeneMapper,
-                              IngredientRepository ingredientRepository, IngredientMapper ingredientMapper,
+                              ProfileMapper profileMapper, IngredientRepository ingredientRepository,
                               ProfileValidator profileValidator) {
         this.profileRepository = profileRepository;
         this.allergeneRepository = allergeneRepository;
-        this.allergeneMapper = allergeneMapper;
         this.ingredientRepository = ingredientRepository;
-        this.ingredientMapper = ingredientMapper;
         this.profileMapper = profileMapper;
         this.profileValidator = profileValidator;
     }
@@ -56,21 +46,17 @@ public class ProfileServiceImpl implements ProfileService {
 
         profileValidator.validateForCreate(profileDto);
 
-        //find all the allergens : TODO: validator here
+        //check if the allergens correspond to the ones in the database
         List<Allergene> allergenes = allergeneRepository.findAll();
-
         for (AllergeneDto allergeneDto : profileDto.getAllergens()) {
-            //check if the allergens correspond to the ones in the database
             if (allergenes.stream().noneMatch(allergene -> allergene.getId() == allergeneDto.getId())) {
                 throw new NotFoundException("Allergene with id " + allergeneDto.getId() + " does not exist");
             }
         }
 
-        //find all the ingredients : TODO: validator here
+        //check if the ingredients correspond to the ones in the database
         List<Ingredient> ingredients = ingredientRepository.findAll();
-
         for (IngredientDto ingredientDto : profileDto.getIngredient()) {
-            //check if the ingredients correspond to the ones in the database
             if (ingredients.stream().noneMatch(ingredient -> ingredient.getId() == ingredientDto.getId())) {
                 throw new NotFoundException("Ingredient with id " + ingredientDto.getId() + " does not exist");
             }

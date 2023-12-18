@@ -4,8 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.type.AllergensEU;
-import at.ac.tuwien.sepr.groupphase.backend.type.FoodPreference;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -108,7 +107,7 @@ public class ProfileValidator {
         LOGGER.trace("hasStringWhitespace({})", element);
         return element != null && element.trim().isEmpty();
     }
-
+    /*
     private boolean hasAllAllergensWhitespaceObjects(List<AllergeneDto> list) {
         return list.stream()
             .allMatch(obj -> obj.toString().trim().isEmpty());
@@ -125,4 +124,5 @@ public class ProfileValidator {
         return list.stream()
             .anyMatch(obj -> obj.toString().contains(" "));
     }
+    */
 }

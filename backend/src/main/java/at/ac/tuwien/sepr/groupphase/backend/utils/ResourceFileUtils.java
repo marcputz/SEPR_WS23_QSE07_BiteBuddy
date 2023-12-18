@@ -15,6 +15,8 @@ import java.util.Optional;
 public class ResourceFileUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private static final String DEFAULT_CLASSPATH = "classpath:";
+
     private String folderPath;
     private Optional<String> loaderFolderPath;
 
@@ -26,13 +28,13 @@ public class ResourceFileUtils {
 
     public File getResourceFile(String filename) throws FileNotFoundException {
         LOGGER.trace("getResourceFile({})", filename);
-        return (filename == null) ? ResourceUtils.getFile("classpath:" + folderPath)
-            : ResourceUtils.getFile("classpath:" + folderPath + "/" + filename);
+        return (filename == null) ? ResourceUtils.getFile(DEFAULT_CLASSPATH + folderPath)
+            : ResourceUtils.getFile(DEFAULT_CLASSPATH + folderPath + "/" + filename);
     }
 
     public Resource getResourceLoader(ResourceLoader resourceLoader, String filename) throws FileNotFoundException {
         LOGGER.trace("getResourceLoader({})", filename);
-        return loaderFolderPath.map(s -> resourceLoader.getResource("classpath:" + s + "/" + filename)).orElse(null);
+        return loaderFolderPath.map(s -> resourceLoader.getResource(DEFAULT_CLASSPATH + s + "/" + filename)).orElse(null);
     }
 
 }
