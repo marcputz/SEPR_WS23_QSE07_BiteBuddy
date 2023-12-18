@@ -1,6 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Column;
+
 
 import java.util.Objects;
 
@@ -74,15 +81,14 @@ public class RecipeRating {
 
     @Override
     public String toString() {
-        if(rating == 0){
+        if (rating == 0) {
             return "RecipeRaiting{"
                 + "id=" + id
                 + "recipe=" + recipe
                 + "user=" + user
                 + "rating=" + "disliked"
                 + '}';
-        }
-        else if(rating == 1){
+        } else if (rating == 1) {
             return "RecipeRaiting{"
                 + "id=" + id
                 + "recipe=" + recipe

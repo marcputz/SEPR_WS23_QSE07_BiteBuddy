@@ -127,11 +127,13 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public void createRating(long recipeID, long userID, int rating) {
-        LOGGER.trace("createRating({})({})", recipeID, userID);
+    public void createRating(long recipeId, long userId, int rating) {
+        LOGGER.trace("createRating({})({})", recipeId, userId);
+
     }
 
 
+    @SuppressWarnings("checkstyle:CommentsIndentation")
     public RecipeDetailsDto getDetailedRecipe(long id) {
         // TODO check if ID is valid (not null)
         LOGGER.trace("details({})", id);
@@ -141,54 +143,37 @@ public class RecipeServiceImpl implements RecipeService {
         } else {
 
 
-        /*TODO: make dtos for allergenes and ingredients, which contain the information needed to display them in details, when the database is working.
-           Ingredients require name and amount, allergenes only the name (and id additionally for both if acces would be required in the future).
-           Transform data into those dtos and add a list of both to the recipedetails dto*/
-            if (recipe.isEmpty()) {
-                throw new NotFoundException("The searched for recipe does not exist in the database anymore.");
-            } else {
-                List<RecipeIngredient> ingredients = this.recipeIngredientRepository.findByRecipe(recipe.get());
-                ArrayList<String> ingredientsAndAmount = new ArrayList<>();
-                for (RecipeIngredient ingredient : ingredients) {
-                    Ingredient currentIngredient = ingredient.getIngredient();
-                    ingredientsAndAmount.add(currentIngredient.getName() + ": " + ingredient.getAmount());
-                }
-
-
-                if (ingredients.isEmpty()) {
-                    throw new NotFoundException("The searched for recipe does not have any ingredients");
-                } else {
-                    ArrayList<String> allergens = new ArrayList<>();
-                    for (RecipeIngredient recipeIngredient : ingredients) {
-                        System.out.println(recipeIngredient.getIngredient());
-                        List<AllergeneIngredient> allergensIngredient = this.allergeneIngredientRepository.findByIngredient(recipeIngredient.getIngredient());
-                        System.out.println(allergensIngredient);
-                        for (AllergeneIngredient allergene : allergensIngredient) {
-                            System.out.println(allergene.getAllergene().getName());
-                            allergens.add(allergene.getAllergene().getName());
-                        /*Optional<Allergene> currentAllergene = allergeneRepository.findById(allergene.getId());
-                        if(currentAllergene.isPresent()){
-                            System.out.println("Added Allergene");
-                            allergens.add(currentAllergene.get().getName());
-                        }*/
-
-                        }
-                    }
-                    System.out.println(ingredients);
-                    System.out.println(allergens);
-                    ;
-                    RecipeDetailsDto detailsDto =
-                        new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions(), ingredientsAndAmount, allergens,
-                            recipe.get().getPicture());
-                    return detailsDto;
-
-
-                }
-
-
+            //TODO: make dtos for allergenes and ingredients, which contain the information needed to display them in details, when the database is working.
+            // Ingredients require name and amount, allergenes only the name (and id additionally for both if acces would be required in the future).
+            // Transform data into those dtos and add a list of both to the recipedetails dto
+            List<RecipeIngredient> ingredients = this.recipeIngredientRepository.findByRecipe(recipe.get());
+            ArrayList<String> ingredientsAndAmount = new ArrayList<>();
+            for (RecipeIngredient ingredient : ingredients) {
+                Ingredient currentIngredient = ingredient.getIngredient();
+                ingredientsAndAmount.add(currentIngredient.getName() + ": " + ingredient.getAmount());
             }
 
+
+            if (ingredients.isEmpty()) {
+                throw new NotFoundException("The searched for recipe does not have any ingredients");
+            } else {
+                ArrayList<String> allergens = new ArrayList<>();
+                for (RecipeIngredient recipeIngredient : ingredients) {
+                    System.out.println(recipeIngredient.getIngredient());
+                    List<AllergeneIngredient> allergensIngredient = this.allergeneIngredientRepository.findByIngredient(recipeIngredient.getIngredient());
+                    System.out.println(allergensIngredient);
+                    for (AllergeneIngredient allergene : allergensIngredient) {
+                        System.out.println(allergene.getAllergene().getName());
+                        allergens.add(allergene.getAllergene().getName());
+                    }
+                }
+                RecipeDetailsDto detailsDto =
+                        new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions(), ingredientsAndAmount, allergens,
+                            recipe.get().getPicture());
+                return detailsDto;
+            }
         }
-        //return null;
+
     }
 }
+
