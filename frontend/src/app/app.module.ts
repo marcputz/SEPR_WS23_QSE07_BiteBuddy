@@ -23,6 +23,8 @@ import { LandingLayoutComponent } from './layouts/landing-layout/landing-layout.
 import { LandingHeaderComponent } from './components/landing-header/landing-header.component';
 import { LandingFooterComponent } from './components/landing-footer/landing-footer.component';
 import {NgOptimizedImage} from "@angular/common";
+import { RecipeCreateComponent } from './components/recipe-create/recipe-create.component';
+import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +44,8 @@ import {NgOptimizedImage} from "@angular/common";
     LandingLayoutComponent,
     LandingHeaderComponent,
     LandingFooterComponent,
+    RecipeCreateComponent,
+    AutocompleteComponent,
   ],
     imports: [
         BrowserModule,

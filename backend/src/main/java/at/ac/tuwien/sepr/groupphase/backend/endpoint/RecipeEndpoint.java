@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import org.slf4j.Logger;
@@ -36,23 +37,42 @@ public class RecipeEndpoint {
 
     @PostMapping()
     public List<RecipeListDto> searchRecipes(@RequestBody RecipeSearchDto searchParams) {
-        LOGGER.info("GET " + BASE_PATH);
+        LOGGER.info("POST " + BASE_PATH);
         LOGGER.debug("request body: {}", searchParams);
         return this.recipeService.searchRecipes(searchParams);
     }
 
-    @GetMapping("/{id}")
-     public RecipeDetailsDto getDetailedRecipe(@PathVariable long id) {
-         LOGGER.info("GET " + BASE_PATH + id);
-         try{
-             return this.recipeService.getDetailedRecipe(id);
-         } catch(NotFoundException e){
-             HttpStatus status = HttpStatus.NOT_FOUND;
-             logClientError(status, "Horse to update not found", e);
-             throw new ResponseStatusException(status, e.getMessage(), e);
-         }
+    @GetMapping("/ingredient/{name}")
+    public List<String> findMatchingIngredients(@PathVariable String name) {
+        LOGGER.info("GET " + BASE_PATH + name);
+        return this.recipeService.findMatchingIngredients(name);
+    }
 
-     }
+    @PostMapping("/create")
+    public void createRecipe(@RequestBody RecipeDetailsDto recipe) {
+        LOGGER.info("POST " + BASE_PATH + "/create");
+        LOGGER.debug("request body: {}", recipe);
+        try {
+            this.recipeService.createRecipe(recipe);
+        } catch (ConflictException e) {
+            HttpStatus status = HttpStatus.CONFLICT;
+            logClientError(status, "Conflict while creating recipe", e);
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public RecipeDetailsDto getDetailedRecipe(@PathVariable long id) {
+        LOGGER.info("GET " + BASE_PATH + id);
+        try {
+            return this.recipeService.getDetailedRecipe(id);
+        } catch (NotFoundException e) {
+            HttpStatus status = HttpStatus.NOT_FOUND;
+            logClientError(status, "Recipe to lookup not found:", e);
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        }
+
+    }
 
     private void logClientError(HttpStatus status, String message, Exception e) {
         LOGGER.warn("{} {}: {}: {}", status.value(), message, e.getClass().getSimpleName(), e.getMessage());

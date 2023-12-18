@@ -4,6 +4,10 @@
     <i class="bi bi-arrow-clockwise"></i>
     Reload
   </button>
+  <button class="btn btn-success" [routerLink]="'create'" aria-label="Create Recipe">
+    <i class="bi-plus-square"></i>
+    Create Recipe
+  </button>
 </div>
 
 <form class="d-flex flex-row w-auto mb-3" (submit)="reloadRecipes()">
@@ -26,21 +30,34 @@
   <table class="table table-hover">
     <thead>
     <tr>
+      <th>Image</th>
       <th>Name</th>
       <th class="min-width">Actions</th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let recipe of recipes" class="center-td">
-      <td><img [src]="sanitizeImage(recipe.picture)">
+      <td><img [src]="sanitizeImage(recipe.picture)" class="img-thumbnail">
       </td>
       <td>{{recipe.name}}</td>
       <td>
         <div class="btn-group">
-          <a class="btn btn-sm responsive-info-button"
+          <a class="btn btn-sm btn-primary"
              [routerLink]="[recipe.id]"
              aria-label="Show recipe details">
             <i class="bi bi-info-lg"></i>
+          </a>
+        </div>
+        <div class="btn-group">
+          <a class="btn btn-sm btn-success"
+             aria-label="Like Recipe">
+            <i class="bi bi-hand-thumbs-up"></i>
+          </a>
+        </div>
+        <div class="btn-group">
+          <a class="btn btn-sm btn-danger"
+             aria-label="Dislike Recipe">
+            <i class="bi bi-hand-thumbs-down"></i>
           </a>
         </div>
       </td>

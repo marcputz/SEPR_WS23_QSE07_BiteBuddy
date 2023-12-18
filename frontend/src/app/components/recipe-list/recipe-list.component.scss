@@ -16,6 +16,11 @@
   @include button-variant($light, $light);
 }
 
+.img-thumbnail {
+  width: auto;
+  height: 150px;
+}
+
 @each $color in (info, warning, danger) {
   $value: map.get($theme-colors, $color);
   tr:hover .responsive-#{$color}-button {

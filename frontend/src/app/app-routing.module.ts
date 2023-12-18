@@ -13,6 +13,7 @@ import {PasswordResetComponent} from "./components/authentication/password-reset
 import {RecipeListComponent} from "./components/recipe-list/recipe-list.component";
 import {RecipeDetailComponent} from "./components/recipe-detail/recipe-detail.component";
 import {LandingLayoutComponent} from "./layouts/landing-layout/landing-layout.component";
+import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 
 const routes: Routes = [
   //{path: '', component: HomeComponent},
@@ -25,7 +26,8 @@ const routes: Routes = [
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'recipes', children: [
       {path: '', component: RecipeListComponent},
-      {path: ':id', component: RecipeDetailComponent}
+      {path: 'create', component: RecipeCreateComponent},
+      {path: ':id', component: RecipeDetailComponent},
   ]},
   {path: '*', redirectTo: ''}
 ];
