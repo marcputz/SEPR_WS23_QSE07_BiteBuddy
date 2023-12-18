@@ -1,6 +1,5 @@
 import {NgModule} from '@angular/core';
 import {mapToCanActivate, RouterModule, Routes} from '@angular/router';
-import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/dialogs/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
 import {MessageComponent} from './components/message/message.component';
@@ -24,7 +23,8 @@ const routes: Routes = [
   {path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
       {path: 'login', component: LoginComponent}, // Login Page
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
-      {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
+      {path: 'password_reset', component: PasswordResetComponent} // Password reset page
+     //{path: 'profile', component: ProfileComponent}
   ]},
 
   // {path: 'login', component: LoginComponent},

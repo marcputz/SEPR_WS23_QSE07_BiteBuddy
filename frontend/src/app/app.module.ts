@@ -26,6 +26,7 @@ import { DialogLayoutComponent } from './layouts/dialog-layout/dialog-layout.com
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ToastrModule } from "ngx-toastr";
 import { NgOptimizedImage } from "@angular/common";
+import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { NgOptimizedImage } from "@angular/common";
     LandingHeaderComponent,
     LandingFooterComponent,
     DialogLayoutComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,
