@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validation;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.type.AllergensEU;
@@ -45,10 +47,10 @@ public class ProfileValidator {
     private void validateUsername(ProfileDto profile, List<String> validationErrors) {
         LOGGER.trace("validateUsername({})", profile);
 
-        if (hasStringWhitespace(profile.getUserName())) {
-            validationErrors.add("Username cannot consist of only white spaces");
+        if (hasStringWhitespace(profile.getName())) {
+            validationErrors.add("Name cannot consist of only white spaces");
         }
-        //is username unique= conflict exception
+        //is name unique= conflict exception
     }
 
     /**
@@ -60,12 +62,14 @@ public class ProfileValidator {
     private void validateAllergens(ProfileDto profile, List<String> validationErrors) {
         LOGGER.trace("validateAllergens({})", profile);
 
+        /*
         if (hasWhitespaceAllergensObject(profile.getAllergens())
             || hasAllAllergensWhitespaceObjects(profile.getAllergens())) {
             validationErrors.add("Allergens cannot consist of only white spaces");
         } else if (profile.getAllergens().contains(AllergensEU.NOT_KNOWN) && profile.getAllergens().size() > 1) {
             validationErrors.add("Allergens cannot contain 'not known' and other allergens");
         }
+         */
     }
 
     /**
@@ -77,6 +81,7 @@ public class ProfileValidator {
     private void validateFoodPreference(ProfileDto profile, List<String> validationErrors) {
         LOGGER.trace("validateFoodPreference({})", profile);
 
+        /*
         if (hasAllFoodPreferencesWhitespaceObjects(profile.getFoodPreference())
             || hasWhitespaceFoodPreferencesObject(profile.getFoodPreference())) {
             validationErrors.add("Food preference cannot consist of only white spaces");
@@ -95,6 +100,7 @@ public class ProfileValidator {
         } else if (profile.getFoodPreference().contains(FoodPreference.NONE) && profile.getFoodPreference().size() > 1) {
             validationErrors.add("Food preferences cannot contain 'none' and other food preferences");
         }
+         */
     }
 
     //helper method for username validation
@@ -103,19 +109,19 @@ public class ProfileValidator {
         return element != null && element.trim().isEmpty();
     }
 
-    private boolean hasAllAllergensWhitespaceObjects(List<AllergensEU> list) {
+    private boolean hasAllAllergensWhitespaceObjects(List<AllergeneDto> list) {
         return list.stream()
             .allMatch(obj -> obj.toString().trim().isEmpty());
     }
-    private boolean hasAllFoodPreferencesWhitespaceObjects(List<FoodPreference> list) {
+    private boolean hasAllFoodPreferencesWhitespaceObjects(List<IngredientDto> list) {
         return list.stream()
             .allMatch(obj -> obj.toString().trim().isEmpty());
     }
-    private boolean hasWhitespaceAllergensObject(List<AllergensEU > list) {
+    private boolean hasWhitespaceAllergensObject(List<AllergeneDto> list) {
         return list.stream()
-            .anyMatch(obj -> obj.toString().contains(" "));
+            .anyMatch(obj -> obj.getName().contains(" ") || obj.getName().trim().isEmpty());
     }
-    private boolean hasWhitespaceFoodPreferencesObject(List<FoodPreference> list) {
+    private boolean hasWhitespaceFoodPreferencesObject(List<IngredientDto> list) {
         return list.stream()
             .anyMatch(obj -> obj.toString().contains(" "));
     }

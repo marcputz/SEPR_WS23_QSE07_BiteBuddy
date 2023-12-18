@@ -13,6 +13,7 @@ public interface ProfileMapper {
 
     /**
      * Maps a {@link Profile} entity to a {@link ProfileDto} DTO.
+     *
      * @param profile the profile to map
      * @return the mapped profileDto
      */
@@ -21,6 +22,7 @@ public interface ProfileMapper {
 
     /**
      * Maps a {@link ProfileDto} DTO to a {@link Profile} entity.
+     *
      * @param profileDto the profileDto to map
      * @return the mapped profile
      */
