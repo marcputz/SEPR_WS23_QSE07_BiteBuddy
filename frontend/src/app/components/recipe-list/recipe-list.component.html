@@ -32,6 +32,8 @@
     </thead>
     <tbody>
     <tr *ngFor="let recipe of recipes" class="center-td">
+      <td><img [src]="sanitizeImage(recipe.picture)">
+      </td>
       <td>{{recipe.name}}</td>
       <td>
         <div class="btn-group">
@@ -46,3 +48,4 @@
     </tbody>
   </table>
 </div>
+

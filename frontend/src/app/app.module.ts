@@ -22,6 +22,7 @@ import { LandingPageComponent } from './components/landing-page/landing-page.com
 import { LandingLayoutComponent } from './layouts/landing-layout/landing-layout.component';
 import { LandingHeaderComponent } from './components/landing-header/landing-header.component';
 import { LandingFooterComponent } from './components/landing-footer/landing-footer.component';
+import {NgOptimizedImage} from "@angular/common";
 import { DialogLayoutComponent } from './layouts/dialog-layout/dialog-layout.component';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {ToastrModule} from "ngx-toastr";
@@ -46,16 +47,17 @@ import {ToastrModule} from "ngx-toastr";
     LandingFooterComponent,
     DialogLayoutComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    NgbModule,
-    FormsModule,
-    BrowserAnimationsModule,
-    ToastrModule.forRoot(),
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        NgbModule,
+        FormsModule,
+        NgOptimizedImage,
+      BrowserAnimationsModule,
+      ToastrModule.forRoot()
+    ],
   providers: [httpInterceptorProviders],
   bootstrap: [AppComponent]
 })

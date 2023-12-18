@@ -1,13 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 
 
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Ingredient {
@@ -17,9 +14,11 @@ public class Ingredient {
 
     @Column(nullable = false, length = 100)
     private String name;
-    /*
+
     @OneToMany(mappedBy = "ingredient")
-    private Set<RecipeIngredient> recipeIngredients; */
+    private Set<RecipeIngredient> recipeIngredients;
+    @OneToMany(mappedBy = "ingredient")
+    private Set<AllergeneIngredient> allergeneIngredients;
 
     public Long getId() {
         return id;
