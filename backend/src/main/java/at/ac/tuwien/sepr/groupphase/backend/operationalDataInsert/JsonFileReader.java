@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 @Profile("addJsonData")
@@ -79,23 +78,24 @@ public class JsonFileReader {
             AllergeneIngredientString[] allergeneIngredients = objectMapper.readValue(fileAllergeneIngredients, AllergeneIngredientString[].class);
             RecipeIngredientString[] recipeIngredients = objectMapper.readValue(fileRecipeIngredients, RecipeIngredientString[].class);
 
+
             if (ingredientRepository.count() == 0) {
                 ingredientRepository.saveAll(Arrays.asList(ingredients));
             }
             if (allergeneRepository.count() == 0) {
                 allergeneRepository.saveAll(Arrays.asList(allergenes));
             }
-
+            //            this aswell as later code are also for the pictures
             int pictureCount = 1;
             if (recipeRepository.count() == 0) {
                 for (Recipe recipe : recipes) {
-                    Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".png");
-                    LOGGER.info("Path where picture is gotten: " + path);
+                    Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + 1 + ".png");
                     recipe.setPicture(Files.readAllBytes(path));
                     recipeRepository.save(recipe);
                     pictureCount++;
                 }
             }
+
             if (allergeneIngredientRepository.count() == 0) {
                 for (AllergeneIngredientString allergeneIngredient : allergeneIngredients) {
                     AllergeneIngredient a = new AllergeneIngredient();
@@ -108,13 +108,14 @@ public class JsonFileReader {
             if (recipeIngredientRepository.count() == 0) {
                 for (RecipeIngredientString recipeIngredientString : recipeIngredients) {
                     RecipeIngredient r = new RecipeIngredient();
-                    r.setId(recipeIngredientString.id);
+                    r.setId(recipeIngredientString.getId());
                     r.setRecipe(recipeRepository.getById(recipeIngredientString.getRecipe()));
                     r.setIngredient(ingredientRepository.getById(recipeIngredientString.getIngredient()));
                     r.setAmount(recipeIngredientString.amount);
                     recipeIngredientRepository.save(r);
                 }
             }
+
 
 
             /*
@@ -148,12 +149,16 @@ public class JsonFileReader {
 
             */
             // get all the pictures from the recipes and save them in RecipePictures
-            for (long i = 1; i < 4; i++) {
+
+
+            // ------------------ the following would do the pictures --------------------------------------
+
+            /*for (long i = 1; i < 4; i++) {
                 byte[] picture = recipeRepository.getById(i).getPicture();
                 Path path2 = Paths.get(DEFAULT_PICTURE_FOLDER + "/" + i + "saved.png");
                 LOGGER.info("Path where picture is saved: " + path2);
                 Files.write(path2, picture);
-            }
+            } */
 
         } catch (IOException e) {
             LOGGER.error("Error reading JSON file", e);

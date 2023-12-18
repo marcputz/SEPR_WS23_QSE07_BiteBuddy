@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
-
 @Entity
 public class Recipe {
     @Id
@@ -14,6 +13,8 @@ public class Recipe {
     private Long id;
     @Column
     private String name;
+
+    @Lob
     @Column
     private String instructions;
     @Lob

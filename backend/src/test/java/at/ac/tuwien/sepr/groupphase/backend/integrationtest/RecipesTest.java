@@ -19,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -130,21 +131,23 @@ public class RecipesTest {
         // asserting test
         assertNotNull(recipeDetails.get(0));
 
-        assertThat(recipeDetails.get(0).name())
-            .contains(
-                "Thai Spicy Basil Chicken Fried Rice"
-            );
-        assertThat(recipeDetails.get(0).description())
+        assertAll(
+            () -> assertThat(recipeDetails.get(0).name())
+                .contains(
+                    "Thai Spicy Basil Chicken Fried Rice"
+                ),
+            () -> assertThat(recipeDetails.get(0).description())
             .contains(
                 "Instructions1"
-            );
-        assertThat(recipeDetails.get(0).ingredients())
+            ),
+            () -> assertThat(recipeDetails.get(0).ingredients())
             .hasSize(4)
             .contains(
                 "Basil: 100 g", "Chicken: 400 g", "Cilantro: 1 cup", "Garlic: 2 kg"
-            );
-        assertThat(recipeDetails.get(0).allergens())
-            .isEmpty();
+            ),
+            () -> assertThat(recipeDetails.get(0).allergens())
+            .isEmpty()
+        );
 
     }
 }
