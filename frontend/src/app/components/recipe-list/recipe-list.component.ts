@@ -15,6 +15,8 @@ export class RecipeListComponent {
   searchParams: RecipeSearch = {
     creator: "",
     name: "",
+    page: 0,
+    entriesPerPage: 25
   };
 
   constructor(
@@ -35,8 +37,6 @@ export class RecipeListComponent {
   }
 
   reloadRecipes() {
-    console.log(this.searchParams);
-
     this.service.search(this.searchParams).subscribe({
       next: data => {
         console.log(data);
@@ -62,5 +62,10 @@ export class RecipeListComponent {
       console.error('Error sanitizing image:', error);
       return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
     }
+  }
+
+  pageCounter(change: number) {
+    this.searchParams.page += change;
+    this.reloadRecipes()
   }
 }

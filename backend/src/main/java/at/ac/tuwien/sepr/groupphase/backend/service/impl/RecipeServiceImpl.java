@@ -13,6 +13,8 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
@@ -47,15 +49,26 @@ public class RecipeServiceImpl implements RecipeService {
         LOGGER.debug("search recipes");
 
         String name = "";
-        String creator = "";
+        // String creator = "";
+        int pageSelector = 0;
+        int entriesPerPage = 25;
 
         // checking searchParams
         if (searchParams != null) {
             name = !searchParams.name().trim().isEmpty() ? searchParams.name() : "";
+
+            if (searchParams.page() >= 0) {
+                pageSelector = searchParams.page();
+            }
+
+            if (searchParams.entriesPerPage() >= 1) {
+                entriesPerPage = searchParams.entriesPerPage();
+            }
             // creator = !searchParams.creator().trim().isEmpty() ? searchParams.creator() : "";
         }
 
-        List<Recipe> recipes = this.recipeRepository.findByNameContainingIgnoreCase(name);
+        Pageable page = PageRequest.of(pageSelector, entriesPerPage);
+        List<Recipe> recipes = this.recipeRepository.findByNameContainingIgnoreCase(name, page);
 
         ArrayList<RecipeListDto> recipeDtos = new ArrayList<>();
         for (Recipe recipe : recipes) {
@@ -81,8 +94,9 @@ public class RecipeServiceImpl implements RecipeService {
         newRecipe.setIngredients(ingredients);
         this.recipeRepository.save(newRecipe);
 
+        Pageable page = PageRequest.of(0, 20);
         // getting recipe id & checking if we can find the RecipeIngredients
-        Recipe queriedRecipe = this.recipeRepository.findByNameContainingIgnoreCase(recipe.name()).get(0);
+        Recipe queriedRecipe = this.recipeRepository.findByNameContainingIgnoreCase(recipe.name(), page).get(0);
 
         // Trying to update recipe, but this does not work
         ingredients = new HashSet<>();

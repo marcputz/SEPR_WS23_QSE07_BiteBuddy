@@ -1,9 +1,5 @@
 <h1>Recipe List</h1>
 <div class="d-flex flex-row w-auto">
-  <button class="btn btn-primary mr-1" (click)="reloadRecipes()" aria-label="Reload Recipes">
-    <i class="bi bi-arrow-clockwise"></i>
-    Reload
-  </button>
   <button class="btn btn-success" [routerLink]="'create'" aria-label="Create Recipe">
     <i class="bi-plus-square"></i>
     Create Recipe
@@ -24,7 +20,14 @@
            (ngModelChange)="searchChanged()">
   </div>
 </form>
-
+<button class="btn btn-primary mr-1" (click)="pageCounter(-1)" aria-label="Last Page">
+  <i class="bi-arrow-left-square"></i>
+  Last Page
+</button>
+<button class="btn btn-primary mr-1" (click)="pageCounter(1)" aria-label="Next Page">
+  <i class="bi-arrow-right-square"></i>
+  Next Page
+</button>
 <!-- Table to show recipes -->
 <div class="mt-3">
   <table class="table table-hover">
@@ -64,5 +67,13 @@
     </tr>
     </tbody>
   </table>
+  <button class="btn btn-primary mr-1" (click)="pageCounter(-1)" aria-label="Reload Recipes">
+    <i class="bi-arrow-left-square"></i>
+    Last Page
+  </button>
+  <button class="btn btn-primary mr-1" (click)="pageCounter(1)" aria-label="Reload Recipes">
+    <i class="bi-arrow-right-square"></i>
+    Next Page
+  </button>
 </div>
 

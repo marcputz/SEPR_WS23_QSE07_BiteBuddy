@@ -143,7 +143,9 @@ public class RecipesTest {
                 .content("""
                     {
                     "name": "",
-                    "creator": ""
+                    "creator": "",
+                    "page": 0,
+                    "entriesPerPage": 1000
                     }
                     """)
                 .accept(MediaType.APPLICATION_JSON)
@@ -174,7 +176,9 @@ public class RecipesTest {
                 .content("""
                     {
                     "name": "1",
-                    "creator": ""
+                    "creator": "",
+                    "page": 0,
+                    "entriesPerPage": 1000
                     }
                     """)
                 .accept(MediaType.APPLICATION_JSON)

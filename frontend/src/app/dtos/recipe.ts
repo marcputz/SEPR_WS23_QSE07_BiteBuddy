@@ -1,6 +1,8 @@
 export interface RecipeSearch {
   creator?: string;
   name?: string;
+  page: number;
+  entriesPerPage: number;
 }
 
 export interface RecipeIngredientDto {
