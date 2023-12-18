@@ -48,7 +48,7 @@ public class AuthTokenUtils {
      * @return the JWT authentication token as a string.
      */
     public static String createToken(ApplicationUser user) {
-        return createToken(user.getId(), user.getNickname());
+        return createToken(user.getId(), user.getNickname(), user.getEmail());
     }
 
     /**
@@ -65,7 +65,7 @@ public class AuthTokenUtils {
      * @param nickname the nickname of the correlating user
      * @return the JWT authentication token as a string.
      */
-    public static String createToken(long userId, String nickname) {
+    public static String createToken(long userId, String nickname, String email) {
         LOGGER.trace("createToken({},{})", userId, nickname);
 
         RSAPrivateKey privateKey = keyService.getPrivateKey();
@@ -86,6 +86,8 @@ public class AuthTokenUtils {
             .expiration(expiration)
             .issuedAt(now)
             .id(Long.valueOf(userId).toString())
+            .claim("username", nickname)
+            .claim("email", email)
             .compact();
 
         return TOKEN_PREFIX + jwt;

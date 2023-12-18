@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.exception;
 
 /**
- * Exception class to describe authentication errors in the REST API
+ * Exception class to describe authentication errors in the REST API.
  *
  * @author Marc Putz
  */
