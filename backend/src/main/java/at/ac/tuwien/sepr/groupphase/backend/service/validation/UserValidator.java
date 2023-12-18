@@ -48,6 +48,8 @@ public class UserValidator {
 
         if (applicationUser.getPasswordEncoded() == null || applicationUser.getPasswordEncoded().trim().isEmpty()) {
             validationErrors.add("Password is required");
+        } else if (applicationUser.getPasswordEncoded().length() < 8) {
+            validationErrors.add("Password has to be at least 8 characters long");
         }
 
         if (applicationUser.getNickname() == null || applicationUser.getNickname().trim().isEmpty()) {
