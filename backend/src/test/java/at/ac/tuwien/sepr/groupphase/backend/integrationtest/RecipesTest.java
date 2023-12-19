@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -252,10 +254,10 @@ public class RecipesTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
-                    "id": null,
+                    "id": -1,
                     "name": "Eine Prise Test",
-                    "description": "Man nehme einen Test 1313üaääw",
-                    "ingredients": ["Chicken", "Garlic"],
+                    "description": "Man nehme einen Test",
+                    "ingredients": ["Apple"],
                     "allergens": [],
                     "picture": ""
                     }
@@ -293,6 +295,12 @@ public class RecipesTest {
             .contains(
                 "Eine Prise Test"
             );
+
+        Pageable page = PageRequest.of(0, 20);
+
+        Recipe recipe = this.recipeRepository.findByNameContainingIgnoreCase("Eine Prise Test", page).get(0);
+        this.recipeIngredientRepository.deleteAll(this.recipeIngredientRepository.findByRecipe(recipe));
+        this.recipeRepository.delete(this.recipeRepository.findByNameContainingIgnoreCase("Eine Prise Test", page).get(0));
     }
 
     @Test

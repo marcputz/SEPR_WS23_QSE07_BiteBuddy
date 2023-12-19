@@ -48,7 +48,7 @@ public class RecipeValidator {
                     List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient);
 
                     if (queriedResults.isEmpty()) {
-                        conflictErrors.add("Ingredient " + ingredient + "does not exist");
+                        conflictErrors.add("Ingredient " + ingredient + " does not exist");
                     }
                 }
             } else {
