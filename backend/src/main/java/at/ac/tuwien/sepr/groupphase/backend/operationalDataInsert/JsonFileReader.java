@@ -26,7 +26,7 @@ import java.util.Arrays;
 @Component
 public class JsonFileReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String DEFAULT_KEY_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/FoodDataFiles";
+    private static final String DEFAULT_KEY_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/data";
     private static final String DEFAULT_PICTURE_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/RecipePictures";
     private static final String PRIVATE_KEY_FILENAME_RECIPES = "Recipes.json";
     private static final String PRIVATE_KEY_FILENAME_INGREDIENTS = "Ingredients.json";
