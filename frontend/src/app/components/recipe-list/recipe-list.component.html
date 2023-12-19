@@ -12,7 +12,7 @@
 
 <h1>Recipe List</h1>
 <div class="d-flex flex-row w-auto">
-  <button class="btn btn-success" [routerLink]="'create'" aria-label="Create Recipe">
+  <button class="btn btn-success" [routerLink]="['/recipes/create']" aria-label="Create Recipe">
     <i class="bi-plus-square"></i>
     Create Recipe
   </button>
@@ -58,7 +58,7 @@
       <td>
         <div class="btn-group">
           <a class="btn btn-sm btn-primary"
-             [routerLink]="[recipe.id]"
+             [routerLink]="['/recipes', recipe.id]"
              aria-label="Show recipe details">
             <i class="bi bi-info-lg"></i>
           </a>
