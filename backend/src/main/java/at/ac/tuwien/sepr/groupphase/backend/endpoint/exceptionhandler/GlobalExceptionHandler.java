@@ -5,7 +5,6 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.List;

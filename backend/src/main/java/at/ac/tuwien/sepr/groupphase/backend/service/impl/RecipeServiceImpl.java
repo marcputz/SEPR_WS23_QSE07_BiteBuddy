@@ -1,15 +1,20 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
-
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.RecipeValidator;
 import org.slf4j.Logger;
@@ -18,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashSet;

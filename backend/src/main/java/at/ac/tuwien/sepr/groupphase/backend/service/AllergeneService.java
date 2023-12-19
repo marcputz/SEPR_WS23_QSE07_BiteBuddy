@@ -9,10 +9,10 @@ import java.util.List;
  */
 public interface AllergeneService {
 
-  /**
-   * Returns a list of all allergens in the database.
-   *
-   * @return all allergens
-   */
-  List<AllergeneDto> getAllAllergens();
+    /**
+    * Returns a list of all allergens in the database.
+    *
+    * @return all allergens
+    */
+    List<AllergeneDto> getAllAllergens();
 }

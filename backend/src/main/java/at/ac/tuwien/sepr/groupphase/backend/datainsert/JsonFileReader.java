@@ -1,4 +1,5 @@
-package at.ac.tuwien.sepr.groupphase.backend.operationalDataInsert;
+package at.ac.tuwien.sepr.groupphase.backend.datainsert;
+
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;

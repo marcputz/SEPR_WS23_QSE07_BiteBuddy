@@ -9,10 +9,10 @@ import java.util.List;
  */
 public interface IngredientService {
 
-  /**
-   * Returns a list of all ingredients in the database.
-   *
-   * @return all ingredients
-   */
-  List<IngredientDto> getAllIngredients();
+    /**
+    * Returns a list of all ingredients in the database.
+    *
+    * @return all ingredients
+    */
+    List<IngredientDto> getAllIngredients();
 }

@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix="file-paths")
+@ConfigurationProperties(prefix = "file-paths")
 public class FilePathsProperties {
 
     private String keySecurityFolder;
