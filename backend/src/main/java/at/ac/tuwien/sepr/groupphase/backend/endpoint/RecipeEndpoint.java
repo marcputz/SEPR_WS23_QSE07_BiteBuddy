@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,10 @@ public class RecipeEndpoint {
         } catch (ConflictException e) {
             HttpStatus status = HttpStatus.CONFLICT;
             logClientError(status, "Conflict while creating recipe", e);
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        } catch (ValidationException e) {
+            HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+            logClientError(status, "Recipe parameters where not valid", e);
             throw new ResponseStatusException(status, e.getMessage(), e);
         }
     }

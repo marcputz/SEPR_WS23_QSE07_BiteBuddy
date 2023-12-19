@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface RecipeService {
      *
      * @param recipe we want to store.
      */
-    void createRecipe(RecipeDetailsDto recipe) throws ConflictException;
+    void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException;
 
     /**
      * Finds the recipe with the given id.

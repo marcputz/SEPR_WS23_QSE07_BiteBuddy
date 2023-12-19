@@ -6,10 +6,12 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.validation.RecipeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +34,18 @@ public class RecipeServiceImpl implements RecipeService {
     private IngredientRepository ingredientRepository;
     private AllergeneIngredientRepository allergeneIngredientRepository;
     private AllergeneRepository allergeneRepository;
+    private RecipeValidator validator;
 
     @Autowired
     public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeIngredientRepository recipeIngredientRepository,
                              IngredientRepository ingredientRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                             AllergeneRepository allergeneRepository) {
+                             AllergeneRepository allergeneRepository, RecipeValidator validator) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.ingredientRepository = ingredientRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.allergeneRepository = allergeneRepository;
+        this.validator = validator;
     }
 
     @Override
@@ -49,7 +53,6 @@ public class RecipeServiceImpl implements RecipeService {
         LOGGER.debug("search recipes");
 
         String name = "";
-        // String creator = "";
         int pageSelector = 0;
         int entriesPerPage = 25;
 
@@ -64,7 +67,6 @@ public class RecipeServiceImpl implements RecipeService {
             if (searchParams.entriesPerPage() >= 1) {
                 entriesPerPage = searchParams.entriesPerPage();
             }
-            // creator = !searchParams.creator().trim().isEmpty() ? searchParams.creator() : "";
         }
 
         Pageable page = PageRequest.of(pageSelector, entriesPerPage);
@@ -79,12 +81,14 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public void createRecipe(RecipeDetailsDto recipe) throws ConflictException {
+    public void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException {
         LOGGER.debug("createRecipe");
 
-        // check ingredients exist
-        Set<RecipeIngredient> ingredients = new HashSet<>();
+        // validate recipe
+        this.validator.validateForCreate(recipe);
+
         ArrayList<String> conflictList = new ArrayList<>();
+        Set<RecipeIngredient> ingredients = new HashSet<>();
 
         // creating database entry
         Recipe newRecipe = new Recipe();
@@ -98,7 +102,7 @@ public class RecipeServiceImpl implements RecipeService {
         // getting recipe id & checking if we can find the RecipeIngredients
         Recipe queriedRecipe = this.recipeRepository.findByNameContainingIgnoreCase(recipe.name(), page).get(0);
 
-        // Trying to update recipe, but this does not work
+        // update recipe with the correct ingredients
         ingredients = new HashSet<>();
         for (String ingredient : recipe.ingredients()) {
             List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient);
