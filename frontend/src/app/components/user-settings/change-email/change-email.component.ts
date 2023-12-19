@@ -68,6 +68,8 @@ export class ChangeEmailComponent {
           console.log('User settings updated successfully');
           this.notifications.success('Email updated successfully');
           this.getUser();
+          this.submitted = false;
+          this.settingsForm.controls['currentPassword'].setValue('');
         },
         error: error => {
           console.error('Error updating user settings', error);
