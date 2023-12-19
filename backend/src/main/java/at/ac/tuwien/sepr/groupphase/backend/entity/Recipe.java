@@ -1,14 +1,18 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
 
-import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Column;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
+
+
 
 import java.util.Objects;
-
+import java.util.Set;
 
 @Entity
 public class Recipe {
@@ -17,10 +21,16 @@ public class Recipe {
     private Long id;
     @Column
     private String name;
+
+    @Lob
     @Column
     private String instructions;
-    //@OneToMany(mappedBy = "recipe")
-    //private Set<RecipeIngredient> recipeIngredients;
+    @Lob
+    @Column
+    private byte[] picture;  // The image data represented as a byte array
+
+    @OneToMany(mappedBy = "recipe")
+    private Set<RecipeIngredient> recipeIngredients;
 
 
     public void setId(Long id) {
@@ -47,13 +57,22 @@ public class Recipe {
         return instructions;
     }
 
-    /*public void setIngredients(Set<RecipeIngredient> ingredients) {
+    public byte[] getPicture() {
+        return picture;
+    }
+
+    public void setPicture(byte[] picture) {
+        this.picture = picture;
+    }
+
+    public void setIngredients(Set<RecipeIngredient> ingredients) {
         this.recipeIngredients = ingredients;
     }
 
     public Set<RecipeIngredient> getIngredients() {
         return recipeIngredients;
-    } */
+    }
+
 
     @Override
     public boolean equals(Object o) {

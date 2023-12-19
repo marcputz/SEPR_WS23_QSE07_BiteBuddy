@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {RecipeService} from "../../services/recipe.service";
 import {RecipeListDto, RecipeSearch} from "../../dtos/recipe";
 import {debounceTime, Subject} from "rxjs";
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-recipe-list',
@@ -14,10 +15,12 @@ export class RecipeListComponent {
   searchParams: RecipeSearch = {
     creator: "",
     name: "",
+    page: 0,
+    entriesPerPage: 25
   };
 
   constructor(
-    private service: RecipeService
+    private service: RecipeService, private sanitizer: DomSanitizer
   ) {
   }
 
@@ -34,8 +37,6 @@ export class RecipeListComponent {
   }
 
   reloadRecipes() {
-    console.log(this.searchParams);
-
     this.service.search(this.searchParams).subscribe({
       next: data => {
         console.log(data);
@@ -46,5 +47,25 @@ export class RecipeListComponent {
         // TODO notification service
       }
     })
+  }
+
+  sanitizeImage(imageBytes: any): SafeUrl {
+    try {
+      if (!imageBytes || imageBytes.length === 0) {
+        throw new Error('Empty or undefined imageBytes');
+      }
+
+      const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
+      const dataUrl = `data:image/png;base64,${imageBytes}`;
+      return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+    } catch (error) {
+      console.error('Error sanitizing image:', error);
+      return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
+    }
+  }
+
+  pageCounter(change: number) {
+    this.searchParams.page += change;
+    this.reloadRecipes()
   }
 }

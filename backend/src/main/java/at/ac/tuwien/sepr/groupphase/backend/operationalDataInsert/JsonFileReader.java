@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
+package at.ac.tuwien.sepr.groupphase.backend.operationalDataInsert;
 
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
@@ -27,13 +27,17 @@ import java.lang.invoke.MethodHandles;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 
-@Profile("readJsonData")
+@Profile("addJsonData")
 @Component
 public class JsonFileReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String DEFAULT_KEY_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/FoodDataFiles";
+    private static final String DEFAULT_PICTURE_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/RecipePictures";
     private static final String PRIVATE_KEY_FILENAME_RECIPES = "Recipes.json";
     private static final String PRIVATE_KEY_FILENAME_INGREDIENTS = "Ingredients.json";
     private static final String PRIVATE_KEY_FILENAME_ALLERGENES = "Allergenes.json";
@@ -74,16 +78,25 @@ public class JsonFileReader {
             AllergeneIngredientString[] allergeneIngredients = objectMapper.readValue(fileAllergeneIngredients, AllergeneIngredientString[].class);
             RecipeIngredientString[] recipeIngredients = objectMapper.readValue(fileRecipeIngredients, RecipeIngredientString[].class);
 
+
             if (ingredientRepository.count() == 0) {
                 ingredientRepository.saveAll(Arrays.asList(ingredients));
             }
             if (allergeneRepository.count() == 0) {
                 allergeneRepository.saveAll(Arrays.asList(allergenes));
             }
+            //            this aswell as later code are also for the pictures
+            int pictureCount = 1;
             if (recipeRepository.count() == 0) {
-                recipeRepository.saveAll(Arrays.asList(recipes));
+                for (Recipe recipe : recipes) {
+                    Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".png");
+                    recipe.setPicture(Files.readAllBytes(path));
+                    recipeRepository.save(recipe);
+                    pictureCount++;
+                }
             }
-            if (allergeneRepository.count() == 0) {
+
+            if (allergeneIngredientRepository.count() == 0) {
                 for (AllergeneIngredientString allergeneIngredient : allergeneIngredients) {
                     AllergeneIngredient a = new AllergeneIngredient();
                     a.setId(allergeneIngredient.getId());
@@ -95,13 +108,58 @@ public class JsonFileReader {
             if (recipeIngredientRepository.count() == 0) {
                 for (RecipeIngredientString recipeIngredientString : recipeIngredients) {
                     RecipeIngredient r = new RecipeIngredient();
-                    r.setId(recipeIngredientString.id);
+                    r.setId(recipeIngredientString.getId());
                     r.setRecipe(recipeRepository.getById(recipeIngredientString.getRecipe()));
                     r.setIngredient(ingredientRepository.getById(recipeIngredientString.getIngredient()));
                     r.setAmount(recipeIngredientString.amount);
                     recipeIngredientRepository.save(r);
                 }
             }
+
+
+
+            /*
+            //The following shows the functionality of the DB, works if uncommented
+
+            // get all informations from recipeId to ingredientId to AllergeneId
+            LOGGER.info("get all information only from RecipeID");
+            Recipe recipe1 = recipeRepository.getById(3L);
+            LOGGER.info(recipe1.toString());
+            Set<Ingredient> ingredientsForRecipe = ingredientRepository.findAllByRecipeIngredientsRecipeId(recipe1.getId());
+            for (Ingredient ingredient : ingredientsForRecipe) {
+                LOGGER.info(ingredient.toString());
+                Set<Allergene> allergenesForIngredient2 = allergeneRepository.findAllByAllergeneIngredientsIngredientId(ingredient.getId());
+                for (Allergene allergene : allergenesForIngredient2) {
+                    LOGGER.info(allergene.toString());
+                }
+            }
+
+            // get all information from AllergeneId to ingredientId to recipeId
+            LOGGER.info("get all information only from AllergeneID");
+            Allergene allergene1 = allergeneRepository.getById(2L);
+            LOGGER.info(allergene1.toString());
+            Set<Ingredient> ingredientsForAllergene = ingredientRepository.findAllByAllergeneIngredientsAllergeneId(allergene1.getId());
+            for (Ingredient ingredient : ingredientsForAllergene) {
+                LOGGER.info(ingredient.toString());
+                Set<Recipe> recipesForIngredient2 = recipeRepository.findAllByRecipeIngredientsIngredientId(ingredient.getId());
+                for (Recipe recipe : recipesForIngredient2) {
+                    LOGGER.info(recipe.toString());
+                }
+            }
+
+            */
+            // get all the pictures from the recipes and save them in RecipePictures
+
+
+            // ------------------ the following would do the pictures --------------------------------------
+
+            /*for (long i = 1; i < 4; i++) {
+                byte[] picture = recipeRepository.getById(i).getPicture();
+                Path path2 = Paths.get(DEFAULT_PICTURE_FOLDER + "/" + i + "saved.png");
+                LOGGER.info("Path where picture is saved: " + path2);
+                Files.write(path2, picture);
+            } */
+
         } catch (IOException e) {
             LOGGER.error("Error reading JSON file", e);
         }

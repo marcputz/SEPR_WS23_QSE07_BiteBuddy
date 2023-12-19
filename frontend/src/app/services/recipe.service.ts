@@ -24,4 +24,12 @@ export class RecipeService {
   getById(id: number): Observable<RecipeDetailsDto> {
     return this.http.get<RecipeDetailsDto>(`${this.baseUri}/${id}`);
   }
+
+  createRecipe(recipe: RecipeDetailsDto) {
+    return this.http.post(this.baseUri + "/create", recipe);
+  }
+
+  searchRecipeIngredientsMatching(term: string) {
+    return this.http.get(`${this.baseUri}/ingredient/${term}`);
+  }
 }

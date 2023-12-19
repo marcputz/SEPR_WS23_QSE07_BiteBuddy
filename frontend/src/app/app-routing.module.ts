@@ -16,6 +16,7 @@ import {ChangeSettingsComponent} from './components/user-settings/change-setting
 import {ChangeEmailComponent} from './components/user-settings/change-email/change-email.component';
 import {ChangePasswordComponent} from './components/user-settings/change-password/change-password.component';
 import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout.component";
+import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 
 const routes: Routes = [
   //{path: '', component: HomeComponent},
@@ -36,14 +37,12 @@ const routes: Routes = [
       {path: 'email', canActivate: mapToCanActivate([AuthGuard]), component: ChangeEmailComponent},
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
   ]},
-
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
-  {
-    path: 'recipes', children: [
+  {path: 'recipes', children: [
       {path: '', component: RecipeListComponent},
-      {path: ':id', component: RecipeDetailComponent}
-    ]
-  },
+      {path: 'create', component: RecipeCreateComponent},
+      {path: ':id', component: RecipeDetailComponent},
+  ]},
 ];
 
 @NgModule({
