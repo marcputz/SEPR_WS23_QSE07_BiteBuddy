@@ -31,10 +31,10 @@ public class AllergeneIngredientDto {
 
     @Override
     public String toString() {
-        return "AllergeneIngredientDto{" +
-            "allergene=" + allergene +
-            ", ingredient=" + ingredient +
-            '}';
+        return "AllergeneIngredientDto{"
+            + "allergene=" + allergene
+            + ", ingredient=" + ingredient
+            + "}";
     }
 
     public static final class AllergeneIngredientDtoBuilder {

@@ -15,19 +15,19 @@ import java.util.List;
 @RestController
 @RequestMapping(path = IngredientEndpoint.BASE_PATH)
 public class IngredientEndpoint {
-  private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-  static final String BASE_PATH = "/api/v1/ingredients";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    static final String BASE_PATH = "/api/v1/ingredients";
 
-  private final IngredientService ingredientService;
+    private final IngredientService ingredientService;
 
-  public IngredientEndpoint(IngredientService ingredientService) {
-    this.ingredientService = ingredientService;
-  }
+    public IngredientEndpoint(IngredientService ingredientService) {
+        this.ingredientService = ingredientService;
+    }
 
-  @Operation(summary = "Get ingredients", description = "Get all ingredient from database")
-  @GetMapping
-  public List<IngredientDto> getAllIngredients() {
-    LOGGER.info("Received GET request on {}", BASE_PATH);
-    return ingredientService.getAllIngredients();
-  }
+    @Operation(summary = "Get ingredients", description = "Get all ingredient from database")
+    @GetMapping
+    public List<IngredientDto> getAllIngredients() {
+        LOGGER.info("Received GET request on {}", BASE_PATH);
+        return ingredientService.getAllIngredients();
+    }
 }

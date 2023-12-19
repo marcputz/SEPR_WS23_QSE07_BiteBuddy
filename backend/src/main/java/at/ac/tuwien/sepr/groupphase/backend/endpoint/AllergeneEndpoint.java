@@ -15,19 +15,19 @@ import java.util.List;
 @RestController
 @RequestMapping(path = AllergeneEndpoint.BASE_PATH)
 public class AllergeneEndpoint {
-  private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-  static final String BASE_PATH = "/api/v1/allergens";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    static final String BASE_PATH = "/api/v1/allergens";
 
-  private final AllergeneService allergeneService;
+    private final AllergeneService allergeneService;
 
-  public AllergeneEndpoint(AllergeneService allergeneService) {
-    this.allergeneService = allergeneService;
-  }
+    public AllergeneEndpoint(AllergeneService allergeneService) {
+        this.allergeneService = allergeneService;
+    }
 
-  @Operation(summary = "Get allergens", description = "Get all allergens from database")
-  @GetMapping
-  public List<AllergeneDto> getAllAllergens() {
-    LOGGER.info("Received GET request on {}", BASE_PATH);
-    return allergeneService.getAllAllergens();
-  }
+    @Operation(summary = "Get allergens", description = "Get all allergens from database")
+    @GetMapping
+    public List<AllergeneDto> getAllAllergens() {
+        LOGGER.info("Received GET request on {}", BASE_PATH);
+        return allergeneService.getAllAllergens();
+    }
 }

@@ -13,19 +13,19 @@ import java.util.List;
 
 @Service
 public class IngredientServiceImpl implements IngredientService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private final IngredientRepository ingredientRepository;
-  private final IngredientMapper ingredientMapper;
+    private final IngredientRepository ingredientRepository;
+    private final IngredientMapper ingredientMapper;
 
-  public IngredientServiceImpl(IngredientRepository ingredientRepository, IngredientMapper ingredientMapper) {
-    this.ingredientRepository = ingredientRepository;
-    this.ingredientMapper = ingredientMapper;
-  }
+    public IngredientServiceImpl(IngredientRepository ingredientRepository, IngredientMapper ingredientMapper) {
+        this.ingredientRepository = ingredientRepository;
+        this.ingredientMapper = ingredientMapper;
+    }
 
-  @Override
-  public List<IngredientDto> getAllIngredients() {
-    LOGGER.trace("getAllIngredients()");
-    return ingredientMapper.ingredientToListAllIngredientDtos(ingredientRepository.findAll());
-  }
+    @Override
+    public List<IngredientDto> getAllIngredients() {
+        LOGGER.trace("getAllIngredients()");
+        return ingredientMapper.ingredientToListAllIngredientDtos(ingredientRepository.findAll());
+    }
 }

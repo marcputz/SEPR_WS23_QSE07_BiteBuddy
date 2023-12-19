@@ -13,19 +13,19 @@ import java.util.List;
 
 @Service
 public class AllergeneServiceImpl implements AllergeneService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private final AllergeneRepository allergeneRepository;
-  private final AllergeneMapper allergeneMapper;
+    private final AllergeneRepository allergeneRepository;
+    private final AllergeneMapper allergeneMapper;
 
-  public AllergeneServiceImpl(AllergeneRepository allergeneRepository, AllergeneMapper allergeneMapper) {
-    this.allergeneRepository = allergeneRepository;
-    this.allergeneMapper = allergeneMapper;
-  }
+    public AllergeneServiceImpl(AllergeneRepository allergeneRepository, AllergeneMapper allergeneMapper) {
+        this.allergeneRepository = allergeneRepository;
+        this.allergeneMapper = allergeneMapper;
+    }
 
-  @Override
-  public List<AllergeneDto> getAllAllergens() {
-    LOGGER.trace("getAllAllergene()");
-    return allergeneMapper.allergenesToListAllergeneDtos(allergeneRepository.findAll());
-  }
+    @Override
+    public List<AllergeneDto> getAllAllergens() {
+        LOGGER.trace("getAllAllergene()");
+        return allergeneMapper.allergenesToListAllergeneDtos(allergeneRepository.findAll());
+    }
 }

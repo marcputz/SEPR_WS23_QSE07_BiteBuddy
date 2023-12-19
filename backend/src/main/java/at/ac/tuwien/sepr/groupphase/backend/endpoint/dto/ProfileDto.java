@@ -52,11 +52,11 @@ public class ProfileDto {
 
     @Override
     public String toString() {
-        return "ProfileDto{" +
-            "name='" + name + '\'' +
-            ", allergens=" + allergens +
-            ", ingredient=" + ingredient +
-            '}';
+        return "ProfileDto{"
+            + "name='" + name + '\''
+            + ", allergens=" + allergens
+            + ", ingredient=" + ingredient
+            + "}";
     }
 
     public static final class ProfileDtoBuilder {
