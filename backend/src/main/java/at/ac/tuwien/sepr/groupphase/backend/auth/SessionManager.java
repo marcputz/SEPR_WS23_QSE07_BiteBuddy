@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.auth;
 
+import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

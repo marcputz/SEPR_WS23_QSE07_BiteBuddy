@@ -1,33 +1,23 @@
 package at.ac.tuwien.sepr.groupphase.backend.operationalDataInsert;
-
-
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
-
-
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.File;
 import java.io.IOException;
-
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.invoke.MethodHandles;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;

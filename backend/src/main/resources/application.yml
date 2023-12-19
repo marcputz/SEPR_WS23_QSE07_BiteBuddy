@@ -6,7 +6,20 @@ bitebuddy:
       port: 587
       username: "mail.bitebuddy@gmail.com"
       password: "nuem wfjl fhnz zrvd"
-
+file-paths:
+  key-security-folder: "security"
+  private-key-filename: "private.pem"
+  public-key-filename: "public.pem"
+  pictures:
+    recipe-folder: "pictures/recipe"
+  data:
+    folder: "data"
+    filename:
+      recipe: "Recipes.json"
+      ingredient: "Ingredients.json"
+      allergen: "Allergenes.json"
+      allergen-ingredient: "AllergeneIngredients.json"
+      recipe-ingredient: "RecipeIngredients.json"
 logging:
   level:
     root: INFO

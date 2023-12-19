@@ -1,25 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.auth;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.json.JsonGeneratorImpl;
-import io.swagger.v3.core.util.Json;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.tomcat.util.json.JSONParser;
-import org.h2.util.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+@Component
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
     private final AuthenticationService authService;

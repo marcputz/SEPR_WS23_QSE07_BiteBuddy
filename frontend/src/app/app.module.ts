@@ -30,6 +30,7 @@ import { SettingsLayoutComponent } from './layouts/settings-layout/settings-layo
 import { NgOptimizedImage } from "@angular/common";
 import { RecipeCreateComponent } from './components/recipe-create/recipe-create.component';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
+import { ProfileComponent } from './components/dialogs/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
     SettingsLayoutComponent,
     RecipeCreateComponent,
     AutocompleteComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,

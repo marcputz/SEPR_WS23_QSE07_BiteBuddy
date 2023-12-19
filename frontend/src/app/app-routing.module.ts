@@ -17,6 +17,7 @@ import {ChangeEmailComponent} from './components/user-settings/change-email/chan
 import {ChangePasswordComponent} from './components/user-settings/change-password/change-password.component';
 import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout.component";
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
+import {ProfileComponent} from "./components/dialogs/profile/profile.component";
 
 const routes: Routes = [
   //{path: '', component: HomeComponent},
@@ -29,6 +30,7 @@ const routes: Routes = [
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
       {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
       {path: 'register', component: RegisterComponent},
+      {path: 'profile', component: ProfileComponent}
     ]},
   {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
