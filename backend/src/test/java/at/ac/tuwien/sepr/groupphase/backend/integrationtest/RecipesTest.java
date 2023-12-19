@@ -67,7 +67,6 @@ public class RecipesTest {
     private long ingredient2Id;
 
 
-
     @BeforeEach
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webAppContext).build();
@@ -90,7 +89,7 @@ public class RecipesTest {
         recipeIngredient2.setIngredient(ingredient2);
         recipeIngredient2.setAmount("200 g");
 
-        Recipe recipe1  = new Recipe();
+        Recipe recipe1 = new Recipe();
         recipe1.setInstructions("Instructions1");
         recipe1.setName("recipe 1");
         Set<RecipeIngredient> rIngredients1 = new HashSet<>();
@@ -103,7 +102,7 @@ public class RecipesTest {
         allergene1.setIngredients(aIngredients);
         allergeneIngredient1.setIngredient(ingredient1);
 
-        Recipe recipe2  = new Recipe();
+        Recipe recipe2 = new Recipe();
         recipe2.setInstructions("Instructions2");
         recipe2.setName("recipe 2");
         Set<RecipeIngredient> rIngredients2 = new HashSet<>();
@@ -112,7 +111,7 @@ public class RecipesTest {
 
         allergene1Id = allergeneRepository.save(allergene1).getId();
         ingredient1Id = ingredientRepository.save(ingredient1).getId();
-        ingredient2Id  = ingredientRepository.save(ingredient2).getId();
+        ingredient2Id = ingredientRepository.save(ingredient2).getId();
         recipe1Id = recipeRepository.save(recipe1).getId();
         recipe2Id = recipeRepository.save(recipe2).getId();
         allergeneIngredient1Id = allergeneIngredientRepository.save(allergeneIngredient1).getId();
@@ -230,19 +229,121 @@ public class RecipesTest {
                     "recipe 1"
                 ),
             () -> assertThat(recipeDetails.get(0).description())
-            .contains(
-                "Instructions1"
-            ),
+                .contains(
+                    "Instructions1"
+                ),
             () -> assertThat(recipeDetails.get(0).ingredients())
-            .hasSize(2)
-            .contains(
-                "Apple: 100 g", "Rice: 200 g"
-            ),
+                .hasSize(2)
+                .contains(
+                    "Apple: 100 g", "Rice: 200 g"
+                ),
             () -> assertThat(recipeDetails.get(0).allergens())
-            .hasSize(1)
-            .contains("Fructose")
+                .hasSize(1)
+                .contains("Fructose")
         );
+    }
 
+    @Test
+    public void createValidRecipe() throws Exception {
+        // creating request
+        mockMvc
+            .perform(MockMvcRequestBuilders
+                .post("/api/v1/recipes/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                    "id": null,
+                    "name": "Eine Prise Test",
+                    "description": "Man nehme einen Test 1313üaääw",
+                    "ingredients": ["Chicken", "Garlic"],
+                    "allergens": [],
+                    "picture": ""
+                    }
+                    """)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk());
+
+        // now requesting the recipe
+        // creating request
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .post("/api/v1/recipes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                    "name": "Eine Prise Test",
+                    "creator": "",
+                    "page": 0,
+                    "entriesPerPage": 1000
+                    }
+                    """)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsByteArray();
+
+        // mapping
+        List<RecipeListDto> recipeResult = objectMapper.readerFor(RecipeListDto.class).<RecipeListDto>readValues(body).readAll();
+
+        // asserting test
+        assertNotNull(recipeResult);
+
+        // check that it exists in the list
+        assertThat(recipeResult)
+            .extracting(RecipeListDto::name)
+            .contains(
+                "Eine Prise Test"
+            );
+    }
+
+    @Test
+    public void createInvalidRecipe() throws Exception {
+        // creating request with invalid ingredient
+        mockMvc
+            .perform(MockMvcRequestBuilders
+                .post("/api/v1/recipes/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                    "name": "Eine Prise falscher Test",
+                    "description": "Man nehme einen Test 1313üaääw",
+                    "ingredients": ["awdoawdinafeinfgwsernuifgweredrtgbhnsd"],
+                    "picture": ""
+                    }
+                    """)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isConflict());
+
+        // creating request with no ingredient
+        mockMvc
+            .perform(MockMvcRequestBuilders
+                .post("/api/v1/recipes/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                    "name": "Eine Prise falscher Test",
+                    "description": "Man nehme einen Test 1313üaääw",
+                    "ingredients": [],
+                    "picture": ""
+                    }
+                    """)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().is4xxClientError());
+
+        // creating request with too long name
+        mockMvc
+            .perform(MockMvcRequestBuilders
+                .post("/api/v1/recipes/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                    "name": "Eine Prise Testwefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                    "description": "Man nehme einen Test 1313üaääw",
+                    "ingredients": [],
+                    "picture": ""
+                    }
+                    """)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().is4xxClientError());
     }
 }
 
