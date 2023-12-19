@@ -5,6 +5,8 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 
+import java.util.List;
+
 /**
  * This class is used to map the {@link Ingredient} entity to the {@link IngredientDto} DTO and vice versa.
  */
@@ -28,4 +30,13 @@ public interface IngredientMapper {
      */
     @Named("ingredientToIngredientDto")
     Ingredient ingredientDtoToIngredient(IngredientDto ingredientDto);
+
+    /**
+     * Maps a list of {@link Ingredient} entities to a list of {@link IngredientDto} DTOs.
+     *
+     * @param ingredients the ingredients to map
+     * @return the mapped ingredientDtos
+     */
+    @Named("ingredientToListAllIngredientDtos")
+    List<IngredientDto> ingredientToListAllIngredientDtos(List<Ingredient> ingredients);
 }

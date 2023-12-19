@@ -31,7 +31,7 @@ import {ChangePasswordComponent} from './components/user-settings/change-passwor
 import {ChangeSettingsComponent} from './components/user-settings/change-settings/change-settings.component';
 import { SettingsLayoutComponent } from './layouts/settings-layout/settings-layout.component';
 import { NgOptimizedImage } from "@angular/common";
-import { ProfileComponent } from './components/profile/profile.component';
+import { ProfileComponent } from './components/dialogs/profile/profile.component';
 
 @NgModule({
   declarations: [

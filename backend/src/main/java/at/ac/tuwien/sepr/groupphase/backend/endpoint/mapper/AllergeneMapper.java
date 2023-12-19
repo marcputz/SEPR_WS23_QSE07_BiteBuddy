@@ -5,6 +5,8 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 
+import java.util.List;
+
 /**
  * This class is used to map the {@link Allergene} entity to the {@link AllergeneDto} DTO and vice versa.
  */
@@ -28,4 +30,13 @@ public interface AllergeneMapper {
      */
     @Named("allergeneDtoToAllergene")
     Allergene allergeneDtoToAllergene(AllergeneDto allergeneDto);
+
+    /**
+     * Maps a list of {@link Allergene} entities to a list of {@link AllergeneDto} DTOs.
+     *
+     * @param allergenes the allergenes to map
+     * @return the mapped allergeneDtos
+     */
+    @Named("allergenesToListAllergeneDtos")
+    List<AllergeneDto> allergenesToListAllergeneDtos(List<Allergene> allergenes);
 }
