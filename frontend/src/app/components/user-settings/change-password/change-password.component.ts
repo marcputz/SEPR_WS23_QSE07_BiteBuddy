@@ -47,6 +47,10 @@ export class ChangePasswordComponent {
         next: () => {
           console.log('Password updated successfully');
           this.notifications.success('Password updated successfully');
+          this.submitted = false;
+          this.settingsForm.controls['currentPassword'].setValue('');
+          this.settingsForm.controls['password'].setValue('');
+          this.settingsForm.controls['password2'].setValue('');
         },
         error: error => {
           console.error('Error updating user settings', error);
