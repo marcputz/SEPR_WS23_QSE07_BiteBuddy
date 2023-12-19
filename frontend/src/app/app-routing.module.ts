@@ -2,7 +2,6 @@ import {NgModule} from '@angular/core';
 import {mapToCanActivate, RouterModule, Routes} from '@angular/router';
 import {LoginComponent} from './components/dialogs/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
-import {MessageComponent} from './components/message/message.component';
 import {RegisterComponent} from "./components/dialogs/register/register.component";
 import {
   RequestPasswordResetComponent
@@ -32,14 +31,13 @@ const routes: Routes = [
       {path: 'register', component: RegisterComponent},
       {path: 'profile', component: ProfileComponent}
     ]},
-  {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
+  {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent}, // TODO: add dashboard component
   {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
       {path: '', pathMatch: 'full', redirectTo: 'user'},
       {path: 'user', canActivate: mapToCanActivate([AuthGuard]), component: ChangeSettingsComponent},
       {path: 'email', canActivate: mapToCanActivate([AuthGuard]), component: ChangeEmailComponent},
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
   ]},
-  {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'recipes', children: [
       {path: '', component: RecipeListComponent},
       {path: 'create', component: RecipeCreateComponent},
