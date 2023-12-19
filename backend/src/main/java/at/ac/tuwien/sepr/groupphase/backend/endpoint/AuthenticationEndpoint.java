@@ -100,7 +100,7 @@ public class AuthenticationEndpoint {
      *
      * @param userUpdateEmailAndPasswordDto DTO containing the new email and/or password along with the current password for verification.
      * @param headers                       HTTP headers from the request, containing the JWT token.
-     * @return ResponseEntity indicating the outcome of the operation. The updated user settings are returned in the response body.
+     * @return a ResponseEntity indicating the outcome of the operation. The updated user settings are returned in the response body.
      * @throws AuthenticationException if the authentication fails due to invalid token or incorrect current password.
      * @throws ValidationException     if the provided new email or password fails validation checks.
      * @throws ConflictException       if the new email conflicts with another user's email.
@@ -138,7 +138,7 @@ public class AuthenticationEndpoint {
      * It fetches the user details based on the user ID extracted from the JWT and returns them as a UserSettingsDto.
      *
      * @param headers HTTP headers from the request, containing the JWT token.
-     * @return ResponseEntity containing the UserSettingsDto of the authenticated user.
+     * @return a ResponseEntity containing the UserSettingsDto of the authenticated user.
      * @throws AuthenticationException if the user is not authenticated or the authentication token is invalid.
      * @throws UserNotFoundException   if the user corresponding to the ID in the JWT token is not found.
      */

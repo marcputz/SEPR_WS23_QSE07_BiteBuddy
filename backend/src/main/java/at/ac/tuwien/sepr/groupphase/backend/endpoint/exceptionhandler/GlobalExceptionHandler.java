@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.exceptionhandler;
 
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -22,9 +24,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Register all your Java exceptions here to map them into meaningful HTTP exceptions
+ * Register all your Java exceptions here to map them into meaningful HTTP exceptions.
  * If you have special cases which are only important for specific endpoints, use ResponseStatusExceptions
- * https://www.baeldung.com/exception-handling-for-rest-with-spring#responsestatusexception
+ * <a href="https://www.baeldung.com/exception-handling-for-rest-with-spring#responsestatusexception">Baeldung Responsestatusexception</a>
  */
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -43,10 +45,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles {@link AuthenticationException}s occurring in REST endpoints.
      *
-     * @author Marc Putz
-     * @param ex the exception
+     * @param ex      the exception
      * @param request the request where the exception occurred
      * @return a ResponseEntity to send back to the client
+     * @author Marc Putz
      */
     @ExceptionHandler(value = {AuthenticationException.class})
     protected ResponseEntity<Object> handleAuthenticationError(AuthenticationException ex, WebRequest request) {
@@ -57,10 +59,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles {@link DataStoreException}s occurring in REST endpoints.
      *
-     * @author Marc Putz
-     * @param ex the exception
+     * @param ex      the exception
      * @param request the request where the exception occurred
      * @return a ResponseEntity to send back to the client
+     * @author Marc Putz
      */
     @ExceptionHandler(value = {DataStoreException.class})
     protected ResponseEntity<Object> handleDataStoreError(DataStoreException ex, WebRequest request) {
@@ -69,13 +71,39 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Handles {@link ConflictException}s occurring in REST endpoints.
+     *
+     * @param ex      the exception
+     * @param request the request where the exception occurred
+     * @return a ResponseEntity to send back to the client
+     */
+    @ExceptionHandler(value = {ConflictException.class})
+    protected ResponseEntity<Object> handleConflictError(ConflictException ex, WebRequest request) {
+        LOGGER.warn("Conflict detected: {}", ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    /**
+     * Handles {@link ValidationException}s occurring in REST endpoints.
+     *
+     * @param ex      the exception
+     * @param request the request where the exception occurred
+     * @return a ResponseEntity to send back to the client
+     */
+    @ExceptionHandler(value = {ValidationException.class})
+    protected ResponseEntity<Object> handleValidationError(ValidationException ex, WebRequest request) {
+        LOGGER.warn("Validation error: {}", ex.getMessage());
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
+    }
+
+    /**
      * Override methods from ResponseEntityExceptionHandler to send a customized HTTP response for a know exception
      * from e.g. Spring
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-        HttpHeaders headers,
-        HttpStatusCode status, WebRequest request) {
+                                                                  HttpHeaders headers,
+                                                                  HttpStatusCode status, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         //Get all errors
         List<String> errors = ex.getBindingResult()
