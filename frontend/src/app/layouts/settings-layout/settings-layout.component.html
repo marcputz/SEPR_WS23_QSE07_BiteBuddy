@@ -21,15 +21,15 @@
           <!-- Navbar -->
           <div id="settings-sidebar-navbar-desktop">
             <ul class="bb-settings-navbar-desktop-list">
-              <li [routerLink]="['/settings/user']" class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'user'">
+              <li [routerLink]="['/settings/user']" class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem === 'user'">
                 <i class="bi-person-badge"></i>
                 <a>User</a>
               </li>
-              <li [routerLink]="['/settings/email']" class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'email'">
+              <li [routerLink]="['/settings/email']" class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem === 'email'">
                 <i class="bi-envelope"></i>
                 <a>Email</a>
               </li>
-              <li [routerLink]="['/settings/password']" class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem == 'password'">
+              <li [routerLink]="['/settings/password']" class="bb-settings-navbar-desktop-list-item" [class.active]="activeNavItem === 'password'">
                 <i class="bi-key"></i>
                 <a>Password</a>
               </li>
@@ -88,13 +88,13 @@
           <!-- Navigation -->
           <div class="bb-settings-layout-box bb-settings-headerbar-navigation-tablet">
             <ul class="bb-settings-navbar-tablet-list">
-              <li [routerLink]="['/settings/user']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem == 'user'">
+              <li [routerLink]="['/settings/user']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem === 'user'">
                 <div>
                 <i class="bi-person-badge"></i>
                 <a>User</a>
                 </div>
               </li>
-              <li [routerLink]="['/settings/email']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem == 'email'">
+              <li [routerLink]="['/settings/email']" class="bb-settings-navbar-tablet-list-item" [class.active]="activeNavItem === 'email'">
                 <div>
                   <i class="bi-envelope"></i>
                   <a>Email</a>
@@ -149,13 +149,13 @@
           <!-- Navigation bar -->
           <div class="bb-settings-headerbar-navigation-phone">
             <ul class="bb-settings-navbar-phone-list">
-              <li [routerLink]="['/settings/user']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem == 'user'">
+              <li [routerLink]="['/settings/user']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem === 'user'">
                 <div>
                 <i class="bi-person-badge"></i>
                 <a>User</a>
                 </div>
               </li>
-              <li [routerLink]="['/settings/email']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem == 'email'">
+              <li [routerLink]="['/settings/email']" class="bb-settings-navbar-phone-list-item" [class.active]="activeNavItem === 'email'">
                 <div>
                 <i class="bi-envelope"></i>
                 <a>Email</a>
