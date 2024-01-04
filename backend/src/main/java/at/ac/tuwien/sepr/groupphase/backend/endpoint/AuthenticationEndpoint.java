@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
@@ -16,6 +15,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -105,7 +106,7 @@ public class AuthenticationEndpoint {
      * @throws ConflictException       if the new email conflicts with another user's email.
      * @throws UserNotFoundException   if no user is found with the provided ID in the JWT token.
      */
-    @PutMapping("/settings")
+    @PutMapping("/settings/authentication")
     public ResponseEntity<UserSettingsDto> updateEmailAndPasswordSettings(@RequestBody UserUpdateEmailAndPasswordDto userUpdateEmailAndPasswordDto,
                                                                           @RequestHeader HttpHeaders headers)
         throws AuthenticationException, ValidationException, ConflictException, UserNotFoundException {
