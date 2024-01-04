@@ -70,7 +70,7 @@ export class RegisterComponent implements OnInit{
     this.authService.registerUser(authRequest).subscribe({
       next: (data) => {
         console.log('Successfully registered user: ' + authRequest.email);
-        this.router.navigate(['']);
+        this.router.navigate(['/profile']);
       },
       error: error => {
         console.log('Could not register user due to:');
