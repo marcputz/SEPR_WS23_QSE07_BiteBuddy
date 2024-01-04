@@ -9,6 +9,7 @@ import {RegisterDto} from "../dtos/registerDto";
 import {UserSettingsDto} from '../dtos/userSettingsDto';
 import {UpdateAuthenticationSettingsDto} from '../dtos/updateAuthenticationSettingsDto';
 import {ResetPasswordDto} from "../dtos/resetPasswordDto";
+import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';
 
 @Injectable({
   providedIn: 'root'
