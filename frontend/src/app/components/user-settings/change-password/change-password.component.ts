@@ -4,7 +4,7 @@ import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {AuthService} from '../../../services/auth.service';
 import {PasswordEncoder} from '../../../utils/passwordEncoder';
 import {Router} from '@angular/router';
-import {UpdateUserSettingsDto} from '../../../dtos/updateUserSettingsDto';
+import {UpdateAuthenticationSettingsDto} from '../../../dtos/updateAuthenticationSettingsDto';
 import {ToastrService} from 'ngx-toastr';
 
 @Component({
@@ -39,11 +39,11 @@ export class ChangePasswordComponent {
       const currentPassword: string = this.passwordEncoder.encodePassword(this.settingsForm.controls.currentPassword.value);
       const newPassword: string = this.passwordEncoder.encodePassword(this.settingsForm.controls.password.value);
 
-      const updateUserSettingsDto: UpdateUserSettingsDto = new UpdateUserSettingsDto(
+      const updateUserSettingsDto: UpdateAuthenticationSettingsDto = new UpdateAuthenticationSettingsDto(
         null, currentPassword, newPassword
       );
 
-      this.authService.updateUser(updateUserSettingsDto).subscribe({
+      this.authService.updateUserAuthentication(updateUserSettingsDto).subscribe({
         next: () => {
           console.log('Password updated successfully');
           this.notifications.success('Password updated successfully');
