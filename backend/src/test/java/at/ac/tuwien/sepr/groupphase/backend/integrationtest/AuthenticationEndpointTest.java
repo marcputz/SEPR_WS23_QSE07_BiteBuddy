@@ -229,7 +229,7 @@ public class AuthenticationEndpointTest {
         updateHeaders.set("Authorization", authToken);
 
         // Perform update request
-        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings")
+        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings/authentication")
                 .content(new ObjectMapper().writeValueAsString(updateDto))
                 .headers(updateHeaders))
             .andExpect(status().isOk())
@@ -276,7 +276,7 @@ public class AuthenticationEndpointTest {
         updateHeaders.set("Authorization", authToken);
 
         // Perform update request
-        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings")
+        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings/authentication")
                 .content(new ObjectMapper().writeValueAsString(updateDto))
                 .headers(updateHeaders))
             .andExpect(status().isOk())
@@ -340,7 +340,7 @@ public class AuthenticationEndpointTest {
         updateHeaders.set("Authorization", authToken);
 
         // Perform update request
-        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings")
+        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings/authentication")
                 .content(new ObjectMapper().writeValueAsString(updateDto))
                 .headers(updateHeaders))
             .andReturn();

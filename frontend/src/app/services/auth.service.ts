@@ -7,8 +7,9 @@ import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
 import {RegisterDto} from "../dtos/registerDto";
 import {UserSettingsDto} from '../dtos/userSettingsDto';
-import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';
+import {UpdateAuthenticationSettingsDto} from '../dtos/updateAuthenticationSettingsDto';
 import {ResetPasswordDto} from "../dtos/resetPasswordDto";
+import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';
 
 @Injectable({
   providedIn: 'root'
@@ -53,17 +54,28 @@ export class AuthService {
       'Authorization': `${authToken}`
     });
 
-    return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`, { headers });
+    return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`, {headers});
   }
 
-  updateUser(updateUserSettingsDto: UpdateUserSettingsDto): Observable<UserSettingsDto> {
+  updateUserAuthentication(updateAuthenticationSettingsDto: UpdateAuthenticationSettingsDto): Observable<UserSettingsDto> {
+    const headers = new HttpHeaders({
+      'Authorization': `${this.getToken()}`
+    });
+    return this.httpClient.put<UserSettingsDto>(
+      this.authBaseUri + "/settings/authentication",
+      updateAuthenticationSettingsDto,
+      {headers}
+    );
+  }
+
+  updateUserSettings(updateUserSettingsDto: UpdateUserSettingsDto): Observable<UserSettingsDto> {
     const headers = new HttpHeaders({
       'Authorization': `${this.getToken()}`
     });
     return this.httpClient.put<UserSettingsDto>(
       this.authBaseUri + "/settings",
       updateUserSettingsDto,
-      { headers }
+      {headers}
     );
   }
 
