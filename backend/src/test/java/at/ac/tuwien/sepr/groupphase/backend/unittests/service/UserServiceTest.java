@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
@@ -15,9 +16,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Base64;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,9 +41,12 @@ public class UserServiceTest {
 
     @BeforeEach
     public void generateTestUser() {
+        String base64EncodedImage = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"; //1x1 Red PNG
+        byte[] imageBytes = Base64.getDecoder().decode(base64EncodedImage);
         testUser = new ApplicationUser().setId(-1L).setEmail("max.mustermann@test.at")
             .setPasswordEncoded("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7") // "password"
-            .setNickname("maxmuster");
+            .setNickname("maxmuster")
+            .setUserPicture(imageBytes);
         testUserId = userRepository.save(testUser).getId();
     }
 
@@ -178,6 +184,53 @@ public class UserServiceTest {
             "Email '" + testUser.getEmail() + "' is already in use",
             "Nickname '" + testUser.getNickname() + "' is already in use");
         assertTrue(conflictException.errors().containsAll(expectedErrors), "Conflict errors should contain messages for duplicate email and nickname");
+    }
+
+    @Test
+    public void testUpdateSettings_Successful() throws Exception {
+        String testBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGNgYPgPAAEDAQAIicLsAAAAAElFTkSuQmCC"; //1x1 Blue PNG
+        byte[] imageBytes = Base64.getDecoder().decode(testBase64);
+
+        UserUpdateSettingsDto updateDto = new UserUpdateSettingsDto();
+        updateDto.setNickname("newNickname");
+        updateDto.setUserPicture(imageBytes);
+
+        ApplicationUser updatedUser = userService.updateSettings(updateDto, testUserId);
+
+        assertAll(
+            () -> assertEquals("newNickname", updatedUser.getNickname(), "Nickname should be updated"),
+            () -> assertArrayEquals(imageBytes, updatedUser.getUserPicture(), "User picture should be updated")
+        );
+    }
+
+    @Test
+    public void testUpdateSettings_PartialUpdate_Successful() throws Exception {
+        UserUpdateSettingsDto updateDto = new UserUpdateSettingsDto();
+        updateDto.setNickname("newPartialNickname");
+        // User picture is not set, implying a partial update
+
+        ApplicationUser originalUser = userService.getUserById(testUserId);
+        ApplicationUser updatedUser = userService.updateSettings(updateDto, testUserId);
+
+        assertAll(
+            () -> assertEquals("newPartialNickname", updatedUser.getNickname(), "Nickname should be updated"),
+            () -> assertArrayEquals(originalUser.getUserPicture(), updatedUser.getUserPicture(), "User picture should remain unchanged")
+        );
+    }
+
+    @Test
+    public void testUpdateSettings_EmptyNicknameAndPicture_NoUpdate() throws Exception {
+        UserUpdateSettingsDto updateDto = new UserUpdateSettingsDto();
+        updateDto.setNickname("");
+        updateDto.setUserPicture(new byte[0]);
+
+        ApplicationUser originalUser = userService.getUserById(testUserId);
+        ApplicationUser updatedUser = userService.updateSettings(updateDto, testUserId);
+
+        assertAll(
+            () -> assertEquals(originalUser.getNickname(), updatedUser.getNickname(), "Nickname should not be updated"),
+            () -> assertArrayEquals(originalUser.getUserPicture(), updatedUser.getUserPicture(), "User picture should not be updated")
+        );
     }
 
 }

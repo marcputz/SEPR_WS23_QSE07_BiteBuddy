@@ -50,7 +50,7 @@
 
   background-color: whitesmoke;
   border-radius: 20px;
-  box-shadow: rgba(0,0,0, 0.15) 1px 1px 10px;
+  box-shadow: rgba(0, 0, 0, 0.15) 1px 1px 10px;
 
   word-wrap: break-word;
 
@@ -169,7 +169,7 @@ li.bb-settings-navbar-desktop-list-item.active i {
   overflow: hidden;
   z-index: 100;
 
-  border-bottom: rgba(0,0,0, 0.08) solid 1px;
+  border-bottom: rgba(0, 0, 0, 0.08) solid 1px;
 }
 
 #settings-sidebar-account-desktop img {
@@ -299,7 +299,7 @@ ul > li.bb-settings-navbar-tablet-list-item > div {
 }
 
 ul > li.bb-settings-navbar-tablet-list-item:hover > div {
-  background-color: rgba(0,0,0, 0.05);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 ul > li.bb-settings-navbar-tablet-list-item.active > div {
@@ -307,7 +307,7 @@ ul > li.bb-settings-navbar-tablet-list-item.active > div {
 }
 
 ul > li.bb-settings-navbar-tablet-list-item + li {
-  border-left: rgba(0,0,0, 0.1) solid 2px;
+  border-left: rgba(0, 0, 0, 0.1) solid 2px;
 }
 
 ul > li.bb-settings-navbar-tablet-list-item i {
@@ -324,6 +324,7 @@ ul > li.bb-settings-navbar-tablet-list-item a {
 ul > li.bb-settings-navbar-tablet-list-item:hover i {
   color: var(--settings-navbar-link-color-hover);
 }
+
 ul > li.bb-settings-navbar-tablet-list-item:hover a {
   color: var(--settings-navbar-link-color-hover);
 }
@@ -331,6 +332,7 @@ ul > li.bb-settings-navbar-tablet-list-item:hover a {
 ul > li.bb-settings-navbar-tablet-list-item.active i {
   color: var(--settings-navbar-link-color-active);
 }
+
 ul > li.bb-settings-navbar-tablet-list-item.active a {
   color: var(--settings-navbar-link-color-active);
 }
@@ -385,7 +387,7 @@ ul > li.bb-settings-navbar-tablet-list-item.active a {
   min-height: 84px;
   max-height: 84px;
 
-  border-bottom: rgba(0,0,0, 0.1) solid 2px;
+  border-bottom: rgba(0, 0, 0, 0.1) solid 2px;
 }
 
 .bb-settings-headerbar-account-phone img {
@@ -448,7 +450,7 @@ ul > li.bb-settings-navbar-phone-list-item > div {
 }
 
 ul > li.bb-settings-navbar-phone-list-item:hover > div {
-  background-color: rgba(0,0,0, 0.05);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 ul > li.bb-settings-navbar-phone-list-item.active > div {
@@ -456,7 +458,7 @@ ul > li.bb-settings-navbar-phone-list-item.active > div {
 }
 
 ul > li.bb-settings-navbar-phone-list-item + li {
-  border-left: rgba(0,0,0, 0.1) solid 2px;
+  border-left: rgba(0, 0, 0, 0.1) solid 2px;
 }
 
 ul > li.bb-settings-navbar-phone-list-item i {
@@ -473,6 +475,7 @@ ul > li.bb-settings-navbar-phone-list-item a {
 ul > li.bb-settings-navbar-phone-list-item:hover i {
   color: var(--settings-navbar-link-color-hover);
 }
+
 ul > li.bb-settings-navbar-phone-list-item:hover a {
   color: var(--settings-navbar-link-color-hover);
 }
@@ -480,6 +483,7 @@ ul > li.bb-settings-navbar-phone-list-item:hover a {
 ul > li.bb-settings-navbar-phone-list-item.active i {
   color: var(--settings-navbar-link-color-active);
 }
+
 ul > li.bb-settings-navbar-phone-list-item.active a {
   color: var(--settings-navbar-link-color-active);
 }

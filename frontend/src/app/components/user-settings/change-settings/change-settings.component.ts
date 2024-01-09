@@ -1,10 +1,13 @@
-import {Component} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, ViewChild} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {AuthService} from '../../../services/auth.service';
 import {PasswordEncoder} from '../../../utils/passwordEncoder';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
+import {UpdateUserSettingsDto} from '../../../dtos/updateUserSettingsDto';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {ImageHandler} from '../../../utils/imageHandler';
 
 @Component({
   selector: 'app-change-settings',
@@ -19,10 +22,20 @@ export class ChangeSettingsComponent {
   errorMessage = '';
 
   originalUserSettings: UserSettingsDto;
+  newUserSettings: UpdateUserSettingsDto = new UpdateUserSettingsDto("", null);
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
+  pictureSelected: File = null;
+  safePictureUrl: SafeUrl = '/assets/icons/user_default.png';
+
+  constructor(
+    private formBuilder: UntypedFormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private notifications: ToastrService,
+    private imageHandler: ImageHandler
+  ) {
     this.settingsForm = this.formBuilder.group({
-      nickname: ['', [Validators.required, Validators.maxLength(255)]]
+      nickname: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]]
     });
   }
 
@@ -34,16 +47,42 @@ export class ChangeSettingsComponent {
     this.getUser();
   }
 
+  onPictureChange(event) {
+    if (event.target.files.length > 0) {
+      this.imageHandler.prepareUserPicture(event.target.files[0])
+        .then(imageBytes => {
+          this.newUserSettings.userPicture = imageBytes;
+          this.loadPreviewPicture();
+        })
+        .catch(error => {
+          console.error('Error processing image: ', error);
+          // Handle the error appropriately
+        });
+    } else {
+      this.newUserSettings.userPicture = null;
+      this.loadPreviewPicture();
+    }
+  }
+
+
+  @ViewChild('fileInput') fileInput: ElementRef;
+
+  triggerFileInput() {
+    this.fileInput.nativeElement.click();
+  }
+
   private getUser() {
     this.authService.getUser().subscribe({
       next: (settings: UserSettingsDto) => {
         this.originalUserSettings = settings;
         this.settingsForm.controls['nickname'].setValue(settings.nickname);
-        // Don't set values for password fields
+        this.loadPreviewPicture();
+        this.newUserSettings = new UpdateUserSettingsDto("", null);
       },
       error: error => {
-        console.error('Error loading user settings', error);
+        console.error('Error loading user settings');
         this.notifications.error('Error loading user settings');
+
         this.error = true;
         this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
       },
@@ -52,26 +91,47 @@ export class ChangeSettingsComponent {
     });
   }
 
+  loadPreviewPicture() {
+    console.info('loadProfilePicture');
+    if (this.newUserSettings.userPicture === null) {
+      console.info('loadProfilePicture originalUserSettings');
+      this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.originalUserSettings.userPicture);
+    } else {
+      console.info('loadProfilePicture newUserSettings');
+      this.safePictureUrl = this.imageHandler.sanitizeUserImage(btoa(String.fromCharCode.apply(null, new Uint8Array(this.newUserSettings.userPicture))));
+    }
+  }
+
   public updateUserSettings() {
     this.submitted = true;
+    let somethingChanged = false;
     if (this.settingsForm.valid) {
-      const nickname: string = this.settingsForm.controls.nickname.value;
-      this.notifications.error('Not yet implemented');
-      //const updateUserSettingsDto: UpdateUserSettingsDto = new UpdateNicknameDto(
-      //  nickname
-      //);
+      if (this.settingsForm.controls.nickname.value !== this.originalUserSettings.nickname) {
+        const nickname: string = this.settingsForm.controls.nickname.value;
+        this.newUserSettings.nickname = nickname;
+        somethingChanged = true;
+      }
+      if (this.newUserSettings.userPicture !== null) {
+        somethingChanged = true;
+      }
+      if (somethingChanged) {
+        this.authService.updateUserSettings(this.newUserSettings).subscribe({
+          next: () => {
+            console.log('User settings updated successfully');
+            this.notifications.success('User settings updated successfully');
+            this.getUser();
+          },
+          error: error => {
+            console.error('Error updating user settings', error);
+            let errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
 
-      /*this.authService.updateUser(updateUserSettingsDto).subscribe({
-        next: () => {
-          console.log('User settings updated successfully');
-          this.notifications.success('User settings updated successfully');
-          this.getUser();
-        },
-        error: error => {
-          console.error('Error updating user settings', error);
-          this.notifications.error('Error updating user settings');
-        }
-      });*/
+            this.notifications.error(errorMessage, 'Error loading user settings: ');
+          }
+        });
+      } else {
+        this.notifications.success('No changes made');
+        console.log('No changes to User Settings');
+      }
     } else {
       console.log('Invalid input');
     }

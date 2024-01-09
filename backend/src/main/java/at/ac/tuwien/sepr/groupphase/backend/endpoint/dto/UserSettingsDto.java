@@ -6,6 +6,7 @@ public class UserSettingsDto {
     private Long id;
     private String email;
     private String nickname;
+    private byte[] userPicture;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -33,6 +34,14 @@ public class UserSettingsDto {
         this.nickname = nickname;
     }
 
+    public byte[] getUserPicture() {
+        return userPicture;
+    }
+
+    public void setUserPicture(byte[] userPicture) {
+        this.userPicture = userPicture;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -51,10 +60,12 @@ public class UserSettingsDto {
 
     @Override
     public String toString() {
+        String userPictureLength = (userPicture != null) ? String.valueOf(userPicture.length) : "null";
         return "UserSettingsDto{"
             + "id=" + id
             + ", email='" + email + '\''
             + ", nickname='" + nickname + '\''
+            + ", userPicture.length=" + userPictureLength
             + ", createdAt=" + createdAt
             + ", updatedAt=" + updatedAt
             + '}';

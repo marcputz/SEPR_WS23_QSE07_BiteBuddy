@@ -3,7 +3,7 @@
 </div>
 
 <div style="padding: 0.8rem;">
-  <div class="bb-login-box">
+  <div class="bb-settings-box">
     <header>Change Email</header>
     <form class="form" [formGroup]="settingsForm" (ngSubmit)="updateUserSettings()">
 
@@ -19,8 +19,14 @@
           <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.required">
             Email is required.
           </small>
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.changed">
+            Email was not changed.
+          </small>
           <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.email">
             Not a valid email.
+          </small>
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.valid">
+            Email already in use
           </small>
         </div>
       </div>
@@ -33,9 +39,20 @@
                [class.bb-input-textfield-error]="submitted && settingsForm.controls.currentPassword.errors"
                id="currentPassword"
                placeholder="Enter Password">
+        <div *ngIf="submitted && settingsForm.controls.currentPassword.errors" class="error">
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.currentPassword.errors.required">
+            Password is required
+          </small>
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.currentPassword.errors.minlength">
+            Password has to be at least 8 characters long
+          </small>
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.currentPassword.errors.valid">
+            Password is not correct
+          </small>
+        </div>
       </div>
 
-      <button type="button" (click)="updateUserSettings()" class="bb-button-big">Save</button>
+      <button type="button" (click)="updateUserSettings()" class="bb-button">Save</button>
 
     </form>
   </div>
