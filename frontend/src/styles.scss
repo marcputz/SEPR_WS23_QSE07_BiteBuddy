@@ -13,15 +13,15 @@
   --button-danger-background-color: rgba(200, 0, 0, 1);
   --button-danger-background-color-hover: rgba(150, 0, 0, 1);
 
-  --input-field-background-color: rgba(0,0,0, 0.04);
+  --input-field-background-color: rgba(0, 0, 0, 0.04);
   --input-field-background-color-error: rgba(200, 0, 0, 0.14);
 
   --link-color: rgba(50, 50, 50, 1);
-  --link-color-hover: rgba(200,150,0,1);
+  --link-color-hover: rgba(200, 150, 0, 1);
 
   --settings-navbar-link-color: rgba(100, 100, 100, 1);
   --settings-navbar-link-color-hover: rgba(200, 150, 0, 1);
-  --settings-navbar-link-color-active: rgba(0,0,0, 1);
+  --settings-navbar-link-color-active: rgba(0, 0, 0, 1);
   --settings-navbar-link-background-color-active: rgba(160, 100, 20, 0.2);
 
   -webkit-font-smoothing: antialiased;
@@ -33,7 +33,8 @@
 
 body::before {
   position: fixed;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 20px;
   height: 20px;
   background-color: green;
@@ -79,7 +80,7 @@ body {
   border: none;
   border-radius: 14px;
 
-  box-shadow: rgba(0,0,0, 0.15) 1px 1px 10px;
+  box-shadow: rgba(0, 0, 0, 0.15) 1px 1px 10px;
 }
 
 .bb-input-textfield {
@@ -171,4 +172,27 @@ body {
 .bb-message-box-error {
   border: red solid 2px;
   background-color: rgba(250, 40, 20, 0.5);
+}
+
+
+.bb-settings-box header {
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+.bb-settings-box {
+  font-size: 1rem;
+}
+
+.bb-settings-box label {
+  margin-top: 1.5rem;
+}
+
+.bb-settings-box input {
+  margin-top: 1.0rem;
+  max-width: 25.0rem;
+}
+
+.bb-settings-box button {
+  margin-top: 1.5rem;
 }

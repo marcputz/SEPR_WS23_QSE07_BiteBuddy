@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
@@ -110,7 +111,7 @@ public class AuthenticationEndpoint {
     public ResponseEntity<UserSettingsDto> updateEmailAndPasswordSettings(@RequestBody UserUpdateEmailAndPasswordDto userUpdateEmailAndPasswordDto,
                                                                           @RequestHeader HttpHeaders headers)
         throws AuthenticationException, ValidationException, ConflictException, UserNotFoundException {
-        LOGGER.trace("update({})", userUpdateEmailAndPasswordDto);
+        LOGGER.trace("updateEmailAndPasswordSettings({})", userUpdateEmailAndPasswordDto);
 
         this.authenticationService.verifyAuthenticated(headers);
         // Retrieve token from authorization header
@@ -127,6 +128,29 @@ public class AuthenticationEndpoint {
 
         // Update the authenticated user
         ApplicationUser updatedUser = userService.updateEmailAndPassword(userUpdateEmailAndPasswordDto, currentUserId);
+        UserSettingsDto userSettingsDto = userMapper.toUserSettingsDto(updatedUser);
+
+        return ResponseEntity.ok(userSettingsDto);
+    }
+
+    @PutMapping("/settings")
+    public ResponseEntity<UserSettingsDto> updateUserSettings(@RequestBody UserUpdateSettingsDto userUpdateSettingsDto,
+                                                              @RequestHeader HttpHeaders headers)
+        throws AuthenticationException, ValidationException, ConflictException, UserNotFoundException {
+        LOGGER.trace("updateUserSettings({})", userUpdateSettingsDto);
+
+        this.authenticationService.verifyAuthenticated(headers);
+        // Retrieve token from authorization header
+        String authToken = headers.getFirst("Authorization");
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+
+        if (currentUserId == null) {
+            LOGGER.warn("Update user did not find ID in token");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        // Update the authenticated user
+        ApplicationUser updatedUser = userService.updateSettings(userUpdateSettingsDto, currentUserId);
         UserSettingsDto userSettingsDto = userMapper.toUserSettingsDto(updatedUser);
 
         return ResponseEntity.ok(userSettingsDto);
@@ -153,6 +177,7 @@ public class AuthenticationEndpoint {
             Long currentUserId = AuthTokenUtils.getUserId(authToken);
             ApplicationUser currentUser = userService.getUserById(currentUserId);
             UserSettingsDto userSettingsDto = userMapper.toUserSettingsDto(currentUser);
+            LOGGER.trace("getSettings() return: {}", userSettingsDto);
             return ResponseEntity.ok(userSettingsDto);
         } catch (UserNotFoundException e) {
             LOGGER.warn("User not found: ", e);

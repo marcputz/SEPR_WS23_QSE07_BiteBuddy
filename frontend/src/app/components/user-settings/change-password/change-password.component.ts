@@ -23,7 +23,7 @@ export class ChangePasswordComponent {
 
   constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
     this.settingsForm = this.formBuilder.group({
-      currentPassword: ['', [Validators.required]],
+      currentPassword: ['', [Validators.required, Validators.minLength(8)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       password2: ['', [Validators.required, Validators.minLength(8)]]
     });
@@ -53,13 +53,17 @@ export class ChangePasswordComponent {
           this.settingsForm.controls['password2'].setValue('');
         },
         error: error => {
-          console.error('Error updating user settings', error);
-          this.notifications.error('Error updating password');
+          console.error('Error updating Password', error);
+          let errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+          this.notifications.error(errorMessage, 'Error updating Password: ');
         }
       });
     } else if (this.settingsForm.controls.password.value !== this.settingsForm.controls.password2.value) {
       console.log('Passwords do not match');
       this.notifications.error('Passwords do not match');
+      this.settingsForm.controls['password'].setErrors({match: true});
+      this.settingsForm.controls['password2'].setErrors({match: true});
+
     } else {
       console.log('Invalid input');
       this.notifications.error('Invalid input');

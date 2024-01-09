@@ -24,7 +24,7 @@ export class ChangeEmailComponent {
   constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
     this.settingsForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
-      currentPassword: ['', [Validators.required]]
+      currentPassword: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
@@ -72,13 +72,21 @@ export class ChangeEmailComponent {
           this.settingsForm.controls['currentPassword'].setValue('');
         },
         error: error => {
-          console.error('Error updating user settings', error);
-          this.notifications.error('Error updating email');
+          console.error('Error updating Email', error);
+          let errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+          this.notifications.error(errorMessage, 'Error updating Email: ');
+          if (errorMessage.indexOf("Password not valid") >= 0) {
+            this.settingsForm.controls['currentPassword'].setErrors({valid: true});
+          }
+          if (errorMessage.indexOf("is already in use") >= 0) {
+            this.settingsForm.controls['email'].setErrors({valid: true});
+          }
         }
       });
     } else if (this.settingsForm.controls.email.value === this.originalUserSettings.email) {
       console.log('Email was not changed');
       this.notifications.error('Email was not changed');
+      this.settingsForm.controls['email'].setErrors({changed: true});
     } else {
       console.log('Invalid input');
     }

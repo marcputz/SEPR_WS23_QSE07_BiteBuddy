@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
@@ -70,5 +71,8 @@ public interface UserService {
      * @throws ConflictException     If there are conflicts with existing data (e.g., duplicate email or nickname).
      */
     ApplicationUser updateApplicationUser(ApplicationUser userToUpdate)
+        throws UserNotFoundException, ValidationException, ConflictException;
+
+    ApplicationUser updateSettings(UserUpdateSettingsDto userUpdateSettingsDto, Long currentUserId)
         throws UserNotFoundException, ValidationException, ConflictException;
 }

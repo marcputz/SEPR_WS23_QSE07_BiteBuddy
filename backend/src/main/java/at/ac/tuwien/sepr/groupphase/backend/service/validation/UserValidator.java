@@ -54,6 +54,8 @@ public class UserValidator {
 
         if (applicationUser.getNickname() == null || applicationUser.getNickname().trim().isEmpty()) {
             validationErrors.add("Nickname is required");
+        } else if (applicationUser.getNickname().length() < 3) {
+            validationErrors.add("Nickname has to be at least 3 characters long");
         } else if (applicationUser.getNickname().length() > 255) {
             validationErrors.add("Nickname cannot be longer than 255 characters");
         }

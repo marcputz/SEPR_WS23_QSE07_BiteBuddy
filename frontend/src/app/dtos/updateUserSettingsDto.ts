@@ -1,7 +1,7 @@
 export class UpdateUserSettingsDto {
   constructor(
-    public email: string,
-    public currentPassword: string,
-    public newPassword: string
-  ) {}
+    public nickname: string,
+    public userPicture: number[]
+  ) {
+  }
 }
