@@ -2,8 +2,16 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +33,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -75,7 +83,6 @@ public class RecipesTest {
 
         Allergene allergene1 = new Allergene();
         allergene1.setName("Fructose");
-        Set<AllergeneIngredient> aIngredients = new HashSet<>();
         AllergeneIngredient allergeneIngredient1 = new AllergeneIngredient();
         allergeneIngredient1.setAllergene(allergene1);
 
@@ -94,22 +101,23 @@ public class RecipesTest {
         Recipe recipe1 = new Recipe();
         recipe1.setInstructions("Instructions1");
         recipe1.setName("recipe 1");
-        Set<RecipeIngredient> rIngredients1 = new HashSet<>();
-        rIngredients1.add(recipeIngredient1);
-        rIngredients1.add(recipeIngredient2);
-        recipe1.setIngredients(rIngredients1);
+        Set<RecipeIngredient> ringredients1 = new HashSet<>();
+        ringredients1.add(recipeIngredient1);
+        ringredients1.add(recipeIngredient2);
+        recipe1.setIngredients(ringredients1);
         recipeIngredient1.setRecipe(recipe1);
         recipeIngredient2.setRecipe(recipe1);
-        aIngredients.add(allergeneIngredient1);
-        allergene1.setIngredients(aIngredients);
+        Set<AllergeneIngredient> aingredients = new HashSet<>();
+        aingredients.add(allergeneIngredient1);
+        allergene1.setIngredients(aingredients);
         allergeneIngredient1.setIngredient(ingredient1);
 
         Recipe recipe2 = new Recipe();
         recipe2.setInstructions("Instructions2");
         recipe2.setName("recipe 2");
-        Set<RecipeIngredient> rIngredients2 = new HashSet<>();
-        rIngredients2.add(recipeIngredient2);
-        recipe2.setIngredients(rIngredients2);
+        Set<RecipeIngredient> ringredients2 = new HashSet<>();
+        ringredients2.add(recipeIngredient2);
+        recipe2.setIngredients(ringredients2);
 
         allergene1Id = allergeneRepository.save(allergene1).getId();
         ingredient1Id = ingredientRepository.save(ingredient1).getId();
@@ -336,20 +344,20 @@ public class RecipesTest {
                     """)
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().is4xxClientError());
-
+        String tooLongName = "Eine Prise Testwe" + "f".repeat(255);
         // creating request with too long name
         mockMvc
             .perform(MockMvcRequestBuilders
                 .post("/api/v1/recipes/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                .content(String.format("""
                     {
-                    "name": "Eine Prise Testwefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                    "description": "Man nehme einen Test 1313üaääw",
-                    "ingredients": [],
-                    "picture": ""
+                        "name": "%s",
+                        "description": "Man nehme einen Test 1313üaääw",
+                        "ingredients": [],
+                        "picture": ""
                     }
-                    """)
+                    """, tooLongName))
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().is4xxClientError());
     }

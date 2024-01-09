@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests;
 
-import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.SessionManager;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,23 +21,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 public class SessionManagerTest {
 
-    private final ApplicationUser TESTUSER = new ApplicationUser()
+    private final ApplicationUser testuser = new ApplicationUser()
         .setId(1L)
         .setNickname("maxmuster")
         .setEmail("max.mustermann@test.at");
-    private final String TESTUSER_AUTHTOKEN = AuthTokenUtils.createToken(TESTUSER);
+    private final String testuserAuthtoken = AuthTokenUtils.createToken(testuser);
 
     @Order(1)
     @Test
     public void testStartAndStopSessionWithValidData() {
-        assertTrue(SessionManager.getInstance().startUserSession(TESTUSER.getId(), TESTUSER_AUTHTOKEN));
-        assertTrue(SessionManager.getInstance().stopUserSession(TESTUSER_AUTHTOKEN));
+        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
+        assertTrue(SessionManager.getInstance().stopUserSession(testuserAuthtoken));
     }
 
     @Test
     public void testStartSessionWithNoTokenThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
-            SessionManager.getInstance().startUserSession(TESTUSER.getId(), null);
+            SessionManager.getInstance().startUserSession(testuser.getId(), null);
         });
     }
 
@@ -49,11 +49,11 @@ public class SessionManagerTest {
 
     @Test
     public void testGetUserFromStartedSession() {
-        assertTrue(SessionManager.getInstance().startUserSession(TESTUSER.getId(), TESTUSER_AUTHTOKEN));
-        assertEquals(TESTUSER.getId(), SessionManager.getInstance().getUserFromAuthToken(TESTUSER_AUTHTOKEN));
+        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
+        assertEquals(testuser.getId(), SessionManager.getInstance().getUserFromAuthToken(testuserAuthtoken));
 
         // cleanup
-        SessionManager.getInstance().stopUserSession(TESTUSER_AUTHTOKEN);
+        SessionManager.getInstance().stopUserSession(testuserAuthtoken);
     }
 
     @Test
@@ -64,11 +64,11 @@ public class SessionManagerTest {
 
     @Test
     public void testGetAuthTokenFromStartedSession() {
-        assertTrue(SessionManager.getInstance().startUserSession(TESTUSER.getId(), TESTUSER_AUTHTOKEN));
-        assertEquals(TESTUSER_AUTHTOKEN, SessionManager.getInstance().getAuthTokenForUser(TESTUSER.getId()));
+        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
+        assertEquals(testuserAuthtoken, SessionManager.getInstance().getAuthTokenForUser(testuser.getId()));
 
         // cleanup
-        SessionManager.getInstance().stopUserSession(TESTUSER_AUTHTOKEN);
+        SessionManager.getInstance().stopUserSession(testuserAuthtoken);
     }
 
     @Test
