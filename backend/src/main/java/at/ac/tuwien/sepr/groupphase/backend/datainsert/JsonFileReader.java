@@ -1,24 +1,21 @@
 package at.ac.tuwien.sepr.groupphase.backend.datainsert;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
-import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.repository.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.IOException;
+
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.lang.invoke.MethodHandles;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -39,15 +36,17 @@ public class JsonFileReader {
     private final AllergeneRepository allergeneRepository;
     private final AllergeneIngredientRepository allergeneIngredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
+    private final RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
 
     public JsonFileReader(RecipeRepository recipeRepository, IngredientRepository ingredientRepository,
                           AllergeneRepository allergeneRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                          RecipeIngredientRepository recipeIngredientRepository) {
+                          RecipeIngredientRepository recipeIngredientRepository, RecipeIngredientDetailsRepository recipeIngredientDetailsRepository) {
         this.recipeRepository = recipeRepository;
         this.ingredientRepository = ingredientRepository;
         this.allergeneRepository = allergeneRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
+        this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
     }
 
     @PostConstruct
@@ -102,7 +101,13 @@ public class JsonFileReader {
                     r.setId(recipeIngredientString.getId());
                     r.setRecipe(recipeRepository.getById(recipeIngredientString.getRecipe()));
                     r.setIngredient(ingredientRepository.getById(recipeIngredientString.getIngredient()));
-                    r.setAmount(recipeIngredientString.amount);
+                    RecipeIngredientDetails r1 = new RecipeIngredientDetails();
+                    r1.setDescriber("little");
+                    r1.setUnit(FoodUnit.tablespoon);
+                    r1.setIngredient("sugar");
+                    r1.setAmount(1);
+                    recipeIngredientDetailsRepository.save(r1);
+                    r.setAmount(r1);
                     recipeIngredientRepository.save(r);
                 }
             }

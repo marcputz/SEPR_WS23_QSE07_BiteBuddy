@@ -3,10 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
@@ -113,7 +110,12 @@ public class RecipeServiceImpl implements RecipeService {
 
             if (!queriedResults.isEmpty()) {
                 RecipeIngredient ing = new RecipeIngredient();
-                ing.setAmount("wenig");
+                RecipeIngredientDetails r = new RecipeIngredientDetails();
+                r.setDescriber("little");
+                r.setUnit(FoodUnit.tablespoon);
+                r.setIngredient("sugar");
+                r.setAmount(3);
+                //ing.setAmount(r);
                 ing.setIngredient(queriedResults.get(0));
                 ing.setRecipe(queriedRecipe);
                 ingredients.add(ing);

@@ -83,13 +83,23 @@ public class RecipesTest {
         ingredient1.setName("Apple");
         RecipeIngredient recipeIngredient1 = new RecipeIngredient();
         recipeIngredient1.setIngredient(ingredient1);
-        recipeIngredient1.setAmount("100 g");
+        RecipeIngredientDetails r1 = new RecipeIngredientDetails();
+        r1.setDescriber("little");
+        r1.setUnit(FoodUnit.tablespoon);
+        r1.setIngredient("sugar");
+        r1.setAmount(1);
+        recipeIngredient1.setAmount(r1);
 
         Ingredient ingredient2 = new Ingredient();
         ingredient2.setName("Rice");
         RecipeIngredient recipeIngredient2 = new RecipeIngredient();
         recipeIngredient2.setIngredient(ingredient2);
-        recipeIngredient2.setAmount("200 g");
+        RecipeIngredientDetails r2 = new RecipeIngredientDetails();
+        r1.setDescriber("much");
+        r1.setUnit(FoodUnit.cup);
+        r1.setIngredient("sugar");
+        r1.setAmount(10);
+        recipeIngredient2.setAmount(r2);
 
         Recipe recipe1 = new Recipe();
         recipe1.setInstructions("Instructions1");

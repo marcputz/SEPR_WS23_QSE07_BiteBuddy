@@ -1,11 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import java.util.Objects;
 
@@ -22,7 +17,8 @@ public class RecipeIngredient {
     @ManyToOne
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
-    private String amount;
+    @OneToOne
+    private RecipeIngredientDetails amount;
 
 
     public Long getId() {
@@ -41,11 +37,11 @@ public class RecipeIngredient {
         this.recipe = recipe;
     }
 
-    public String getAmount() {
+    public RecipeIngredientDetails getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(RecipeIngredientDetails amount) {
         this.amount = amount;
     }
 
