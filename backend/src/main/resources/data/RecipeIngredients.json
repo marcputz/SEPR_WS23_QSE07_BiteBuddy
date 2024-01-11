@@ -975,7 +975,7 @@
         "id": 163,
         "recipe": 21,
         "ingredient": 146,
-        "amount": "8 large cooked shrimp - peeled, deveined and cut in half"
+        "amount": "8 large cooked shrimp, peeled deveined and cut in half"
     },
     {
         "id": 164,
@@ -2271,7 +2271,7 @@
         "id": 379,
         "recipe": 52,
         "ingredient": 273,
-        "amount": "1/2 pound cooked chicken breasts - cut into bite size pieces"
+        "amount": "1/2 pound cooked chicken breasts , cut into bite size pieces"
     },
     {
         "id": 380,
@@ -3249,7 +3249,7 @@
         "id": 542,
         "recipe": 74,
         "ingredient": 273,
-        "amount": "4 skinless, boneless chicken breast halves - pounded to 1/2 inch thickness"
+        "amount": "4 skinless, boneless chicken breast halves , pounded to 1/2 inch thickness"
     },
     {
         "id": 543,
@@ -3309,7 +3309,7 @@
         "id": 552,
         "recipe": 77,
         "ingredient": 273,
-        "amount": "4 skinless, boneless chicken breast halves - pounded 1/4 inch thick"
+        "amount": "4 skinless, boneless chicken breast halves , pounded 1/4 inch thick"
     },
     {
         "id": 553,
@@ -4209,7 +4209,7 @@
         "id": 702,
         "recipe": 94,
         "ingredient": 146,
-        "amount": "1 pound medium shrimp - peeled and deveined"
+        "amount": "1 pound medium shrimp , peeled and deveined"
     },
     {
         "id": 703,
@@ -5745,7 +5745,7 @@
         "id": 958,
         "recipe": 124,
         "ingredient": 367,
-        "amount": "2 cucumbers - peeled, seeded and diced"
+        "amount": "2 cucumbers , peeled, seeded and diced"
     },
     {
         "id": 959,
@@ -6615,7 +6615,7 @@
         "id": 1103,
         "recipe": 142,
         "ingredient": 69,
-        "amount": "One 8-ounce package cream cheese"
+        "amount": "8 ounce cream cheese"
     },
     {
         "id": 1104,
@@ -6693,7 +6693,7 @@
         "id": 1116,
         "recipe": 143,
         "ingredient": 273,
-        "amount": "8 skinless, boneless chicken breast halves - cut into 1 inch cubes"
+        "amount": "8 skinless, boneless chicken breast halves , cut into 1 inch cubes"
     },
     {
         "id": 1117,
@@ -6741,7 +6741,7 @@
         "id": 1124,
         "recipe": 144,
         "ingredient": 285,
-        "amount": "4 (14-ounce) cans black beans, drained and rinsed"
+        "amount": "4 (14 ounce) cans black beans, drained and rinsed"
     },
     {
         "id": 1125,
@@ -7383,7 +7383,7 @@
         "id": 1231,
         "recipe": 155,
         "ingredient": 241,
-        "amount": "2 lemons - cut into wedges, for garnish"
+        "amount": "2 lemons , cut into wedges, for garnish"
     },
     {
         "id": 1232,
@@ -8307,7 +8307,7 @@
         "id": 1385,
         "recipe": 175,
         "ingredient": 273,
-        "amount": "3 large skinless, boneless chicken breast halves - cut into 1/2-inch medallions"
+        "amount": "3 large skinless boneless chicken breast halves , cut into 1/2-inch medallions"
     },
     {
         "id": 1386,
@@ -10515,7 +10515,7 @@
         "id": 1753,
         "recipe": 217,
         "ingredient": 166,
-        "amount": "1 avocado - peeled, pitted and diced"
+        "amount": "1 avocado , peeled pitted and diced"
     },
     {
         "id": 1754,
@@ -11043,7 +11043,7 @@
         "id": 1841,
         "recipe": 229,
         "ingredient": 287,
-        "amount": "1 (16 ounce) can canned kidney beans - drained, rinsed, and mashed"
+        "amount": "1 (16 ounce) can canned kidney beans , drained, rinsed, and mashed"
     },
     {
         "id": 1842,
@@ -11259,7 +11259,7 @@
         "id": 1877,
         "recipe": 234,
         "ingredient": 69,
-        "amount": "1 8-ounce package cream cheese, room temperature"
+        "amount": "8 ounce cream cheese, room temperature"
     },
     {
         "id": 1878,
@@ -11283,13 +11283,13 @@
         "id": 1881,
         "recipe": 235,
         "ingredient": 273,
-        "amount": "1 1/2 pounds skinless, boneless chicken breast halves - cut into bite-sized pieces"
+        "amount": "1 1/2 pounds skinless boneless chicken breast halves , cut into bite-sized pieces"
     },
     {
         "id": 1882,
         "recipe": 235,
         "ingredient": 367,
-        "amount": "1/2 cucumber - peeled, seeded, and grated"
+        "amount": "1/2 cucumber , peeled, seeded, and grated"
     },
     {
         "id": 1883,
@@ -11421,7 +11421,7 @@
         "id": 1904,
         "recipe": 238,
         "ingredient": 273,
-        "amount": "1 1/2 pounds skinless, boneless chicken breast, cut into bite-sized chunks"
+        "amount": "1 1/2 pounds skinless boneless chicken breast, cut into bite-sized chunks"
     },
     {
         "id": 1905,
@@ -11625,7 +11625,7 @@
         "id": 1938,
         "recipe": 243,
         "ingredient": 166,
-        "amount": "2 avocados - peeled, pitted, and chopped"
+        "amount": "2 avocados , peeled, pitted, and chopped"
     },
     {
         "id": 1939,
@@ -11637,7 +11637,7 @@
         "id": 1940,
         "recipe": 243,
         "ingredient": 255,
-        "amount": "1 bunch fresh cilantro - stems discarded and leaves chopped"
+        "amount": "1 bunch fresh cilantro , stems discarded and leaves chopped"
     },
     {
         "id": 1941,
@@ -11679,7 +11679,7 @@
         "id": 1947,
         "recipe": 243,
         "ingredient": 146,
-        "amount": "1 pound chilled cooked medium shrimp - peeled, deveined, and tails removed"
+        "amount": "1 pound chilled cooked medium shrimp , peeled, deveined, and tails removed"
     },
     {
         "id": 1948,
@@ -12675,7 +12675,7 @@
         "id": 2113,
         "recipe": 262,
         "ingredient": 273,
-        "amount": "1 pound skinless, boneless chicken breast halves - cut into chunks"
+        "amount": "1 pound skinless boneless chicken breast halves , cut into chunks"
     },
     {
         "id": 2114,
@@ -12873,7 +12873,7 @@
         "id": 2146,
         "recipe": 267,
         "ingredient": 273,
-        "amount": "2 skinless, boneless chicken breast halves - cut into bite-size pieces"
+        "amount": "2 skinless boneless chicken breast halves , cut into bite-size pieces"
     },
     {
         "id": 2147,
@@ -14535,7 +14535,7 @@
         "id": 2423,
         "recipe": 300,
         "ingredient": 347,
-        "amount": "1/4 head iceberg lettuce - rinsed, dried, and shredded"
+        "amount": "1/4 head iceberg lettuce , rinsed, dried, and shredded"
     },
     {
         "id": 2424,
@@ -15003,7 +15003,7 @@
         "id": 2501,
         "recipe": 311,
         "ingredient": 273,
-        "amount": "2 skinless, boneless chicken breast halves - cut into cubes"
+        "amount": "2 skinless boneless chicken breast halves , cut into cubes"
     },
     {
         "id": 2502,

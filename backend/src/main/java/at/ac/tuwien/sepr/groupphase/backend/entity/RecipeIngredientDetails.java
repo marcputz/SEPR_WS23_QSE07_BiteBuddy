@@ -9,14 +9,14 @@ public class RecipeIngredientDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
-    private float amount;
+    @Column(nullable = true)
+    private Float amount;
     @Enumerated(EnumType.STRING)
-    @Column
+    @Column(nullable = true)
     private FoodUnit unit;
     @Column
     private String ingredient;
-    @Column
+    @Column(nullable = true)
     private String describer;
 
     public void setId(Long id) {

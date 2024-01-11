@@ -19,6 +19,8 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Profile("addJsonData")
 @Component
@@ -101,11 +103,8 @@ public class JsonFileReader {
                     r.setId(recipeIngredientString.getId());
                     r.setRecipe(recipeRepository.getById(recipeIngredientString.getRecipe()));
                     r.setIngredient(ingredientRepository.getById(recipeIngredientString.getIngredient()));
-                    RecipeIngredientDetails r1 = new RecipeIngredientDetails();
-                    r1.setDescriber("little");
-                    r1.setUnit(FoodUnit.tablespoon);
-                    r1.setIngredient("sugar");
-                    r1.setAmount(1);
+                    String detailsString = recipeIngredientString.getAmount();
+                    RecipeIngredientDetails r1 = setRecipeIngredientDetails(detailsString);
                     recipeIngredientDetailsRepository.save(r1);
                     r.setAmount(r1);
                     recipeIngredientRepository.save(r);
@@ -160,6 +159,221 @@ public class JsonFileReader {
             LOGGER.error("Error reading JSON file", e);
         }
     }
+
+    private RecipeIngredientDetails setRecipeIngredientDetails(String s) {
+        String remainingString = s;
+        Float amount = null;
+        FoodUnit foodUnit = null;
+        String ingredient;
+        String describer;
+        RecipeIngredientDetails r = new RecipeIngredientDetails();
+        if (!startsWithNumber(s)) {
+            //amount = null;
+        } else if (startsWithOunce(s)) {
+            amount = (float) extractNumbersIfStartsWithNOunce(s);
+            remainingString = extractStringAfterNumericValueBrackets(s);
+        } else {
+            amount = extractNumericValueBeforeUnit(s);
+            remainingString = extractStringAfterNumericValueNormal(s);
+        }
+        remainingString = removeTextInParentheses(remainingString);
+        describer = extractSubstringAfterComma(remainingString);
+        remainingString = extractSubstringBeforeComma(remainingString);
+        if (isFirstWordFoodUnit(remainingString)) {
+            foodUnit = convertFirstWordToFoodUnit(remainingString);
+            remainingString = removeFirstWord(remainingString);
+        }
+        ingredient = remainingString;
+        r.setUnit(foodUnit);
+        r.setDescriber(describer);
+        r.setIngredient(ingredient);
+        if (amount != null) {
+            r.setAmount(amount);
+        }
+        return r;
+    }
+
+    private static boolean startsWithNumber(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+
+        char firstChar = input.charAt(0);
+        return Character.isDigit(firstChar);
+    }
+
+    private boolean startsWithOunce(String amount) {
+        String patternString = "^(\\d+) \\(\\d+ ounce\\)";
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(amount);
+        return matcher.find();
+    }
+
+    private static int extractNumbersIfStartsWithNOunce(String amount) {
+        String patternString = "^(\\d+) \\((\\d+) ounce\\)";
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(amount);
+
+        if (matcher.find()) {
+            int firstNumber = Integer.parseInt(matcher.group(1));
+            int secondNumber = Integer.parseInt(matcher.group(2));
+            return firstNumber * secondNumber;
+        } else {
+            return 0;
+        }
+    }
+
+    private Float extractNumericValueBeforeUnit(String amount) {
+        Pattern pattern = Pattern.compile("(\\d+(?: \\d+/\\d+)?)\\s*(\\S+)");
+        Matcher matcher = pattern.matcher(amount);
+
+        if (matcher.find()) {
+            String numericPart = matcher.group(1);
+            String unitPart = matcher.group(2);
+
+            Float numericValue = (float) parseNumericPart(numericPart);
+            return numericValue;
+        } else {
+            // Return some default value or handle the case where the pattern doesn't match
+            return 0.0F;
+        }
+    }
+
+    private double parseNumericPart(String numericPart) {
+        if (numericPart.contains("/")) {
+            // Handle fractions (e.g., 1/4, 3/4)
+            String[] parts = numericPart.split(" ");
+            if (parts.length == 2) {
+                // If there are two parts (e.g., 1 1/4), add them together
+                int whole = Integer.parseInt(parts[0]);
+                String[] fractionParts = parts[1].split("/");
+                int numerator = Integer.parseInt(fractionParts[0]);
+                int denominator = Integer.parseInt(fractionParts[1]);
+                return whole + (double) numerator / denominator;
+            } else {
+                // If there is only one part (e.g., 1/4), directly parse it
+                String[] fractionParts = numericPart.split("/");
+                int numerator = Integer.parseInt(fractionParts[0]);
+                int denominator = Integer.parseInt(fractionParts[1]);
+                return (double) numerator / denominator;
+            }
+        } else {
+            // Handle whole numbers
+            return Double.parseDouble(numericPart);
+        }
+    }
+
+    private static String extractStringAfterNumericValueNormal(String amount) {
+        Pattern pattern = Pattern.compile("\\d+(?: \\d+/\\d+)?\\s*(.+)");
+        Matcher matcher = pattern.matcher(amount);
+
+        if (matcher.find()) {
+            return matcher.group(1).trim();
+        } else {
+            // Return the original string or handle the case where the pattern doesn't match
+            return amount;
+        }
+    }
+
+    private static String extractStringAfterNumericValueBrackets(String amount) {
+        Pattern pattern = Pattern.compile("\\d+(?: \\d+/\\d+)?\\s*\\((\\d+\\s*\\S+\\s*\\S*)\\)\\s*(.+)");
+        Matcher matcher = pattern.matcher(amount);
+
+        if (matcher.find()) {
+            String unitPart = matcher.group(1).trim();
+            String restOfString = matcher.group(2).trim();
+
+            // Remove the word after the closing parenthesis from the extracted string
+            if (restOfString.startsWith(unitPart)) {
+                restOfString = restOfString.substring(unitPart.length()).trim();
+            }
+
+            return restOfString;
+        } else {
+            // Return the original string or handle the case where the pattern doesn't match
+            return amount;
+        }
+    }
+
+    private static String removeTextInParentheses(String input) {
+        Pattern pattern = Pattern.compile("\\([^)]+\\)");
+        Matcher matcher = pattern.matcher(input);
+
+        StringBuffer result = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(result, "");
+        }
+        matcher.appendTail(result);
+
+        return result.toString().trim();
+    }
+
+    private static String extractSubstringAfterComma(String amount) {
+        int commaIndex = amount.indexOf(',');
+        if (commaIndex != -1) {
+            // Check if there's a space after the comma and adjust the substring accordingly
+            int startIndex = amount.charAt(commaIndex + 1) == ' ' ? commaIndex + 2 : commaIndex + 1;
+            return amount.substring(startIndex).trim();
+        } else {
+            // Return the original string or handle the case where there's no comma
+            return "";
+        }
+    }
+
+    private static String extractSubstringBeforeComma(String amount) {
+        int commaIndex = amount.indexOf(',');
+        if (commaIndex != -1) {
+            return amount.substring(0, commaIndex).trim();
+        } else {
+            // Return the original string or handle the case where there's no comma
+            return amount;
+        }
+    }
+
+    private static boolean isFirstWordFoodUnit(String amount) {
+        // Extract the first word from the string
+        String[] words = amount.split("\\s+");
+        if (words.length > 0) {
+            String firstWord = words[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
+
+            // Check if the first word is a superstring of a word in the FoodUnit enum
+            for (FoodUnit foodUnit : FoodUnit.values()) {
+                if (foodUnit.name().toLowerCase().contains(firstWord)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static FoodUnit convertFirstWordToFoodUnit(String amount) {
+        // Extract the first word from the string
+        String firstWord = amount.split("\\s+")[0].toLowerCase(); // Convert to lowercase for case-insensitive comparison
+
+        // Find the corresponding FoodUnit enum value
+        for (FoodUnit foodUnit : FoodUnit.values()) {
+            if (foodUnit.name().toLowerCase().contains(firstWord)) {
+                return foodUnit;
+            }
+        }
+        // Handle the case where no matching FoodUnit is found (this could be an error case)
+        throw new IllegalArgumentException("Unknown FoodUnit: " + firstWord);
+    }
+
+    private static String removeFirstWord(String input) {
+        // Split the string into words
+        String[] words = input.split("\\s+");
+
+        // Remove the first word and join the remaining words
+        if (words.length > 1) {
+            return String.join(" ", Arrays.copyOfRange(words, 1, words.length));
+        } else {
+            // Handle the case where there is only one word or an empty string
+            return "";
+        }
+    }
+
 
     public static class RecipeIngredientString {
         private Long id;
