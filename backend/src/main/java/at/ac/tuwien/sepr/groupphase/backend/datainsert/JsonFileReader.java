@@ -1,7 +1,20 @@
 package at.ac.tuwien.sepr.groupphase.backend.datainsert;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
+
+
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
@@ -164,13 +177,11 @@ public class JsonFileReader {
         String remainingString = s;
         Float amount = null;
         FoodUnit foodUnit = null;
-        String ingredient;
         String describer;
-        RecipeIngredientDetails r = new RecipeIngredientDetails();
         if (!startsWithNumber(s)) {
             //amount = null;
         } else if (startsWithOunce(s)) {
-            amount = (float) extractNumbersIfStartsWithNOunce(s);
+            amount = (float) extractNumbersIfStartsWithOunce(s);
             remainingString = extractStringAfterNumericValueBrackets(s);
         } else {
             amount = extractNumericValueBeforeUnit(s);
@@ -183,7 +194,8 @@ public class JsonFileReader {
             foodUnit = convertFirstWordToFoodUnit(remainingString);
             remainingString = removeFirstWord(remainingString);
         }
-        ingredient = remainingString;
+        String ingredient = remainingString;
+        RecipeIngredientDetails r = new RecipeIngredientDetails();
         r.setUnit(foodUnit);
         r.setDescriber(describer);
         r.setIngredient(ingredient);
@@ -209,7 +221,7 @@ public class JsonFileReader {
         return matcher.find();
     }
 
-    private static int extractNumbersIfStartsWithNOunce(String amount) {
+    private static int extractNumbersIfStartsWithOunce(String amount) {
         String patternString = "^(\\d+) \\((\\d+) ounce\\)";
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(amount);

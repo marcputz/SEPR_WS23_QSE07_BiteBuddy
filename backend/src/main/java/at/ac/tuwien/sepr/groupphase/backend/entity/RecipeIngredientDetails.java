@@ -1,6 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+
 
 import java.util.Objects;
 
@@ -22,30 +29,39 @@ public class RecipeIngredientDetails {
     public void setId(Long id) {
         this.id = id;
     }
+
     public Long getId() {
         return id;
     }
+
     public void setAmount(float amount) {
         this.amount = amount;
     }
+
     public float getAmount() {
         return amount;
     }
+
     public void setUnit(FoodUnit unit) {
         this.unit = unit;
     }
+
     public FoodUnit getUnit() {
         return unit;
     }
+
     public void setIngredient(String ingredient) {
         this.ingredient = ingredient;
     }
+
     public String getIngredient() {
         return ingredient;
     }
+
     public void setDescriber(String describer) {
         this.describer = describer;
     }
+
     public String getDescriber() {
         return describer;
     }
