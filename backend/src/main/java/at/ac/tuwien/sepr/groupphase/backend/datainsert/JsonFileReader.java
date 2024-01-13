@@ -181,8 +181,13 @@ public class JsonFileReader {
         if (!startsWithNumber(s)) {
             //amount = null;
         } else if (startsWithOunce(s)) {
-            amount = (float) extractNumbersIfStartsWithOunce(s);
+            amount = extractNumbersIfStartsWithOunce(s);
             remainingString = extractStringAfterNumericValueBrackets(s);
+            remainingString = removeFirstWord(remainingString);
+            foodUnit = FoodUnit.ounce;
+        } else if (startsWithFraction(s)) {
+            amount = parseFraction(s);
+            remainingString = getRemainingStringAfterFraction(s);
         } else {
             amount = extractNumericValueBeforeUnit(s);
             remainingString = extractStringAfterNumericValueNormal(s);
@@ -214,6 +219,67 @@ public class JsonFileReader {
         return Character.isDigit(firstChar);
     }
 
+    public static boolean startsWithFraction(String input) {
+        // Define a regex pattern for matching "m/n" at the beginning of the string, where m and n are integers
+        String regexPattern = "^\\d+/\\d+.*";
+
+        // Use Pattern.matches() to check if the input string matches the pattern
+        return Pattern.matches(regexPattern, input);
+    }
+
+    public static float parseFraction(String input) {
+        // Define a regex pattern to match the format m/n where m and n are integers
+        String regexPattern = "^(\\d+)/(\\d+).*";
+
+        // Use Pattern and Matcher to extract numerator and denominator
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regexPattern);
+        java.util.regex.Matcher matcher = pattern.matcher(input);
+
+        // Check if the pattern matches the input
+        if (matcher.matches()) {
+            // Extract numerator and denominator as strings
+            String numeratorStr = matcher.group(1);
+            String denominatorStr = matcher.group(2);
+
+            // Convert strings to integers
+            int numerator = Integer.parseInt(numeratorStr);
+            int denominator = Integer.parseInt(denominatorStr);
+
+            // Check for division by zero
+            if (denominator != 0) {
+                // Return the result as a float
+                return (float) numerator / denominator;
+            } else {
+                // Handle division by zero case
+                throw new IllegalArgumentException("Denominator cannot be zero.");
+            }
+        } else {
+            // Handle the case where the input doesn't match the expected format
+            throw new IllegalArgumentException("Invalid input format. Expected m/n.");
+        }
+    }
+
+    public static String getRemainingStringAfterFraction(String input) {
+        // Define a regex pattern to match the format m/n where m and n are integers
+        String regexPattern = "^(\\d+)/(\\d+)(.*)";
+
+        // Use Pattern and Matcher to extract numerator, denominator, and remaining string
+        Pattern pattern = Pattern.compile(regexPattern);
+        Matcher matcher = pattern.matcher(input);
+
+        // Check if the pattern matches the input
+        if (matcher.matches()) {
+            // Extract remaining string
+            String remainingString = matcher.group(3);
+
+            // Return the remaining string
+            return remainingString;
+        } else {
+            // Handle the case where the input doesn't match the expected format
+            throw new IllegalArgumentException("Invalid input format. Expected m/n.");
+        }
+    }
+
     private boolean startsWithOunce(String amount) {
         String patternString = "^(\\d+) \\(\\d+ ounce\\)";
         Pattern pattern = Pattern.compile(patternString);
@@ -221,15 +287,15 @@ public class JsonFileReader {
         return matcher.find();
     }
 
-    private static int extractNumbersIfStartsWithOunce(String amount) {
+    private static float extractNumbersIfStartsWithOunce(String amount) {
         String patternString = "^(\\d+) \\((\\d+) ounce\\)";
         Pattern pattern = Pattern.compile(patternString);
         Matcher matcher = pattern.matcher(amount);
 
         if (matcher.find()) {
             int firstNumber = Integer.parseInt(matcher.group(1));
-            int secondNumber = Integer.parseInt(matcher.group(2));
-            return firstNumber * secondNumber;
+            double secondNumber = Double.parseDouble(matcher.group(2));
+            return (float) (firstNumber * secondNumber); // Cast to int for the final result
         } else {
             return 0;
         }
@@ -350,7 +416,7 @@ public class JsonFileReader {
 
             // Check if the first word is a superstring of a word in the FoodUnit enum
             for (FoodUnit foodUnit : FoodUnit.values()) {
-                if (foodUnit.name().toLowerCase().contains(firstWord)) {
+                if (firstWord.toLowerCase().contains(foodUnit.name())) {
                     return true;
                 }
             }
@@ -365,12 +431,11 @@ public class JsonFileReader {
 
         // Find the corresponding FoodUnit enum value
         for (FoodUnit foodUnit : FoodUnit.values()) {
-            if (foodUnit.name().toLowerCase().contains(firstWord)) {
+            if (firstWord.toLowerCase().contains(foodUnit.name().toLowerCase())) {
                 return foodUnit;
             }
         }
-        // Handle the case where no matching FoodUnit is found (this could be an error case)
-        throw new IllegalArgumentException("Unknown FoodUnit: " + firstWord);
+        return null;
     }
 
     private static String removeFirstWord(String input) {
