@@ -6,7 +6,7 @@ public record RecipeDetailsDto(
     Long id,
     String name,
     String description,
-    ArrayList<String> ingredients,
+    ArrayList<RecipeIngredientDto> ingredients,
     ArrayList<String> allergens,
     byte[] picture
 ){}

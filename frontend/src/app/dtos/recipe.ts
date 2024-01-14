@@ -6,7 +6,9 @@ export interface RecipeSearch {
 }
 
 export interface RecipeIngredientDto {
-
+  name: string,
+  amount: number,
+  unit: string;
 }
 
 export interface RecipeDto {
@@ -29,7 +31,14 @@ export interface RecipeDetailsDto {
   name: string;
   description: string;
   id: number;
-  ingredients: string[];
+  ingredients: RecipeIngredientDto[];
   allergens: string[];
   picture: number[];
+}
+
+export interface RecipeSearchResultDto {
+  page: number,
+  entriesPerPage: number,
+  numberOfPages: number,
+  recipes: RecipeListDto[];
 }

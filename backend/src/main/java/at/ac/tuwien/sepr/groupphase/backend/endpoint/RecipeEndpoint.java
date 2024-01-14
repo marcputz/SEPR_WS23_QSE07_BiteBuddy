@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -37,7 +38,7 @@ public class RecipeEndpoint {
     }
 
     @PostMapping()
-    public List<RecipeListDto> searchRecipes(@RequestBody RecipeSearchDto searchParams) {
+    public RecipeSearchResultDto searchRecipes(@RequestBody RecipeSearchDto searchParams) {
         LOGGER.info("POST " + BASE_PATH);
         LOGGER.debug("request body: {}", searchParams);
         return this.recipeService.searchRecipes(searchParams);
@@ -68,7 +69,7 @@ public class RecipeEndpoint {
 
     @GetMapping("/{id}")
     public RecipeDetailsDto getDetailedRecipe(@PathVariable long id) {
-        LOGGER.info("GET " + BASE_PATH + id);
+        LOGGER.info("GET " + BASE_PATH + "/" + id);
         try {
             return this.recipeService.getDetailedRecipe(id);
         } catch (NotFoundException e) {

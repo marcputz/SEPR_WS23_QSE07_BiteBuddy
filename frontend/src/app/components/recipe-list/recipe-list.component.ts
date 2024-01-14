@@ -1,8 +1,9 @@
 import {Component} from '@angular/core';
 import {RecipeService} from "../../services/recipe.service";
-import {RecipeListDto, RecipeSearch} from "../../dtos/recipe";
+import {RecipeListDto, RecipeSearch, RecipeSearchResultDto} from "../../dtos/recipe";
 import {debounceTime, Subject} from "rxjs";
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {ToastrService} from "ngx-toastr";
 
 @Component({
   selector: 'app-recipe-list',
@@ -11,16 +12,21 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 })
 export class RecipeListComponent {
   recipes: RecipeListDto[] = [];
+  maxPages: number = 5;
   searchChangedObservable = new Subject<void>();
   searchParams: RecipeSearch = {
     creator: "",
     name: "",
     page: 0,
-    entriesPerPage: 25
+    entriesPerPage: 21,
   };
 
+  searchResponse: RecipeSearchResultDto;
+
   constructor(
-    private service: RecipeService, private sanitizer: DomSanitizer
+    private service: RecipeService,
+    private sanitizer: DomSanitizer,
+    private notification: ToastrService,
   ) {
   }
 
@@ -39,12 +45,15 @@ export class RecipeListComponent {
   reloadRecipes() {
     this.service.search(this.searchParams).subscribe({
       next: data => {
-        console.log(data);
-        this.recipes = data;
+        this.searchResponse = data;
+        this.recipes = data.recipes;
+        this.maxPages = data.numberOfPages;
+        this.searchParams.page = data.page;
+        console.log("number of pages: " + data.numberOfPages);
+        console.log("recipes available: " + data.recipes.length);
       },
       error: err => {
-        console.log('Error fetching recipes', err)
-        // TODO notification service
+        this.notification.error('Error fetching recipes', err)
       }
     })
   }
@@ -64,8 +73,8 @@ export class RecipeListComponent {
     }
   }
 
-  pageCounter(change: number) {
-    this.searchParams.page += change;
+  pageChanger(newPageNumber: number) {
+    this.searchParams.page = newPageNumber;
     this.reloadRecipes()
   }
 }
