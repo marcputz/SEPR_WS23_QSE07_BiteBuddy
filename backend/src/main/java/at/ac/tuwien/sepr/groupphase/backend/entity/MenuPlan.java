@@ -11,6 +11,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -29,12 +31,12 @@ public class MenuPlan {
     private Profile profile;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime fromTime;
+    @Temporal(TemporalType.DATE)
+    private LocalDate fromDate;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime untilTime;
+    @Temporal(TemporalType.DATE)
+    private LocalDate untilDate;
 
     @OneToMany(mappedBy = "menuplan")
     private Set<MenuPlanContent> content;
