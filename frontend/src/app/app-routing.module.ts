@@ -17,6 +17,7 @@ import {ChangePasswordComponent} from './components/user-settings/change-passwor
 import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout.component";
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
+import {MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
 
 const routes: Routes = [
   //{path: '', component: HomeComponent},
@@ -43,6 +44,7 @@ const routes: Routes = [
       {path: 'create', component: RecipeCreateComponent},
       {path: ':id', component: RecipeDetailComponent},
   ]},
+  {path: 'menuplan', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent},
 ];
 
 @NgModule({

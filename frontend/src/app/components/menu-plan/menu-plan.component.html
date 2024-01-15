@@ -1,0 +1,24 @@
+<h1>GENERATE MENU PLAN</h1>
+
+<form>
+  <select name="profileDropdown">
+    <option value="1">Profile 1</option>
+  </select>
+  <br>
+  <button (click)="onClickGenerate()">Generate Menu Plan</button>
+</form>
+
+<br><br>
+
+<div *ngIf="generateRequest != undefined">
+  <p><b>REQUEST:</b></p>
+  <p [innerHTML]="generateRequest"></p>
+</div>
+
+<br><br>
+
+<div *ngIf="generateResponse != undefined">
+  <p><b>RESPONSE:</b></p>
+  <p [innerHTML]="generateResponse"></p>
+</div>
+
