@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
@@ -12,6 +14,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service class definition for MenuPlan entities.
@@ -58,13 +61,27 @@ public interface MenuPlanService {
      * @param profile the profile to use for generating the menu plan.
      * @param from the start time for this menu plan to be valid (inclusive).
      * @param until the end time for this menu plan to be valid (inclusive).
-     * @return the generated menu plan
+     * @return the generated menu plan as a detail dto
      * @throws DataStoreException if the data store is unable to process the new entity.
-     * @throws ConflictException if the new entity is in conflict with the current state of the data store (e.g. another menu plan already exists durin the specified timeframe).
-     * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan generation
+     * @throws ConflictException if the new entity is in conflict with the current state of the data store (e.g. another menu plan already exists during the specified timeframe).
+     * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan generation.
      * @author Marc Putz
      */
-    MenuPlan generateMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until) throws DataStoreException, ConflictException, ValidationException;
+    MenuPlanDetailDto generateMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until) throws DataStoreException, ConflictException, ValidationException;
+
+    /**
+     * Generates a new menu plan for a user using the data specified in the MenuPlanCreateDto and saves it to the data store.
+     * Only one menu plan can be valid for a specific timefame, otherwise a {@link ConflictException} may be thrown.
+     *
+     * @param user the user for which to create a new menu plan for.
+     * @param createDto the creation dto containing menu plan creation data.
+     * @return the generated menu plan as a detail dto.
+     * @throws DataStoreException if the data store is unable to process the new entity.
+     * @throws ConflictException if the new entity is in conflict with the current state of the data store.
+     * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan generation.
+     * @author Marc Putz
+     */
+    MenuPlanDetailDto generateMenuPlan(ApplicationUser user, MenuPlanCreateDto createDto) throws DataStoreException, ConflictException, ValidationException;
 
     /**
      * Deletes a menu plan from the data store.
@@ -91,10 +108,10 @@ public interface MenuPlanService {
      * Gets a list of all recipes contained in a menu plan.
      *
      * @param plan the menu plan to get contents of.
-     * @return a list of menu plan contents. Can be empty if menu plan has no content.
+     * @return a set of menu plan contents. Can be empty if menu plan has no content.
      * @author Marc Putz
      */
-    List<MenuPlanContent> getContentsOfMenuPlan(MenuPlan plan);
+    Set<MenuPlanContent> getContentsOfMenuPlan(MenuPlan plan);
 
     /**
      * Gets a list of all recipes in a menu plan on a specified day.

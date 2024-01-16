@@ -51,8 +51,12 @@ public class MenuPlanCreateDto {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MenuPlanCreateDto that = (MenuPlanCreateDto) o;
         return Objects.equals(profileId, that.profileId) && Objects.equals(fromTime, that.fromTime) && Objects.equals(untilTime, that.untilTime);
     }
