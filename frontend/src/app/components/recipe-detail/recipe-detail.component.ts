@@ -34,9 +34,11 @@ export class RecipeDetailComponent implements OnInit{
     this.service.getById(this.recipeDetails.id).subscribe(
       (recipeDetails: RecipeDetailsDto) => {
         this.recipeDetails = recipeDetails;
+        console.log(recipeDetails);
       },
     );
   }
+
   sanitizeImage(imageBytes: any): SafeUrl {
     try {
       if (!imageBytes || imageBytes.length === 0) {

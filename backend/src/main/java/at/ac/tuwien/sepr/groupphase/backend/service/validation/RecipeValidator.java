@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validation;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -44,11 +45,11 @@ public class RecipeValidator {
 
             // check that every recipe ingredient actually exists in the database
             if (!recipe.ingredients().isEmpty()) {
-                for (String ingredient : recipe.ingredients()) {
-                    List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient);
+                for (RecipeIngredientDto ingredient : recipe.ingredients()) {
+                    List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient.name());
 
                     if (queriedResults.isEmpty()) {
-                        conflictErrors.add("Ingredient " + ingredient + " does not exist");
+                        conflictErrors.add("Ingredient " + ingredient.name() + " does not exist");
                     }
                 }
             } else {
