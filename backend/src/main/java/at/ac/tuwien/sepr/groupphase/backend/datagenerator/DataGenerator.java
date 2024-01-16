@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ProfileRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRatingRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
@@ -36,6 +37,7 @@ public class DataGenerator {
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final RecipeRatingRepository recipeRatingRepository;
     private final PasswordResetRequestRepository passwordResetRepository;
+    private final RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
 
     public DataGenerator(UserRepository userRepository,
                          MenuPlanRepository menuPlanRepository,
@@ -46,7 +48,8 @@ public class DataGenerator {
                          ProfileRepository profileRepository,
                          RecipeIngredientRepository recipeIngredientRepository,
                          RecipeRatingRepository recipeRatingRepository,
-                         PasswordResetRequestRepository passwordResetRepository) {
+                         PasswordResetRequestRepository passwordResetRepository,
+                         RecipeIngredientDetailsRepository recipeIngredientDetailsRepository) {
         this.userRepository = userRepository;
         this.menuPlanRepository = menuPlanRepository;
         this.recipeRepository = recipeRepository;
@@ -57,6 +60,7 @@ public class DataGenerator {
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.recipeRatingRepository = recipeRatingRepository;
         this.passwordResetRepository = passwordResetRepository;
+        this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
     }
 
     @PostConstruct
@@ -88,7 +92,9 @@ public class DataGenerator {
     }
 
     private void insertRecipeData() {
-        JsonFileReader jsonDataInsert = new JsonFileReader(recipeRepository, ingredientRepository, allergeneRepository, allergeneIngredientRepository, recipeIngredientRepository);
+        JsonFileReader jsonDataInsert = new JsonFileReader(recipeRepository, ingredientRepository,
+            allergeneRepository, allergeneIngredientRepository,
+            recipeIngredientRepository, recipeIngredientDetailsRepository);
         jsonDataInsert.putFoodDataInDataBase();
     }
 
