@@ -16,9 +16,9 @@
 .header .text-wrapper {
   position: relative;
   width: fit-content;
-  font-family: "Jost-Regular", Helvetica;
-  font-weight: 400;
-  color: var(--blue-gray900);
+  //font-family: "Jost-Regular", Helvetica;
+  //font-weight: 400;
+  //color: var(--blue-gray900);
   font-size: 32px;
   letter-spacing: 0;
   line-height: 35.2px;
@@ -31,6 +31,10 @@
   gap: 16px;
   position: relative;
   flex: 0 0 auto;
+}
+
+.button-header {
+  flex-direction: row;
 }
 
 .header .menu-item {
@@ -47,9 +51,9 @@
   position: relative;
   width: fit-content;
   margin-top: -1px;
-  font-family: "Jost-Regular", Helvetica;
-  font-weight: 400;
-  color: var(--blue-gray900);
+ // font-family: "Jost-Regular", Helvetica;
+  //font-weight: 400;
+  //color: var(--blue-gray900);
   font-size: 16px;
   letter-spacing: 0.5px;
   line-height: 24px;
@@ -61,19 +65,6 @@
   align-items: center;
   gap: 22px;
   margin-left: auto; /* Pushes buttons-group-2 to the right */
-}
-
-.header .button, .button-2 {
-  display: flex;
-  width: 125px;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  position: relative;
-  border-radius: 8px;
-  border: 2px solid #584238;
-  box-shadow: var(--shadow-dark-s);
-  background-color: white;
 }
 
 .header .text-container {
@@ -90,7 +81,7 @@
   position: relative;
   width: fit-content;
   margin-top: -1px;
-  font-family: "Jost-Medium", Helvetica;
+ // font-family: "Jost-Medium", Helvetica;
   font-weight: 500;
   color: #584238;
   font-size: 16px;
@@ -99,19 +90,6 @@
   white-space: nowrap;
   all: unset;
   box-sizing: border-box;
-}
-
-.header .button-2 {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  position: relative;
-  flex: 0 0 auto;
-  background-color: #594338;
-  border: 2px solid #584238;
-  border-radius: 8px;
-  box-shadow: var(--shadow-dark-s);
 }
 
 .header .button-text-wrapper {
@@ -126,8 +104,8 @@
   position: relative;
   width: fit-content;
   margin-top: -1px;
-  font-family: "Roboto-Medium", Helvetica;
-  font-weight: 400;
+ // font-family: "Roboto-Medium", Helvetica;
+  //font-weight: 400;
   color: #ffffff;
   font-size: 16px;
   letter-spacing: 0.5px;
@@ -136,8 +114,8 @@
 }
 
 .header .span {
-  font-weight: var(--button-m-font-weight);
-  font-family: var(--button-m-font-family);
+  //font-weight: var(--button-m-font-weight);
+ // font-family: var(--button-m-font-family);
   font-style: var(--button-m-font-style);
   letter-spacing: var(--button-m-letter-spacing);
   line-height: var(--button-m-line-height);
@@ -145,8 +123,8 @@
 }
 
 .header .text-wrapper-2 {
-  font-family: "Jost-Medium", Helvetica;
-  font-weight: 500;
+ // font-family: "Jost-Medium", Helvetica;
+ // font-weight: 500;
 }
 
 i, .text-inside-btn {

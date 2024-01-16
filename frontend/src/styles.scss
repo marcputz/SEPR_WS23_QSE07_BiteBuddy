@@ -1,10 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
-@import url("https://fonts.googleapis.com/css?family=Jost:500,400,700|Roboto:400|Open+Sans:400");
+@import url("https://fonts.googleapis.com/css?family=Jost:300,500,400,700|Roboto:400|Open+Sans:400");
 
 :root {
   --app-background-color: rgb(241, 241, 221);
+
+  --app-header-text-color: rgba(15,23,42);
 
   --button-background-color: rgba(80, 50, 5, 1);
   --button-background-color-hover: rgba(60, 30, 4, 1);
@@ -46,6 +48,40 @@ body {
   background-position: left;
   background-attachment: fixed;
   background-size: cover;
+  font-family: 'Jost-Regular', sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Jost-Medium', sans-serif !important;
+  color: var(--app-header-text-color);
+}
+
+.header {
+  color: var(--app-header-text-color);
+}
+
+.button-transparent {
+  background-color: rgba(255, 255, 255, 0); /* Fully transparent */
+  display: flex;
+  width: 150px;
+  padding: 12px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 2px solid #594338;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.07), 0px 1px 3px 0px rgba(0, 0, 0, 0.10);
+}
+
+.button-full {
+  background-color: var(--button-background-color);
+  display: flex;
+  width: 150px;
+  padding: 12px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 2px solid #594338;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.07), 0px 1px 3px 0px rgba(0, 0, 0, 0.10);
 }
 
 .bb-selectable {
