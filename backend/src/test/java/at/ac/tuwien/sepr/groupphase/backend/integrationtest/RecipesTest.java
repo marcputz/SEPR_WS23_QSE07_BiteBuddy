@@ -179,7 +179,7 @@ public class RecipesTest {
     }
 
     @Test
-    public void getAllRecipes() throws Exception {
+    public void getAllAddedRecipes() throws Exception {
         // creating request
         var body = mockMvc
             .perform(MockMvcRequestBuilders
@@ -187,10 +187,10 @@ public class RecipesTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
-                    "name": "",
+                    "name": "recipe",
                     "creator": "",
                     "page": 0,
-                    "entriesPerPage": 1000
+                    "entriesPerPage": 21
                     }
                     """)
                 .accept(MediaType.APPLICATION_JSON)
