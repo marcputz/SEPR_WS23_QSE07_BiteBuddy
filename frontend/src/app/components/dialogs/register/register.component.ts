@@ -23,6 +23,8 @@ export class RegisterComponent implements OnInit{
   errorMailAlreadyExists: boolean = false;
   errorPasswordsNotSame: boolean = false;
 
+  isInputFocused: {[key: string]: boolean } = {};
+
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
               private passwordEncoder: PasswordEncoder,
@@ -70,7 +72,8 @@ export class RegisterComponent implements OnInit{
     this.authService.registerUser(authRequest).subscribe({
       next: (data) => {
         console.log('Successfully registered user: ' + authRequest.email);
-        this.router.navigate(['/profile']);
+        //this.router.navigate(['/profile']);
+        this.router.navigate(['/#']);
       },
       error: error => {
         console.log('Could not register user due to:');
@@ -122,6 +125,13 @@ export class RegisterComponent implements OnInit{
   }
 
   ngOnInit() {
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.registerForm.get(attribute).value !== '';
   }
 
 }
