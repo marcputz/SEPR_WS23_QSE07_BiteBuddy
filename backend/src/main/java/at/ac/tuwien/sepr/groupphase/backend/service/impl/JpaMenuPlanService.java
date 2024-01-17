@@ -1,12 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.idclasses.MenuPlanContentId;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -22,12 +24,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.lang.invoke.MethodHandles;
 import java.security.InvalidParameterException;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -113,9 +116,9 @@ public class JpaMenuPlanService implements MenuPlanService {
 
                 // find recipe in data store. if not available, try next id (stop after MAX_RETRIES tries)
                 Recipe recipe = null;
-                final int MAX_RETRIES = 30;
+                final int maxRetries = 30;
                 int retry = 0;
-                while (recipe == null && retry < MAX_RETRIES) {
+                while (recipe == null && retry < maxRetries) {
                     try {
                         recipe = recipeService.getRecipeById(recipeId);
                     } catch (NotFoundException e) {

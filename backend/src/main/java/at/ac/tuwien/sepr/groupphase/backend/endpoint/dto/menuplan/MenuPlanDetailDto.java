@@ -96,7 +96,13 @@ public class MenuPlanDetailDto {
             return false;
         }
         MenuPlanDetailDto that = (MenuPlanDetailDto) o;
-        return numDays == that.numDays && Objects.equals(userId, that.userId) && Objects.equals(profileId, that.profileId) && Objects.equals(profileName, that.profileName) && Objects.equals(fromTime, that.fromTime) && Objects.equals(untilTime, that.untilTime) && Objects.equals(contents, that.contents);
+        return numDays == that.numDays
+            && Objects.equals(userId, that.userId)
+            && Objects.equals(profileId, that.profileId)
+            && Objects.equals(profileName, that.profileName)
+            && Objects.equals(fromTime, that.fromTime)
+            && Objects.equals(untilTime, that.untilTime)
+            && Objects.equals(contents, that.contents);
     }
 
     @Override
@@ -108,14 +114,14 @@ public class MenuPlanDetailDto {
 
     @Override
     public String toString() {
-        return "MenuPlanDetailDto{" +
-            "userId=" + userId +
-            ", profileId=" + profileId +
-            ", profileName='" + profileName + '\'' +
-            ", fromTime=" + fromTime +
-            ", untilTime=" + untilTime +
-            ", numDays=" + numDays +
-            ", contents=" + contents +
-            '}';
+        return "MenuPlanDetailDto{"
+            + "userId=" + userId
+            + ", profileId=" + profileId
+            + ", profileName='" + profileName + '\''
+            + ", fromTime=" + fromTime
+            + ", untilTime=" + untilTime
+            + ", numDays=" + numDays
+            + ", contents=" + contents
+            + '}';
     }
 }
