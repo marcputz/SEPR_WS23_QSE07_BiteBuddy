@@ -7,6 +7,7 @@ import { ErrorFormatterService } from './error-formatter.service';
 import {Globals} from "../global/globals";
 import {UpdateAuthenticationSettingsDto} from "../dtos/updateAuthenticationSettingsDto";
 import {UserSettingsDto} from "../dtos/userSettingsDto";
+import {RecipeRatingListsDto} from "../dtos/recipe";
 
 @Injectable({
     providedIn: 'root'
@@ -43,5 +44,9 @@ export class ProfileService {
     }
   createRating(recipeRatingDto: RecipeRatingDto){
     return this.http.put(`${this.baseUri}/rating/${recipeRatingDto.recipeId}`, recipeRatingDto);
+  }
+
+  getRatingLists(userId: number): Observable<RecipeRatingListsDto>{
+    return this.http.get<RecipeRatingListsDto>(`${this.baseUri}/rating/${userId}`);
   }
 }

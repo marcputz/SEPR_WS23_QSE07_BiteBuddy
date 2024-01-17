@@ -38,7 +38,7 @@ public class RecipeIngredientDetails {
         this.amount = amount;
     }
 
-    public float getAmount() {
+    public Float getAmount() {
         return amount;
     }
 

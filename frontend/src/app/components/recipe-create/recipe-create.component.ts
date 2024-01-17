@@ -22,7 +22,7 @@ export class RecipeCreateComponent {
     description: '',
     id: null,
     ingredients: [],
-    allergens: []
+    allergens: [],
   }
   pictureSelected: File = null;
   submitButtonClicked = false;

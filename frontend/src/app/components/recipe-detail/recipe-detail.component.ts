@@ -1,8 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {RecipeDetailsDto} from "../../dtos/recipe";
+import {RecipeDetailsDto, RecipeRatingListsDto} from "../../dtos/recipe";
 import {RecipeService} from "../../services/recipe.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {AuthService} from "../../services/auth.service";
+import {ProfileService} from "../../services/profile.service";
+import {UserSettingsDto} from "../../dtos/userSettingsDto";
+import {CheckRatingDto} from "../../dtos/profileDto";
 
 @Component({
   selector: 'app-recipe-detail',
@@ -20,8 +24,15 @@ export class RecipeDetailComponent implements OnInit{
     picture: null
   }
 
+  userId: number = -1;
+  likes: number[] = [];
+  dislikes: number[] = [];
+  rating: number = -1;
+  ratingStatus: String = "";
   constructor(
     private service: RecipeService,
+    private authService: AuthService,
+    private profileService: ProfileService,
     private router: Router,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer
@@ -37,6 +48,27 @@ export class RecipeDetailComponent implements OnInit{
         console.log(recipeDetails);
       },
     );
+
+    this.authService.getUser().subscribe(
+      (settings: UserSettingsDto) => {
+        this.userId = settings.id;
+        console.log(settings);
+        this.profileService.getRatingLists(this.userId)
+          .subscribe(
+              (recipeRatingListsDto: RecipeRatingListsDto) => {
+                this.likes = recipeRatingListsDto.likes;
+                this.dislikes = recipeRatingListsDto.dislikes;
+                if(recipeRatingListsDto.likes.includes(this.recipeDetails.id)){
+                  this.rating = 1;
+                  this.ratingStatus = "Liked";
+                }
+                if(recipeRatingListsDto.dislikes.includes(this.recipeDetails.id)){
+                  this.rating = 0;
+                  this.ratingStatus = "Disliked"
+                }
+            }
+          );
+      });
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {

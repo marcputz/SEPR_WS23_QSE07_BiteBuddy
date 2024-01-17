@@ -172,15 +172,12 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public RecipeDetailsDto getDetailedRecipe(long id) {
-        // TODO check if ID is valid (not null)
+
         LOGGER.trace("details({})", id);
         Optional<Recipe> recipe = this.recipeRepository.findById(id);
         if (recipe.isEmpty()) {
             throw new NotFoundException("The searched for recipe does not exist in the database anymore.");
         } else {
-            //TODO: make dtos for allergenes and ingredients, which contain the information needed to display them in details, when the database is working.
-            // Ingredients require name and amount, allergenes only the name (and id additionally for both if acces would be required in the future).
-            // Transform data into those dtos and add a list of both to the recipedetails dto
             List<RecipeIngredient> ingredients = this.recipeIngredientRepository.findByRecipe(recipe.get());
             ArrayList<String> ingredientsAndAmount = new ArrayList<>();
             ArrayList<RecipeIngredientDto> newIngredients = new ArrayList<>();

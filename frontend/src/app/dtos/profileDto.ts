@@ -17,3 +17,8 @@ export interface RecipeRatingDto {
   userId: number;
   rating: number;
 }
+
+export interface CheckRatingDto {
+  recipeId: number;
+  userId: number;
+}

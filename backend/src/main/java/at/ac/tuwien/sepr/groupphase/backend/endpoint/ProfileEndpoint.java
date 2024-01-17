@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.invoke.MethodHandles;
 
@@ -50,4 +51,13 @@ public class ProfileEndpoint {
 
         profileService.rateRecipe(recipeRatingDto);
     }
+
+    @GetMapping("/rating/{UserId}")
+    public RecipeRatingListsDto get(@PathVariable long UserId) throws NotFoundException {
+        LOGGER.info("Received Get request on {}", BASE_PATH);
+        LOGGER.debug("Request body for Get:\n{}", UserId);
+
+        return profileService.getRatingLists(UserId);
+    }
+
 }

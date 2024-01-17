@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,5 +106,33 @@ public class ProfileServiceImpl implements ProfileService {
             ratingProfile.getLiked().add(recipeToRate);
         }
         profileRepository.save(ratingProfile);
+    }
+
+    @Override
+    public RecipeRatingListsDto getRatingLists(long id) throws NotFoundException {
+        LOGGER.trace("getRatingLists({})", id);
+
+        ApplicationUser user = userRepository.getReferenceById(id);
+
+        Profile activeProfile = user.getActiveProfile();
+
+        List<Long> liked = new ArrayList<>();
+        List<Long> disliked = new ArrayList<>();
+
+        for (Recipe recipe : activeProfile.getLiked()) {
+            liked.add(recipe.getId());
+        }
+
+        for (Recipe recipe : activeProfile.getDisliked()) {
+            disliked.add(recipe.getId());
+        }
+
+        LOGGER.info("ALL THE LIKEIES: " + liked.toString());
+
+        RecipeRatingListsDto ratingLists = new RecipeRatingListsDto(
+            liked,
+            disliked);
+
+        return ratingLists;
     }
 }
