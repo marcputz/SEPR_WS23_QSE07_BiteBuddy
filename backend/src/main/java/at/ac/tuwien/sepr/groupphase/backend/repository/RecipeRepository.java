@@ -30,4 +30,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
             save(recipe);
         }
     }
+
+    Recipe findFirstByOrderByIdDesc();
+
+    Recipe findFirstByOrderByIdAsc();
 }

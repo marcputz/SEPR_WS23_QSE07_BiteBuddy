@@ -1,16 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
-import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.entity.idclasses.MenuPlanContentId;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
@@ -27,10 +27,8 @@ import java.lang.invoke.MethodHandles;
 import java.security.InvalidParameterException;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * JPA implementation of MenuPlanService interface.
@@ -91,42 +89,102 @@ public class JpaMenuPlanService implements MenuPlanService {
             throw new ConflictException("New Menu Plan would conflict with the current system state", List.of("There is already a menu plan active during the specified timeframe"));
         }
 
-        // TODO: get list of recipes
+        // select recipes
         // TODO: filter according to profile
-        List<RecipeListDto> recipes = new ArrayList<>();
-
-        // TODO: generate menu plan content
         Set<MenuPlanContent> contents = new HashSet<>();
+        Set<MenuPlanContentDetailDto> contentDtos = new HashSet<>();
+
+        Set<Long> usedIds = new HashSet<>();
+
+        long highestId = recipeService.getHighestRecipeId();
+        long lowestId = recipeService.getLowestRecipeId();
+
+        int numDays = (int) Duration.between(from.atStartOfDay(), until.atStartOfDay()).toDays() + 1;
+        final int timeslotsPerDay = 3; // TODO: make this changeable
+        for (int day = 0; day < numDays; day++) {
+            for (int timeslot = 0; timeslot < timeslotsPerDay; timeslot++) {
+                // generate random ID
+                long recipeId = ThreadLocalRandom.current().nextInt((int) lowestId, (int) highestId + 1);
+
+                // make sure no ID is used twice
+                while (usedIds.contains(recipeId)) {
+                    recipeId++;
+                }
+
+                // find recipe in data store. if not available, try next id (stop after MAX_RETRIES tries)
+                Recipe recipe = null;
+                final int MAX_RETRIES = 30;
+                int retry = 0;
+                while (recipe == null && retry < MAX_RETRIES) {
+                    try {
+                        recipe = recipeService.getRecipeById(recipeId);
+                    } catch (NotFoundException e) {
+                        recipeId++;
+                        if (recipeId > highestId) {
+                            recipeId = lowestId;
+                        }
+                        retry++;
+                    }
+                }
+
+                // if no recipe after MAX_RETRIES could be found, throw error
+                if (recipe == null) {
+                    throw new ConflictException("Cannot generate menu plan", List.of("Menu Plan can not find enough content in data store"));
+                }
+
+                // add ID to set of used IDs, so it's not used again
+                usedIds.add(recipeId);
+
+                // create content entity and add to list
+                MenuPlanContent content = new MenuPlanContent()
+                    .setRecipe(recipe)
+                    .setTimeslot(timeslot)
+                    .setDayIdx(day);
+                contents.add(content);
+
+                // create content detail dto
+                MenuPlanContentDetailDto contentDto = new MenuPlanContentDetailDto()
+                    .setDay(day)
+                    .setTimeslot(timeslot)
+                    .setRecipe(new RecipeListDto(
+                        "",
+                        recipe.getName(),
+                        recipe.getId(),
+                        recipe.getPicture()
+                    ));
+                contentDtos.add(contentDto);
+            }
+        }
 
         // create menu plan entity
         MenuPlan menuPlan = new MenuPlan()
             .setFromDate(from)
             .setUntilDate(until)
             .setUser(user)
-            .setProfile(profile)
-            .setContent(contents);
+            .setProfile(profile);
 
+        // set relationships
+        for (MenuPlanContent c : contents) {
+            menuPlan.addContent(c);
+        }
 
         try {
             // save menu plan to data store
-            menuPlanRepository.save(menuPlan);
+            MenuPlan savedPlan = menuPlanRepository.save(menuPlan);
 
-            // TODO: save contents to data store (if needed? see jpa documentation)
-
-            // TODO: retrieve final objects from data store and return detail dto
+            // create detail dto
             return new MenuPlanDetailDto()
-                .setUserId(menuPlan.getUser().getId())
+                .setUserId(savedPlan.getId())
+                .setUntilTime(savedPlan.getUntilDate())
+                .setFromTime(savedPlan.getFromDate())
                 // TODO: add profile information to detail dto
                 .setProfileId(-1L)
                 .setProfileName("Not available")
-                //.setProfileId(menuPlan.getProfile().getId())
-                //.setProfileName(menuPlan.getProfile().getName())
-                .setUntilTime(menuPlan.getUntilDate())
-                .setFromTime(menuPlan.getFromDate())
                 .setNumDays((int) Duration.between(
-                    menuPlan.getFromDate().atStartOfDay(),
-                    menuPlan.getUntilDate().atStartOfDay()
-                ).toDays() + 1);
+                    savedPlan.getFromDate().atStartOfDay(),
+                    savedPlan.getUntilDate().atStartOfDay()
+                ).toDays() + 1)
+                .setContents(contentDtos);
         } catch (JDBCException e) {
             throw new DataStoreException(e.getErrorMessage(), e);
         }

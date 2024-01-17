@@ -150,6 +150,34 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public long getHighestRecipeId() {
+        LOGGER.trace("getHighestRecipeId()");
+
+        Recipe r = this.recipeRepository.findFirstByOrderByIdDesc();
+        return r.getId();
+    }
+
+    @Override
+    public long getLowestRecipeId() {
+        LOGGER.trace("getLowestRecipeId()");
+
+        Recipe r = this.recipeRepository.findFirstByOrderByIdAsc();
+        return r.getId();
+    }
+
+    @Override
+    public Recipe getRecipeById(long id) throws NotFoundException {
+        LOGGER.trace("getRecipeById({})", id);
+
+        Optional<Recipe> recipe = this.recipeRepository.findById(id);
+        if (recipe.isEmpty()) {
+            throw new NotFoundException("The searched for recipe does not exist in the database.");
+        } else {
+            return recipe.get();
+        }
+    }
+
+    @Override
     public List<String> findMatchingIngredients(String name) {
         // TODO when we have ingredients with working amount and units we should return a dto of ingredients
 

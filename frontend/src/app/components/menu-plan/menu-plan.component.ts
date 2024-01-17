@@ -16,6 +16,9 @@ export class MenuPlanComponent implements OnInit {
   protected generateRequest: string | null = null;
   protected generateResponse: string | null = null;
 
+  protected fromDate: string | null = "2024-01-17";
+  protected untilDate: string | null = "2024-01-23";
+
   constructor(private menuPlanService: MenuPlanService, private profileService: ProfileService, private datePipe: DatePipe, protected router: Router, protected notifications: ToastrService) {
   }
 
@@ -27,14 +30,13 @@ export class MenuPlanComponent implements OnInit {
 
     console.log("generate clicked");
 
-    let fromDate = new Date();
-    let untilDate = new Date();
-    untilDate.setDate(untilDate.getDate() + 6);
+    let fromDate = this.fromDate;
+    let untilDate = this.untilDate;
 
     let createDto: MenuPlanCreateDto = {
       profileId: 0,
-      fromTime: this.datePipe.transform(fromDate, 'yyyy-MM-dd'),
-      untilTime: this.datePipe.transform(untilDate, 'yyyy-MM-dd')
+      fromTime: fromDate,
+      untilTime: untilDate,
     }
 
     this.generateRequest = JSON.stringify(createDto);

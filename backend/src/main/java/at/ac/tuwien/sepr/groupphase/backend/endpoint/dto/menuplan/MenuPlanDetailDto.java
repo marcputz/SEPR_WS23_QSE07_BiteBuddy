@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan;
 
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Set;
 
 public class MenuPlanDetailDto {
 
@@ -15,6 +17,8 @@ public class MenuPlanDetailDto {
     private LocalDate untilTime;
 
     private int numDays;
+
+    private Set<MenuPlanContentDetailDto> contents;
 
     /* GETTER and SETTER */
 
@@ -72,7 +76,46 @@ public class MenuPlanDetailDto {
         return this;
     }
 
-    /* EQUALS and HASHCODE */
-    // TODO: Generate equals and hashcode
+    public Set<MenuPlanContentDetailDto> getContents() {
+        return contents;
+    }
 
+    public MenuPlanDetailDto setContents(Set<MenuPlanContentDetailDto> contents) {
+        this.contents = contents;
+        return this;
+    }
+
+    /* EQUALS and HASHCODE */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MenuPlanDetailDto that = (MenuPlanDetailDto) o;
+        return numDays == that.numDays && Objects.equals(userId, that.userId) && Objects.equals(profileId, that.profileId) && Objects.equals(profileName, that.profileName) && Objects.equals(fromTime, that.fromTime) && Objects.equals(untilTime, that.untilTime) && Objects.equals(contents, that.contents);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, profileId, profileName, fromTime, untilTime, numDays, contents);
+    }
+
+    /* TO_STRING */
+
+    @Override
+    public String toString() {
+        return "MenuPlanDetailDto{" +
+            "userId=" + userId +
+            ", profileId=" + profileId +
+            ", profileName='" + profileName + '\'' +
+            ", fromTime=" + fromTime +
+            ", untilTime=" + untilTime +
+            ", numDays=" + numDays +
+            ", contents=" + contents +
+            '}';
+    }
 }

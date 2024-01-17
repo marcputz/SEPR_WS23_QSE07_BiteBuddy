@@ -11,6 +11,8 @@ public class MenuPlanContentId implements Serializable {
 
     private MenuPlan menuplan;
 
+    public MenuPlanContentId() {}
+
     public MenuPlanContentId(Integer timeslot, Integer day, MenuPlan menuplan) {
         this.timeslot = timeslot;
         this.dayIdx = day;

@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -26,6 +27,32 @@ public interface RecipeService {
      * @param recipe we want to store.
      */
     void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException;
+
+    /**
+     * Gets the highest ID of any recipe in the data store.
+     *
+     * @return maximum ID of the recipe table.
+     * @author Marc Putz
+     */
+    long getHighestRecipeId();
+
+    /**
+     * Gets the lowest ID of any recipe in the data store.
+     *
+     * @return minimum ID of the recipe table.
+     * @author Marc Putz
+     */
+    long getLowestRecipeId();
+
+    /**
+     * Find a recipe by its ID.
+     *
+     * @param id the ID of the recipe to find.
+     * @return the recipe entity
+     * @throws NotFoundException if the recipe with the given ID does not exist in the data store.
+     * @author Marc Putz
+     */
+    Recipe getRecipeById(long id) throws NotFoundException;
 
     /**
      * Finds the recipe with the given id.

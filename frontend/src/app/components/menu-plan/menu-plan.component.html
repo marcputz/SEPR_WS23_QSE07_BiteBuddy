@@ -1,24 +1,29 @@
-<h1>GENERATE MENU PLAN</h1>
+<div style="margin: 20px;">
+  <h1>GENERATE MENU PLAN</h1>
 
-<form>
-  <select name="profileDropdown">
-    <option value="1">Profile 1</option>
-  </select>
-  <br>
-  <button (click)="onClickGenerate()">Generate Menu Plan</button>
-</form>
+  <form>
+    <select name="profileDropdown">
+      <option value="1">Profile 1</option>
+    </select>
+    <br>
+    FROM: <input type="date" id="fromDate" name="fromDate" [(ngModel)]="fromDate">
+    UNTIL: <input type="date" id="untilDate" name="untilDate" [(ngModel)]="untilDate">
+    <br><br>
+    <button (click)="onClickGenerate()">Generate Menu Plan</button>
+  </form>
 
-<br><br>
+  <br><br>
 
-<div *ngIf="generateRequest !== undefined">
-  <p><b>REQUEST:</b></p>
-  <p [innerHTML]="generateRequest"></p>
+  <div *ngIf="generateRequest !== undefined">
+    <p><b>REQUEST:</b></p>
+    <p [innerHTML]="generateRequest"></p>
+  </div>
+
+  <br><br>
+
+  <div *ngIf="generateResponse !== undefined">
+    <p><b>RESPONSE:</b></p>
+    <p [innerHTML]="generateResponse"></p>
+  </div>
+
 </div>
-
-<br><br>
-
-<div *ngIf="generateResponse !== undefined">
-  <p><b>RESPONSE:</b></p>
-  <p [innerHTML]="generateResponse"></p>
-</div>
-

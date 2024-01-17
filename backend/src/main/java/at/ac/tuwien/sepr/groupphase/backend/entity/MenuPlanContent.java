@@ -54,32 +54,36 @@ public class MenuPlanContent {
         return timeslot;
     }
 
-    public void setTimeslot(Integer timeslot) {
+    public MenuPlanContent setTimeslot(Integer timeslot) {
         this.timeslot = timeslot;
+        return this;
     }
 
     public Integer getDayIdx() {
         return dayIdx;
     }
 
-    public void setDayIdx(Integer day) {
+    public MenuPlanContent setDayIdx(Integer day) {
         this.dayIdx = day;
+        return this;
     }
 
     public MenuPlan getMenuplan() {
         return menuplan;
     }
 
-    public void setMenuplan(MenuPlan menuplan) {
+    public MenuPlanContent setMenuplan(MenuPlan menuplan) {
         this.menuplan = menuplan;
+        return this;
     }
 
     public Recipe getRecipe() {
         return recipe;
     }
 
-    public void setRecipe(Recipe recipe) {
+    public MenuPlanContent setRecipe(Recipe recipe) {
         this.recipe = recipe;
+        return this;
     }
 
     /* EQUALS and HASHCODE */
