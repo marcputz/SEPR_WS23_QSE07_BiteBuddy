@@ -205,7 +205,9 @@ public class RecipeServiceImpl implements RecipeService {
                     System.out.println(allergensIngredient);
                     for (AllergeneIngredient allergene : allergensIngredient) {
                         System.out.println(allergene.getAllergene().getName());
-                        allergens.add(allergene.getAllergene().getName());
+                        if (!allergens.contains(allergene.getAllergene().getName())) {
+                            allergens.add(allergene.getAllergene().getName());
+                        }
                     }
                 }
                 RecipeDetailsDto detailsDto =

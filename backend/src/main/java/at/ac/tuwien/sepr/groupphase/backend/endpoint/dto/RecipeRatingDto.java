@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 public record RecipeRatingDto(
-    Long id,
-    String rating
+    Long recipeId,
+    Long userId,
+    int rating
 ) {}

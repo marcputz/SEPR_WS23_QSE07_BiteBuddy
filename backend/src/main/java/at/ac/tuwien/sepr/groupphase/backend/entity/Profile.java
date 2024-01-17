@@ -1,12 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,13 +22,23 @@ public class Profile {
     @ManyToMany
     private Set<Ingredient> ingredient = new HashSet<>();
 
+    @ManyToMany
+    private Set<Recipe> liked = new HashSet<>();
+
+    @ManyToMany
+    private Set<Recipe> disliked = new HashSet<>();
+
+    @ManyToOne
+    private ApplicationUser user;
+
     public Profile() {}
 
-    public Profile(Long id, String name, Set<Allergene> allergens, Set<Ingredient> ingredient) {
+    public Profile(Long id, String name, Set<Allergene> allergens, Set<Ingredient> ingredient, ApplicationUser user) {
         this.id = id;
         this.name = name;
         this.allergens = allergens;
         this.ingredient = ingredient;
+        this.user = user;
     }
 
     public Long getId() {
@@ -67,6 +71,30 @@ public class Profile {
 
     public void setIngredient(Set<Ingredient> ingredient) {
         this.ingredient = ingredient;
+    }
+
+    public Set<Recipe> getLiked() {
+        return liked;
+    }
+
+    public void setLiked(Set<Recipe> liked) {
+        this.liked = liked;
+    }
+
+    public Set<Recipe> getDisliked() {
+        return disliked;
+    }
+
+    public void setDisliked(Set<Recipe> disliked) {
+        this.disliked = disliked;
+    }
+
+    public void setUser(ApplicationUser user) {
+        this.user = user;
+    }
+
+    public ApplicationUser getUser() {
+        return user;
     }
 
 }

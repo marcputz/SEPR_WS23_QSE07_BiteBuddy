@@ -9,4 +9,11 @@ export interface ProfileDto {
     name: string;
     allergens: AllergeneDto[];
     ingredient: IngredientDto[];
+    userId: number;
+}
+
+export interface RecipeRatingDto {
+  recipeId: number;
+  userId: number;
+  rating: number;
 }
