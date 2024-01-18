@@ -24,12 +24,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.awt.*;
 import java.lang.invoke.MethodHandles;
 import java.security.InvalidParameterException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -195,7 +198,16 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     @Override
     public void deleteMenuPlan(MenuPlan toDelete) throws DataStoreException {
-        throw new NotImplementedException();
+        deleteMenuPlan(toDelete.getId());
+    }
+
+    @Override
+    public void deleteMenuPlan(long id) throws DataStoreException {
+        try {
+            this.menuPlanRepository.deleteById(id);
+        } catch (JDBCException e) {
+            throw new DataStoreException(e.getErrorMessage(), e);
+        }
     }
 
     @Override
@@ -204,28 +216,110 @@ public class JpaMenuPlanService implements MenuPlanService {
     }
 
     @Override
-    public Set<MenuPlanContent> getContentsOfMenuPlan(MenuPlan plan) {
-        MenuPlan menuPlan = menuPlanRepository.getReferenceById(plan.getId());
-        return menuPlan.getContent();
+    public Set<MenuPlanContent> getContentsOfMenuPlan(MenuPlan plan) throws NotFoundException {
+        return getContentsOfMenuPlan(plan.getId());
     }
 
     @Override
-    public List<MenuPlanContent> getContentsOfMenuPlanOnDay(MenuPlan plan, int day) throws InvalidParameterException {
-        throw new NotImplementedException();
+    public Set<MenuPlanContent> getContentsOfMenuPlan(long menuPlanId) throws NotFoundException {
+        Optional<MenuPlan> dbVal = menuPlanRepository.findById(menuPlanId);
+        if (dbVal.isEmpty()) {
+            throw new NotFoundException("Menu Plan with ID '" + menuPlanId + "' does not exist in the data store.");
+        }
+        return dbVal.get().getContent() != null ? dbVal.get().getContent() : new HashSet<>();
     }
 
     @Override
-    public MenuPlanContent getContentOfMenuPlanOnDayAndTimeslot(MenuPlan plan, int day, int timeslot) throws InvalidParameterException {
-        throw new NotImplementedException();
+    public Set<MenuPlanContentDetailDto> getContentsOfMenuPlanAsDetailDto(MenuPlan plan) throws NotFoundException {
+        return getContentsOfMenuPlanAsDetailDto(plan.getId());
     }
 
     @Override
-    public MenuPlanContent getContentOfMenuPlanById(MenuPlanContentId contentId) throws InvalidParameterException {
-        throw new NotImplementedException();
+    public Set<MenuPlanContentDetailDto> getContentsOfMenuPlanAsDetailDto(long menuPlanId) throws NotFoundException {
+        Set<MenuPlanContent> contents = this.getContentsOfMenuPlan(menuPlanId);
+        return this.convertContentsToDetailDtos(contents);
+    }
+
+    @Override
+    public Set<MenuPlanContent> getContentsOfMenuPlanOnDay(MenuPlan plan, int day) throws NotFoundException, IllegalArgumentException {
+        int menuPlanDuration = (int) Duration.between(plan.getFromDate().atStartOfDay(), plan.getUntilDate().atStartOfDay()).toDays() + 1;
+        if (menuPlanDuration >= day) {
+            throw new IllegalArgumentException("Specified Day Index of '" + day + "' is outside the range of this menu plan");
+        }
+
+        Set<MenuPlanContent> allContent = this.getContentsOfMenuPlan(plan);
+
+        Set<MenuPlanContent> contentOnDay = new HashSet<>();
+        for (MenuPlanContent c : allContent) {
+            if (c.getDayIdx() == day) {
+                contentOnDay.add(c);
+            }
+        }
+
+        return contentOnDay;
+    }
+
+    @Override
+    public Set<MenuPlanContentDetailDto> getContentsOfMenuPlanOnDayAsDetailDto(MenuPlan plan, int day) throws NotFoundException, IllegalArgumentException {
+        Set<MenuPlanContent> contents = this.getContentsOfMenuPlanOnDay(plan, day);
+        return this.convertContentsToDetailDtos(contents);
+    }
+
+    @Override
+    public MenuPlanContent getContentOfMenuPlanOnDayAndTimeslot(MenuPlan plan, int day, int timeslot) throws NotFoundException, IllegalArgumentException {
+        Set<MenuPlanContent> allContent = this.getContentsOfMenuPlanOnDay(plan, day);
+
+        for (MenuPlanContent c : allContent) {
+            if (c.getTimeslot() == timeslot) {
+                return c;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public MenuPlanContentDetailDto getContentOfMenuPlanOnDayAndTimeslotAsDetailDto(MenuPlan plan, int day, int timeslot) throws NotFoundException, IllegalArgumentException {
+        MenuPlanContent content = this.getContentOfMenuPlanOnDayAndTimeslot(plan, day, timeslot);
+        return content != null ? this.convertContentToDetailDto(content) : null;
+    }
+
+    @Override
+    public MenuPlanContent getContentOfMenuPlanById(MenuPlanContentId contentId) throws NotFoundException, IllegalArgumentException {
+        MenuPlan plan = contentId.getMenuplan();
+        int day = contentId.getDayIdx();
+        int timeslot = contentId.getTimeslot();
+
+        return this.getContentOfMenuPlanOnDayAndTimeslot(plan, day, timeslot);
+    }
+
+    @Override
+    public MenuPlanContentDetailDto getContentOfMenuPlanByIdAsDetailDto(MenuPlanContentId contentId) throws IllegalArgumentException {
+        MenuPlanContent content = this.getContentOfMenuPlanById(contentId);
+        return content != null ? this.convertContentToDetailDto(content) : null;
     }
 
     @Override
     public MenuPlanContent updateMenuPlanContent(MenuPlanContent content) throws DataStoreException, ValidationException {
         throw new NotImplementedException();
+    }
+
+    private MenuPlanContentDetailDto convertContentToDetailDto(MenuPlanContent c) {
+        Recipe r = c.getRecipe();
+        RecipeListDto recipeListDto = new RecipeListDto("", r.getName(), r.getId(), r.getPicture());
+
+        return new MenuPlanContentDetailDto()
+            .setDay(c.getDayIdx())
+            .setTimeslot(c.getTimeslot())
+            .setRecipe(recipeListDto);
+
+    }
+
+    private Set<MenuPlanContentDetailDto> convertContentsToDetailDtos(Set<MenuPlanContent> contents) {
+        Set<MenuPlanContentDetailDto> dtos = new HashSet<>();
+        for (MenuPlanContent c : contents) {
+            dtos.add(this.convertContentToDetailDto(c));
+        }
+        return dtos;
     }
 }
