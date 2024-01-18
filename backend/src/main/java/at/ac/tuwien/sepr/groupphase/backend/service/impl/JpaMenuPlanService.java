@@ -60,7 +60,7 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     @Override
     public List<MenuPlan> getAllMenuPlansOfUser(ApplicationUser user) {
-        throw new NotImplementedException();
+        return menuPlanRepository.getAllByUser(user);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     @Override
     public MenuPlan getMenuPlanForUserOnDate(ApplicationUser user, LocalDate date) {
-        throw new NotImplementedException();
+        return menuPlanRepository.getByUserOnDate(user, date);
     }
 
     @Override
@@ -211,8 +211,38 @@ public class JpaMenuPlanService implements MenuPlanService {
     }
 
     @Override
-    public MenuPlan updateMenuPlan(MenuPlan toUpdate) throws DataStoreException, ValidationException, ConflictException {
-        throw new NotImplementedException();
+    public MenuPlanDetailDto updateMenuPlan(MenuPlan toUpdate) throws DataStoreException, ValidationException, ConflictException {
+        // validate input
+        validator.validateForUpdate(toUpdate);
+
+        // check if there are already existing menu plans in the specified timeframe
+        List<MenuPlan> conflictingMenuPlans = this.getAllMenuPlansOfUserDuringTimeframe(toUpdate.getUser(), toUpdate.getFromDate(), toUpdate.getUntilDate());
+        if (!conflictingMenuPlans.isEmpty()) {
+            throw new ConflictException("New Menu Plan would conflict with the current system state", List.of("There is already a menu plan active during the specified timeframe"));
+        }
+
+        try {
+            MenuPlan savedPlan = this.menuPlanRepository.save(toUpdate);
+
+            // create dtos for menu plan content
+            Set<MenuPlanContentDetailDto> contentDtos = this.convertContentsToDetailDtos(savedPlan.getContent());
+
+            // create detail dto
+            return new MenuPlanDetailDto()
+                .setUserId(savedPlan.getId())
+                .setUntilTime(savedPlan.getUntilDate())
+                .setFromTime(savedPlan.getFromDate())
+                // TODO: add profile information to detail dto
+                .setProfileId(-1L)
+                .setProfileName("Not available")
+                .setNumDays((int) Duration.between(
+                    savedPlan.getFromDate().atStartOfDay(),
+                    savedPlan.getUntilDate().atStartOfDay()
+                ).toDays() + 1)
+                .setContents(contentDtos);
+        } catch (JDBCException e) {
+            throw new DataStoreException(e.getErrorMessage(), e);
+        }
     }
 
     @Override
@@ -299,11 +329,15 @@ public class JpaMenuPlanService implements MenuPlanService {
         return content != null ? this.convertContentToDetailDto(content) : null;
     }
 
-    @Override
-    public MenuPlanContent updateMenuPlanContent(MenuPlanContent content) throws DataStoreException, ValidationException {
-        throw new NotImplementedException();
-    }
+    /* HELPER FUNCTIONS */
 
+    /**
+     * Helper function to convert MenuPlanContent objects into their corresponding detail DTO object.
+     *
+     * @param c the MenuPlanContent object to convert.
+     * @return the content's detail DTO.
+     * @author Marc Putz
+     */
     private MenuPlanContentDetailDto convertContentToDetailDto(MenuPlanContent c) {
         Recipe r = c.getRecipe();
         RecipeListDto recipeListDto = new RecipeListDto("", r.getName(), r.getId(), r.getPicture());
@@ -315,6 +349,13 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     }
 
+    /**
+     * Helper function to convert MenuPlanContent sets into sets of their corresponding detail DTO objects.
+     *
+     * @param contents a set of MenuPlanContent objects to convert.
+     * @return a set of the content's detail DTOs.
+     * @author Marc Putz
+     */
     private Set<MenuPlanContentDetailDto> convertContentsToDetailDtos(Set<MenuPlanContent> contents) {
         Set<MenuPlanContentDetailDto> dtos = new HashSet<>();
         for (MenuPlanContent c : contents) {

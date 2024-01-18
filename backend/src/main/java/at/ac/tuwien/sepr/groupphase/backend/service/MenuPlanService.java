@@ -113,7 +113,7 @@ public interface MenuPlanService {
      * @throws ConflictException if the updated entity is in conflict with the current state of the data store (e.g. there's another menu plan active during the same timeframe)
      * @author Marc Putz
      */
-    MenuPlan updateMenuPlan(MenuPlan toUpdate) throws DataStoreException, ValidationException, ConflictException;
+    MenuPlanDetailDto updateMenuPlan(MenuPlan toUpdate) throws DataStoreException, ValidationException, ConflictException;
 
     /**
      * Gets a list of all recipes contained in a menu plan.
@@ -226,15 +226,4 @@ public interface MenuPlanService {
      * @author Marc Putz
      */
     MenuPlanContentDetailDto getContentOfMenuPlanByIdAsDetailDto(MenuPlanContentId contentId) throws NotFoundException, IllegalArgumentException;
-
-    /**
-     * Updates the content of a menu plan with the data in the given object. Content to replace is identified by the entity's ID class.
-     *
-     * @param contentToUpdate menu plan content object containing the data to be updated.
-     * @return the updated content object. NULL if no old object was found and nothing was updated.
-     * @throws DataStoreException if the data store is unable to process the request.
-     * @throws ValidationException if the new data is invalid (e.g. too many days, invalid timeslot, etc.)
-     * @author Marc Putz
-     */
-    MenuPlanContent updateMenuPlanContent(MenuPlanContent contentToUpdate) throws DataStoreException, ValidationException;
 }
