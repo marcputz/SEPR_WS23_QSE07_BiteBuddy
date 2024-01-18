@@ -81,7 +81,7 @@ public class ProfileServiceTest {
         Assertions.assertNotNull(createdProfile);
 
         Assertions.assertAll(
-         //   () -> Assertions.assertNotNull(createdProfile.getId()),
+            //   () -> Assertions.assertNotNull(createdProfile.getId()),
             () -> Assertions.assertEquals(testProfileDto.getName(), createdProfile.getName()),
             () -> Assertions.assertEquals(testProfileDto.getAllergens().toString(), createdProfile.getAllergens().toString()),
             () -> Assertions.assertEquals(testProfileDto.getIngredient().toString(), createdProfile.getIngredient().toString())
@@ -120,8 +120,8 @@ public class ProfileServiceTest {
 
     @AfterEach
     public void deleteTestData() {
-       // allergeneRepository.deleteById(allergeneId);
-       // ingredientRepository.deleteById(ingredientId);
+        // allergeneRepository.deleteById(allergeneId);
+        // ingredientRepository.deleteById(ingredientId);
     }
 
 }

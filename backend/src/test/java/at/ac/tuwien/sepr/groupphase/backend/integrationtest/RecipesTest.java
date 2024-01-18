@@ -4,8 +4,19 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,10 +35,10 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -70,7 +81,8 @@ public class RecipesTest {
     private long recipeIngredient2Id;
     private long ingredient2Id;
     private long ingredient3Id;
-    private long rd1ID, rd2ID;
+    private long rd1Id;
+    private long rd2Id;
 
 
     @BeforeEach
@@ -111,14 +123,14 @@ public class RecipesTest {
         r1.setUnit(FoodUnit.tablespoon);
         r1.setIngredient("sugar");
         r1.setAmount(1);
-        rd1ID = recipeIngredientDetailsRepository.save(r1).getId();
+        rd1Id = recipeIngredientDetailsRepository.save(r1).getId();
 
         RecipeIngredientDetails r2 = new RecipeIngredientDetails();
         r2.setDescriber("much");
         r2.setUnit(FoodUnit.cup);
         r2.setIngredient("sugar");
         r2.setAmount(10);
-        rd2ID = recipeIngredientDetailsRepository.save(r2).getId();
+        rd2Id = recipeIngredientDetailsRepository.save(r2).getId();
 
 
         // creating recipeIngredients
@@ -135,24 +147,24 @@ public class RecipesTest {
         recipeIngredient2Id = recipeIngredientRepository.save(recipeIngredient2).getId();
 
         // updating recipes with ingredients
-        Set<RecipeIngredient> rIngredients1 = new HashSet<>();
-        rIngredients1.add(recipeIngredient1);
-        rIngredients1.add(recipeIngredient2);
-        recipeRepository.updateIngredients(recipe1Id, rIngredients1);
+        Set<RecipeIngredient> ringredients1 = new HashSet<>();
+        ringredients1.add(recipeIngredient1);
+        ringredients1.add(recipeIngredient2);
+        recipeRepository.updateIngredients(recipe1Id, ringredients1);
 
-        Set<RecipeIngredient> rIngredients2 = new HashSet<>();
-        rIngredients2.add(recipeIngredient2);
-        recipe2.setIngredients(rIngredients2);
-        recipeRepository.updateIngredients(recipe2Id, rIngredients2);
+        Set<RecipeIngredient> ringredients2 = new HashSet<>();
+        ringredients2.add(recipeIngredient2);
+        recipe2.setIngredients(ringredients2);
+        recipeRepository.updateIngredients(recipe2Id, ringredients2);
 
         Allergene allergene1 = new Allergene();
         allergene1.setName("Fructose");
-        Set<AllergeneIngredient> aIngredients = new HashSet<>();
+        Set<AllergeneIngredient> aingredients = new HashSet<>();
         AllergeneIngredient allergeneIngredient1 = new AllergeneIngredient();
         allergeneIngredient1.setAllergene(allergene1);
 
-        aIngredients.add(allergeneIngredient1);
-        allergene1.setIngredients(aIngredients);
+        aingredients.add(allergeneIngredient1);
+        allergene1.setIngredients(aingredients);
         allergeneIngredient1.setIngredient(ingredient1);
 
         allergene1Id = allergeneRepository.save(allergene1).getId();
@@ -164,8 +176,8 @@ public class RecipesTest {
         recipeIngredientRepository.deleteById(recipeIngredient1Id);
         recipeIngredientRepository.deleteById(recipeIngredient2Id);
 
-        recipeIngredientDetailsRepository.deleteById(rd1ID);
-        recipeIngredientDetailsRepository.deleteById(rd2ID);
+        recipeIngredientDetailsRepository.deleteById(rd1Id);
+        recipeIngredientDetailsRepository.deleteById(rd2Id);
 
         allergeneIngredientRepository.deleteById(allergeneIngredient1Id);
         allergeneRepository.deleteById(allergene1Id);
@@ -380,20 +392,20 @@ public class RecipesTest {
                     """)
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().is4xxClientError());
-
+        String tooLongName = "Eine Prise Testwe" + "f".repeat(255);
         // creating request with too long name
         mockMvc
             .perform(MockMvcRequestBuilders
                 .post("/api/v1/recipes/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+                .content(String.format("""
                     {
-                    "name": "Eine Prise Testwefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                    "description": "Man nehme einen Test 1313üaääw",
-                    "ingredients": [],
-                    "picture": ""
+                        "name": "%s",
+                        "description": "Man nehme einen Test 1313üaääw",
+                        "ingredients": [],
+                        "picture": ""
                     }
-                    """)
+                    """, tooLongName))
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().is4xxClientError());
     }

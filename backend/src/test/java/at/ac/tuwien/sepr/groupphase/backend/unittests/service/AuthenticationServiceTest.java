@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
@@ -18,8 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -32,7 +32,7 @@ public class AuthenticationServiceTest implements TestData {
     @Autowired
     UserRepository user;
 
-    private ApplicationUser TESTUSER = new ApplicationUser()
+    private ApplicationUser testuser = new ApplicationUser()
         .setId(1L)
         .setNickname("testuser_authservicetest")
         .setEmail("test.user@authservice.test")
@@ -40,26 +40,26 @@ public class AuthenticationServiceTest implements TestData {
 
     @BeforeEach
     void beforeEach() {
-        long newId = user.save(TESTUSER).getId();
-        TESTUSER.setId(newId);
+        long newId = user.save(testuser).getId();
+        testuser.setId(newId);
     }
 
     @AfterEach
     void afterEach() {
-        user.deleteById(TESTUSER.getId());
+        user.deleteById(testuser.getId());
     }
 
     @Test
     void testLogin_WithValidData_Returns() throws Exception {
         LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(TESTUSER.getEmail())
+            .withEmail(testuser.getEmail())
             .withPassword("password")
             .build();
 
         assertDoesNotThrow(() -> service.loginUser(dto));
 
         // cleanup
-        service.logoutUser(TESTUSER);
+        service.logoutUser(testuser);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class AuthenticationServiceTest implements TestData {
     @Test
     void testLogout_WithValidSession_Returns() throws Exception {
         LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(TESTUSER.getEmail())
+            .withEmail(testuser.getEmail())
             .withPassword("password")
             .build();
         String authToken = service.loginUser(dto);
@@ -92,13 +92,13 @@ public class AuthenticationServiceTest implements TestData {
     @Test
     void testLogout_WithLoggedInUser_Returns() throws Exception {
         LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(TESTUSER.getEmail())
+            .withEmail(testuser.getEmail())
             .withPassword("password")
             .build();
         service.loginUser(dto);
 
         // logout
-        assertDoesNotThrow(() -> service.logoutUser(TESTUSER));
+        assertDoesNotThrow(() -> service.logoutUser(testuser));
     }
 
     @Test
@@ -115,7 +115,7 @@ public class AuthenticationServiceTest implements TestData {
     @Test
     void testVerifyAuthenticated_WithValidToken_Returns() throws Exception {
         LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(TESTUSER.getEmail())
+            .withEmail(testuser.getEmail())
             .withPassword("password")
             .build();
         service.loginUser(dto);
@@ -132,7 +132,7 @@ public class AuthenticationServiceTest implements TestData {
     @Test
     void testVerifyAuthenticated_WithValidHeaders_Returns() throws Exception {
         LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(TESTUSER.getEmail())
+            .withEmail(testuser.getEmail())
             .withPassword("password")
             .build();
         service.loginUser(dto);
@@ -160,12 +160,12 @@ public class AuthenticationServiceTest implements TestData {
 
     @Test
     void testVerifyPassword_WithValidPassword_Returns() {
-        assertDoesNotThrow(() -> service.verifyUserPassword(TESTUSER.getId(), "password"));
+        assertDoesNotThrow(() -> service.verifyUserPassword(testuser.getId(), "password"));
     }
 
     @Test
     void testVerifyPassword_WithInvalidPassword_ThrowsAuthenticationError() {
-        assertThrows(AuthenticationException.class, () -> service.verifyUserPassword(TESTUSER.getId(), "wrongPassword"));
+        assertThrows(AuthenticationException.class, () -> service.verifyUserPassword(testuser.getId(), "wrongPassword"));
     }
 
     @Test

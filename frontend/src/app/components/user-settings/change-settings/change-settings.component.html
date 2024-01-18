@@ -3,16 +3,28 @@
 </div>
 
 <div style="padding: 0.8rem;">
-  <div class="bb-login-box">
+  <div class="bb-settings-box">
     <header>Change User Settings</header>
     <form class="form" [formGroup]="settingsForm" (ngSubmit)="updateUserSettings()">
 
 
       <div class="form-group">
-        <label>Profile Picture:</label>
-        <img src="/assets/icons/user_default.png" alt="Account Image"
-             style="width: 100px; height: 100px;display: block;">
+        <label for="image">Profile Picture:</label>
+
+        <div class="image-container">
+          <img [ngSrc]="safePictureUrl" alt="Account Image" height="100" width="100">
+          <button type="button" class="btn btn-primary" (click)="triggerFileInput()">
+            <i class="bi-pencil" aria-hidden="true"></i>
+          </button>
+          <input type="file"
+                 id="image"
+                 name="image"
+                 accept="image/png, image/jpeg"
+                 (change)="onPictureChange($event)"
+                 #fileInput hidden>
+        </div>
       </div>
+
       <div class="form-group">
         <label for="inputNickname">Nickname:</label>
         <input type="text" name="nickname" formControlName="nickname"
@@ -28,7 +40,7 @@
         </div>
       </div>
 
-      <button type="button" (click)="updateUserSettings()" class="bb-button-big">Save</button>
+      <button type="button" (click)="updateUserSettings()" class="bb-button">Save</button>
 
     </form>
   </div>

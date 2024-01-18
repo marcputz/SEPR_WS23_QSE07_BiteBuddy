@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
@@ -104,6 +105,24 @@ public class JpaUserService implements UserService {
             : userUpdateEmailAndPasswordDto.getNewPassword();
         if (newPassword != null) {
             existingUser.setPasswordEncoded(PasswordEncoder.encode(newPassword, existingUser.getEmail()));
+        }
+        return updateApplicationUser(existingUser);
+    }
+
+
+    @Override
+    public ApplicationUser updateSettings(UserUpdateSettingsDto userUpdateSettingsDto, Long currentUserId)
+        throws UserNotFoundException, ValidationException, ConflictException {
+        LOGGER.trace("updateSettings({})", userUpdateSettingsDto);
+
+        ApplicationUser existingUser = userRepository.findById(currentUserId)
+            .orElseThrow(() -> new UserNotFoundException("User with Id '" + currentUserId + "' could not be found"));
+        if (userUpdateSettingsDto.getNickname() != null && !userUpdateSettingsDto.getNickname().isEmpty() && !userUpdateSettingsDto.getNickname()
+            .equals(existingUser.getNickname())) {
+            existingUser.setNickname(userUpdateSettingsDto.getNickname());
+        }
+        if (userUpdateSettingsDto.getUserPicture() != null && userUpdateSettingsDto.getUserPicture().length != 0) {
+            existingUser.setUserPicture(userUpdateSettingsDto.getUserPicture());
         }
         return updateApplicationUser(existingUser);
     }

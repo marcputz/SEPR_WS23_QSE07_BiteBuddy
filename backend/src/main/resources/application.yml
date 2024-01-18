@@ -23,7 +23,7 @@ file-paths:
 logging:
   level:
     root: INFO
-    at.ac.tuwien.sepr.groupphase.backend.*: DEBUG
+    at.ac.tuwien.sepr.groupphase.backend.*: TRACE #TODO DEBUG
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
   charset:
     console: 'utf-8'

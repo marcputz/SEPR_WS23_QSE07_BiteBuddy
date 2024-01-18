@@ -1,10 +1,24 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -19,6 +33,9 @@ public class ApplicationUser {
     private String passwordEncoded;
     @Column(nullable = false, unique = true, length = 255)
     private String nickname;
+    @Lob
+    @Column
+    private byte[] userPicture;  // The image data represented as a byte array
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
@@ -93,6 +110,15 @@ public class ApplicationUser {
 
     public ApplicationUser setActiveProfile(Profile activeProfile) {
         this.activeProfile = activeProfile;
+        return this;
+    }
+
+    public byte[] getUserPicture() {
+        return userPicture;
+    }
+
+    public ApplicationUser setUserPicture(byte[] picture) {
+        this.userPicture = picture;
         return this;
     }
 

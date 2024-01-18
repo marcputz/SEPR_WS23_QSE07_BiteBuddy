@@ -76,8 +76,10 @@ public class ProfileDto {
         private String name;
         private List<AllergeneDto> allergens;
         private List<IngredientDto> ingredient;
+        private Long userId;
 
-        private ProfileDtoBuilder() {}
+        private ProfileDtoBuilder() {
+        }
 
         public static ProfileDtoBuilder aProfileDto() {
             return new ProfileDtoBuilder();
@@ -98,11 +100,17 @@ public class ProfileDto {
             return this;
         }
 
+        public ProfileDtoBuilder withUserId(Long userId) {
+            this.userId = userId;
+            return this;
+        }
+
         public ProfileDto build() {
             ProfileDto profileDto = new ProfileDto();
             profileDto.setName(name);
             profileDto.setAllergens(allergens);
             profileDto.setIngredient(ingredient);
+            profileDto.setUserId(userId);
             return profileDto;
         }
     }

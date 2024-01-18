@@ -58,14 +58,14 @@ public class AuthenticationEndpointTest {
     private ObjectMapper objectMapper;
 
     private final String testUserPassword = "password";
-    private final ApplicationUser TESTUSER = new ApplicationUser()
+    private final ApplicationUser testuser = new ApplicationUser()
         .setId(-100L)
         .setNickname("authEndpointTest")
         .setEmail("test@authEndpoint.at")
         .setPasswordEncoded(PasswordEncoder.encode(testUserPassword, "test@authEndpoint.at"));
 
 
-    private final ApplicationUser TESTUSER2 = new ApplicationUser()
+    private final ApplicationUser testuser2 = new ApplicationUser()
         .setId(-101L)
         .setNickname("secondTestUser")
         .setEmail("secondTest@authEndpoint.at")
@@ -77,13 +77,13 @@ public class AuthenticationEndpointTest {
 
     @BeforeEach
     public void beforeEach() throws UserNotFoundException, MessagingException {
-        testUserId = userRepository.save(TESTUSER).getId();
-        testUserId2 = userRepository.save(TESTUSER2).getId();
+        testUserId = userRepository.save(testuser).getId();
+        testUserId2 = userRepository.save(testuser2).getId();
     }
 
     @AfterEach
     public void afterEach() {
-        passwordResetRequestRepository.deleteByUser(TESTUSER.setId(testUserId));
+        passwordResetRequestRepository.deleteByUser(testuser.setId(testUserId));
         userRepository.deleteAll();
     }
 
@@ -95,7 +95,7 @@ public class AuthenticationEndpointTest {
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
-                    .withEmail(TESTUSER.getEmail())
+                    .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
                     .build()))
                 .headers(requestHeaders))
@@ -139,7 +139,7 @@ public class AuthenticationEndpointTest {
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
-                    .withEmail(TESTUSER.getEmail())
+                    .withEmail(testuser.getEmail())
                     .withPassword("thisIsAWrongPassword")
                     .build()))
                 .headers(requestHeaders))
@@ -159,7 +159,7 @@ public class AuthenticationEndpointTest {
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
-                    .withEmail(TESTUSER.getEmail())
+                    .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
                     .build()))
                 .headers(requestHeaders))
@@ -206,7 +206,7 @@ public class AuthenticationEndpointTest {
 
         MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
-                    .withEmail(TESTUSER.getEmail())
+                    .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
                     .build()))
                 .headers(loginHeaders))
@@ -251,7 +251,7 @@ public class AuthenticationEndpointTest {
 
         MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
-                    .withEmail(TESTUSER.getEmail())
+                    .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
                     .build()))
                 .headers(loginHeaders))
@@ -321,7 +321,7 @@ public class AuthenticationEndpointTest {
 
         MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
-                    .withEmail(TESTUSER.getEmail())
+                    .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
                     .build()))
                 .headers(loginHeaders))
@@ -330,7 +330,7 @@ public class AuthenticationEndpointTest {
         String authToken = loginResult.getResponse().getContentAsString();
         assertNotNull(authToken);
         UserUpdateEmailAndPasswordDto updateDto = UserUpdateEmailAndPasswordDto.UserUpdateDtoBuilder.anUserUpdateDto()
-            .withEmail(TESTUSER2.getEmail()) // Email already in use by secondTestUser
+            .withEmail(testuser2.getEmail()) // Email already in use by secondTestUser
             .withCurrentPassword(testUserPassword)
             .withNewPassword("newPassword")
             .build();
@@ -411,7 +411,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/request_password_reset")
-                .content("{\"email\":\"" + TESTUSER.getEmail() + "\"}")
+                .content("{\"email\":\"" + testuser.getEmail() + "\"}")
                 .headers(requestHeaders))
             .andDo(print())
             .andReturn();
@@ -439,12 +439,12 @@ public class AuthenticationEndpointTest {
     @Test
     void testPasswordReset_WithValidRequest_IsOk() throws Exception {
         // given
-        final String REQUEST_ID = "abcdefghijklmnop";
-        final String REQUEST_ID_ENCODED = PasswordEncoder.encode(REQUEST_ID, "password_reset");
+        final String requestId = "abcdefghijklmnop";
+        final String requestIdEncoded = PasswordEncoder.encode(requestId, "password_reset");
         PasswordResetRequest resetRequest = new PasswordResetRequest();
         resetRequest.setRequestTime(LocalDateTime.now());
-        resetRequest.setId(REQUEST_ID_ENCODED);
-        resetRequest.setUser(TESTUSER.setId(testUserId));
+        resetRequest.setId(requestIdEncoded);
+        resetRequest.setUser(testuser.setId(testUserId));
         passwordResetRequestRepository.save(resetRequest);
 
         // when
@@ -453,7 +453,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
         ResetPasswordDto resetDto = new ResetPasswordDto();
-        resetDto.setResetId(REQUEST_ID);
+        resetDto.setResetId(requestId);
         resetDto.setNewPassword("newPassword");
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/password_reset")
                 .content((new ObjectMapper()).writeValueAsString(resetDto))
@@ -466,18 +466,18 @@ public class AuthenticationEndpointTest {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
 
         ApplicationUser updatedUser = userRepository.getReferenceById(testUserId);
-        assertEquals(PasswordEncoder.encode("newPassword", TESTUSER.getEmail()), updatedUser.getPasswordEncoded());
+        assertEquals(PasswordEncoder.encode("newPassword", testuser.getEmail()), updatedUser.getPasswordEncoded());
     }
 
     @Test
-    void testPasswordReset_WithInvalidRequestID_IsNotFound() throws Exception {
+    void testPasswordReset_WithInvalidRequestId_IsNotFound() throws Exception {
         // given
-        final String REQUEST_ID = "abcdefghijklmnop";
-        final String REQUEST_ID_ENCODED = PasswordEncoder.encode(REQUEST_ID, "password_reset");
+        final String requestId = "abcdefghijklmnop";
+        final String requestIdEncoded = PasswordEncoder.encode(requestId, "password_reset");
         PasswordResetRequest resetRequest = new PasswordResetRequest();
         resetRequest.setRequestTime(LocalDateTime.now());
-        resetRequest.setId(REQUEST_ID_ENCODED);
-        resetRequest.setUser(TESTUSER.setId(testUserId));
+        resetRequest.setId(requestIdEncoded);
+        resetRequest.setUser(testuser.setId(testUserId));
         passwordResetRequestRepository.save(resetRequest);
 
         // when
@@ -502,12 +502,12 @@ public class AuthenticationEndpointTest {
     @Test
     void testPasswordReset_WithExpiredDate_IsUnauthorized() throws Exception {
         // given
-        final String REQUEST_ID = "abcdefghijklmnop";
-        final String REQUEST_ID_ENCODED = PasswordEncoder.encode(REQUEST_ID, "password_reset");
+        final String requestId = "abcdefghijklmnop";
+        final String requestIdEncoded = PasswordEncoder.encode(requestId, "password_reset");
         PasswordResetRequest resetRequest = new PasswordResetRequest();
         resetRequest.setRequestTime(LocalDateTime.now().minusDays(10));
-        resetRequest.setId(REQUEST_ID_ENCODED);
-        resetRequest.setUser(TESTUSER.setId(testUserId));
+        resetRequest.setId(requestIdEncoded);
+        resetRequest.setUser(testuser.setId(testUserId));
         passwordResetRequestRepository.save(resetRequest);
 
         // when
@@ -516,7 +516,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
         ResetPasswordDto resetDto = new ResetPasswordDto();
-        resetDto.setResetId(REQUEST_ID);
+        resetDto.setResetId(requestId);
         resetDto.setNewPassword("newPassword");
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/password_reset")
                 .content((new ObjectMapper()).writeValueAsString(resetDto))
