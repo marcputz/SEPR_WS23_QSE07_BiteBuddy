@@ -8,11 +8,9 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -67,8 +65,8 @@ public class MenuPlanValidator {
                 if (c.getMenuplan() == null) {
                     validationErrors.add("Content (Day: " + c.getDayIdx() + " / Timeslot: " + c.getTimeslot() + " has NULL as MenuPlan value");
                 } else {
-                    long mId = c.getMenuplan().getId();
-                    if (mId != menuplan.getId()) {
+                    long menuplanId = c.getMenuplan().getId();
+                    if (menuplanId != menuplan.getId()) {
                         validationErrors.add("Content (Day: " + c.getDayIdx() + " / Timeslot: " + c.getTimeslot() + " has wrong MenuPlan value set");
                     }
                 }

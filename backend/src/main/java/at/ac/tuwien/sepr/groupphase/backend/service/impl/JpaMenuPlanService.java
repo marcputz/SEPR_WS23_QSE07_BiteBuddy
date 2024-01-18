@@ -18,16 +18,12 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
-import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.JDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.awt.*;
 import java.lang.invoke.MethodHandles;
-import java.security.InvalidParameterException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashSet;
