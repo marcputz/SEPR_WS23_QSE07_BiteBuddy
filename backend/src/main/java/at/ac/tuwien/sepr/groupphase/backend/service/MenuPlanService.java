@@ -26,6 +26,16 @@ import java.util.Set;
 public interface MenuPlanService {
 
     /**
+     * Gets a menu plan entity by its ID.
+     *
+     * @param id the ID of the menu plan to get.
+     * @return the menu plan entity
+     * @throws NotFoundException if the entity couldn't be found in the data store.
+     * @author Marc Putz
+     */
+    MenuPlan getById(long id) throws NotFoundException;
+
+    /**
      * Gets a list of all MenuPlan entities associated with a User.
      *
      * @param user the user for which to get all menu plans for.

@@ -59,6 +59,16 @@ public class JpaMenuPlanService implements MenuPlanService {
     }
 
     @Override
+    public MenuPlan getById(long id) throws NotFoundException {
+        Optional<MenuPlan> dbVal = menuPlanRepository.findById(id);
+        if (dbVal.isEmpty()) {
+            throw new NotFoundException("MenuPlan with ID " + id + " could not be found in the data store.");
+        } else {
+            return dbVal.get();
+        }
+    }
+
+    @Override
     public List<MenuPlan> getAllMenuPlansOfUser(ApplicationUser user) {
         return menuPlanRepository.getAllByUser(user);
     }
