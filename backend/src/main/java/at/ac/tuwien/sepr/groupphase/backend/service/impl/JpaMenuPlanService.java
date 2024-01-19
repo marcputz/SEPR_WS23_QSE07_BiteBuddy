@@ -15,6 +15,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.InventoryIngredientService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
@@ -46,12 +47,15 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     private final RecipeService recipeService;
     private final MenuPlanRepository menuPlanRepository;
+    private final InventoryIngredientService inventoryIngredientService;
 
     @Autowired
-    public JpaMenuPlanService(MenuPlanRepository repository, RecipeService recipeService, MenuPlanValidator validator) {
+    public JpaMenuPlanService(MenuPlanRepository repository, RecipeService recipeService, MenuPlanValidator validator,
+                              InventoryIngredientService inventoryIngredientService) {
         this.validator = validator;
         this.menuPlanRepository = repository;
         this.recipeService = recipeService;
+        this.inventoryIngredientService = inventoryIngredientService;
     }
 
     @Override
@@ -84,6 +88,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         LocalDate fromDate = createDto.getFromTime();
         LocalDate untilDate = createDto.getUntilTime();
         // TODO: set profile defined in dto class
+        // TODO: fridge needs to be considered
         Profile profile = null;
         return generateMenuPlan(user, profile, fromDate, untilDate);
     }
@@ -93,7 +98,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         LOGGER.trace("generateMenuPlan({},{},{},{})", user, profile, from, until);
 
         // validate inputs
-        validator.validateForCreate(user, profile, from, until);
+        validator.validateForCreate(user, profile, from, until, null);
 
         // check if there are already existing menu plans in the specified timeframe
         List<MenuPlan> conflictingMenuPlans = this.getAllMenuPlansOfUserDuringTimeframe(user, from, until);
@@ -333,6 +338,11 @@ public class JpaMenuPlanService implements MenuPlanService {
     public MenuPlanContentDetailDto getContentOfMenuPlanByIdAsDetailDto(MenuPlanContentId contentId) throws IllegalArgumentException {
         MenuPlanContent content = this.getContentOfMenuPlanById(contentId);
         return content != null ? this.convertContentToDetailDto(content) : null;
+    }
+
+    @Override
+    public void addFridgeIngredientsToInventory(MenuPlan menuPlan, List<String> fridge) {
+        inventoryIngredientService.createFridge(menuPlan, fridge);
     }
 
     /* HELPER FUNCTIONS */

@@ -12,6 +12,42 @@
     <button (click)="onClickGenerate()">Generate Menu Plan</button>
   </form>
 
+  <!-- Adding ingredients -->
+  <div class="row mb-3">
+    <div class="col-3 mx-2">
+      <app-autocomplete
+        #ingredientInput
+        id="ingredients"
+        name="ingredients"
+        class="rounded-pill"
+        textInputClass="input"
+        valueNeedsToMatchSuggestion="true"
+        [(ngModel)]="ingredient"
+        [formatModel]="formatIngredient"
+        [suggestions]="ingredientSuggestions"
+      ></app-autocomplete>
+    </div>
+    <div class="col-3">
+      <button (click)="addIngredientToFridge(ingredientInput)" class="btn btn-success rounded-pill">
+        <i class="bi-plus-square"></i>
+        Add Ingredient</button>
+    </div>
+    <br>
+    <table *ngIf="createDto.fridge.length > 0">
+      <thead>
+      <tr>
+        <th>Name</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let ingredient of createDto.fridge">
+        <td>{{ingredient}}</td>
+      </tr>
+      </tbody>
+    </table>
+    <br>
+  </div>
+
   <br><br>
 
   <div *ngIf="generateRequest !== undefined">

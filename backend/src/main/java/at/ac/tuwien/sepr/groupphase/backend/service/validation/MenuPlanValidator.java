@@ -1,12 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validation;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
@@ -19,6 +23,8 @@ import java.util.Set;
 public class MenuPlanValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    @Autowired
+    private IngredientRepository ingredientRepository;
 
     public void validateForUpdate(MenuPlan menuplan) throws ValidationException {
         LOGGER.trace("validateForUpdate({})", menuplan);
@@ -91,9 +97,10 @@ public class MenuPlanValidator {
 
     }
 
-    public void validateForCreate(ApplicationUser user, Profile profile, LocalDate fromDate, LocalDate untilDate) throws ValidationException {
+    public void validateForCreate(ApplicationUser user, Profile profile, LocalDate fromDate, LocalDate untilDate, List<String> fridge) throws ValidationException, ConflictException {
         LOGGER.trace("validateForCreate({},{},{},{})", user, profile, fromDate, untilDate);
         List<String> validationErrors = new ArrayList<>();
+        List<String> conflictErrors = new ArrayList<>();
 
         // check if all values are not null
         if (user == null) {
@@ -120,8 +127,24 @@ public class MenuPlanValidator {
             }
         }
 
+        if (fridge != null && !fridge.isEmpty()) {
+            for (String ingredient : fridge) {
+                List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient);
+
+                if (queriedResults.isEmpty()) {
+                    conflictErrors.add("Ingredient " + ingredient + " does not exist");
+                }
+            }
+        } else {
+            LOGGER.debug("Fridge is ignored!");
+        }
+
         if (!validationErrors.isEmpty()) {
             throw new ValidationException("Validation of menu plan for create failed", validationErrors);
+        }
+
+        if (!conflictErrors.isEmpty()) {
+            throw new ConflictException("Creation of menu plan has conflict errors", conflictErrors);
         }
 
     }

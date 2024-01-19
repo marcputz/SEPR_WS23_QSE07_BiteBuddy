@@ -43,6 +43,11 @@ public class InventoryIngredientServiceImpl implements InventoryIngredientServic
     }
 
     @Override
+    public void createFridge(MenuPlan menuPlan, List<String> fridge) {
+
+    }
+
+    @Override
     public void createInventory(ApplicationUser user) {
         // MenuPlan menuPlan = this.menuPlanService.getMenuPlanForUserOnDate(user, LocalDate.now());
         MenuPlan menuPlan = null;

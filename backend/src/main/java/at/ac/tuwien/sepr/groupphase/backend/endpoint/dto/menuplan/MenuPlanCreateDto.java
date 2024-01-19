@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -20,6 +21,8 @@ public class MenuPlanCreateDto {
 
     @NotNull(message = "Until Time must not be null")
     private LocalDate untilTime;
+
+    private List<String> fridge;
 
     /* GETTER and SETTER */
 
@@ -47,6 +50,14 @@ public class MenuPlanCreateDto {
         this.untilTime = untilTime;
     }
 
+    public void setFridge(List<String> fridge) {
+        this.fridge = fridge;
+    }
+
+    public List<String> getFridge() {
+        return this.fridge;
+    }
+
     /* EQUALS and HASHCODE */
 
     @Override
@@ -58,12 +69,12 @@ public class MenuPlanCreateDto {
             return false;
         }
         MenuPlanCreateDto that = (MenuPlanCreateDto) o;
-        return Objects.equals(profileId, that.profileId) && Objects.equals(fromTime, that.fromTime) && Objects.equals(untilTime, that.untilTime);
+        return Objects.equals(profileId, that.profileId) && Objects.equals(fromTime, that.fromTime) && Objects.equals(untilTime, that.untilTime) && Objects.equals(fridge, that.fridge);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(profileId, fromTime, untilTime);
+        return Objects.hash(profileId, fromTime, untilTime, fridge);
     }
 
     /* TO_STRING */
@@ -74,6 +85,7 @@ public class MenuPlanCreateDto {
             + "profileId=" + profileId
             + ", fromTime=" + fromTime
             + ", untilTime=" + untilTime
+            + ", fridge=" + fridge
             + '}';
     }
 }

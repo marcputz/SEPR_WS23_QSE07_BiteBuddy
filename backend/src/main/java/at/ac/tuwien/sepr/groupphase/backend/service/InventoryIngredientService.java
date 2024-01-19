@@ -3,12 +3,22 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 
 import java.util.List;
 
 public interface InventoryIngredientService {
+
+    /**
+     * Creates the fridge for the menu plan.
+     *
+     * @param menuPlan needs to have valid id, everything else is irrelevant.
+     * @param fridge   List of Ingredients which we add to the fridge.
+     */
+    void createFridge(MenuPlan menuPlan, List<String> fridge);
+
     /**
      * Checks the MenuPlan for running recipes and adds all the ingredients to the inventory.
      * Only creates the inventory for running MenuPlans, not outdated ones!

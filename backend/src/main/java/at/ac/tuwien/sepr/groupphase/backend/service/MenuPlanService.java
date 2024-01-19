@@ -12,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -45,8 +46,8 @@ public interface MenuPlanService {
     /**
      * Gets a list of all MenuPlan entities associated with a user during a specified timeframe.
      *
-     * @param user the user for which to get menu plans for.
-     * @param from the start date to filter menu plans. All menu plans ending on or after this date will be included.
+     * @param user  the user for which to get menu plans for.
+     * @param from  the start date to filter menu plans. All menu plans ending on or after this date will be included.
      * @param until the end date to filter menu plans. All menu plans starting on or before this date will be included.
      * @return a list of menu plans, can be empty if no menu plans match the criteria.
      * @author Marc Putz
@@ -67,27 +68,28 @@ public interface MenuPlanService {
      * Generates a new menu plan for a user using the specified profile and timeframe and saves it to the data store.
      * Only one menu plan can be valid for a specific timeframe, otherwise a {@link ConflictException} may be thrown.
      *
-     * @param user the user for which to create a new menu plan for.
+     * @param user    the user for which to create a new menu plan for.
      * @param profile the profile to use for generating the menu plan.
-     * @param from the start time for this menu plan to be valid (inclusive).
-     * @param until the end time for this menu plan to be valid (inclusive).
+     * @param from    the start time for this menu plan to be valid (inclusive).
+     * @param until   the end time for this menu plan to be valid (inclusive).
      * @return the generated menu plan as a detail dto
-     * @throws DataStoreException if the data store is unable to process the new entity.
-     * @throws ConflictException if the new entity is in conflict with the current state of the data store (e.g. another menu plan already exists during the specified timeframe).
+     * @throws DataStoreException  if the data store is unable to process the new entity.
+     * @throws ConflictException   if the new entity is in conflict with the current state of the data store (e.g. another menu plan already exists during the specified timeframe).
      * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan generation.
      * @author Marc Putz
      */
-    MenuPlanDetailDto generateMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until) throws DataStoreException, ConflictException, ValidationException;
+    MenuPlanDetailDto generateMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until)
+        throws DataStoreException, ConflictException, ValidationException;
 
     /**
      * Generates a new menu plan for a user using the data specified in the MenuPlanCreateDto and saves it to the data store.
      * Only one menu plan can be valid for a specific timefame, otherwise a {@link ConflictException} may be thrown.
      *
-     * @param user the user for which to create a new menu plan for.
+     * @param user      the user for which to create a new menu plan for.
      * @param createDto the creation dto containing menu plan creation data.
      * @return the generated menu plan as a detail dto.
-     * @throws DataStoreException if the data store is unable to process the new entity.
-     * @throws ConflictException if the new entity is in conflict with the current state of the data store.
+     * @throws DataStoreException  if the data store is unable to process the new entity.
+     * @throws ConflictException   if the new entity is in conflict with the current state of the data store.
      * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan generation.
      * @author Marc Putz
      */
@@ -116,9 +118,9 @@ public interface MenuPlanService {
      *
      * @param toUpdate the menu plan to update.
      * @return the updated menu plan entity.
-     * @throws DataStoreException if the data store is unable to process the request.
+     * @throws DataStoreException  if the data store is unable to process the request.
      * @throws ValidationException if the data in the entity is invalid
-     * @throws ConflictException if the updated entity is in conflict with the current state of the data store (e.g. there's another menu plan active during the same timeframe)
+     * @throws ConflictException   if the updated entity is in conflict with the current state of the data store (e.g. there's another menu plan active during the same timeframe)
      * @author Marc Putz
      */
     MenuPlanDetailDto updateMenuPlan(MenuPlan toUpdate) throws DataStoreException, ValidationException, ConflictException;
@@ -167,9 +169,9 @@ public interface MenuPlanService {
      * Gets a list of all recipes in a menu plan on a specified day.
      *
      * @param plan the menu plan to get contents of.
-     * @param day the day for which to get contents of. (0 = first day, 1 = second day, etc.)
+     * @param day  the day for which to get contents of. (0 = first day, 1 = second day, etc.)
      * @return a set of menu plan contents on the specified day. Can be empty if menu plan has no contents on that day.
-     * @throws NotFoundException if the menu plan specified in the argument list could not be found in the data store.
+     * @throws NotFoundException        if the menu plan specified in the argument list could not be found in the data store.
      * @throws IllegalArgumentException if the specified day is not within range of the menu plan (e.g. menu plan has 7 days, day = 10 would be invalid)
      * @author Marc Putz
      */
@@ -179,9 +181,9 @@ public interface MenuPlanService {
      * Gets a list of all recipes in a menu plan on a specified day as their corresponding detail DTOs.
      *
      * @param plan the menu plan to get contents of.
-     * @param day the day for which to get contents of. (0 = first day, 1 = second day, etc.)
+     * @param day  the day for which to get contents of. (0 = first day, 1 = second day, etc.)
      * @return a set of menu plan content detail DTOs on the specified day. Can be empty if menu plan has no contents on that day.
-     * @throws NotFoundException if the menu plan specified in the argument list could not be found in the data store.
+     * @throws NotFoundException        if the menu plan specified in the argument list could not be found in the data store.
      * @throws IllegalArgumentException if the specified day is not within range of the menu plan (e.g. menu plan has 7 days, day = 10 would be invalid)
      * @author Marc Putz
      */
@@ -190,11 +192,11 @@ public interface MenuPlanService {
     /**
      * Gets the content of a menu plan by day and timeslot.
      *
-     * @param plan the menu plan to get the content of.
-     * @param day the day for which to get content of. (0 = first day, 1 = second day, etc.)
+     * @param plan     the menu plan to get the content of.
+     * @param day      the day for which to get content of. (0 = first day, 1 = second day, etc.)
      * @param timeslot the timeslot of the day to get content of (0 = first slot, 1 = second slot, etc.)
      * @return the menu plan content specified on the given day and timeslot. Can be NULL if no content is specified.
-     * @throws NotFoundException if the menu plan specified in the argument list could not be found in the data store.
+     * @throws NotFoundException        if the menu plan specified in the argument list could not be found in the data store.
      * @throws IllegalArgumentException if the specified day is not within range of the menu plan (e.g. menu plan has 7 days, day = 10 would be invalid)
      * @author Marc Putz
      */
@@ -203,22 +205,23 @@ public interface MenuPlanService {
     /**
      * Gets the content of a menu plan by day and timeslot as its corresponding detail DTO.
      *
-     * @param plan the menu plan to get the content of.
-     * @param day the day for which to get content of. (0 = first day, 1 = second day, etc.)
+     * @param plan     the menu plan to get the content of.
+     * @param day      the day for which to get content of. (0 = first day, 1 = second day, etc.)
      * @param timeslot the timeslot of the day to get content of (0 = first slot, 1 = second slot, etc.)
      * @return the menu plan content detail DTO specified on the given day and timeslot. Can be NULL if no content is specified.
-     * @throws NotFoundException if the menu plan specified in the argument list could not be found in the data store.
+     * @throws NotFoundException        if the menu plan specified in the argument list could not be found in the data store.
      * @throws IllegalArgumentException if the specified day is not within range of the menu plan (e.g. menu plan has 7 days, day = 10 would be invalid)
      * @author Marc Putz
      */
-    MenuPlanContentDetailDto getContentOfMenuPlanOnDayAndTimeslotAsDetailDto(MenuPlan plan, int day, int timeslot) throws NotFoundException, IllegalArgumentException;
+    MenuPlanContentDetailDto getContentOfMenuPlanOnDayAndTimeslotAsDetailDto(MenuPlan plan, int day, int timeslot)
+        throws NotFoundException, IllegalArgumentException;
 
     /**
      * Gets the content of a menu plan by its ID class.
      *
      * @param contentId the ID class of the menu plan content containing the search parameters.
      * @return the menu plan content specified by the ID object. Can be NULL if no content is specified.
-     * @throws NotFoundException if the menu plan specified in the ID object could not be found in the data store.
+     * @throws NotFoundException        if the menu plan specified in the ID object could not be found in the data store.
      * @throws IllegalArgumentException if parameters in ID object are not within range of the menu plan (e.g. too many days, invalid timeslot, etc.)
      * @author Marc Putz
      */
@@ -229,9 +232,17 @@ public interface MenuPlanService {
      *
      * @param contentId the ID class of the menu plan content containing the search parameters.
      * @return the menu plan content detail DTO specified by the ID object. Can be NULL if no content is specified.
-     * @throws NotFoundException if the menu plan specified in the ID object could not be found in the data store.
+     * @throws NotFoundException        if the menu plan specified in the ID object could not be found in the data store.
      * @throws IllegalArgumentException if parameters in ID object are not within range of the menu plan (e.g. too many days, invalid timeslot, etc.)
      * @author Marc Putz
      */
     MenuPlanContentDetailDto getContentOfMenuPlanByIdAsDetailDto(MenuPlanContentId contentId) throws NotFoundException, IllegalArgumentException;
+
+    /**
+     * Adds the fridge to the ingredient inventory for the specific menu plan.
+     *
+     * @param menuPlan with the correct id for which the fridge is for.
+     * @param fridge   List of names of ingredients the fridge contains.
+     */
+    void addFridgeIngredientsToInventory(MenuPlan menuPlan, List<String> fridge);
 }

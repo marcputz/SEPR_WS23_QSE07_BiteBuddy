@@ -5,6 +5,8 @@ import {DatePipe} from "@angular/common";
 import {MenuPlanService} from "../../services/menuplan.service";
 import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
+import {RecipeService} from "../../services/recipe.service";
+import {of} from "rxjs";
 
 @Component({
   selector: 'app-menu-plan',
@@ -19,7 +21,15 @@ export class MenuPlanComponent implements OnInit {
   protected fromDate: string | null = "2024-01-17";
   protected untilDate: string | null = "2024-01-23";
 
-  constructor(private menuPlanService: MenuPlanService, private profileService: ProfileService, private datePipe: DatePipe, protected router: Router, protected notifications: ToastrService) {
+  createDto: MenuPlanCreateDto = {
+    profileId: 0,
+    fromTime: this.fromDate,
+    untilTime: this.untilDate,
+    fridge: []
+  }
+  ingredient: string = '';
+
+  constructor(private menuPlanService: MenuPlanService, private profileService: ProfileService, private datePipe: DatePipe, protected router: Router, protected notifications: ToastrService, private recipeService: RecipeService) {
   }
 
   ngOnInit() {
@@ -33,15 +43,12 @@ export class MenuPlanComponent implements OnInit {
     let fromDate = this.fromDate;
     let untilDate = this.untilDate;
 
-    let createDto: MenuPlanCreateDto = {
-      profileId: 0,
-      fromTime: fromDate,
-      untilTime: untilDate,
-    }
+    this.createDto.fromTime = fromDate;
+    this.createDto.untilTime = untilDate;
 
-    this.generateRequest = JSON.stringify(createDto);
+    this.generateRequest = JSON.stringify(this.createDto);
 
-    this.menuPlanService.generateMenuPlan(createDto).subscribe(
+    this.menuPlanService.generateMenuPlan(this.createDto).subscribe(
       data => {
         this.generateResponse = JSON.stringify(data);
       },
@@ -66,6 +73,17 @@ export class MenuPlanComponent implements OnInit {
         }
       }
     )
-
   }
+
+  addIngredientToFridge(ingredient) {
+    this.createDto.fridge.push(ingredient.value)
+  }
+
+  formatIngredient(ingredient: String | null) {
+    return ingredient ?? '';
+  }
+
+  ingredientSuggestions = (input: string) => (input === '')
+    ? of([])
+    : this.recipeService.searchRecipeIngredientsMatching(input);
 }
