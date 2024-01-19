@@ -28,6 +28,7 @@ import { RecipeCreateComponent } from './components/recipe-create/recipe-create.
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 import { ProfileComponent } from './components/dialogs/profile/profile.component';
 import { MenuPlanComponent } from './components/menu-plan/menu-plan.component';
+import { InventoryComponent } from './components/inventory/inventory.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { MenuPlanComponent } from './components/menu-plan/menu-plan.component';
     AutocompleteComponent,
     ProfileComponent,
     MenuPlanComponent,
+    InventoryComponent,
   ],
   imports: [
     BrowserModule,

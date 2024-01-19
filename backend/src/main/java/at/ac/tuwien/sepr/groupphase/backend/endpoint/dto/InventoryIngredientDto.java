@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
@@ -9,6 +10,9 @@ public class InventoryIngredientDto {
     private Long id;
 
     @NotNull
+    private String name;
+
+    @NotNull
     private Long menuPlanId;
 
     @NotNull
@@ -16,18 +20,30 @@ public class InventoryIngredientDto {
 
     @NotNull
     private float amount;
+    private FoodUnit unit;
 
     private boolean inventoryStatus;
 
-    public InventoryIngredientDto(Long id, Long menuPlanId, long ingredientId, float amount, boolean inventoryStatus) {
+    public InventoryIngredientDto(Long id, String name, Long menuPlanId, long ingredientId, float amount, FoodUnit unit, boolean inventoryStatus) {
         this.id = id;
+        this.name = name;
         this.menuPlanId = menuPlanId;
         this.ingredientId = ingredientId;
         this.amount = amount;
+        this.unit = unit;
         this.inventoryStatus = inventoryStatus;
     }
 
     public InventoryIngredientDto() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public InventoryIngredientDto setName(String name) {
+        this.name = name;
+        return this;
     }
 
     public Long getId() {
@@ -63,6 +79,15 @@ public class InventoryIngredientDto {
 
     public InventoryIngredientDto setAmount(float amount) {
         this.amount = amount;
+        return this;
+    }
+
+    public FoodUnit getUnit() {
+        return unit;
+    }
+
+    public InventoryIngredientDto setUnit(FoodUnit unit) {
+        this.unit = unit;
         return this;
     }
 

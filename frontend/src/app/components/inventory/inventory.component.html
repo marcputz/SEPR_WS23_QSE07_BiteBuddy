@@ -1,0 +1,60 @@
+<h1>Inventory Test Frontend</h1>
+
+<button (click)="createInventory()">Create Inventory</button>
+<button (click)="getInventory()">Load Inventory</button>
+
+<div class="container-fluid">
+  <div class="row mx-2">
+    <div class="col-lg-auto">
+      <!-- Table of ingredients which are not already bought -->
+      <!-- TODO Maybe use 2 cols, otherwise the list is very long ... -->
+      <div class="card">
+        <div class="card-header mx-2">
+          <b style="text-align: center">Missing for recipes</b>
+        </div>
+        <div class="card-body">
+          <table *ngIf="inventory.missing.length > 0">
+            <thead>
+            <tr>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let inv of inventory.missing" class="center-td">
+              <td><i *ngIf="inv.inventoryStatus === false" class="bi bi-square mx-2" (click)="markAsChecked(inv)"></i>
+              </td>
+              <td>{{formatInventoryIngredient(inv)}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-auto">
+      <!-- Table of ingredients which are already bought -->
+      <div *ngIf="inventory.available.length > 0" class="card">
+        <div class="card-header">
+          <b>Already bought for recipes</b>
+        </div>
+        <div class="card-body">
+          <table>
+            <thead>
+            <tr>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let inv of inventory.available" class="center-td">
+              <td><i *ngIf="inv.inventoryStatus === true" class="bi bi-check-square mx-2"
+                     (click)="markAsUnchecked(inv)"></i>
+              </td>
+              <td>{{formatInventoryIngredient(inv)}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

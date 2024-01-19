@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -21,17 +22,17 @@ public interface InventoryIngredientService {
      *
      * @param user      for which we want to get the inventory.
      * @param onlyValid if true we only look at the inventory for the MenuPlan which is still running. If false we return the whole inventory over all MenuPlans.
-     * @return list of the inventory.
+     * @return list of the inventory split into missing and available ingredients.
      */
-    List<InventoryIngredientDto> searchInventory(ApplicationUser user, boolean onlyValid);
+    InventoryListDto searchInventory(ApplicationUser user, boolean onlyValid);
 
     /**
      * Returns the inventory for a specific MenuPlan.
      *
      * @param menuPlanId id of the MenuPlan which we want to lookup.
-     * @return list of all matching inventory ingredients used in the specific MenuPlan.
+     * @return list of the inventory split into missing and available ingredients used in the specific MenuPlan.
      */
-    List<InventoryIngredientDto> searchInventory(Long menuPlanId);
+    InventoryListDto searchInventory(Long menuPlanId);
 
     /**
      * Updates a single inventory ingredient.

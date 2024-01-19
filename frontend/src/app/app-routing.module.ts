@@ -18,6 +18,7 @@ import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
 import {MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
+import {InventoryComponent} from "./components/inventory/inventory.component";
 
 const routes: Routes = [
   //{path: '', component: HomeComponent},
@@ -45,6 +46,7 @@ const routes: Routes = [
       {path: ':id', component: RecipeDetailComponent},
   ]},
   {path: 'menuplan', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent},
+  {path: 'inventory', canActivate: mapToCanActivate([AuthGuard]), component: InventoryComponent},
 ];
 
 @NgModule({

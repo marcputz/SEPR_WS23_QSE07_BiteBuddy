@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
 import java.util.Objects;
 
 @Entity
@@ -14,16 +15,38 @@ public class InventoryIngredient {
     private Long id;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private Long menuPlanId;
 
     @Column(nullable = false)
     private Long ingredientId;
 
     @Column(nullable = false)
-    private float amount;
+    private Float amount;
+
+    @Column(nullable = true)
+    private FoodUnit unit;
 
     @Column(nullable = false)
     private boolean inventoryStatus;
+
+    public InventoryIngredient() {
+    }
+
+    public InventoryIngredient(String name, Long menuPlanId, Long ingredientId, float amount, FoodUnit unit, boolean inventoryStatus) {
+        this.name = name;
+        this.menuPlanId = menuPlanId;
+        this.ingredientId = ingredientId;
+        this.amount = amount;
+        this.unit = unit;
+        this.inventoryStatus = inventoryStatus;
+    }
+
+    public Long getId() {
+        return id;
+    }
 
     public Long getMenuPlanId() {
         return menuPlanId;
@@ -43,7 +66,7 @@ public class InventoryIngredient {
         return this;
     }
 
-    public float getAmount() {
+    public Float getAmount() {
         return amount;
     }
 
@@ -52,8 +75,17 @@ public class InventoryIngredient {
         return this;
     }
 
-    public boolean isInventoryStatus() {
+    public boolean getInventoryStatus() {
         return inventoryStatus;
+    }
+
+    public FoodUnit getUnit() {
+        return unit;
+    }
+
+    public InventoryIngredient setUnit(FoodUnit unit) {
+        this.unit = unit;
+        return this;
     }
 
     public InventoryIngredient setInventoryStatus(boolean inventoryStatus) {
@@ -78,6 +110,15 @@ public class InventoryIngredient {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuPlanId, ingredientId, amount, inventoryStatus);
+        return Objects.hash(id, menuPlanId, ingredientId, amount);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public InventoryIngredient setName(String name) {
+        this.name = name;
+        return this;
     }
 }
