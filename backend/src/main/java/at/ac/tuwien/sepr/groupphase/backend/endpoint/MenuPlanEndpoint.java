@@ -55,8 +55,10 @@ public class MenuPlanEndpoint {
             Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
             ApplicationUser thisUser = this.userService.getUserById(thisUserId);
 
-            // generate menu plan
-            return this.service.generateMenuPlan(thisUser, dto);
+            // generate menu plan // TODO: insert profile from dto
+            MenuPlan newPlan = this.service.createEmptyMenuPlan(thisUser, null, dto.getFromTime(), dto.getUntilTime());
+            // TODO: save fridge to menu plan
+            return this.service.generateContent(newPlan);
 
         } catch (UserNotFoundException e) {
             // this should not happen as the authService verifies the logged-in user

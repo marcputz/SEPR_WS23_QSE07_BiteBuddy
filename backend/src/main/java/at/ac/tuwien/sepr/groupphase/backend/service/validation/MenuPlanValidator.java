@@ -97,7 +97,7 @@ public class MenuPlanValidator {
 
     }
 
-    public void validateForCreate(ApplicationUser user, Profile profile, LocalDate fromDate, LocalDate untilDate, List<String> fridge) throws ValidationException, ConflictException {
+    public void validateForCreate(ApplicationUser user, Profile profile, LocalDate fromDate, LocalDate untilDate) throws ValidationException, ConflictException {
         LOGGER.trace("validateForCreate({},{},{},{})", user, profile, fromDate, untilDate);
         List<String> validationErrors = new ArrayList<>();
         List<String> conflictErrors = new ArrayList<>();
@@ -127,7 +127,7 @@ public class MenuPlanValidator {
             }
         }
 
-        if (fridge != null && !fridge.isEmpty()) {
+        /*if (fridge != null && !fridge.isEmpty()) {
             for (String ingredient : fridge) {
                 List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient);
 
@@ -137,7 +137,7 @@ public class MenuPlanValidator {
             }
         } else {
             LOGGER.debug("Fridge is ignored!");
-        }
+        }*/
 
         if (!validationErrors.isEmpty()) {
             throw new ValidationException("Validation of menu plan for create failed", validationErrors);
@@ -148,4 +148,6 @@ public class MenuPlanValidator {
         }
 
     }
+
+
 }

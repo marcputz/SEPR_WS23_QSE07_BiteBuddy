@@ -65,35 +65,32 @@ public interface MenuPlanService {
     MenuPlan getMenuPlanForUserOnDate(ApplicationUser user, LocalDate date);
 
     /**
-     * Generates a new menu plan for a user using the specified profile and timeframe and saves it to the data store.
-     * Only one menu plan can be valid for a specific timeframe, otherwise a {@link ConflictException} may be thrown.
+     * Generates contents for a menu plan and stores them in the data store.
+     * If there is already content stored in the menu plan, it will be erased and replaced with new content.
      *
-     * @param user    the user for which to create a new menu plan for.
-     * @param profile the profile to use for generating the menu plan.
-     * @param from    the start time for this menu plan to be valid (inclusive).
-     * @param until   the end time for this menu plan to be valid (inclusive).
-     * @return the generated menu plan as a detail dto
-     * @throws DataStoreException  if the data store is unable to process the new entity.
-     * @throws ConflictException   if the new entity is in conflict with the current state of the data store (e.g. another menu plan already exists during the specified timeframe).
-     * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan generation.
-     * @author Marc Putz
+     * @param plan the menu plan to fill with content
+     * @return the menu plan with generated contents as a detail DTO object.
+     * @throws DataStoreException if the data store is unable to process the new entity.
+     * @throws ConflictException if the current state of the data store does not allow generating content (e.g. not enough recipes available).
      */
-    MenuPlanDetailDto generateMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until)
-        throws DataStoreException, ConflictException, ValidationException;
+    MenuPlanDetailDto generateContent(MenuPlan plan) throws DataStoreException, ConflictException;
 
     /**
-     * Generates a new menu plan for a user using the data specified in the MenuPlanCreateDto and saves it to the data store.
-     * Only one menu plan can be valid for a specific timefame, otherwise a {@link ConflictException} may be thrown.
+     * Creates a new menu plan entity in the data store.
+     * The created menu plan will have no contents yet, these can be generated with the {@code generateContent} function.
+     * Only one menu plan can be created for a specific timeframe, otherwise a {@link ConflictException} will be thrown.
      *
-     * @param user      the user for which to create a new menu plan for.
-     * @param createDto the creation dto containing menu plan creation data.
-     * @return the generated menu plan as a detail dto.
-     * @throws DataStoreException  if the data store is unable to process the new entity.
-     * @throws ConflictException   if the new entity is in conflict with the current state of the data store.
-     * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan generation.
-     * @author Marc Putz
+     * @param user the user for which to create a new menu plan for.
+     * @param profile the profile to use for creating the menu plan.
+     * @param from the start time for this menu plan to be valid (inclusive).
+     * @param until the end time for this menu plan to be valid (inclusive).
+     * @return the created (empty) menu plan entity.
+     * @throws DataStoreException if the data store is unable to process the new entity.
+     * @throws ConflictException if the new entity is in conflict with the current state of the data store (e.g. another menu plan is already defined during the specified timeframe).
+     * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan creation.
      */
-    MenuPlanDetailDto generateMenuPlan(ApplicationUser user, MenuPlanCreateDto createDto) throws DataStoreException, ConflictException, ValidationException;
+    MenuPlan createEmptyMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until)
+        throws DataStoreException, ConflictException, ValidationException;
 
     /**
      * Deletes a menu plan from the data store. If the entity doesn't exist, this method does nothing.

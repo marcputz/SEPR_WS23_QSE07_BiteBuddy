@@ -2,9 +2,9 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -84,112 +85,102 @@ public class JpaMenuPlanService implements MenuPlanService {
     }
 
     @Override
-    public MenuPlanDetailDto generateMenuPlan(ApplicationUser user, MenuPlanCreateDto createDto) throws DataStoreException, ConflictException, ValidationException {
-        LocalDate fromDate = createDto.getFromTime();
-        LocalDate untilDate = createDto.getUntilTime();
-        // TODO: set profile defined in dto class
-        // TODO: fridge needs to be considered
-        Profile profile = null;
-        return generateMenuPlan(user, profile, fromDate, untilDate);
-    }
+    public MenuPlanDetailDto generateContent(MenuPlan plan) throws DataStoreException, ConflictException {
+        LOGGER.trace("generateContent({})", plan);
 
-    @Override
-    public MenuPlanDetailDto generateMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until) throws DataStoreException, ConflictException, ValidationException {
-        LOGGER.trace("generateMenuPlan({},{},{},{})", user, profile, from, until);
-
-        // validate inputs
-        validator.validateForCreate(user, profile, from, until, null);
-
-        // check if there are already existing menu plans in the specified timeframe
-        List<MenuPlan> conflictingMenuPlans = this.getAllMenuPlansOfUserDuringTimeframe(user, from, until);
-        if (!conflictingMenuPlans.isEmpty()) {
-            throw new ConflictException("New Menu Plan would conflict with the current system state", List.of("There is already a menu plan active during the specified timeframe"));
+        // make sure plan parameter is not NULL
+        if (plan == null) {
+            throw new IllegalArgumentException("MenuPlan parameter cannot be NULL value");
         }
 
-        // select recipes
-        // TODO: filter according to profile
+        // get fridge contents
+        List<Long> fridgeIngredientsIds = new ArrayList<>(); // TODO: insert command here
+        List<Ingredient> fridgeIngredients = new ArrayList<>();
+        for (Long ingredientId : fridgeIngredientsIds) {
+            // TODO: get ingredient object by ID and add to fridgeIngredients list
+        }
+
+        // define content sets
         Set<MenuPlanContent> contents = new HashSet<>();
         Set<MenuPlanContentDetailDto> contentDtos = new HashSet<>();
 
-        Set<Long> usedIds = new HashSet<>();
+        // get available recipes from data store
+        List<Recipe> availableRecipes = new ArrayList<>(); // TODO: replace with this - this.recipeService.getRecipesForIngredients(ingredients);
 
-        long highestId = recipeService.getHighestRecipeId();
-        long lowestId = recipeService.getLowestRecipeId();
-
-        int numDays = (int) Duration.between(from.atStartOfDay(), until.atStartOfDay()).toDays() + 1;
+        // select recipes from list and populate content lists
+        int numDays = (int) Duration.between(plan.getFromDate().atStartOfDay(), plan.getUntilDate().atStartOfDay()).toDays() + 1;
         final int timeslotsPerDay = 3; // TODO: make this changeable
-        for (int day = 0; day < numDays; day++) {
-            for (int timeslot = 0; timeslot < timeslotsPerDay; timeslot++) {
-                // generate random ID
-                long recipeId = ThreadLocalRandom.current().nextInt((int) lowestId, (int) highestId + 1);
+        if (!availableRecipes.isEmpty()) {
 
-                // make sure no ID is used twice
-                while (usedIds.contains(recipeId)) {
-                    recipeId++;
-                }
+            // set to keep track of already added recipes, so nothing is added twice
+            Set<Long> usedIds = new HashSet<>();
 
-                // find recipe in data store. if not available, try next id (stop after MAX_RETRIES tries)
-                Recipe recipe = null;
-                final int maxRetries = 30;
-                int retry = 0;
-                while (recipe == null && retry < maxRetries) {
-                    try {
-                        recipe = recipeService.getRecipeById(recipeId);
-                    } catch (NotFoundException e) {
-                        recipeId++;
-                        if (recipeId > highestId) {
-                            recipeId = lowestId;
+            for (int day = 0; day < numDays; day++) {
+                for (int timeslot = 0; timeslot < timeslotsPerDay; timeslot++) {
+
+                    // get random recipe from list
+                    Recipe r = null;
+                    final int maxRetries = 30;
+                    int retry = 0;
+                    while (r == null && retry < maxRetries) {
+                        // generate random index and get from list
+                        int recipeIdx = ThreadLocalRandom.current().nextInt(0, availableRecipes.size());
+                        r = availableRecipes.get(recipeIdx);
+
+                        // make sure no ID is used twice
+                        if (!usedIds.contains(r.getId())) {
+
+                            // TODO: further checks if recipe can be used, if not set r back to NULL
+
+                        } else {
+                            // recipe already used, reset to NULL
+                            r = null;
                         }
                         retry++;
                     }
+
+                    // check if a recipe was found
+                    if (r == null) {
+                        throw new ConflictException("Cannot generate menu plan", List.of("Menu Plan can not find enough content in data store"));
+                    }
+
+                    usedIds.add(r.getId());
+
+                    // create content entity and add to list
+                    MenuPlanContent content = new MenuPlanContent()
+                        .setRecipe(r)
+                        .setTimeslot(timeslot)
+                        .setDayIdx(day);
+                    contents.add(content);
+
+                    // create content detail dto
+                    MenuPlanContentDetailDto contentDto = new MenuPlanContentDetailDto()
+                        .setDay(day)
+                        .setTimeslot(timeslot)
+                        .setRecipe(new RecipeListDto(
+                            "",
+                            r.getName(),
+                            r.getId(),
+                            r.getPicture()
+                        ));
+                    contentDtos.add(contentDto);
+
                 }
 
-                // if no recipe after MAX_RETRIES could be found, throw error
-                if (recipe == null) {
-                    throw new ConflictException("Cannot generate menu plan", List.of("Menu Plan can not find enough content in data store"));
-                }
-
-                // add ID to set of used IDs, so it's not used again
-                usedIds.add(recipeId);
-
-                // create content entity and add to list
-                MenuPlanContent content = new MenuPlanContent()
-                    .setRecipe(recipe)
-                    .setTimeslot(timeslot)
-                    .setDayIdx(day);
-                contents.add(content);
-
-                // create content detail dto
-                MenuPlanContentDetailDto contentDto = new MenuPlanContentDetailDto()
-                    .setDay(day)
-                    .setTimeslot(timeslot)
-                    .setRecipe(new RecipeListDto(
-                        "",
-                        recipe.getName(),
-                        recipe.getId(),
-                        recipe.getPicture()
-                    ));
-                contentDtos.add(contentDto);
             }
         }
 
-        // create menu plan entity
-        MenuPlan menuPlan = new MenuPlan()
-            .setFromDate(from)
-            .setUntilDate(until)
-            .setUser(user)
-            .setProfile(profile);
-
-        // set relationships
+        // add contents to menu plan
         for (MenuPlanContent c : contents) {
-            menuPlan.addContent(c);
+            plan.addContent(c);
         }
 
         try {
-            // save menu plan to data store
-            MenuPlan savedPlan = menuPlanRepository.save(menuPlan);
 
-            // create detail dto
+            // save menu plan
+            MenuPlan savedPlan = this.menuPlanRepository.save(plan);
+
+            // create detail dto and return
             return new MenuPlanDetailDto()
                 .setUserId(savedPlan.getId())
                 .setUntilTime(savedPlan.getUntilDate())
@@ -202,9 +193,31 @@ public class JpaMenuPlanService implements MenuPlanService {
                     savedPlan.getUntilDate().atStartOfDay()
                 ).toDays() + 1)
                 .setContents(contentDtos);
+
         } catch (JDBCException e) {
             throw new DataStoreException(e.getErrorMessage(), e);
         }
+    }
+
+    @Override
+    public MenuPlan createEmptyMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until) throws DataStoreException, ConflictException, ValidationException {
+        LOGGER.trace("createEmptyMenuPlan({},{},{},{})", user, profile, from, until);
+
+        validator.validateForCreate(user, profile, from, until);
+
+        // check if there are already existing menu plans in the specified timeframe
+        List<MenuPlan> conflictingMenuPlans = this.getAllMenuPlansOfUserDuringTimeframe(user, from, until);
+        if (!conflictingMenuPlans.isEmpty()) {
+            throw new ConflictException("New Menu Plan would conflict with the current system state", List.of("There is already a menu plan active during the specified timeframe"));
+        }
+
+        MenuPlan menuPlan = new MenuPlan()
+            .setFromDate(from)
+            .setUntilDate(until)
+            .setUser(user)
+            .setProfile(profile);
+
+        return this.menuPlanRepository.save(menuPlan);
     }
 
     @Override
