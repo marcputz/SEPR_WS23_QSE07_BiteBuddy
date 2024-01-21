@@ -1,15 +1,36 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ProfileRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.ProfileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
@@ -28,11 +49,13 @@ public class ProfileServiceImpl implements ProfileService {
     private final IngredientRepository ingredientRepository;
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
+    private AllergeneMapper allergeneMapper;
+    private IngredientMapper ingredientMapper;
 
     public ProfileServiceImpl(ProfileRepository profileRepository, AllergeneRepository allergeneRepository,
                               ProfileMapper profileMapper, IngredientRepository ingredientRepository,
                               RecipeRepository recipeRepository, UserRepository userRepository,
-                              ProfileValidator profileValidator) {
+                              ProfileValidator profileValidator, AllergeneMapper allergeneMapper, IngredientMapper ingredientMapper) {
         this.profileRepository = profileRepository;
         this.allergeneRepository = allergeneRepository;
         this.ingredientRepository = ingredientRepository;
@@ -40,7 +63,55 @@ public class ProfileServiceImpl implements ProfileService {
         this.profileMapper = profileMapper;
         this.profileValidator = profileValidator;
         this.userRepository = userRepository;
+        this.allergeneMapper = allergeneMapper;
+        this.ingredientMapper = ingredientMapper;
     }
+
+    @Override
+    public ProfileSearchResultDto searchProfiles(ProfileSearchDto searchParams) {
+        LOGGER.debug("search profiles");
+
+        //Set Default values
+        String name = Optional.ofNullable(searchParams)
+            .map(ProfileSearchDto::name)
+            .filter(str -> !str.trim().isEmpty())
+            .orElse("");
+        String creator = Optional.ofNullable(searchParams)
+            .map(ProfileSearchDto::creator)
+            .filter(str -> !str.trim().isEmpty())
+            .orElse("");
+        int pageSelector = Optional.ofNullable(searchParams)
+            .map(ProfileSearchDto::page)
+            .filter(page -> page >= 0)
+            .orElse(0);
+        int entriesPerPage = Optional.ofNullable(searchParams)
+            .map(ProfileSearchDto::entriesPerPage)
+            .filter(entries -> entries >= 21)
+            .orElse(21);
+        Long userId = Optional.ofNullable(searchParams)
+            .map(ProfileSearchDto::userId)
+            .filter(id -> id != 0)
+            .orElse(null);
+
+        Pageable page = PageRequest.of(pageSelector, entriesPerPage);
+        Page<Profile> profiles = creator.isEmpty()
+            ? profileRepository.findByNameContainingIgnoreCaseAndUserId(name, userId, page)
+            : profileRepository.findByNameContainingIgnoreCaseAndCreatorAndNotUserId(name, creator, userId, page);
+
+        List<ProfileListDto> profileDtos = profiles.getContent().stream()
+            .map(profile -> new ProfileListDto(
+                profile.getId(),
+                profile.getName(),
+                profile.getAllergens().stream().map(allergeneMapper::allergeneToAllergeneDto).toList(),
+                profile.getIngredient().stream().map(ingredientMapper::ingredientToIngredientDto).toList(),
+                profile.getUser().getId(),
+                profile.getUser().getNickname()
+            ))
+            .toList();
+
+        return new ProfileSearchResultDto(pageSelector, entriesPerPage, profiles.getTotalPages(), profileDtos);
+    }
+
 
     @Override
     public ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException {
@@ -95,7 +166,6 @@ public class ProfileServiceImpl implements ProfileService {
         ApplicationUser user = userRepository.getReferenceById(recipeRatingDto.userId());
         Profile ratingProfile = user.getActiveProfile();
         profileValidator.validateRating(recipeRatingDto.rating());
-
 
 
         if (recipeRatingDto.rating() == 0) {

@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -13,8 +15,14 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
 
@@ -30,11 +38,25 @@ public class ProfileEndpoint {
         this.profileService = profileService;
     }
 
+
+    @Operation(summary = "Search profiles", description = "Search for profiles based on given search criteria")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
+        @ApiResponse(responseCode = "400", description = "Invalid search criteria provided")
+    })
+    @GetMapping("/search")
+    public ProfileSearchResultDto searchProfiles(@Valid @RequestBody ProfileSearchDto searchParams) {
+        LOGGER.info("Received POST request for profile search on {}", BASE_PATH);
+        LOGGER.debug("Search parameters: {}", searchParams);
+
+        return profileService.searchProfiles(searchParams);
+    }
+
     @Operation(summary = "Create profile", description = "Profile fields should be valid")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created"),
         @ApiResponse(responseCode = "422", description = "Unable to process the data, because contains invalid data"),
-        @ApiResponse(responseCode = "400", description = "Illegal arguments in the request body") })
+        @ApiResponse(responseCode = "400", description = "Illegal arguments in the request body")})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProfileDto post(@Valid @RequestBody ProfileDto toCreateProfile) throws ValidationException {

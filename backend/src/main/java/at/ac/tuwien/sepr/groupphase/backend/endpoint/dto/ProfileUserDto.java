@@ -5,13 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.util.List;/**
-    * Data object transfer for Profile entity to send information through the network and between layers.
-    * To create java boilerplate code use lombok.
-    */
+import java.util.List;
+
+/**
+ * Data object transfer for Profile entity to send information through the network and between layers.
+ * To create java boilerplate code use lombok.
+ */
 
 public class ProfileUserDto {
-
+    @JsonProperty("id")
+    @NotNull(message = "Id must not be null")
+    private Long Id;
     @JsonProperty("name")
     @NotNull(message = "Name must not be null")
     @Size(max = 255, min = 1)
@@ -28,6 +32,14 @@ public class ProfileUserDto {
     @JsonProperty("user")
     @NotNull(message = "User id must not be null")
     private ApplicationUser user;
+
+    public Long getId() {
+        return Id;
+    }
+
+    public void setId(Long id) {
+        Id = id;
+    }
 
     public String getName() {
         return name;
@@ -75,8 +87,10 @@ public class ProfileUserDto {
         private String name;
         private List<AllergeneDto> allergens;
         private List<IngredientDto> ingredient;
+        private ApplicationUser user;
 
-        private ProfileDtoBuilder() {}
+        private ProfileDtoBuilder() {
+        }
 
         public static ProfileDtoBuilder aProfileDto() {
             return new ProfileDtoBuilder();
@@ -97,11 +111,17 @@ public class ProfileUserDto {
             return this;
         }
 
-        public ProfileDto build() {
-            ProfileDto profileDto = new ProfileDto();
+        public ProfileDtoBuilder withUser(ApplicationUser user) {
+            this.user = user;
+            return this;
+        }
+
+        public ProfileUserDto build() {
+            ProfileUserDto profileDto = new ProfileUserDto();
             profileDto.setName(name);
             profileDto.setAllergens(allergens);
             profileDto.setIngredient(ingredient);
+            profileDto.setUser(user);
             return profileDto;
         }
     }

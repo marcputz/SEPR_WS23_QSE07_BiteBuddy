@@ -104,6 +104,14 @@ public class ApplicationUser {
         return this;
     }
 
+    public List<Profile> getProfiles() {
+        return profiles;
+    }
+
+    public void setProfiles(List<Profile> profiles) {
+        this.profiles = profiles;
+    }
+
     public Profile getActiveProfile() {
         return activeProfile;
     }
