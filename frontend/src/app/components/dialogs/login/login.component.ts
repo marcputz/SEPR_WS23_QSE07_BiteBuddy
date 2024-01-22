@@ -20,6 +20,10 @@ export class LoginComponent implements OnInit {
   errorEmailNotFound: boolean = false;
   errorPasswordWrong: boolean = false;
 
+  isInputFocused: {[key: string]: boolean } = {};
+
+  loginError: boolean = false;
+
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
               private passwordEncoder: PasswordEncoder,
@@ -79,12 +83,14 @@ export class LoginComponent implements OnInit {
               // user does not exist
               console.warn("User does not exist");
               this.loginForm.controls['email'].setErrors({userNotFound: true});
+              this.loginError = true;
               break;
             }
             if (message.indexOf("Wrong Password") >= 0) {
               // password wrong error
               console.warn("Wrong password");
               this.loginForm.controls['password'].setErrors({wrongPassword: true});
+              this.loginError = true;
               break;
             }
             // other type of authentication error
@@ -98,6 +104,13 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.loginForm.get(attribute).value !== '';
   }
 
 }

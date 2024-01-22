@@ -8,6 +8,7 @@ import {AllergeneDto} from "../../../dtos/allergeneDto";
 import {IngredientDto} from "../../../dtos/ingredientDto";
 import {IngredientService} from "../../../services/ingredient.service";
 import {AllergensService} from "../../../services/allergens.service";
+import {AuthService} from "../../../services/auth.service";
 
 @Component({
   selector: 'app-profile',
@@ -16,9 +17,11 @@ import {AllergensService} from "../../../services/allergens.service";
 })
 export class ProfileComponent {
 
-  title: string = "Welcome at BiteBuddy!"
+  title: string = "Set up your Profile"
   subtitle1: string = "Before we start we need a few informations about you."
-  subtitle2: string = "Set up your profile and get started."
+
+  submitted = false;
+  isInputFocused: {[key: string]: boolean } = {};
 
   profile: ProfileDto = {} as ProfileDto;
   allergens: AllergeneDto[] = [];
@@ -36,7 +39,7 @@ export class ProfileComponent {
   ) {
       // Initialize the form in the constructor
       this.form = this.fb.group({
-          name: ['', Validators.required],
+          name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(255)]],
           allergens: [[], Validators.required],
           ingredient: [[], Validators.required],
       });
@@ -72,9 +75,9 @@ export class ProfileComponent {
 
   public onSubmit(): void {
         console.log('is form valid?', this.form.valid, this.form.value);
+        this.submitted = true;
         if (this.form.valid) {
             this.profile = this.form.value;
-            console.log(this.profile)
             this.service.create(this.profile)
                 .subscribe({
                 next: data => {
@@ -89,5 +92,12 @@ export class ProfileComponent {
             });
         }
     }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.form.get(attribute).value !== '';
+  }
 
 }

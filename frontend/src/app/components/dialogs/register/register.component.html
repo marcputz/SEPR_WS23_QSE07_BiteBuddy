@@ -1,21 +1,19 @@
-<!-- New register like figma -->
 <div class="container-fluid">
   <div class="background-img-responsive">
     <div class="row-cols-1">
-      <img class="img-fluid" src="assets/images/register.png" alt="Registration image">
+      <img class="img-fluid" src="assets/images/register2.png" alt="Registration image">
     </div>
   </div>
-  <div class="background-rectangle">
+  <div class="background-rectangle-big">
     <div class="row-cols-1">
-      <h2 class="title">Welcome to Bite-Buddy</h2>
+      <h2 class="bb-title">Welcome to Bite-Buddy</h2>
       <div class="row-cols-1 register-form">
-        <!-- Added to test it -->
         <form class="form" [formGroup]="registerForm" (ngSubmit)="registerUser()">
           <div class="form-group">
-            <label for="inputUsername" class="animated-label"
+            <label for="inputUsername" class="bb-transition-label"
                    *ngIf="isInputFocused['username'] || registerForm.get('username').value">Username</label>
             <input type="text" name="username" formControlName="username"
-                   class="bb-input-textfield"
+                   class="bb-input-textfield bb-input"
                    id="inputUsername"
                    aria-describedby="usernameHelp"
                    placeholder="Username"
@@ -23,21 +21,24 @@
                    (blur)="this.updateInputFocus('username')"
                    [ngClass]="{'filled-input': registerForm.get('username').value !== ''}"
                    required >
-            <div *ngIf="submitted && registerForm.controls.username.errors" class="error">
-              <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors.required">Your username is
-                required!
+            <div *ngIf="submitted && registerForm.controls.username.errors" class="bb-input-error">
+              <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors?.required">
+                Username is required
               </small>
-              <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors.userAlreadyExists">Your
-                username already exists!
+              <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors?.userAlreadyExists">
+                Username already exists
+              </small>
+              <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors?.maxLength">
+                Username is too long. Please enter a max of 255 characters
               </small>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="inputEmail" class="animated-label"
+            <label for="inputEmail" class="bb-transition-label"
                    *ngIf="isInputFocused['email'] || registerForm.get('email').value">Email Address</label>
             <input type="text" name="email" formControlName="email"
-                   class="bb-input-textfield"
+                   class="bb-input-textfield bb-input"
                    [class.bb-input-textfield-error]="submitted && registerForm.controls.email.errors"
                    id="inputEmail"
                    aria-describedby="emailHelp"
@@ -46,24 +47,27 @@
                    (blur)="this.updateInputFocus('email')"
                    [ngClass]="{'filled-input': registerForm.get('email').value !== ''}"
                    required >
-            <div *ngIf="submitted && registerForm.controls.email.errors" class="error">
-              <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors.required">Email is required
+            <div *ngIf="submitted && registerForm.controls.email.errors" class="bb-input-error">
+              <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors?.required">
+                Email is required
               </small>
-              <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors.emailNotValid">Not a valid email
+              <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors?.emailNotValid">
+                Not a valid email
               </small>
-              <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors.email">Not a valid email
+              <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors?.email">
+                Not a valid email
               </small>
-              <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors.emailAlreadyExists">This email
-                is already registered
+              <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors?.emailAlreadyExists">
+                This email is already registered
               </small>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="password" class="animated-label"
+            <label for="password" class="bb-transition-label"
                    *ngIf="isInputFocused['password'] || registerForm.get('password').value">Password</label>
             <input type="password" name="password" formControlName="password"
-                   class="bb-input-textfield"
+                   class="bb-input-textfield bb-input"
                    [class.bb-input-textfield-error]="submitted && registerForm.controls.password.errors"
                    id="password"
                    placeholder="Password"
@@ -71,22 +75,21 @@
                    (blur)="this.updateInputFocus('password')"
                    [ngClass]="{'filled-input': registerForm.get('password').value !== ''}"
                    required >
-            <div *ngIf="submitted && registerForm.controls.password.errors" class="error">
-              <small class="form-text text-danger" *ngIf="registerForm.controls.password.errors.required">Your password
-                is
-                required!
+            <div *ngIf="submitted && registerForm.controls.password.errors" class="bb-input-error">
+              <small class="form-text text-danger" *ngIf="registerForm.controls.password.errors?.required">
+                Your password is required
               </small>
-              <small class="form-text text-danger" *ngIf="registerForm.controls.password.errors.minlength">Your password
-                must be at least 8 characters long!
+              <small class="form-text text-danger" *ngIf="registerForm.controls.password.errors?.minlength">
+                Your password must be at least 8 characters long
               </small>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="password2" class="animated-label"
+            <label for="password2" class="bb-transition-label"
                    *ngIf="isInputFocused['password2'] || registerForm.get('password2').value">Confirm Password</label>
             <input type="password" name="password2" formControlName="password2"
-                   class="bb-input-textfield"
+                   class="bb-input-textfield bb-input"
                    [class.bb-input-textfield-error]="submitted && registerForm.controls.password.errors"
                    id="password2"
                    placeholder="Confirm Password"
@@ -94,23 +97,22 @@
                    (blur)="this.updateInputFocus('password2')"
                    [ngClass]="{'filled-input': registerForm.get('password2').value !== ''}"
                    required >
-            <div *ngIf="submitted && registerForm.controls.password2.errors" class="error">
-              <small class="form-text text-danger" *ngIf="registerForm.controls.password2.errors.required">Your password
-                is
-                required!
+            <div *ngIf="submitted && registerForm.controls.password2.errors" class="bb-input-error">
+              <small class="form-text text-danger" *ngIf="registerForm.controls.password2.errors?.required">
+                Please enter the password again
               </small>
-              <small class="form-text text-danger" *ngIf="registerForm.controls.password2.errors.minlength">Your password
-                must be at least 8 characters long!
+              <small class="form-text text-danger" *ngIf="registerForm.controls.password2.errors?.minlength">
+                Your password must be at least 8 characters long
               </small>
-              <small class="form-text text-danger" *ngIf="registerForm.controls.password2.errors.passwordsDifferent">
-                The passwords are not the same!
+              <small class="form-text text-danger" *ngIf="registerForm.controls.password2.errors?.passwordsDifferent">
+                The passwords are not the same
               </small>
             </div>
           </div>
-          <button type="submit" name="registerButton" class="button-full button-create">Create Account</button>
+          <button type="submit" name="registerButton" class="button-full bb-form-button">Create Account</button>
         </form>
-        <div class="text-under-button">
-          <span>Already have an account? </span><a routerLink="/login" class="login">Login</a>
+        <div class="bb-text-under-button">
+          <span>Already have an account? </span><a routerLink="/login" class="bb-link">Login</a>
         </div>
       </div>
     </div>

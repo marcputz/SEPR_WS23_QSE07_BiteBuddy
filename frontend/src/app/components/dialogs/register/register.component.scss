@@ -1,12 +1,3 @@
-input, button {
-  margin-top: 2%;
-  margin-bottom: 8%;
-}
-
-#forgotPasswordContainer {
-  margin-top: 1rem;
-}
-
 .background-img-responsive {
   position: fixed; /* Responsive */
   top: 0;
@@ -15,72 +6,31 @@ input, button {
   height: auto;
 }
 
-.background-rectangle {
+.background-rectangle-big {
   position: fixed; /* Responsive */
   top: 0;
   right: 0;
-  width: 60%;
+  width: 65%;
   height: 100vh;
   background-color: white;
+  border-radius: 35px;
   border-right: 2px solid #ccc; /* Optional: Add a border for separation */
-}
-
-.title {
-  color: #594338;
-  font-size: 32px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-
-  margin-top: 16%;
-  margin-left: 15%;
- // margin-right: 337px;
+  z-index: -1;
 }
 
 .register-form {
-  margin: 5% 15%;
+  margin: 5% 20%;
   width: 60%;
-}
-
-input {
-  background-color: white;
-  color: rgba(0, 0, 0, 0.30);
 }
 
 .filled-input {
   color: black;
 }
 
-.error {
-  margin-top: -6%;
-  margin-bottom: 4%;
-  margin-left: 2%;
+img {
+  width: 200%;
 }
 
-.animated-label {
-  position: relative;
-  color: var(--button-background-color);
-  transition: transform 0.2s ease-out, font-size 0.2s ease-out, color 0.2s ease-out;
-}
-
-.button-create {
-  color: white;
-  width: 100%;
-  margin-top: 10%;
-}
-
-.text-under-button {
-  margin-top: 10%;
-  color: rgba(0, 0, 0, 0.30);
-}
-
-.login {
-  color: var(--button-background-color);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.login:hover {
-  text-decoration: underline;
-  color: var(--button-background-color-hover);
+.bb-title {
+  margin-left: 20% !important;
 }

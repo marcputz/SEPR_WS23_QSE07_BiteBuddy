@@ -1,51 +1,60 @@
-<div style="padding: 20px;">
-  <!-- DIALOG HEADER -->
-  <span class="bb-dialog-box-header">Login</span>
-
-  <!-- FORM INPUTS -->
+<h2 class="bb-dialog-box-header title-margin">Login</h2>
+<div class="row-cols-1 register-form">
   <form class="form" [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
-
-    <!-- EMAIL INPUT -->
     <div class="form-group">
+      <label for="inputEmail" class="bb-transition-label"
+             *ngIf="isInputFocused['email'] || loginForm.get('email').value">Email Address</label>
       <input type="text" name="email" formControlName="email"
-             class="bb-input-textfield"
+             class="bb-input-textfield bb-input"
              [class.bb-input-textfield-error]="submitted && loginForm.controls.email.errors"
              id="inputEmail"
              aria-describedby="emailHelp"
-             placeholder="Enter Email">
-      <div *ngIf="submitted && loginForm.controls.email.errors" class="error">
-        <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.required">Email is required
+             placeholder="Email Address"
+             (focus)="isInputFocused['email'] = true"
+             (blur)="this.updateInputFocus('email')"
+             [ngClass]="{'filled-input': loginForm.get('email').value !== ''}"
+             required >
+      <div *ngIf="submitted && loginForm.controls.email.errors" class="bb-input-error">
+        <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.required">
+          Email is required
         </small>
-        <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.email">Not a valid email
-        </small>
-        <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.userNotFound">No account found
+        <small class="form-text text-danger" *ngIf="loginForm.controls.email.errors.email">
+          Please enter a valid email. Example: mustermann@gmail.com
         </small>
       </div>
     </div>
 
-    <!-- PASSWORD INPUT -->
     <div class="form-group">
+      <label for="password" class="bb-transition-label"
+             *ngIf="isInputFocused['password'] || loginForm.get('password').value">Password</label>
       <input type="password" name="password" formControlName="password"
-             class="bb-input-textfield"
+             class="bb-input-textfield bb-input"
              [class.bb-input-textfield-error]="submitted && loginForm.controls.password.errors"
              id="password"
-             placeholder="Enter Password">
-      <div *ngIf="submitted && loginForm.controls.password.errors" class="error">
-        <small class="form-text text-danger" *ngIf="loginForm.controls.password.errors.required">Password is required
+             placeholder="Password"
+             (focus)="isInputFocused['password'] = true"
+             (blur)="this.updateInputFocus('password')"
+             [ngClass]="{'filled-input': loginForm.get('password').value !== ''}"
+             required >
+      <div *ngIf="submitted && loginForm.controls.password.errors" class="bb-input-error">
+        <small class="form-text text-danger" *ngIf="loginForm.controls.password.errors.required">
+          Password is required
         </small>
-        <small class="form-text text-danger" *ngIf="loginForm.controls.password.errors.wrongPassword">Wrong password
+        <small class="form-text text-danger" *ngIf="loginForm.controls.password.errors.minlength">
+          Password must be at least 8 characters long
+        </small>
+      </div>
+      <!-- Email and password error for security issue-->
+      <div  *ngIf="submitted && this.loginError" class="bb-input-error input-error-general">
+        <small class="form-text text-danger">
+          Something went wrong. Email or password are incorrect. Please try again.
         </small>
       </div>
     </div>
-
-    <!-- FORGOT PASSWORD LINK -->
-    <div id="forgotPasswordContainer">
-      Forgot password? Click <a class="bb-link" style="font-weight: bold;" routerLink="/request_password_reset">here</a>
-    </div>
-
     <!-- LOGIN BUTTON -->
-    <button type="submit" name="loginButton" class="bb-button-big">Login</button>
-
+    <button type="submit" name="loginButton" class="button-full bb-form-button">Login</button>
   </form>
-
+  <div class="bb-text-under-button">
+    <span>Forgot password? </span><a routerLink="/request_password_reset" class="bb-link">Reset password</a>
+  </div>
 </div>

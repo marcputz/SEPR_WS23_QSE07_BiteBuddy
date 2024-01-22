@@ -28,9 +28,9 @@ const routes: Routes = [
       {path: 'login', component: LoginComponent}, // Login Page
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
       {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
-      {path: 'register', component: RegisterComponent},
       {path: 'profile', component: ProfileComponent}
     ]},
+  {path: 'register', component: RegisterComponent}, // Register Page
   {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent}, // TODO: add dashboard component
   {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
       {path: '', pathMatch: 'full', redirectTo: 'user'},
