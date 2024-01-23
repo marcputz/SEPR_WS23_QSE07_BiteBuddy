@@ -1,9 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
-import java.util.ArrayList;
-
-public record RecipeGetByIdDto(
+public record RecipeProfileViewDto(
     Long id,
-    Long userId
+    String name
 ) {
 }
