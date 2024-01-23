@@ -1,10 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
@@ -74,8 +70,16 @@ public class ProfileEndpoint {
         profileService.rateRecipe(recipeRatingDto);
     }
 
+    @GetMapping("/{ProfileId}")
+    public ProfileDetailDto getProfileDetails(@PathVariable long ProfileId) throws NotFoundException {
+        LOGGER.info("Received Get request on {}", BASE_PATH);
+        LOGGER.debug("Request body for Get:\n{}", ProfileId);
+
+        return null;
+    }
+
     @GetMapping("/rating/{UserId}")
-    public RecipeRatingListsDto get(@PathVariable long UserId) throws NotFoundException {
+    public RecipeRatingListsDto getRatingLists(@PathVariable long UserId) throws NotFoundException {
         LOGGER.info("Received Get request on {}", BASE_PATH);
         LOGGER.debug("Request body for Get:\n{}", UserId);
 
