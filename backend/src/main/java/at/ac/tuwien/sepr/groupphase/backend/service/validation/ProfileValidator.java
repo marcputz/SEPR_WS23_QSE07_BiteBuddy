@@ -102,6 +102,24 @@ public class ProfileValidator {
          */
     }
 
+    /**
+     * Validate the ratings rating integer.
+     *
+     * @param rating the rating to validate
+     */
+    public void validateRating(int rating) throws ValidationException {
+        LOGGER.trace("validateRating({})", rating);
+        List<String> validationErrors = new ArrayList<>();
+
+        if (rating != 0 && rating != 1) {
+            validationErrors.add("rating has to be either 0 or 1");
+        }
+
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Validation of rating for rating for recipe rating failed", validationErrors);
+        }
+    }
+
     //helper method for username validation
     private boolean hasStringWhitespace(String element) {
         LOGGER.trace("hasStringWhitespace({})", element);

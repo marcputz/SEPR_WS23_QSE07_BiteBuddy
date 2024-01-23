@@ -4,6 +4,12 @@ import {RecipeListDto, RecipeSearch, RecipeSearchResultDto} from "../../dtos/rec
 import {debounceTime, Subject} from "rxjs";
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {ToastrService} from "ngx-toastr";
+import {RecipeRatingDto} from "../../dtos/profileDto";
+import {AuthService} from "../../services/auth.service";
+import {UserSettingsDto} from "../../dtos/userSettingsDto";
+import {ProfileService} from "../../services/profile.service";
+import {ErrorFormatterService} from "../../services/error-formatter.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-recipe-list',
@@ -23,10 +29,20 @@ export class RecipeListComponent {
 
   searchResponse: RecipeSearchResultDto;
 
+  recipeRating: RecipeRatingDto = {
+    recipeId: -100,
+    userId: -100,
+    rating: -1
+  };
+
   constructor(
     private service: RecipeService,
+    private authService: AuthService,
+    private profileService: ProfileService,
     private sanitizer: DomSanitizer,
     private notification: ToastrService,
+    private errorFormatter: ErrorFormatterService,
+    private router: Router,
   ) {
   }
 
@@ -76,5 +92,33 @@ export class RecipeListComponent {
   pageChanger(newPageNumber: number) {
     this.searchParams.page = newPageNumber;
     this.reloadRecipes()
+  }
+
+  rateRecipe(recipeId: number, rating: number) {
+    this.recipeRating.recipeId = recipeId;
+    this.recipeRating.rating = rating;
+    this.authService.getUser().subscribe(
+      (settings: UserSettingsDto) => {
+        this.recipeRating.userId = settings.id;
+        console.log(settings);
+        console.log(this.recipeRating)
+        this.profileService.createRating(this.recipeRating)
+          .subscribe({
+              next: data => {
+                this.notification.success("Successfully rated new recipe!")
+                this.router.navigate(['/recipes']);
+              },
+              error: error => {
+                console.log(error)
+                console.error(error.message, error);
+                let title = "Could not rate recipe!";
+                this.notification.error(this.errorFormatter.format(error), title, {
+                  enableHtml: true,
+                  timeOut: 5000,
+                });
+              }
+            }
+          );
+      });
   }
 }

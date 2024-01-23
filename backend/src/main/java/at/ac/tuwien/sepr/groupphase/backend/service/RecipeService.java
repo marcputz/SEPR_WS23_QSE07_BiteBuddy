@@ -72,11 +72,11 @@ public interface RecipeService {
     List<String> findMatchingIngredients(String name);
 
     /**
-     * Creates a Raiting, based on the int raiting for the recipe with id recipeID from the user with the id userID.
+     * Creates a Rating, based on the int rating for the recipe with id recipeID from the user with the id userID.
      *
      * @param recipeId is the id of the rated recipe.
      * @param userId   is the id of the rating user.
-     * @param rating   is the id of the raiting based on the int value (0 is dislike and 1 is like).
+     * @param rating   is the id of the rating based on the int value (0 is dislike and 1 is like).
      * @throws NotFoundException if the recipe or the user can not be found.
      */
     void createRating(long recipeId, long userId, int rating);

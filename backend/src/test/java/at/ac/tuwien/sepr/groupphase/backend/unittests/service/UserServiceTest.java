@@ -176,14 +176,18 @@ public class UserServiceTest {
     @Test
     public void testUpdateUser_DuplicateNicknameAndEmail_ThrowsConflictException() {
         generateSecondTestUser();
-        testUser.setEmail(secondTestUser.getEmail());
-        testUser.setNickname(secondTestUser.getNickname());
-        ConflictException conflictException = assertThrows(ConflictException.class, () -> userService.updateApplicationUser(testUser),
-            "Expected ConflictException for duplicate email");
-        List<String> expectedErrors = List.of(
-            "Email '" + testUser.getEmail() + "' is already in use",
-            "Nickname '" + testUser.getNickname() + "' is already in use");
-        assertTrue(conflictException.errors().containsAll(expectedErrors), "Conflict errors should contain messages for duplicate email and nickname");
+        try {
+            testUser.setEmail(secondTestUser.getEmail());
+            testUser.setNickname(secondTestUser.getNickname());
+            ConflictException conflictException = assertThrows(ConflictException.class, () -> userService.updateApplicationUser(testUser),
+                "Expected ConflictException for duplicate email");
+            List<String> expectedErrors = List.of(
+                "Email '" + testUser.getEmail() + "' is already in use",
+                "Nickname '" + testUser.getNickname() + "' is already in use");
+            assertTrue(conflictException.errors().containsAll(expectedErrors), "Conflict errors should contain messages for duplicate email and nickname");
+        } finally {
+            userRepository.deleteById(testUserId);
+        }
     }
 
     @Test

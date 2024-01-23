@@ -8,6 +8,10 @@ import {AllergeneDto} from "../../../dtos/allergeneDto";
 import {IngredientDto} from "../../../dtos/ingredientDto";
 import {IngredientService} from "../../../services/ingredient.service";
 import {AllergensService} from "../../../services/allergens.service";
+import {AuthService} from "../../../services/auth.service";
+import {UserSettingsDto} from "../../../dtos/userSettingsDto";
+import {Observable} from "rxjs";
+import {RecipeDetailsDto} from "../../../dtos/recipe";
 
 @Component({
   selector: 'app-profile',
@@ -24,6 +28,9 @@ export class ProfileComponent {
   allergens: AllergeneDto[] = [];
   ingredient: IngredientDto[] = [];
 
+  user: UserSettingsDto = {} as UserSettingsDto;
+  userId: number = 1;
+
   form: FormGroup;
   constructor(
       private fb: FormBuilder,
@@ -32,7 +39,8 @@ export class ProfileComponent {
       private ingredientService: IngredientService,
       private router: Router,
       private route: ActivatedRoute,
-      private notification: ToastrService
+      private notification: ToastrService,
+      private authService: AuthService
   ) {
       // Initialize the form in the constructor
       this.form = this.fb.group({
@@ -73,20 +81,28 @@ export class ProfileComponent {
   public onSubmit(): void {
         console.log('is form valid?', this.form.valid, this.form.value);
         if (this.form.valid) {
-            this.profile = this.form.value;
-            console.log(this.profile)
-            this.service.create(this.profile)
+          this.profile = this.form.value;
+          this.authService.getUser().subscribe(
+            (settings: UserSettingsDto) => {
+              this.user = settings;
+              this.profile.userId = settings.id;
+              console.log(settings);
+              console.log(this.profile)
+              this.service.create(this.profile)
                 .subscribe({
-                next: data => {
+                  next: data => {
                     this.notification.success(`Profile ${this.profile?.name} successfully.`);
                     this.router.navigate(['/dashboard']);
-                },
-                error: error => {
+                  },
+                  error: error => {
                     console.error('Error creating profile', error);
                     const errorMessage = error?.message || 'Unknown error occured';
                     this.notification.error(`Error creating profile: ${errorMessage}`);
-                }
-            });
+                  }
+                });
+            },
+          );
+
         }
     }
 

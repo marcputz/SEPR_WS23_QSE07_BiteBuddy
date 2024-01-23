@@ -1,17 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.util.List;
+import java.util.List;/**
+    * Data object transfer for Profile entity to send information through the network and between layers.
+    * To create java boilerplate code use lombok.
+    */
 
-/**
- * Data object transfer for Profile entity to send information through the network and between layers.
- * To create java boilerplate code use lombok.
- */
-
-public class ProfileDto {
+public class ProfileUserDto {
 
     @JsonProperty("name")
     @NotNull(message = "Name must not be null")
@@ -26,9 +25,9 @@ public class ProfileDto {
     @NotNull(message = "Food preferences must not be null")
     private List<IngredientDto> ingredient;
 
-    @JsonProperty("userId")
+    @JsonProperty("user")
     @NotNull(message = "User id must not be null")
-    private Long userId;
+    private ApplicationUser user;
 
     public String getName() {
         return name;
@@ -54,12 +53,12 @@ public class ProfileDto {
         this.ingredient = ingredient;
     }
 
-    public long getUserId() {
-        return userId;
+    public ApplicationUser getUser() {
+        return user;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setUser(ApplicationUser user) {
+        this.user = user;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class ProfileDto {
             + "name='" + name + '\''
             + ", allergens=" + allergens
             + ", ingredient=" + ingredient
-            + ", userId=" + userId
+            + ", user=" + user
             + "}";
     }
 
@@ -76,10 +75,8 @@ public class ProfileDto {
         private String name;
         private List<AllergeneDto> allergens;
         private List<IngredientDto> ingredient;
-        private Long userId;
 
-        private ProfileDtoBuilder() {
-        }
+        private ProfileDtoBuilder() {}
 
         public static ProfileDtoBuilder aProfileDto() {
             return new ProfileDtoBuilder();
@@ -100,17 +97,11 @@ public class ProfileDto {
             return this;
         }
 
-        public ProfileDtoBuilder withUserId(Long userId) {
-            this.userId = userId;
-            return this;
-        }
-
         public ProfileDto build() {
             ProfileDto profileDto = new ProfileDto();
             profileDto.setName(name);
             profileDto.setAllergens(allergens);
             profileDto.setIngredient(ingredient);
-            profileDto.setUserId(userId);
             return profileDto;
         }
     }

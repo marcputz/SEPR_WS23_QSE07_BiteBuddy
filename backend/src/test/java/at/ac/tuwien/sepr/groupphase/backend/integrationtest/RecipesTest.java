@@ -70,7 +70,8 @@ public class RecipesTest {
     private long recipeIngredient2Id;
     private long ingredient2Id;
     private long ingredient3Id;
-    private long rd1ID, rd2ID;
+    private long rd1Id;
+    private long rd2Id;
 
 
     @BeforeEach
@@ -111,14 +112,14 @@ public class RecipesTest {
         r1.setUnit(FoodUnit.tablespoon);
         r1.setIngredient("sugar");
         r1.setAmount(1);
-        rd1ID = recipeIngredientDetailsRepository.save(r1).getId();
+        rd1Id = recipeIngredientDetailsRepository.save(r1).getId();
 
         RecipeIngredientDetails r2 = new RecipeIngredientDetails();
         r2.setDescriber("much");
         r2.setUnit(FoodUnit.cup);
         r2.setIngredient("sugar");
         r2.setAmount(10);
-        rd2ID = recipeIngredientDetailsRepository.save(r2).getId();
+        rd2Id = recipeIngredientDetailsRepository.save(r2).getId();
 
 
         // creating recipeIngredients
@@ -164,8 +165,8 @@ public class RecipesTest {
         recipeIngredientRepository.deleteById(recipeIngredient1Id);
         recipeIngredientRepository.deleteById(recipeIngredient2Id);
 
-        recipeIngredientDetailsRepository.deleteById(rd1ID);
-        recipeIngredientDetailsRepository.deleteById(rd2ID);
+        recipeIngredientDetailsRepository.deleteById(rd1Id);
+        recipeIngredientDetailsRepository.deleteById(rd2Id);
 
         allergeneIngredientRepository.deleteById(allergeneIngredient1Id);
         allergeneRepository.deleteById(allergene1Id);

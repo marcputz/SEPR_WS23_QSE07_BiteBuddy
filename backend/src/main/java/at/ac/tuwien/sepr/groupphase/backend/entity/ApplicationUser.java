@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -44,6 +45,8 @@ public class ApplicationUser {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private List<Profile> profiles = new ArrayList<>();
+    @OneToOne
+    private Profile activeProfile;
 
     public ApplicationUser() {
     }
@@ -98,6 +101,15 @@ public class ApplicationUser {
 
     public ApplicationUser setNickname(String nickname) {
         this.nickname = nickname;
+        return this;
+    }
+
+    public Profile getActiveProfile() {
+        return activeProfile;
+    }
+
+    public ApplicationUser setActiveProfile(Profile activeProfile) {
+        this.activeProfile = activeProfile;
         return this;
     }
 
