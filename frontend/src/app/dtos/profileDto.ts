@@ -1,5 +1,6 @@
 import {AllergeneDto} from "./allergeneDto";
 import {IngredientDto} from "./ingredientDto";
+import {RecipeProfileViewDto} from "./recipe";
 
 /**
  * DTO for Profile related requests to pass data between frontend and backend
@@ -21,4 +22,14 @@ export interface RecipeRatingDto {
 export interface CheckRatingDto {
   recipeId: number;
   userId: number;
+}
+
+export interface ProfileDetailDto{
+  id: number,
+  name: string,
+  allergens: string[],
+  ingredients: string[],
+  liked: RecipeProfileViewDto[],
+  disliked: RecipeProfileViewDto[],
+  user: string
 }
