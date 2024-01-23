@@ -1,24 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapperImpl;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.ProfileRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.*;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -30,9 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -61,12 +48,26 @@ public class ProfileServiceTest {
     private ProfileRepository profileRepository;
     @Autowired
     private ProfileMapperImpl profileMapper;
+    @Autowired
+    private RecipeRepository recipeRepository;
+
+    @Autowired
+    private RecipeIngredientRepository recipeIngredientRepository;
+
+    @Autowired
+    private RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
+
     private Long allergeneId;
     private Long ingredientId;
     private Long profileId;
     private Long profileId2;
     private Long testUserId;
     private Long testUserId2;
+
+    private long recipe1Id;
+    private long recipeIngredient1Id;
+    private long ingredient1Id;
+    private long rd1Id;
 
     @BeforeEach
     public void generateTestData() {
@@ -124,6 +125,45 @@ public class ProfileServiceTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        // creating ingredients
+        // adding apple
+        Ingredient ingredient1 = new Ingredient();
+        ingredient1.setName("Apple");
+        ingredient1Id = ingredientRepository.save(ingredient1).getId();
+
+        // creating recipes without ingredients
+        Recipe recipe1 = new Recipe();
+        recipe1.setInstructions("Instructions 1");
+        recipe1.setName("recipe 1");
+        recipe1Id = recipeRepository.save(recipe1).getId();
+
+        // creating recipeIngredientDetails
+        RecipeIngredientDetails r1 = new RecipeIngredientDetails();
+        r1.setDescriber("little");
+        r1.setUnit(FoodUnit.tablespoon);
+        r1.setIngredient("sugar");
+        r1.setAmount(1);
+        rd1Id = recipeIngredientDetailsRepository.save(r1).getId();
+
+        // creating recipeIngredients
+        RecipeIngredient recipeIngredient1 = new RecipeIngredient();
+        recipeIngredient1.setIngredient(ingredient1);
+        recipeIngredient1.setAmount(r1);
+        recipeIngredient1.setRecipe(recipe1);
+        recipeIngredient1Id = recipeIngredientRepository.save(recipeIngredient1).getId();
+
+        // updating recipes with ingredients
+        Set<RecipeIngredient> ringredients1 = new HashSet<>();
+        ringredients1.add(recipeIngredient1);
+        recipeRepository.updateIngredients(recipe1Id, ringredients1);
+
+        Profile profile2 = profileRepository.getReferenceById(profileId2);
+        profile2.getDisliked().add(recipe1);
+        profileRepository.save(profile2);
+
+        userRepository.save(userRepository.getReferenceById(testUserId2).setActiveProfile(profileRepository.getReferenceById(profileId2)));
+
     }
 
 
@@ -135,10 +175,19 @@ public class ProfileServiceTest {
             user.getProfiles().clear();
             userRepository.save(user);
         }
+
+        recipeIngredientRepository.deleteById(recipeIngredient1Id);
+        recipeIngredientDetailsRepository.deleteById(rd1Id);
+        ingredientRepository.deleteById(ingredient1Id);
+
         profileRepository.deleteAll();
         allergeneRepository.deleteAll();
         ingredientRepository.deleteAll();
         userRepository.deleteAll();
+
+        recipeRepository.deleteById(recipe1Id);
+
+
     }
 
     @Test
@@ -213,6 +262,26 @@ public class ProfileServiceTest {
 
         Assertions.assertThrows(NotFoundException.class,
             () -> profileService.saveProfile(testProfileDto));
+    }
+
+    @Test
+    public void rateRecipeWithExistingProfileAndIncorrectRatingIntegerThrowValidationException(){
+        RecipeRatingDto recipeRatingDto = new RecipeRatingDto(recipe1Id, testUserId, 2);
+
+        Assertions.assertThrows(ValidationException.class,
+            () -> profileService.rateRecipe(recipeRatingDto));
+    }
+
+    @Test
+    public void getRatingListsOfExistingProfileReturnsRatingListsOfProfile(){
+        RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId2);
+
+        Assertions.assertAll("Rating Lists result validation",
+            () -> Assertions.assertNotNull(ratingLists, "Result should not be null"),
+            () -> Assertions.assertEquals(1, ratingLists.dislikes().size(), "The dislikes list should contain one recipe ID"),
+            () -> Assertions.assertEquals(0, ratingLists.likes().size(), "The likes list should contain zero recipe IDs"),
+            () -> Assertions.assertEquals(profileId, ratingLists.dislikes().get(0), recipe1Id)
+        );
     }
 
 }

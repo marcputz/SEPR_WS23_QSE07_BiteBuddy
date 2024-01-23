@@ -197,8 +197,6 @@ public class ProfileServiceImpl implements ProfileService {
             disliked.add(recipe.getId());
         }
 
-        LOGGER.info("ALL THE LIKEIES: " + liked.toString());
-
         RecipeRatingListsDto ratingLists = new RecipeRatingListsDto(
             liked,
             disliked);

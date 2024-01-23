@@ -106,7 +106,6 @@ export class RecipeListComponent {
           .subscribe({
               next: data => {
                 this.notification.success("Successfully rated new recipe!")
-                this.router.navigate(['/recipes']);
               },
               error: error => {
                 console.log(error)
