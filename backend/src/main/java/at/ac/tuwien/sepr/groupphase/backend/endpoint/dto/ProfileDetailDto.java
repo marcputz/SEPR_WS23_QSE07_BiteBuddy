@@ -9,7 +9,8 @@ public record ProfileDetailDto(
     ArrayList<String> ingredients,
     ArrayList<RecipeDto> liked,
     ArrayList<RecipeDto> disliked,
-    String user
+    String user,
+    Long userId
 
 ) {
 }
