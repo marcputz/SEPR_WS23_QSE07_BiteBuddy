@@ -62,6 +62,7 @@ h1, h2, h3, h4 {
 
 .button-transparent {
   background-color: rgba(255, 255, 255, 0); /* Fully transparent */
+  color: var(--button-background-color);
   display: flex;
   width: 150px;
   padding: 12px;
@@ -72,6 +73,20 @@ h1, h2, h3, h4 {
   box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.07), 0px 1px 3px 0px rgba(0, 0, 0, 0.10);
 }
 
+.button-transparent:hover,
+.button-transparent:hover .bb-text-inside-btn-transp {
+  background-color: var(--button-background-color);
+  color: white;
+}
+
+.bb-text-inside-btn-transp {
+  color: inherit;
+}
+
+.bb-text-inside-btn-transp i {
+  margin-right: 0.3rem;
+}
+
 .button-full {
   background-color: var(--button-background-color);
   display: flex;
@@ -80,6 +95,7 @@ h1, h2, h3, h4 {
   justify-content: center;
   align-items: center;
   border-radius: 8px;
+  margin-bottom: 5%;
   border: 2px solid #594338;
   box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.07), 0px 1px 3px 0px rgba(0, 0, 0, 0.10);
 }

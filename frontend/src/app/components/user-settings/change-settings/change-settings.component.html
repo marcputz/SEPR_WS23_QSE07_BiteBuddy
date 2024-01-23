@@ -2,18 +2,15 @@
   {{ errorMessage }}
 </div>
 
-<div style="padding: 0.8rem;">
-  <div class="bb-settings-box">
-    <header>Change User Settings</header>
+<div class="setting-container-msg">
+  <h2 class="setting-header">User Info</h2>
+  <div class="row-cols-1 register-form">
     <form class="form" [formGroup]="settingsForm" (ngSubmit)="updateUserSettings()">
-
-
       <div class="form-group">
-        <label for="image">Profile Picture:</label>
-
+        <label for="image" class="label-picture">Your profile picture</label>
         <div class="image-container">
-          <img [ngSrc]="safePictureUrl" alt="Account Image" height="100" width="100">
-          <button type="button" class="btn btn-primary" (click)="triggerFileInput()">
+          <img [ngSrc]="safePictureUrl" alt="Account Image">
+          <button type="button" class="btn button-upload" (click)="triggerFileInput()">
             <i class="bi-pencil" aria-hidden="true"></i>
           </button>
           <input type="file"
@@ -24,24 +21,52 @@
                  #fileInput hidden>
         </div>
       </div>
-
+      <!-- Username input fields -->
       <div class="form-group">
-        <label for="inputNickname">Nickname:</label>
+        <label for="inputNickname" class="bb-transition-label"
+               *ngIf="isInputFocused['nickname'] || settingsForm.get('nickname').value">Username</label>
         <input type="text" name="nickname" formControlName="nickname"
-               class="bb-input-textfield"
+               class="bb-input-textfield bb-input"
                [class.bb-input-textfield-error]="submitted && settingsForm.controls.nickname.errors"
                id="inputNickname"
-               placeholder="Nickname">
-
-        <div *ngIf="submitted && settingsForm.controls.nickname.errors" class="error">
+               aria-describedby="nicknameHelp"
+               placeholder="Username"
+               (focus)="isInputFocused['nickname'] = true"
+               (blur)="this.updateInputFocus('nickname')"
+               [ngClass]="{'filled-input': settingsForm.get('nickname').value !== ''}"
+               required
+        >
+        <div *ngIf="submitted && settingsForm.controls.nickname.errors" class="bb-input-error">
           <small class="form-text text-danger" *ngIf="settingsForm.controls.nickname.errors.required">
-            Nickname is required.
+            Username is required.
+          </small>
+          <!-- TODO: Add username to long or made out of whitespaces -->
+        </div>
+      </div>
+      <!-- Email input field -->
+      <div class="form-group">
+        <label for="inputEmail" class="bb-transition-label"
+               *ngIf="isInputFocused['email'] || settingsForm.get('email').value">Email Address</label>
+        <input type="text" name="email" formControlName="email"
+               class="bb-input-textfield bb-input"
+               [class.bb-input-textfield-error]="submitted && settingsForm.controls.email.errors"
+               id="inputEmail"
+               aria-describedby="emailHelp"
+               placeholder="Email Address"
+               (focus)="isInputFocused['email'] = true"
+               (blur)="this.updateInputFocus('email')"
+               [ngClass]="{'filled-input': settingsForm.get('email').value !== ''}"
+               required >
+        <div *ngIf="submitted && settingsForm.controls.email.errors" class="bb-input-error">
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.required">
+            Email is required
+          </small>
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.email">
+            Please enter a valid email. Example: mustermann@gmail.com
           </small>
         </div>
       </div>
-
-      <button type="button" (click)="updateUserSettings()" class="bb-button">Save</button>
-
+      <button type="submit" name="emailUpdateButton" class="button-full bb-form-button" (click)="updateUserSettings()">Save changes</button>
     </form>
   </div>
 </div>
