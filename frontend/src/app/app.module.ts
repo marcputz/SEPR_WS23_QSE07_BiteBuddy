@@ -29,6 +29,7 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
 import { ProfileComponent } from './components/dialogs/profile/profile.component';
 import { MenuPlanComponent } from './components/menu-plan/menu-plan.component';
 import { InventoryComponent } from './components/inventory/inventory.component';
+import {MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
 
 @NgModule({
   declarations: [
@@ -53,6 +54,7 @@ import { InventoryComponent } from './components/inventory/inventory.component';
     ProfileComponent,
     MenuPlanComponent,
     InventoryComponent,
+    MenuPlanLookupComponent,
   ],
   imports: [
     BrowserModule,

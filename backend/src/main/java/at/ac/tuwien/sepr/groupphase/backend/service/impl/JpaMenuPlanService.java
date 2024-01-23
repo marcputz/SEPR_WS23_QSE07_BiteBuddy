@@ -22,7 +22,6 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.InventoryIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
@@ -87,6 +86,34 @@ public class JpaMenuPlanService implements MenuPlanService {
     @Override
     public List<MenuPlan> getAllMenuPlansOfUser(ApplicationUser user) {
         return menuPlanRepository.getAllByUser(user);
+    }
+
+    public List<MenuPlanDetailDto> getAllMenuPlansofUserDetailDto(ApplicationUser user) {
+        List<MenuPlan> plans = menuPlanRepository.getAllByUser(user);
+        List<MenuPlanDetailDto> details = new ArrayList<>();
+        for (MenuPlan plan : plans) {
+            MenuPlanDetailDto detail = new MenuPlanDetailDto();
+            //Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(plan);
+            detail.setUserId(user.getId()).setFromTime(plan.getFromDate());  // .setContents(contents)
+            detail.setUntilTime(plan.getUntilDate()).setNumDays(7);
+            details.add(detail);
+        }
+        return details;
+    }
+
+    @Override
+    public MenuPlanDetailDto getMenuPlanForUserOnDateDetailDto(ApplicationUser user, LocalDate date) {
+        MenuPlanDetailDto menuPlanDetailDto = new MenuPlanDetailDto();
+        MenuPlan menuPlan = getMenuPlanForUserOnDate(user, date);
+        if (menuPlan == null) {
+            LOGGER.info("no Menuplan at this time: " + date.toString() + " and user id: " + user.getId() + " email: " + user.getEmail() + " nickname: " + user.getNickname() + " password: " + user.getPasswordEncoded());
+            return null;
+        }
+        Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(menuPlan);
+        menuPlanDetailDto.setUserId(user.getId()).setContents(contents).setFromTime(menuPlan.getFromDate());
+        menuPlanDetailDto.setUntilTime(menuPlan.getUntilDate());
+        LOGGER.info("get menuplan: " + menuPlanDetailDto.toString());
+        return menuPlanDetailDto;
     }
 
     @Override

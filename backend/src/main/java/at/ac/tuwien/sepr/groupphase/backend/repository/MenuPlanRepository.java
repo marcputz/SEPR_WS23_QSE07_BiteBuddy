@@ -22,6 +22,6 @@ public interface MenuPlanRepository extends JpaRepository<MenuPlan, Long> {
     @Query("select m from MenuPlan m where m.user = :user and ((m.fromDate between :fromDate and :untilDate) or (m.untilDate between :fromDate and :untilDate))")
     List<MenuPlan> getAllByUserMatchingTimeframe(@Param("user") ApplicationUser user, @Param("fromDate") LocalDate fromDate, @Param("untilDate") LocalDate untilDate);
 
-    @Query("select m from MenuPlan m where m.user = :user and m.fromDate >= :date and m.untilDate <= :date")
+    @Query("select m from MenuPlan m where m.user = :user and m.fromDate <= :date and m.untilDate >= :date")
     MenuPlan getByUserOnDate(@Param("user") ApplicationUser user, @Param("date") LocalDate date);
 }

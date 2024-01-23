@@ -3,7 +3,6 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
@@ -44,6 +43,25 @@ public interface MenuPlanService {
      * @author Marc Putz
      */
     List<MenuPlan> getAllMenuPlansOfUser(ApplicationUser user);
+
+    /**
+     * Gets a list of all MenuPlans as DetailDtos associated with a User.
+     *
+     * @param user the user for which to get all menu plan detail dtos for.
+     * @return a list of menu plan detail dtos, can be empty if no menu plans are found.
+     * @author Marc Putz
+     */
+    List<MenuPlanDetailDto> getAllMenuPlansofUserDetailDto(ApplicationUser user);
+
+    /**
+     * Gets the MenuPlanDetailDto associated with a user which is valid on the specified date.
+     *
+     * @param user the user for which to get the menu plan detail dto for.
+     * @param date the date for which the menu plan dto is valid for.
+     * @return the menu plan detail dto matching these criteria or NULL if no menu plan detail dto matching the criteria is found.
+     * @author Marc Putz
+     */
+    MenuPlanDetailDto getMenuPlanForUserOnDateDetailDto(ApplicationUser user, LocalDate date);
 
     /**
      * Gets a list of all MenuPlan entities associated with a user during a specified timeframe.

@@ -1,3 +1,4 @@
+import {MenuPlanContentDetailDto} from "./menuPlanContentDetailDto";
 
 export interface MenuPlanDetailDto {
   userId: number;
@@ -6,4 +7,6 @@ export interface MenuPlanDetailDto {
   fromTime: string;
   untilTime: string;
   numDays: number;
+  contents: Set<MenuPlanContentDetailDto>;
+
 }

@@ -1,9 +1,14 @@
 import { Component } from '@angular/core';
-import {RecipeListDto, RecipeSearch, RecipeSearchResultDto} from "../../dtos/recipe";
 import {debounceTime, Subject} from "rxjs";
-import {RecipeService} from "../../services/recipe.service";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ToastrService} from "ngx-toastr";
+import {MenuPlanService} from "../../services/menuplan.service";
+import {MenuPlanDetailDto} from "../../dtos/menuplan/menuPlanDetailDto";
+import {MenuPlanContentDetailDto} from "../../dtos/menuplan/menuPlanContentDetailDto";
+import {RecipeService} from "../../services/recipe.service";
+import {RecipeListDto} from "../../dtos/recipe";
+import {forEach} from "lodash";
+import {Logger} from "jasmine-spec-reporter/built/display/logger";
 
 @Component({
   selector: 'app-menu-plan-lookup',
@@ -11,48 +16,70 @@ import {ToastrService} from "ngx-toastr";
   styleUrls: ['./menu-plan-lookup.component.scss']
 })
 export class MenuPlanLookupComponent {
-  recipes: RecipeListDto[] = [];
-  searchChangedObservable = new Subject<void>();
-  searchParams: RecipeSearch = {
-    creator: "",
-    name: "",
-    page: 0,
-    entriesPerPage: 21,
-  };
 
-  searchResponse: RecipeSearchResultDto;
+  menuplan: MenuPlanDetailDto;
+  searchday: string;
+  menuplans: MenuPlanDetailDto[];
+  maxTimeslots: number;
+  contents: MenuPlanContentDetailDto[];
+  searchChangedObservable = new Subject<void>();
+  recipes: RecipeListDto[] = [];
+
+
 
   constructor(
-    private service: RecipeService,
+    private service: MenuPlanService,
     private sanitizer: DomSanitizer,
     private notification: ToastrService,
   ) {
   }
-
   ngOnInit() {
-    this.reloadRecipes();
+    this.searchday = new Date().toString();
+    this.getMenuPlans();
+    this.getMenuPlan();
     this.searchChangedObservable
       .pipe(debounceTime(300))
-      .subscribe({next: () => this.reloadRecipes()});
+      .subscribe({next: () => this.getMenuPlan()});
   }
 
-  searchChanged(): void {
-    this.searchChangedObservable.next();
-  }
-
-  reloadRecipes() {
-    this.service.search(this.searchParams).subscribe({
+  getMenuPlans(){
+    this.service.getMenuPlans().subscribe({
       next: data => {
-        this.searchResponse = data;
-        this.recipes = data.recipes;
-        this.searchParams.page = data.page;
-        console.log("number of pages: " + data.numberOfPages);
-        console.log("recipes available: " + data.recipes.length);
+        this.menuplans = data;
+        console.log("plans available plans: " + data.length);
       },
       error: err => {
         this.notification.error('Error fetching recipes', err)
       }
     })
+  }
+  getMenuPlan() {
+    console.log("before sending getMenuPlan date: " + this.searchday);
+    this.service.getMenuPlanForDay(this.searchday).subscribe({
+      next: data => {
+        this.menuplan = data;
+        this.contents = [...data.contents];
+        this.contents.sort((a, b) => {
+          if (a.day !== b.day) {
+            return a.day - b.day;
+          } else {
+            return a.timeslot - b.timeslot;
+          }
+        });
+        this.maxTimeslots = Math.max(...this.contents.map(content => content.timeslot)) + 1;
+      },
+      error: err => {
+        this.notification.error('Error fetching recipes for 1 menuplan', err)
+      }
+    })
+  }
+  onMenuPlanSelected(event: Event): void {
+    const selectedMenuPlanValue = (event.target as HTMLSelectElement).value;
+    this.searchday = selectedMenuPlanValue.replace(/^\d+/, '').replace(':', '').replace(/'/g, '');
+    this.searchChanged();
+  }
+  searchChanged(): void {
+    this.searchChangedObservable.next();
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {
@@ -60,6 +87,7 @@ export class MenuPlanLookupComponent {
       if (!imageBytes || imageBytes.length === 0) {
         throw new Error('Empty or undefined imageBytes');
       }
+
       const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
       const dataUrl = `data:image/png;base64,${imageBytes}`;
       return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
@@ -69,8 +97,4 @@ export class MenuPlanLookupComponent {
     }
   }
 
-  pageChanger(newPageNumber: number) {
-    this.searchParams.page = newPageNumber;
-    this.reloadRecipes()
-  }
 }

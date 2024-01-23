@@ -19,6 +19,7 @@ import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -142,5 +143,34 @@ public class ApplicationUser {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ApplicationUser applicationUser)) {
+            return false;
+        }
+        return Objects.equals(id, applicationUser.id)
+            && Objects.equals(email, applicationUser.email)
+            && Objects.equals(passwordEncoded, applicationUser.passwordEncoded)
+            && Objects.equals(nickname, applicationUser.nickname);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, passwordEncoded, nickname);
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationUser{"
+            + "id=" + id
+            + "email=" + email
+            + "passwordEncoded=" + passwordEncoded
+            + "nickname=" + nickname
+            + '}';
     }
 }

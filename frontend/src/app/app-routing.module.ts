@@ -19,6 +19,7 @@ import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.co
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
 import {MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
 import {InventoryComponent} from "./components/inventory/inventory.component";
+import {MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
 
 const routes: Routes = [
   //{path: '', component: HomeComponent},
@@ -46,6 +47,7 @@ const routes: Routes = [
       {path: ':id', component: RecipeDetailComponent},
   ]},
   {path: 'menuplan', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent},
+  {path: 'menuplanLookup', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanLookupComponent},
   {path: 'inventory', canActivate: mapToCanActivate([AuthGuard]), component: InventoryComponent},
 ];
 
