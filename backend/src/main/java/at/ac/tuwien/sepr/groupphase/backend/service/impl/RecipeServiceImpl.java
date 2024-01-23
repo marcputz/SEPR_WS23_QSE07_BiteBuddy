@@ -214,7 +214,7 @@ public class RecipeServiceImpl implements RecipeService {
                 ingredientsAndAmount.add(currentIngredient.getName() + ": " + ingredient.getAmount());
 
                 newIngredients.add(new RecipeIngredientDto(
-                    currentIngredient.getName(),
+                    ingredient.getAmount().getIngredient(),
                     ingredient.getAmount().getAmount(),
                     ingredient.getAmount().getUnit()));
             }

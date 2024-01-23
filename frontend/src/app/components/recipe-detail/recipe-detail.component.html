@@ -25,10 +25,10 @@
         >
           <ng-container *ngFor="let ingredient of recipeDetails.ingredients">
             <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit !== null">
-              {{ingredient.name + ", " + ingredient.amount + " " + ingredient.unit}}
+              {{ingredient.name + ", " + (isInteger(ingredient.amount) ? ingredient.amount : (ingredient.amount | number:'1.2-2'))  + " " + ingredient.unit}}
             </div>
             <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit === null">
-              {{ingredient.name + ", " + ingredient.amount }}
+              {{ingredient.name + ", " + (isInteger(ingredient.amount) ? ingredient.amount : (ingredient.amount | number:'1.2-2'))  }}
             </div>
             <div class="model" *ngIf="ingredient.amount === null && ingredient.unit === null">
               {{ingredient.name}}

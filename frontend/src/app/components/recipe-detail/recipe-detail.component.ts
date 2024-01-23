@@ -83,5 +83,7 @@ export class RecipeDetailComponent implements OnInit{
       return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
     }
   }
-
+  isInteger(value: number): boolean {
+    return Number.isInteger(value);
+  }
 }
