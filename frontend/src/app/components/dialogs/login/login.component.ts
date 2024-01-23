@@ -17,6 +17,8 @@ export class LoginComponent implements OnInit {
   // After first submission attempt, form validation will start
   submitted = false;
 
+  showPasswords: boolean = false;
+
   errorEmailNotFound: boolean = false;
   errorPasswordWrong: boolean = false;
 
@@ -104,6 +106,10 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
   }
 
   /**

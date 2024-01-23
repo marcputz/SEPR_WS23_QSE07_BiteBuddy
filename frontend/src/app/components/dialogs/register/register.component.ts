@@ -25,6 +25,9 @@ export class RegisterComponent implements OnInit{
 
   isInputFocused: {[key: string]: boolean } = {};
 
+  showPasswords: boolean = false;
+  showPassword1: boolean = false;
+
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
               private passwordEncoder: PasswordEncoder,
@@ -128,6 +131,14 @@ export class RegisterComponent implements OnInit{
   }
 
   ngOnInit() {
+  }
+
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
+  }
+  //TODO: refactor this
+  togglePasswordVisibility1() {
+    this.showPassword1 = !this.showPassword1;
   }
 
   /**

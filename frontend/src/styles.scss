@@ -134,9 +134,9 @@ h1, h2, h3, h4 {
 }
 
 .bb-input-textfield {
-  display: block;
+  //display: block;
   width: 100%;
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.75rem;
 
   font-size: 1rem;
   line-height: 1.5;
@@ -287,4 +287,24 @@ h1, h2, h3, h4 {
 .bb-text-under-button {
   margin-top: 8%;
   color: rgba(0, 0, 0, 0.30);
+}
+
+/* Important for putting the icon inside the input */
+.bb-input-container {
+  position: relative;
+}
+
+.bb-toggle-password {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.bi-eye, .bi-eye-slash {
+  font-size: 1.8em;
+  color: lightgray;
 }

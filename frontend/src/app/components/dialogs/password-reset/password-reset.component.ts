@@ -25,6 +25,7 @@ export class PasswordResetComponent implements OnInit {
   submitted: boolean = false;
 
   showPasswords: boolean = false;
+  showPassword1: boolean = false;
 
   urlValid: boolean;
   requestIdValid: boolean;
@@ -139,6 +140,10 @@ export class PasswordResetComponent implements OnInit {
 
   togglePasswordVisibility() {
     this.showPasswords = !this.showPasswords;
+  }
+  //TODO: refactor this
+  togglePasswordVisibility1() {
+    this.showPassword1 = !this.showPassword1;
   }
 
   /**

@@ -66,15 +66,20 @@
           <div class="form-group">
             <label for="password" class="bb-transition-label"
                    *ngIf="isInputFocused['password'] || registerForm.get('password').value">Password</label>
-            <input type="password" name="password" formControlName="password"
-                   class="bb-input-textfield bb-input"
-                   [class.bb-input-textfield-error]="submitted && registerForm.controls.password.errors"
-                   id="password"
-                   placeholder="Password"
-                   (focus)="isInputFocused['password'] = true"
-                   (blur)="this.updateInputFocus('password')"
-                   [ngClass]="{'filled-input': registerForm.get('password').value !== ''}"
-                   required >
+            <div class="bb-input-container">
+              <input [type]="this.showPasswords ? 'text' : 'password'" name="password" formControlName="password"
+                     class="bb-input-textfield bb-input"
+                     [class.bb-input-textfield-error]="submitted && registerForm.controls.password.errors"
+                     id="password"
+                     placeholder="Password"
+                     (focus)="isInputFocused['password'] = true"
+                     (blur)="this.updateInputFocus('password')"
+                     [ngClass]="{'filled-input': registerForm.get('password').value !== ''}"
+                     required >
+              <button type="button" class="bb-toggle-password" (click)="togglePasswordVisibility()">
+                <i *ngIf="!showPasswords; else showHiddenPassword" class="bi bi-eye"></i>
+              </button>
+            </div>
             <div *ngIf="submitted && registerForm.controls.password.errors" class="bb-input-error">
               <small class="form-text text-danger" *ngIf="registerForm.controls.password.errors?.required">
                 Your password is required
@@ -88,15 +93,23 @@
           <div class="form-group">
             <label for="password2" class="bb-transition-label"
                    *ngIf="isInputFocused['password2'] || registerForm.get('password2').value">Confirm Password</label>
-            <input type="password" name="password2" formControlName="password2"
-                   class="bb-input-textfield bb-input"
-                   [class.bb-input-textfield-error]="submitted && registerForm.controls.password.errors"
-                   id="password2"
-                   placeholder="Confirm Password"
-                   (focus)="isInputFocused['password2'] = true"
-                   (blur)="this.updateInputFocus('password2')"
-                   [ngClass]="{'filled-input': registerForm.get('password2').value !== ''}"
-                   required >
+            <div class="bb-input-container">
+              <input [type]="this.showPassword1 ? 'text' : 'password'" name="password2" formControlName="password2"
+                     class="bb-input-textfield bb-input"
+                     [class.bb-input-textfield-error]="submitted && registerForm.controls.password.errors"
+                     id="password2"
+                     placeholder="Confirm Password"
+                     (focus)="isInputFocused['password2'] = true"
+                     (blur)="this.updateInputFocus('password2')"
+                     [ngClass]="{'filled-input': registerForm.get('password2').value !== ''}"
+                     required >
+              <button type="button" class="bb-toggle-password" (click)="togglePasswordVisibility1()">
+                <i *ngIf="!showPassword1; else showHiddenPassword" class="bi bi-eye"></i>
+              </button>
+              <ng-template #showHiddenPassword>
+                <i class="bi bi-eye-slash"></i>
+              </ng-template>
+            </div>
             <div *ngIf="submitted && registerForm.controls.password2.errors" class="bb-input-error">
               <small class="form-text text-danger" *ngIf="registerForm.controls.password2.errors?.required">
                 Please enter the password again
