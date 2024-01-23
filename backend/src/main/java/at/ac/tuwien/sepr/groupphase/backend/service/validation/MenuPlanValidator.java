@@ -5,9 +5,11 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ public class MenuPlanValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private IngredientRepository ingredientRepository;
+    @Autowired
+    private RecipeIngredientRepository recipeIngredientRepository;
 
     public void validateForUpdate(MenuPlan menuplan) throws ValidationException {
         LOGGER.trace("validateForUpdate({})", menuplan);
@@ -150,4 +154,35 @@ public class MenuPlanValidator {
     }
 
 
+    public void validateFridge(List<String> fridge) throws ValidationException, ConflictException {
+        LOGGER.trace("validateFridge({})", fridge);
+        List<String> validationErrors = new ArrayList<>();
+        List<String> conflictErrors = new ArrayList<>();
+
+        if (!fridge.isEmpty()) {
+            for (String ingredientStr : fridge) {
+                var result = this.ingredientRepository.findByNameContainingIgnoreCase(ingredientStr);
+
+                if (!result.isEmpty()) {
+                    Ingredient ingredient = result.get(0);
+
+                    List<RecipeIngredient> recipeIngredients = this.recipeIngredientRepository.findByIngredient_Id(ingredient.getId());
+
+                    if (recipeIngredients.isEmpty()) {
+                        conflictErrors.add("Ingredient" + ingredientStr + " is not used in any recipes");
+                    }
+                } else {
+                    validationErrors.add("Ingredient " + ingredientStr + " does not exist");
+                }
+            }
+        }
+
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Validation of menu plan for create failed", validationErrors);
+        }
+
+        if (!conflictErrors.isEmpty()) {
+            throw new ConflictException("Creation of menu plan has conflict errors", conflictErrors);
+        }
+    }
 }

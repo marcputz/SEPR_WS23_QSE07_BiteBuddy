@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
@@ -236,10 +238,55 @@ public interface MenuPlanService {
     MenuPlanContentDetailDto getContentOfMenuPlanByIdAsDetailDto(MenuPlanContentId contentId) throws NotFoundException, IllegalArgumentException;
 
     /**
-     * Adds the fridge to the ingredient inventory for the specific menu plan.
+     * Creates the fridge for the menu plan.
      *
-     * @param menuPlan with the correct id for which the fridge is for.
-     * @param fridge   List of names of ingredients the fridge contains.
+     * @param menuPlan needs to have valid id, everything else is irrelevant.
+     * @param fridge   List of Ingredients which we add to the fridge.
      */
-    void addFridgeIngredientsToInventory(MenuPlan menuPlan, List<String> fridge);
+    void createFridge(MenuPlan menuPlan, List<String> fridge) throws ValidationException, ConflictException;
+
+    /**
+     * Checks the MenuPlan for running recipes and adds all the ingredients to the inventory.
+     * Only creates the inventory for running MenuPlans, not outdated ones!
+     *
+     * @param user for which we want to create the inventory.
+     */
+    void createInventory(ApplicationUser user);
+
+    /**
+     * Searches the inventory for all ingredients matching the user.
+     *
+     * @param user      for which we want to get the inventory.
+     * @param onlyValid if true we only look at the inventory for the MenuPlan which is still running. If false we return the whole inventory over all MenuPlans.
+     * @return list of the inventory split into missing and available ingredients.
+     */
+    InventoryListDto searchInventory(ApplicationUser user, boolean onlyValid);
+
+    /**
+     * Returns the inventory for a specific MenuPlan.
+     *
+     * @param menuPlanId id of the MenuPlan which we want to lookup.
+     * @return list of the inventory split into missing and available ingredients used in the specific MenuPlan.
+     */
+    InventoryListDto searchInventory(Long menuPlanId);
+
+    /**
+     * Updates a single inventory ingredient.
+     *
+     * @param user                 user of which we want to update an ingredient from
+     * @param updatedIngredientDto updated inventory ingredient.
+     * @throws NotFoundException if ingredient did not exist before
+     * @throws ConflictException if ingredient was updated incorrectly
+     */
+    void updateInventoryIngredient(ApplicationUser user, InventoryIngredientDto updatedIngredientDto) throws NotFoundException, ConflictException;
+
+    /**
+     * Updates a single inventory ingredient. This should never be used in the endpoint for security reasons,
+     * since we not validate if the user is authorized to change the inventory.
+     *
+     * @param updatedIngredientDto updated inventory ingredient.
+     * @throws NotFoundException if ingredient did not exist before
+     * @throws ConflictException if ingredient was updated incorrectly
+     */
+    void updateInventoryIngredient(InventoryIngredientDto updatedIngredientDto) throws NotFoundException, ConflictException;
 }

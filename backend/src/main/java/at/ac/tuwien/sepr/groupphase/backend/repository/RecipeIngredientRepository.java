@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface RecipeIngredientRepository extends JpaRepository<RecipeIngredient, Long> {
     List<RecipeIngredient> findByRecipe(Recipe recipe);
+    List<RecipeIngredient> findByIngredient_Id(Long id);
 }

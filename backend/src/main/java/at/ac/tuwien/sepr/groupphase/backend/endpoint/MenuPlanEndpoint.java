@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
@@ -19,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +61,9 @@ public class MenuPlanEndpoint {
 
             // generate menu plan // TODO: insert profile from dto
             MenuPlan newPlan = this.service.createEmptyMenuPlan(thisUser, null, dto.getFromTime(), dto.getUntilTime());
-            // TODO: save fridge to menu plan
+
+            // saving fridge
+            this.service.createFridge(newPlan, dto.getFridge());
             return this.service.generateContent(newPlan);
 
         } catch (UserNotFoundException e) {
@@ -65,5 +71,42 @@ public class MenuPlanEndpoint {
             LOGGER.warn("Error processing user data, user not found: ", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing user data", e);
         }
+    }
+
+    @GetMapping("/create")
+    public void createInventory(@RequestHeader HttpHeaders headers) throws UserNotFoundException, AuthenticationException {
+        this.authService.verifyAuthenticated(headers);
+        String authToken = headers.getFirst("Authorization");
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+        ApplicationUser user = this.userService.getUserById(currentUserId);
+
+        this.service.createInventory(user);
+    }
+
+    @GetMapping("/inventory/")
+    public InventoryListDto getInventory(@RequestHeader HttpHeaders headers) throws AuthenticationException, UserNotFoundException {
+        LOGGER.trace("getInventory()");
+        this.authService.verifyAuthenticated(headers);
+        String authToken = headers.getFirst("Authorization");
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+        ApplicationUser user = this.userService.getUserById(currentUserId);
+
+        if (currentUserId != null) {
+            return this.service.searchInventory(user, true);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/inventory/update")
+    public void updateInventoryIngredient(@RequestHeader HttpHeaders headers, @RequestBody InventoryIngredientDto updatedIngredient)
+        throws AuthenticationException, UserNotFoundException, ConflictException {
+        LOGGER.trace("update({})", updatedIngredient);
+        this.authService.verifyAuthenticated(headers);
+        String authToken = headers.getFirst("Authorization");
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+        ApplicationUser user = this.userService.getUserById(currentUserId);
+
+        this.service.updateInventoryIngredient(user, updatedIngredient);
     }
 }

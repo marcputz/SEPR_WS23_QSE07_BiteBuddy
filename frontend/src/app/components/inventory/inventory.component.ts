@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {InventoryListDto} from "../../dtos/InventoryListDto";
 import {InventoryIngredientDto} from "../../dtos/InventoryIngredientDto";
 import {ToastrService} from "ngx-toastr";
-import {InventoryService} from "../../services/inventory.service";
+import {MenuPlanService} from "../../services/menuplan.service";
 
 @Component({
   selector: 'app-inventory',
@@ -13,7 +13,7 @@ export class InventoryComponent {
   inventory: InventoryListDto
 
   constructor(
-    private service: InventoryService,
+    private service: MenuPlanService,
     private notification: ToastrService,
   ) {
   }

@@ -35,7 +35,7 @@ public class InventoryIngredient {
     public InventoryIngredient() {
     }
 
-    public InventoryIngredient(String name, Long menuPlanId, Long ingredientId, float amount, FoodUnit unit, boolean inventoryStatus) {
+    public InventoryIngredient(String name, Long menuPlanId, Long ingredientId, Float amount, FoodUnit unit, boolean inventoryStatus) {
         this.name = name;
         this.menuPlanId = menuPlanId;
         this.ingredientId = ingredientId;
