@@ -1,3 +1,7 @@
+h5 {
+  color: var(--button-background-color);
+}
+
 .setting-layout {
   margin-top: 15%;
   margin-left: 20%;
@@ -14,11 +18,16 @@
 .profile-sidebar-wrapper {
   position: relative;
   text-align: center;
+  height: fit-content;
 }
 
 .profile-img {
-  width: 40%;
+  width: 35%;
   transform: translateY(-50%);
+}
+
+.user-info {
+  margin-top: -8%;
 }
 
 .link-sidebar {
@@ -27,14 +36,18 @@
 
 .link-sidebar ul {
   padding:2rem !important;
-  margin-bottom: 10rem !important;
+  margin-bottom: 2.5rem !important;
+}
+
+.link-email {
+  margin-left: -10%;
 }
 
 .link-sidebar li {
-  font-size: 21px;
+  font-size: 20px;
   width: 70%;
   margin-left: 10%;
-  margin-bottom: 20%;
+  margin-bottom: 12%;
 }
 
 .link-sidebar a {
@@ -54,12 +67,11 @@ i {
 }
 
 .btn-group-vertical {
-  //margin-top: 50%;
   margin-bottom: 5%;
 }
 
-button {
-  margin-bottom: 15%;
+.button-transparent {
+  margin: 8% 0;
 }
 
 /* Media query for screens up to 1170px */

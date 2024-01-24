@@ -19,6 +19,11 @@ export class ChangePasswordComponent {
   error = false;
   errorMessage = '';
 
+  isInputFocused: {[key: string]: boolean } = {};
+  showPasswords: boolean = false;
+  showPassword1: boolean = false;
+  showPassword2: boolean = false;
+
   originalUserSettings: UserSettingsDto;
 
   constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
@@ -68,5 +73,22 @@ export class ChangePasswordComponent {
       console.log('Invalid input');
       this.notifications.error('Invalid input');
     }
+  }
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
+  }
+
+  togglePasswordVisibility1() {
+    this.showPassword1 = !this.showPassword1;
+  }
+
+  togglePasswordVisibility2() {
+    this.showPassword2 = !this.showPassword2;
+  }
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.settingsForm.get(attribute).value !== '';
   }
 }

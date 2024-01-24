@@ -19,6 +19,9 @@ export class ChangeEmailComponent {
   error = false;
   errorMessage = '';
 
+  isInputFocused: {[key: string]: boolean } = {};
+  showPasswords: boolean = false;
+
   originalUserSettings: UserSettingsDto;
 
   constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
@@ -90,5 +93,16 @@ export class ChangeEmailComponent {
     } else {
       console.log('Invalid input');
     }
+  }
+
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.settingsForm.get(attribute).value !== '';
   }
 }

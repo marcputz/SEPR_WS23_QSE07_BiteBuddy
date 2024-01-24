@@ -43,29 +43,7 @@
           <!-- TODO: Add username to long or made out of whitespaces -->
         </div>
       </div>
-      <!-- Email input field -->
-      <div class="form-group">
-        <label for="inputEmail" class="bb-transition-label"
-               *ngIf="isInputFocused['email'] || settingsForm.get('email').value">Email Address</label>
-        <input type="text" name="email" formControlName="email"
-               class="bb-input-textfield bb-input"
-               [class.bb-input-textfield-error]="submitted && settingsForm.controls.email.errors"
-               id="inputEmail"
-               aria-describedby="emailHelp"
-               placeholder="Email Address"
-               (focus)="isInputFocused['email'] = true"
-               (blur)="this.updateInputFocus('email')"
-               [ngClass]="{'filled-input': settingsForm.get('email').value !== ''}"
-               required >
-        <div *ngIf="submitted && settingsForm.controls.email.errors" class="bb-input-error">
-          <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.required">
-            Email is required
-          </small>
-          <small class="form-text text-danger" *ngIf="settingsForm.controls.email.errors.email">
-            Please enter a valid email. Example: mustermann@gmail.com
-          </small>
-        </div>
-      </div>
+      <!-- TODO: add cancel button? -->
       <button type="submit" name="emailUpdateButton" class="button-full bb-form-button" (click)="updateUserSettings()">Save changes</button>
     </form>
   </div>

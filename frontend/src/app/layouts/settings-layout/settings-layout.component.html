@@ -7,10 +7,10 @@
         </div>
         <div class="user-info">
           <div class="username">
-            <h4>{{ this.accountUsername }}</h4>
+            <h5>{{ this.accountUsername }}</h5>
           </div>
           <div class="user-email">
-            <h5 *ngIf="this.accountEmail.length < 40"  id="sidebar-email">{{ this.accountEmail }}</h5>
+            <h6 *ngIf="this.accountEmail.length < 40"  id="sidebar-email">{{ this.accountEmail }}</h6>
           </div>
         </div>
         <!-- Add links-->
@@ -23,7 +23,7 @@
               </a>
             </li>
             <li>
-              <a [routerLink]="['/settings/email']" class="bb-link" [class.active]="activeNavItem === 'email'">
+              <a [routerLink]="['/settings/email']" class="bb-link link-email" [class.active]="activeNavItem === 'email'">
                 <i class="bi bi-envelope"></i>
                 Email
               </a>

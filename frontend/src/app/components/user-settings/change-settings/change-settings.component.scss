@@ -4,8 +4,8 @@
   font-weight: 500;
   line-height: normal;
 
-  margin-top: 21% !important;
-  margin-bottom: 5%;
+  margin-top: 16% !important;
+  margin-bottom: 10%;
 }
 
 .register-form {
@@ -27,7 +27,11 @@
 .image-container {
   position: relative;
   width: 35%;
-  margin: 5% 0;
+  margin: 5% 40%;
+}
+
+.label-picture {
+  margin-left: 40%;
 }
 
 img {
@@ -36,7 +40,6 @@ img {
 }
 
 .form-group {
-  margin-top: 10%;
   margin-bottom: 10%;
 
   height: fit-content;

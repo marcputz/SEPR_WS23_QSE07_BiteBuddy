@@ -17,7 +17,6 @@ import {ImageHandler} from '../../../utils/imageHandler';
 export class ChangeSettingsComponent {
 
   settingsForm: UntypedFormGroup;
-
   submitted = false;
   error = false;
   errorMessage = '';
@@ -38,9 +37,7 @@ export class ChangeSettingsComponent {
     private imageHandler: ImageHandler
   ) {
     this.settingsForm = this.formBuilder.group({
-      nickname: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
-      email: ['', [Validators.required, Validators.email]],
-      currentPassword: ['', [Validators.required, Validators.minLength(8)]]
+      nickname: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]]
     });
   }
 
@@ -81,13 +78,12 @@ export class ChangeSettingsComponent {
       next: (settings: UserSettingsDto) => {
         this.originalUserSettings = settings;
         this.settingsForm.controls['nickname'].setValue(settings.nickname);
-        this.settingsForm.controls['email'].setValue(settings.email);
         this.loadPreviewPicture();
         this.newUserSettings = new UpdateUserSettingsDto("", null);
       },
       error: error => {
         console.error('Error loading user settings');
-        this.notifications.error('Error loading user settings, try later');
+        this.notifications.error('Error loading user settings');
 
         this.error = true;
         this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
