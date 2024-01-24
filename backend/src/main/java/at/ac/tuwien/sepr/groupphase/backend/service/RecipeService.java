@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public interface RecipeService {
      *
      * @param recipe we want to store.
      */
-    void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException;
+    void createRecipe(RecipeDetailsDto recipe, Long userId) throws ConflictException, ValidationException;
 
     /**
      * Finds the recipe with the given id.
@@ -34,7 +35,7 @@ public interface RecipeService {
      * @return the {@link RecipeDto} with the given id
      * @throws NotFoundException if the recipe with the given ID does not exist in the persistent data store
      */
-    RecipeDetailsDto getDetailedRecipe(long id) throws NotFoundException;
+    RecipeDetailsDto getDetailedRecipe(long id) throws NotFoundException, UserNotFoundException;
 
     /**
      * Finds the first 10 ingredients matching a name. It is not positional, upper/lower case-sensitive.

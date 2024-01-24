@@ -18,6 +18,7 @@ export class RecipeCreateComponent {
   ingredient: string = '';
   recipe: RecipeDetailsDto = {
     name: '',
+    creatorName: '',
     picture: null,
     description: '',
     id: null,

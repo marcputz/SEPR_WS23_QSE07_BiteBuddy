@@ -17,6 +17,7 @@ export class RecipeDetailComponent implements OnInit{
 
   recipeDetails: RecipeDetailsDto = {
     name: "",
+    creatorName: "",
     description: "",
     id: -1,
     ingredients: null,

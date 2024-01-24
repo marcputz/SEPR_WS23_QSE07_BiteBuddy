@@ -5,18 +5,24 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
+import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = RecipeEndpoint.BASE_PATH)
@@ -31,10 +38,12 @@ public class RecipeEndpoint {
     public static final String BASE_PATH = "/api/v1/recipes";
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final RecipeService recipeService;
+    private AuthenticationService authenticationService;
 
     @Autowired
-    public RecipeEndpoint(RecipeService recipeService) {
+    public RecipeEndpoint(RecipeService recipeService, AuthenticationService authenticationService) {
         this.recipeService = recipeService;
+        this.authenticationService = authenticationService;
     }
 
     @PostMapping()
@@ -51,11 +60,16 @@ public class RecipeEndpoint {
     }
 
     @PostMapping("/create")
-    public void createRecipe(@RequestBody RecipeDetailsDto recipe) {
+    public void createRecipe(@RequestBody RecipeDetailsDto recipe, @RequestHeader HttpHeaders headers) throws AuthenticationException {
+        // checking for logged in and valid user
+        this.authenticationService.verifyAuthenticated(headers);
+        String authToken = headers.getFirst("Authorization");
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+
         LOGGER.info("POST " + BASE_PATH + "/create");
         LOGGER.debug("request body: {}", recipe);
         try {
-            this.recipeService.createRecipe(recipe);
+            this.recipeService.createRecipe(recipe, currentUserId);
         } catch (ConflictException e) {
             HttpStatus status = HttpStatus.CONFLICT;
             logClientError(status, "Conflict while creating recipe", e);
@@ -76,6 +90,8 @@ public class RecipeEndpoint {
             HttpStatus status = HttpStatus.NOT_FOUND;
             logClientError(status, "Recipe to lookup not found:", e);
             throw new ResponseStatusException(status, e.getMessage(), e);
+        } catch (UserNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 

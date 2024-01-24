@@ -6,10 +6,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-
-
 
 import java.util.Objects;
 import java.util.Set;
@@ -21,6 +21,9 @@ public class Recipe {
     private Long id;
     @Column
     private String name;
+
+    @Column
+    private Long creatorId;
 
     @Lob
     @Column
@@ -73,6 +76,14 @@ public class Recipe {
         return recipeIngredients;
     }
 
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    public Recipe setCreatorId(Long userId) {
+        this.creatorId = userId;
+        return this;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -84,7 +95,8 @@ public class Recipe {
         }
         return Objects.equals(id, recipe.id)
             && Objects.equals(name, recipe.name)
-            && Objects.equals(instructions, recipe.instructions);
+            && Objects.equals(instructions, recipe.instructions)
+            && Objects.equals(creatorId, recipe.creatorId);
     }
 
     @Override
@@ -97,6 +109,7 @@ public class Recipe {
         return "Recipe{"
             + "id=" + id
             + "name=" + name
+            + "creator=" + creatorId
             + "instructions=" + instructions
             + '}';
     }

@@ -29,6 +29,7 @@ export interface RecipeListDto {
 
 export interface RecipeDetailsDto {
   name: string;
+  creatorName: string;
   description: string;
   id: number;
   ingredients: RecipeIngredientDto[];

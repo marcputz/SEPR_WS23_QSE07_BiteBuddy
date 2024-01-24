@@ -10,8 +10,8 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
@@ -47,12 +47,13 @@ public class RecipeServiceImpl implements RecipeService {
     private AllergeneIngredientRepository allergeneIngredientRepository;
     private AllergeneRepository allergeneRepository;
     private RecipeValidator validator;
+    private JpaUserService userService;
 
     @Autowired
     public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeIngredientRepository recipeIngredientRepository,
                              RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
                              IngredientRepository ingredientRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                             AllergeneRepository allergeneRepository, RecipeValidator validator) {
+                             AllergeneRepository allergeneRepository, RecipeValidator validator, JpaUserService userService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
@@ -60,6 +61,7 @@ public class RecipeServiceImpl implements RecipeService {
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.allergeneRepository = allergeneRepository;
         this.validator = validator;
+        this.userService = userService;
     }
 
     @Override
@@ -95,7 +97,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException {
+    public void createRecipe(RecipeDetailsDto recipe, Long userId) throws ConflictException, ValidationException {
         LOGGER.debug("createRecipe");
 
         // validate recipe
@@ -110,6 +112,7 @@ public class RecipeServiceImpl implements RecipeService {
         newRecipe.setName(recipe.name());
         newRecipe.setInstructions(recipe.description());
         newRecipe.setIngredients(ingredients);
+        newRecipe.setCreatorId(userId);
         this.recipeRepository.save(newRecipe);
 
         // getting recipe id & checking if we can find the RecipeIngredients
@@ -171,7 +174,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public RecipeDetailsDto getDetailedRecipe(long id) {
+    public RecipeDetailsDto getDetailedRecipe(long id) throws UserNotFoundException {
 
         LOGGER.trace("details({})", id);
         Optional<Recipe> recipe = this.recipeRepository.findById(id);
@@ -207,8 +210,15 @@ public class RecipeServiceImpl implements RecipeService {
                         }
                     }
                 }
+
+                String creatorName = "BiteBuddy";
+                if (recipe.get().getCreatorId() >= 0) {
+                    var creator = this.userService.getUserById(recipe.get().getCreatorId());
+                    creatorName = creator.getNickname();
+                }
+
                 RecipeDetailsDto detailsDto =
-                    new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions(), newIngredients, allergens,
+                    new RecipeDetailsDto(id, recipe.get().getName(), creatorName, recipe.get().getInstructions(), newIngredients, allergens,
                         recipe.get().getPicture());
                 return detailsDto;
             }
