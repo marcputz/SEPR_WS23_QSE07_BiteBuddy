@@ -1,10 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
@@ -32,8 +28,9 @@ public interface ProfileService {
      * @param profileDto to save
      * @return saved profile entry
      * @throws ValidationException if the profileDto is not valid
+     * @throws NotFoundException if the given user id, at least one of the allergens or at least one of the ingredients can not be found in the database
      */
-    ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException;
+    ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException, NotFoundException;
 
     /**
      * Likes or Dislikes a Recipe with a given Profile.
@@ -45,11 +42,30 @@ public interface ProfileService {
     void rateRecipe(RecipeRatingDto recipeRatingDto) throws NotFoundException, ValidationException;
 
     /**
-     * Likes or Dislikes a Recipe with a given Profile.
+     * Returns the liked and disliked list of recipes of a profile.
      *
      * @param id contains the current user's id
      * @return 2 lists of recipes, one containing liked and the other one disliked ones
-     * @throws NotFoundException if the user could not be found
+     * @throws NotFoundException if the user could not be found or the user's active Profile does not exist
      */
     RecipeRatingListsDto getRatingLists(long id) throws NotFoundException;
+
+    /**
+     * Returns a profile's detailed information
+     *
+     * @param id contains the profile's id
+     * @return the details of a profile (id, name, allergenes, ingredients, liked recipes, disliked recipes
+     * @throws NotFoundException if the profile could not be found
+     */
+    ProfileDetailDto getProfileDetails(long id) throws NotFoundException;
+
+    /**
+     * Edits a single profile entry.
+     *
+     * @param profileDto to edit
+     * @return edited profile entry
+     * @throws ValidationException if the profileDto is not valid
+     * @throws NotFoundException if the profileDto's contents (profile, ingredients, allergenes, user) does not exist in the database
+     */
+    ProfileDto editProfile(ProfileDto profileDto) throws ValidationException, NotFoundException;
 }

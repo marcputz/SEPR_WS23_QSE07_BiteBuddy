@@ -13,6 +13,9 @@ import java.util.List;
 
 public class ProfileDto {
 
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("name")
     @NotNull(message = "Name must not be null")
     @Size(max = 255, min = 1)
@@ -29,6 +32,14 @@ public class ProfileDto {
     @JsonProperty("userId")
     @NotNull(message = "User id must not be null")
     private Long userId;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

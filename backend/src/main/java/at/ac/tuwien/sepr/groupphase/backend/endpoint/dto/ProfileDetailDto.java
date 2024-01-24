@@ -7,9 +7,8 @@ public record ProfileDetailDto(
     String name,
     ArrayList<String> allergens,
     ArrayList<String> ingredients,
-
-    ArrayList<RecipeDto> liked,
-    ArrayList<RecipeDto> disliked,
+    ArrayList<RecipeProfileViewDto> liked,
+    ArrayList<RecipeProfileViewDto> disliked,
     String user,
     Long userId
 

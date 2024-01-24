@@ -92,8 +92,8 @@ public class ProfileServiceImpl implements ProfileService {
                 profile.getName(),
                 profile.getAllergens().stream().map(Allergene::getName).collect(Collectors.toCollection(ArrayList::new)),
                 profile.getIngredient().stream().map(Ingredient::getName).collect(Collectors.toCollection(ArrayList::new)),
-                profile.getLiked().stream().map(recipeMapper::recipeToRecipeDto).collect(Collectors.toCollection(ArrayList::new)),
-                profile.getDisliked().stream().map(recipeMapper::recipeToRecipeDto).collect(Collectors.toCollection(ArrayList::new)),
+                profile.getLiked().stream().map(recipeMapper::recipeToRecipeProfileViewDto).collect(Collectors.toCollection(ArrayList::new)),
+                profile.getDisliked().stream().map(recipeMapper::recipeToRecipeProfileViewDto).collect(Collectors.toCollection(ArrayList::new)),
                 profile.getUser().getNickname(),
                 profile.getUser().getId()
             ))
@@ -173,9 +173,16 @@ public class ProfileServiceImpl implements ProfileService {
     public RecipeRatingListsDto getRatingLists(long id) throws NotFoundException {
         LOGGER.trace("getRatingLists({})", id);
 
-        ApplicationUser user = userRepository.getReferenceById(id);
+        Optional<ApplicationUser> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new NotFoundException("The user does not exist");
+        }
 
-        Profile activeProfile = user.getActiveProfile();
+        Profile activeProfile = user.get().getActiveProfile();
+
+        if (activeProfile == null) {
+            throw new NotFoundException("The user does not have an active profile");
+        }
 
         List<Long> liked = new ArrayList<>();
         List<Long> disliked = new ArrayList<>();
@@ -284,6 +291,7 @@ public class ProfileServiceImpl implements ProfileService {
         Profile edited = profileRepository.save(profileToEdit);
         ProfileDto editedDto = profileMapper.profileToProfileDto(edited);
         editedDto.setUserId(edited.getUser().getId());
+        editedDto.setId(edited.getId());
         return editedDto;
     }
 }
