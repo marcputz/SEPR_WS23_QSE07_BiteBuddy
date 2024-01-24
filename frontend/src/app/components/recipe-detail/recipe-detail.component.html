@@ -23,9 +23,17 @@
         </label>
         <div class="col-md-10 col-lg-8"
         >
-          <div class="model" *ngFor="let ingredient of recipeDetails.ingredients">
-            {{ingredient + ", "}}
-          </div>
+          <ng-container *ngFor="let ingredient of recipeDetails.ingredients">
+            <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit !== null">
+              {{ingredient.name + ", " + ingredient.amount + " " + ingredient.unit}}
+            </div>
+            <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit === null">
+              {{ingredient.name + ", " + ingredient.amount }}
+            </div>
+            <div class="model" *ngIf="ingredient.amount === null && ingredient.unit === null">
+              {{ingredient.name}}
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
@@ -59,6 +67,24 @@
             </div>
           </ng-container>
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="mb-2 col-lg-10">
+      <div class="row">
+        <ng-container *ngIf="rating !== -1">
+          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+            Rating:
+          </label>
+          {{ratingStatus}}
+        </ng-container>
+        <ng-container *ngIf="rating === -1">
+          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+            Currently not rated
+          </label>
+        </ng-container>
+
       </div>
     </div>
   </div>

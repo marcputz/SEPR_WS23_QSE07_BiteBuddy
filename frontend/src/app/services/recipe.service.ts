@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {RecipeDetailsDto, RecipeDto, RecipeListDto, RecipeSearch} from "../dtos/recipe";
+import {RecipeDetailsDto, RecipeDto, RecipeListDto, RecipeSearch, RecipeSearchResultDto} from "../dtos/recipe";
 import {Observable} from "rxjs";
 import {Globals} from '../global/globals';
 
@@ -17,8 +17,8 @@ export class RecipeService {
   ) {
   }
 
-  public search(searchParams: RecipeSearch): Observable<RecipeListDto[]> {
-    return this.http.post<RecipeListDto[]>(this.baseUri, searchParams);
+  public search(searchParams: RecipeSearch): Observable<RecipeSearchResultDto> {
+    return this.http.post<RecipeSearchResultDto>(this.baseUri, searchParams);
   }
 
   getById(id: number): Observable<RecipeDetailsDto> {

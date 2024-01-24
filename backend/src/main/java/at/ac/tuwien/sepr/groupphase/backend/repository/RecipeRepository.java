@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.repository;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,9 @@ import java.util.Set;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
-    List<Recipe> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Recipe> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    List<Recipe> findByNameContainingIgnoreCase(String name);
 
     Set<Recipe> findAllByRecipeIngredientsIngredientId(long l);
 

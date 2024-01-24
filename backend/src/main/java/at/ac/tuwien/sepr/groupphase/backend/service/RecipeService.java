@@ -2,8 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -15,9 +15,9 @@ public interface RecipeService {
      * Finds all recipes that match the search parameters given.
      *
      * @param searchParams {@link RecipeSearchDto} with all parameters.
-     * @return List of {@link RecipeListDto} with all the recipe entries that match the given search parameters
+     * @return {@link RecipeSearchResultDto} with all the recipe entries that match the given search parameters and page information
      */
-    List<RecipeListDto> searchRecipes(RecipeSearchDto searchParams);
+    RecipeSearchResultDto searchRecipes(RecipeSearchDto searchParams);
 
     /**
      * Creates a recipe from all the details of the {@link RecipeDetailsDto}.
@@ -45,11 +45,11 @@ public interface RecipeService {
     List<String> findMatchingIngredients(String name);
 
     /**
-     * Creates a Raiting, based on the int raiting for the recipe with id recipeID from the user with the id userID.
+     * Creates a Rating, based on the int rating for the recipe with id recipeID from the user with the id userID.
      *
      * @param recipeId is the id of the rated recipe.
-     * @param userId is the id of the rating user.
-     * @param rating is the id of the raiting based on the int value (0 is dislike and 1 is like).
+     * @param userId   is the id of the rating user.
+     * @param rating   is the id of the rating based on the int value (0 is dislike and 1 is like).
      * @throws NotFoundException if the recipe or the user can not be found.
      */
     void createRating(long recipeId, long userId, int rating);
