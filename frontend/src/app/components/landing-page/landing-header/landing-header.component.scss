@@ -2,12 +2,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 12px;
+}
+
+.glassy-background {
+  background-color: rgba(224, 219, 213, 21%); /* Adjust the alpha channel for transparency */
+  backdrop-filter: blur(10px);
 }
 
 .header .left {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: 38px;
   position: relative;
   flex: 0 0 auto;
@@ -16,13 +20,11 @@
 .header .text-wrapper {
   position: relative;
   width: fit-content;
-  //font-family: "Jost-Regular", Helvetica;
-  //font-weight: 400;
-  //color: var(--blue-gray900);
-  font-size: 32px;
+  font-size: 28px;
   letter-spacing: 0;
-  line-height: 35.2px;
+  line-height: 28.2px;
   white-space: nowrap;
+  margin-left: 12%;
 }
 
 .header .buttons-group {
@@ -35,6 +37,10 @@
 
 .button-header {
   flex-direction: row;
+}
+
+.button-login, .button-signup {
+  margin-bottom: 0 !important;
 }
 
 .header .menu-item {
@@ -51,9 +57,6 @@
   position: relative;
   width: fit-content;
   margin-top: -1px;
- // font-family: "Jost-Regular", Helvetica;
-  //font-weight: 400;
-  //color: var(--blue-gray900);
   font-size: 16px;
   letter-spacing: 0.5px;
   line-height: 24px;
@@ -81,7 +84,6 @@
   position: relative;
   width: fit-content;
   margin-top: -1px;
- // font-family: "Jost-Medium", Helvetica;
   font-weight: 500;
   color: #584238;
   font-size: 16px;
@@ -104,8 +106,6 @@
   position: relative;
   width: fit-content;
   margin-top: -1px;
- // font-family: "Roboto-Medium", Helvetica;
-  //font-weight: 400;
   color: #ffffff;
   font-size: 16px;
   letter-spacing: 0.5px;
@@ -114,19 +114,16 @@
 }
 
 .header .span {
-  //font-weight: var(--button-m-font-weight);
- // font-family: var(--button-m-font-family);
   font-style: var(--button-m-font-style);
   letter-spacing: var(--button-m-letter-spacing);
   line-height: var(--button-m-line-height);
   font-size: var(--button-m-font-size);
 }
 
-.header .text-wrapper-2 {
- // font-family: "Jost-Medium", Helvetica;
- // font-weight: 500;
-}
-
 i, .text-inside-btn {
   color: white;
+}
+
+.left {
+  align-self: center;
 }
