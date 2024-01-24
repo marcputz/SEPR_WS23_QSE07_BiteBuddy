@@ -95,6 +95,11 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public List<Recipe> getAll() {
+        return this.recipeRepository.findAll();
+    }
+
+    @Override
     public void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException {
         LOGGER.debug("createRecipe");
 

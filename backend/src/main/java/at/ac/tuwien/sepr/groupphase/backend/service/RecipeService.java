@@ -20,6 +20,8 @@ public interface RecipeService {
      */
     RecipeSearchResultDto searchRecipes(RecipeSearchDto searchParams);
 
+    List<Recipe> getAll();
+
     /**
      * Creates a recipe from all the details of the {@link RecipeDetailsDto}.
      * Before creating, it checks that every ingredient already exists in the database. If one does not an exception is thrown.

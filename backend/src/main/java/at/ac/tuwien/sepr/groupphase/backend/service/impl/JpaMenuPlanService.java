@@ -151,7 +151,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         Set<MenuPlanContentDetailDto> contentDtos = new HashSet<>();
 
         // get available recipes from data store
-        List<Recipe> availableRecipes = new ArrayList<>(); // TODO: replace
+        List<Recipe> availableRecipes = this.recipeService.getAll(); // TODO: replace
 
         // TODO: remove unsuited recipes from list
 
