@@ -1,16 +1,17 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -24,7 +25,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validation.ProfileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +99,24 @@ public class ProfileServiceImpl implements ProfileService {
         userRepository.save(user.get());
         return createdDto;
         //return profileMapper.profileToProfileDto(profileRepository.save(profileMapper.profileDtoToProfile(actualUser)));
+    }
+
+    @Override
+    public List<ProfileListDto> getAllByUser(ApplicationUser user) {
+        LOGGER.trace("getAllByUser({})", user);
+
+        List<Profile> profiles =  this.profileRepository.getAllByUser(user);
+        List<ProfileListDto> profileDtos = new ArrayList<>();
+
+        for (Profile p : profiles) {
+            profileDtos.add(new ProfileListDto()
+                .setId(p.getId())
+                .setName(p.getName())
+                .setUserId(p.getUser().getId())
+            );
+        }
+
+        return profileDtos;
     }
 
     public void rateRecipe(RecipeRatingDto recipeRatingDto) throws NotFoundException, ValidationException {

@@ -7,6 +7,7 @@ import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {RecipeService} from "../../services/recipe.service";
 import {of} from "rxjs";
+import {ProfileDto, ProfileListDto} from "../../dtos/profileDto";
 
 @Component({
   selector: 'app-menu-plan',
@@ -21,8 +22,11 @@ export class MenuPlanComponent implements OnInit {
   protected fromDate: string | null = "2024-01-17";
   protected untilDate: string | null = "2024-01-23";
 
+  protected userProfiles: ProfileListDto[];
+  protected selectedProfile: number | null = null;
+
   createDto: MenuPlanCreateDto = {
-    profileId: 0,
+    profileId: this.selectedProfile,
     fromTime: this.fromDate,
     untilTime: this.untilDate,
     fridge: []
@@ -33,18 +37,20 @@ export class MenuPlanComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    this.profileService.getAllProfilesOfUser().subscribe(response => {
+      this.userProfiles = response;
+    });
   }
 
   onClickGenerate() {
 
-    console.log("generate clicked");
+    if (this.selectedProfile == null) {
+      return;
+    }
 
-    let fromDate = this.fromDate;
-    let untilDate = this.untilDate;
-
-    this.createDto.fromTime = fromDate;
-    this.createDto.untilTime = untilDate;
+    this.createDto.fromTime = this.fromDate;
+    this.createDto.untilTime = this.untilDate;
+    this.createDto.profileId = this.selectedProfile;
 
     this.generateRequest = JSON.stringify(this.createDto);
 

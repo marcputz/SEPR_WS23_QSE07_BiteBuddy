@@ -1,10 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+
+import java.util.List;
 
 
 public interface ProfileService {
@@ -16,6 +21,8 @@ public interface ProfileService {
      * @throws ValidationException if the profileDto is not valid
      */
     ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException;
+
+    List<ProfileListDto> getAllByUser(ApplicationUser user);
 
     /**
      * Likes or Dislikes a Recipe with a given Profile.

@@ -2,8 +2,8 @@
   <h1>GENERATE MENU PLAN</h1>
 
   <form>
-    <select name="profileDropdown">
-      <option value="1">Profile 1</option>
+    <select name="profileDropdown" [(ngModel)]="selectedProfile">
+      <option *ngFor="let profile of userProfiles" [value]="profile.id">{{profile.name}}</option>
     </select>
     <br>
     FROM: <input type="date" id="fromDate" name="fromDate" [(ngModel)]="fromDate">

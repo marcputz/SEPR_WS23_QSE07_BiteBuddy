@@ -1,12 +1,9 @@
 import {Injectable} from "@angular/core";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {Globals} from "../global/globals";
 import {MenuPlanCreateDto} from "../dtos/menuplan/menuPlanCreateDto";
-import {catchError, Observable, throwError} from "rxjs";
+import {Observable} from "rxjs";
 import {MenuPlanDetailDto} from "../dtos/menuplan/menuPlanDetailDto";
-import {tap} from "rxjs/operators";
-import {MenuPlanListDto} from "../dtos/menuplan/menuPlanListDto";
-import {Logger} from "jasmine-spec-reporter/built/display/logger";
 import {formatDate} from "@angular/common";
 import {InventoryIngredientDto} from "../dtos/InventoryIngredientDto";
 
