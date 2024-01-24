@@ -10,18 +10,21 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 public interface ProfileService {
     /**
-     * Searches for profiles based on provided criteria in {@link ProfileSearchDto}.
+     * Searches for profiles based on criteria provided in {@link ProfileSearchDto} and the current user's ID.
      *
-     * <p>This method returns a paginated list of profiles that match the search criteria,
-     * including profile name, creator's nickname, and user ID. It applies default values
-     * for pagination if not specified. When 'creator' is given, profiles created by that user
-     * are fetched, excluding the specified 'userId'. Without 'creator', it searches by name and
-     * 'userId' only.
+     * <p>This method returns a paginated list of profiles matching the search criteria, including profile name,
+     * creator's nickname, and user ID. It supports filtering profiles based on whether the search is for the
+     * user's own profiles or others'. When 'ownProfiles' in {@link ProfileSearchDto} is true, it fetches profiles
+     * created by the current user specified by 'currentUserId'. Otherwise, it fetches profiles matching the name
+     * and creator's nickname but excludes profiles associated with 'currentUserId'.
      *
-     * @param searchParams The criteria for searching profiles.
-     * @return A paginated {@link ProfileSearchResultDto} containing matching profiles and pagination details.
+     * <p>Default pagination values are applied if not specified in the search parameters.
+     *
+     * @param searchParams  The criteria for searching profiles including flags for own profile search.
+     * @param currentUserId The ID of the current user, used to filter own profiles or exclude from search.
+     * @return A paginated {@link ProfileSearchResultDto} containing matching profiles with detailed information and pagination details.
      */
-    ProfileSearchResultDto searchProfiles(ProfileSearchDto searchParams);
+    ProfileSearchResultDto searchProfiles(ProfileSearchDto searchParams, Long currentUserId);
 
     /**
      * Save a single profile entry.

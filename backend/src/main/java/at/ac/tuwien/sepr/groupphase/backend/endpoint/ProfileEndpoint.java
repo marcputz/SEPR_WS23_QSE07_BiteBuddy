@@ -1,21 +1,30 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
+import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,23 +38,23 @@ public class ProfileEndpoint {
     static final String BASE_PATH = "/api/v1/profiles";
 
     private final ProfileService profileService;
+    private AuthenticationService authenticationService;
 
-    public ProfileEndpoint(ProfileService profileService) {
+    public ProfileEndpoint(ProfileService profileService, AuthenticationService authenticationService) {
         this.profileService = profileService;
+        this.authenticationService = authenticationService;
     }
 
 
-    @Operation(summary = "Search profiles", description = "Search for profiles based on given search criteria")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
-        @ApiResponse(responseCode = "400", description = "Invalid search criteria provided")
-    })
-    @GetMapping("/search")
-    public ProfileSearchResultDto searchProfiles(@Valid @RequestBody ProfileSearchDto searchParams) {
+    @PostMapping("/search")
+    public ProfileSearchResultDto searchProfiles(@Valid @RequestBody ProfileSearchDto searchParams, @RequestHeader HttpHeaders headers) {
         LOGGER.info("Received POST request for profile search on {}", BASE_PATH);
         LOGGER.debug("Search parameters: {}", searchParams);
 
-        return profileService.searchProfiles(searchParams);
+        String authToken = this.authenticationService.getAuthToken(headers);
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+
+        return profileService.searchProfiles(searchParams, currentUserId);
     }
 
     @Operation(summary = "Create profile", description = "Profile fields should be valid")

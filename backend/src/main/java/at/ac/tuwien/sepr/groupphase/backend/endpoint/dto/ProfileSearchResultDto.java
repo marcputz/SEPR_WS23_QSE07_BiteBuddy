@@ -6,6 +6,6 @@ public record ProfileSearchResultDto(
     int page,
     int entriesPerPage,
     int numberOfPages,
-    List<ProfileListDto> profiles
+    List<ProfileDetailDto> profiles
 ) {
 }

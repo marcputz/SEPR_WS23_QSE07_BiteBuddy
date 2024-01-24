@@ -1,9 +1,19 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeProfileViewDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.RecipeMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
@@ -29,6 +39,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfileServiceImpl implements ProfileService {
@@ -41,13 +52,13 @@ public class ProfileServiceImpl implements ProfileService {
     private final IngredientRepository ingredientRepository;
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
-    private AllergeneMapper allergeneMapper;
-    private IngredientMapper ingredientMapper;
+    private final RecipeMapper recipeMapper;
 
     public ProfileServiceImpl(ProfileRepository profileRepository, AllergeneRepository allergeneRepository,
                               ProfileMapper profileMapper, IngredientRepository ingredientRepository,
                               RecipeRepository recipeRepository, UserRepository userRepository,
-                              ProfileValidator profileValidator, AllergeneMapper allergeneMapper, IngredientMapper ingredientMapper) {
+                              ProfileValidator profileValidator, AllergeneMapper allergeneMapper, IngredientMapper ingredientMapper,
+                              RecipeMapper recipeMapper) {
         this.profileRepository = profileRepository;
         this.allergeneRepository = allergeneRepository;
         this.ingredientRepository = ingredientRepository;
@@ -55,53 +66,40 @@ public class ProfileServiceImpl implements ProfileService {
         this.profileMapper = profileMapper;
         this.profileValidator = profileValidator;
         this.userRepository = userRepository;
-        this.allergeneMapper = allergeneMapper;
-        this.ingredientMapper = ingredientMapper;
+        this.recipeMapper = recipeMapper;
     }
 
     @Override
-    public ProfileSearchResultDto searchProfiles(ProfileSearchDto searchParams) {
+    public ProfileSearchResultDto searchProfiles(ProfileSearchDto searchParams, Long currentUserId) {
         LOGGER.debug("search profiles");
 
-        //Set Default values
-        String name = Optional.ofNullable(searchParams)
-            .map(ProfileSearchDto::name)
-            .filter(str -> !str.trim().isEmpty())
-            .orElse("");
-        String creator = Optional.ofNullable(searchParams)
-            .map(ProfileSearchDto::creator)
-            .filter(str -> !str.trim().isEmpty())
-            .orElse("");
-        int pageSelector = Optional.ofNullable(searchParams)
-            .map(ProfileSearchDto::page)
-            .filter(page -> page >= 0)
-            .orElse(0);
-        int entriesPerPage = Optional.ofNullable(searchParams)
-            .map(ProfileSearchDto::entriesPerPage)
-            .filter(entries -> entries >= 21)
-            .orElse(21);
-        Long userId = Optional.ofNullable(searchParams)
-            .map(ProfileSearchDto::userId)
-            .filter(id -> id != 0)
-            .orElse(null);
+        String name = (searchParams.name() != null && !searchParams.name().trim().isEmpty()) ? searchParams.name() : "";
+
+        String creator = (searchParams.creator() != null && !searchParams.creator().trim().isEmpty()) ? searchParams.creator() : "";
+
+        int pageSelector = Math.max(searchParams.page(), 0);
+
+        int entriesPerPage = Math.max(searchParams.entriesPerPage(), 21);
 
         Pageable page = PageRequest.of(pageSelector, entriesPerPage);
-        Page<Profile> profiles = creator.isEmpty()
-            ? profileRepository.findByNameContainingIgnoreCaseAndUserId(name, userId, page)
-            : profileRepository.findByNameContainingIgnoreCaseAndCreatorAndNotUserId(name, creator, userId, page);
-
-        List<ProfileListDto> profileDtos = profiles.getContent().stream()
-            .map(profile -> new ProfileListDto(
+        Page<Profile> profilesPage = searchParams.ownProfiles()
+            ? profileRepository.findByNameContainingIgnoreCaseAndUserId(name, currentUserId, page)
+            : profileRepository.findByNameContainingIgnoreCaseAndCreatorAndNotUserId(name, creator, currentUserId, page);
+        List<Profile> profiles = profilesPage.getContent().stream().toList();
+        List<ProfileDetailDto> profileDtos = profiles.stream()
+            .map(profile -> new ProfileDetailDto(
                 profile.getId(),
                 profile.getName(),
-                profile.getAllergens().stream().map(allergeneMapper::allergeneToAllergeneDto).toList(),
-                profile.getIngredient().stream().map(ingredientMapper::ingredientToIngredientDto).toList(),
-                profile.getUser().getId(),
-                profile.getUser().getNickname()
+                profile.getAllergens().stream().map(Allergene::getName).collect(Collectors.toCollection(ArrayList::new)),
+                profile.getIngredient().stream().map(Ingredient::getName).collect(Collectors.toCollection(ArrayList::new)),
+                profile.getLiked().stream().map(recipeMapper::recipeToRecipeDto).collect(Collectors.toCollection(ArrayList::new)),
+                profile.getDisliked().stream().map(recipeMapper::recipeToRecipeDto).collect(Collectors.toCollection(ArrayList::new)),
+                profile.getUser().getNickname(),
+                profile.getUser().getId()
             ))
             .toList();
 
-        return new ProfileSearchResultDto(pageSelector, entriesPerPage, profiles.getTotalPages(), profileDtos);
+        return new ProfileSearchResultDto(pageSelector, entriesPerPage, profilesPage.getTotalPages(), profileDtos);
     }
 
 

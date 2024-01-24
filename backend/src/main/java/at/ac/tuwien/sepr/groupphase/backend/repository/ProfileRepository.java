@@ -26,4 +26,5 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     Page<Profile> findByNameContainingIgnoreCaseAndUserId(String name, Long userId, Pageable pageable);
 
+    Profile findByName(String name);
 }
