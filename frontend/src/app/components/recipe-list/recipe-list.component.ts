@@ -35,6 +35,9 @@ export class RecipeListComponent {
     rating: -1
   };
 
+  likes: number[];
+  dislikes: number[];
+
   constructor(
     private service: RecipeService,
     private authService: AuthService,
@@ -52,6 +55,23 @@ export class RecipeListComponent {
     this.searchChangedObservable
       .pipe(debounceTime(300))
       .subscribe({next: () => this.reloadRecipes()});
+
+      this.authService.getUser().subscribe(
+          (settings: UserSettingsDto) => {
+              this.profileService.getRatingLists(settings.id)
+                  .subscribe({
+                      next: data => {
+                          this.likes = data.likes;
+                          this.dislikes = data.dislikes
+                      },
+                      error: error => {
+                          console.error('Error getting rating list', error);
+                          const errorMessage = error?.message || 'Unknown error occured';
+                          this.notification.error(`Error getting rating lists: ${errorMessage}`);
+                      }
+                  });
+          },
+      );
   }
 
   searchChanged(): void {
@@ -105,7 +125,8 @@ export class RecipeListComponent {
         this.profileService.createRating(this.recipeRating)
           .subscribe({
               next: data => {
-                this.notification.success("Successfully rated new recipe!")
+                  this.notification.success("Successfully rated new recipe!");
+                  window.location.reload();
               },
               error: error => {
                 console.log(error)
@@ -120,4 +141,5 @@ export class RecipeListComponent {
           );
       });
   }
+
 }

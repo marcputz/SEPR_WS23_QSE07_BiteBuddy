@@ -60,12 +60,15 @@
             <a class="btn btn-sm btn-success"
                (click)="rateRecipe(recipe.id, 1)"
                aria-label="Like Recipe">
-              <i class="bi bi-hand-thumbs-up"></i>
+              <i *ngIf= "likes.includes(recipe.id); else elseBlock" class="bi bi-hand-thumbs-up-fill"></i>
+              <ng-template #elseBlock><i class="bi bi-hand-thumbs-up"></i></ng-template>
+
             </a>
             <a class="btn btn-sm btn-danger"
                (click)="rateRecipe(recipe.id, 0)"
                aria-label="Dislike Recipe">
-              <i class="bi bi-hand-thumbs-down"></i>
+              <i *ngIf= "dislikes.includes(recipe.id); else elseBlock"class="bi bi-hand-thumbs-down-fill"></i>
+              <ng-template #elseBlock><i class="bi bi-hand-thumbs-down"></i></ng-template>
             </a>
           </div>
         </div>

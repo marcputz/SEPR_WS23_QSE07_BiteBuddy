@@ -1,14 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
@@ -114,9 +106,8 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
-    public ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException {
+    public ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException, NotFoundException {
         LOGGER.trace("saveProfile({})", profileDto);
-        LOGGER.info("saveProfile({})", profileDto);
 
         profileValidator.validateForCreate(profileDto);
 
@@ -140,8 +131,6 @@ public class ProfileServiceImpl implements ProfileService {
         if (user.isEmpty()) {
             throw new NotFoundException("User with id " + profileDto.getUserId() + " does not exist");
         }
-
-        LOGGER.info("GOT RIGHT BEFORE POSTING User is: " + user.get().getId());
 
         ProfileUserDto actualUser = new ProfileUserDto();
         actualUser.setName(profileDto.getName());
@@ -170,10 +159,14 @@ public class ProfileServiceImpl implements ProfileService {
 
         if (recipeRatingDto.rating() == 0) {
             ratingProfile.getLiked().remove(recipeToRate);
-            ratingProfile.getDisliked().add(recipeToRate);
+            if (!ratingProfile.getDisliked().add(recipeToRate)) {
+                ratingProfile.getDisliked().remove(recipeToRate);
+            }
         } else if (recipeRatingDto.rating() == 1) {
             ratingProfile.getDisliked().remove(recipeToRate);
-            ratingProfile.getLiked().add(recipeToRate);
+            if (!ratingProfile.getLiked().add(recipeToRate)) {
+                ratingProfile.getLiked().remove(recipeToRate);
+            }
         }
         profileRepository.save(ratingProfile);
     }
@@ -202,5 +195,97 @@ public class ProfileServiceImpl implements ProfileService {
             disliked);
 
         return ratingLists;
+    }
+
+    @Override
+    public ProfileDetailDto getProfileDetails(long id) throws NotFoundException {
+        LOGGER.trace("getProfileDetails({})", id);
+        Optional<Profile> profileOptional = profileRepository.findById(id);
+        Profile profile;
+        if (profileOptional.isEmpty()) {
+            throw new NotFoundException("Profile could not be found");
+        } else {
+            profile = profileOptional.get();
+        }
+        ArrayList<String> allergens = new ArrayList<>();
+        if (profile.getAllergens() != null) {
+            for (Allergene allergene : profile.getAllergens()) {
+                allergens.add(allergene.getName());
+            }
+        }
+
+        ArrayList<String> ingredients = new ArrayList<>();
+        if (profile.getIngredient() != null) {
+            for (Ingredient ingredient : profile.getIngredient()) {
+                ingredients.add(ingredient.getName());
+            }
+        }
+
+        ArrayList<RecipeProfileViewDto> liked = new ArrayList<>();
+        for (Recipe recipe : profile.getLiked()) {
+            liked.add(new RecipeProfileViewDto(recipe.getId(), recipe.getName()));
+        }
+
+        ArrayList<RecipeProfileViewDto> disliked = new ArrayList<>();
+        for (Recipe recipe : profile.getDisliked()) {
+            disliked.add(new RecipeProfileViewDto(recipe.getId(), recipe.getName()));
+        }
+
+        ProfileDetailDto profileDetails = new ProfileDetailDto(profile.getId(), profile.getName(),
+            allergens, ingredients, liked, disliked, profile.getUser().getNickname(), profile.getUser().getId());
+
+        return profileDetails;
+    }
+
+    @Override
+    public ProfileDto editProfile(ProfileDto profileDto) throws ValidationException, NotFoundException {
+        LOGGER.trace("editProfile({})", profileDto);
+
+        profileValidator.validateForCreate(profileDto);
+
+        Optional<Profile> profileToEditOp = profileRepository.findById(profileDto.getId());
+
+        if (profileToEditOp.isEmpty()) {
+            throw new NotFoundException("This profile does not exist in the database");
+        }
+
+        //check if the allergens correspond to the ones in the database
+        List<Allergene> allergenes = allergeneRepository.findAll();
+        for (AllergeneDto allergeneDto : profileDto.getAllergens()) {
+            if (allergenes.stream().noneMatch(allergene -> allergene.getId() == allergeneDto.getId())) {
+                throw new NotFoundException("Allergene with id " + allergeneDto.getId() + " does not exist");
+            }
+        }
+
+        //check if the ingredients correspond to the ones in the database
+        List<Ingredient> ingredients = ingredientRepository.findAll();
+        for (IngredientDto ingredientDto : profileDto.getIngredient()) {
+            if (ingredients.stream().noneMatch(ingredient -> ingredient.getId() == ingredientDto.getId())) {
+                throw new NotFoundException("Ingredient with id " + ingredientDto.getId() + " does not exist");
+            }
+        }
+
+        Optional<ApplicationUser> user = userRepository.findById(profileDto.getUserId());
+        if (user.isEmpty()) {
+            throw new NotFoundException("User with id " + profileDto.getUserId() + " does not exist");
+        }
+
+        Profile profileToEdit = profileToEditOp.get();
+
+        ProfileUserDto actualUser = new ProfileUserDto();
+        actualUser.setId(profileDto.getId());
+        actualUser.setName(profileDto.getName());
+        actualUser.setIngredient(profileDto.getIngredient());
+        actualUser.setAllergens(profileDto.getAllergens());
+        actualUser.setUser(user.get());
+
+        Profile editedProfile = profileMapper.profileDtoToProfile(actualUser);
+        profileToEdit.setAllergens(editedProfile.getAllergens());
+        profileToEdit.setIngredient(editedProfile.getIngredient());
+        profileToEdit.setName(profileDto.getName());
+        Profile edited = profileRepository.save(profileToEdit);
+        ProfileDto editedDto = profileMapper.profileToProfileDto(edited);
+        editedDto.setUserId(edited.getUser().getId());
+        return editedDto;
     }
 }
