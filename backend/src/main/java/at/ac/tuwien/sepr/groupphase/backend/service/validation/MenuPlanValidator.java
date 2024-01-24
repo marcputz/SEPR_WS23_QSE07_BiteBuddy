@@ -37,10 +37,9 @@ public class MenuPlanValidator {
         if (menuplan.getUser() == null) {
             validationErrors.add("User must be set to a value");
         }
-        // TODO: check for profile once it's implemented
-        /*if (menuplan.getProfile() == null) {
+        if (menuplan.getProfile() == null) {
             validationErrors.add("Profile must be set to a value");
-        }*/
+        }
         if (menuplan.getFromDate() == null) {
             validationErrors.add("From Date must be set to a value");
         }
@@ -110,10 +109,9 @@ public class MenuPlanValidator {
         if (user == null) {
             validationErrors.add("User cannot be NULL value");
         } else {
-            // TODO: add check for profile once it's implemented
-            // if (profile == null) {
-            //     validationErrors.add("Profile cannot be NULL value");
-            /* } else*/ {
+            if (profile == null) {
+                validationErrors.add("Profile cannot be NULL value");
+            } else {
                 if (fromDate == null || untilDate == null) {
                     validationErrors.add("Dates cannot be NULL values");
                 } else {

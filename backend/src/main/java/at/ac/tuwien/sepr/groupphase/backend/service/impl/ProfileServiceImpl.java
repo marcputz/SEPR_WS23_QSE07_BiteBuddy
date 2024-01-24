@@ -25,6 +25,8 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validation.ProfileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import javax.swing.text.html.Option;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +119,17 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         return profileDtos;
+    }
+
+    @Override
+    public Profile getById(long profileId) throws NotFoundException {
+        LOGGER.trace("getById({})", profileId);
+
+        Optional<Profile> profileOptional = this.profileRepository.findById(profileId);
+        if (profileOptional.isEmpty()) {
+            throw new NotFoundException("Profile ID " + profileId + " could not be found in the data store.");
+        }
+        return profileOptional.get();
     }
 
     public void rateRecipe(RecipeRatingDto recipeRatingDto) throws NotFoundException, ValidationException {

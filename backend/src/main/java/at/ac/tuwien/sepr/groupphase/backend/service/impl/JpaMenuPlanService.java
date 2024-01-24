@@ -142,12 +142,18 @@ public class JpaMenuPlanService implements MenuPlanService {
             // TODO: get ingredient object by ID and add to fridgeIngredients list
         }
 
+        // TODO: get allergenes / allergic ingredients
+
+        // TODO: get profile ingredient preferences
+
         // define content sets
         Set<MenuPlanContent> contents = new HashSet<>();
         Set<MenuPlanContentDetailDto> contentDtos = new HashSet<>();
 
         // get available recipes from data store
-        List<Recipe> availableRecipes = new ArrayList<>(); // TODO: replace with this - this.recipeService.getRecipesForIngredients(ingredients);
+        List<Recipe> availableRecipes = new ArrayList<>(); // TODO: replace
+
+        // TODO: remove unsuited recipes from list
 
         // select recipes from list and populate content lists
         int numDays = (int) Duration.between(plan.getFromDate().atStartOfDay(), plan.getUntilDate().atStartOfDay()).toDays() + 1;
@@ -172,7 +178,7 @@ public class JpaMenuPlanService implements MenuPlanService {
                         // make sure no ID is used twice
                         if (!usedIds.contains(r.getId())) {
 
-                            // TODO: further checks if recipe can be used, if not set r back to NULL
+                            // TODO: further checks if recipe can be used, if not set r back to NULL and mark as used
 
                         } else {
                             // recipe already used, reset to NULL
@@ -227,9 +233,8 @@ public class JpaMenuPlanService implements MenuPlanService {
                 .setUserId(savedPlan.getId())
                 .setUntilTime(savedPlan.getUntilDate())
                 .setFromTime(savedPlan.getFromDate())
-                // TODO: add profile information to detail dto
-                .setProfileId(-1L)
-                .setProfileName("Not available")
+                .setProfileId(savedPlan.getProfile().getId())
+                .setProfileName(savedPlan.getProfile().getName())
                 .setNumDays((int) Duration.between(
                     savedPlan.getFromDate().atStartOfDay(),
                     savedPlan.getUntilDate().atStartOfDay()

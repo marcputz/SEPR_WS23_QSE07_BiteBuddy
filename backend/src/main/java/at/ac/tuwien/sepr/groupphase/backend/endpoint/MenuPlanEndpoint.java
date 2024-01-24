@@ -6,12 +6,15 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreate
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
+import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import jakarta.validation.Valid;
@@ -30,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.List;
@@ -44,12 +46,14 @@ public class MenuPlanEndpoint {
     private final MenuPlanService service;
     private final AuthenticationService authService;
     private final UserService userService;
+    private final ProfileService profileService;
 
     @Autowired
-    public MenuPlanEndpoint(MenuPlanService menuPlanService, UserService userService, AuthenticationService authService) {
+    public MenuPlanEndpoint(MenuPlanService menuPlanService, UserService userService, ProfileService profileService, AuthenticationService authService) {
         this.service = menuPlanService;
         this.userService = userService;
         this.authService = authService;
+        this.profileService = profileService;
     }
 
     @PostMapping("/generate")
@@ -61,17 +65,25 @@ public class MenuPlanEndpoint {
             Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
             ApplicationUser thisUser = this.userService.getUserById(thisUserId);
 
-            // generate menu plan // TODO: insert profile from dto
-            MenuPlan newPlan = this.service.createEmptyMenuPlan(thisUser, null, dto.getFromTime(), dto.getUntilTime());
+            // get profile
+            Profile profile = this.profileService.getById(dto.getProfileId());
+
+            // create menu plan
+            MenuPlan newPlan = this.service.createEmptyMenuPlan(thisUser, profile, dto.getFromTime(), dto.getUntilTime());
 
             // saving fridge
             this.service.createFridge(newPlan, dto.getFridge());
+
+            // generate menu plan content and return
             return this.service.generateContent(newPlan);
 
         } catch (UserNotFoundException e) {
             // this should not happen as the authService verifies the logged-in user
             LOGGER.warn("Error processing user data, user not found: ", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing user data", e);
+        } catch (NotFoundException e) {
+            // profile not found
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find Profile with ID " + dto.getProfileId(), e);
         }
     }
 

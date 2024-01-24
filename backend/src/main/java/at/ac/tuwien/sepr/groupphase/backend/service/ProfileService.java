@@ -24,6 +24,8 @@ public interface ProfileService {
 
     List<ProfileListDto> getAllByUser(ApplicationUser user);
 
+    Profile getById(long profileId) throws NotFoundException;
+
     /**
      * Likes or Dislikes a Recipe with a given Profile.
      *
