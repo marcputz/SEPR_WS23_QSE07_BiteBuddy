@@ -1,13 +1,34 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapperImpl;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ProfileRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -19,7 +40,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -61,6 +92,8 @@ public class ProfileServiceTest {
     private Long ingredientId;
     private Long profileId;
     private Long profileId2;
+    private Long profileId3;
+
     private Long testUserId;
     private Long testUserId2;
 
@@ -72,59 +105,7 @@ public class ProfileServiceTest {
     @BeforeEach
     public void generateTestData() {
 
-        AllergeneDto allergeneDto = AllergeneDto.AllergeneDtoBuilder
-            .anAllergeneDto().withId(1L).withName("Gluten")
-            .build();
-        Allergene savedAllergene = allergeneRepository.save(allergeneMapper.allergeneDtoToAllergene(allergeneDto));
-        allergeneId = savedAllergene.getId();
-        IngredientDto ingredientDto = IngredientDto.IngredientDtoBuilder
-            .anIngredientDto().withId(1L).withName("Rice")
-            .build();
-
-        Ingredient savedIngredient = ingredientRepository.save(ingredientMapper.ingredientDtoToIngredient(ingredientDto));
-        ingredientId = savedIngredient.getId();
-
-        String base64EncodedImage = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC"; //1x1 Red PNG
-        byte[] imageBytes = Base64.getDecoder().decode(base64EncodedImage);
-
-        String email1 = "John@test.at";
-        String nickname1 = "John Doe";
-
-        var testUser = new ApplicationUser().setId(-1L).setEmail(email1)
-            .setPasswordEncoded("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7") // "password"
-            .setNickname(nickname1)
-            .setUserPicture(imageBytes);
-        testUserId = userRepository.save(testUser).getId();
-
-        String email2 = "Jane@test.at";
-        String nickname2 = "Jane Doe";
-
-        var testUser2 = new ApplicationUser().setId(-2L).setEmail(email2)
-            .setPasswordEncoded("ba527ca265c37cf364b057b4f412d175f79d363e0e15d709097f188a4fe979ba2cc1c048e1c97da7804465cef5f8abe7") // "password"
-            .setNickname(nickname2)
-            .setUserPicture(imageBytes);
-        testUserId2 = userRepository.save(testUser2).getId();
-
-        ProfileUserDto profileDto = ProfileUserDto.ProfileDtoBuilder.aProfileDto()
-            .withName("Asian")
-            .withAllergens(Collections.singletonList(allergeneMapper.allergeneToAllergeneDto(savedAllergene)))
-            .withIngredient(Collections.singletonList(ingredientMapper.ingredientToIngredientDto(savedIngredient)))
-            .withUser(testUser)
-            .build();
-
-        ProfileUserDto profileDto2 = ProfileUserDto.ProfileDtoBuilder.aProfileDto()
-            .withName("Italian")
-            .withAllergens(Collections.singletonList(allergeneMapper.allergeneToAllergeneDto(savedAllergene)))
-            .withIngredient(Collections.singletonList(ingredientMapper.ingredientToIngredientDto(savedIngredient)))
-            .withUser(testUser2)
-            .build();
-
-        try {
-            profileId = profileRepository.save(profileMapper.profileDtoToProfile(profileDto)).getId();
-            profileId2 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto2)).getId();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        GenerateAllergeneAndIngredientAndTestProfiles();
 
         // creating ingredients
         // adding apple
@@ -163,50 +144,141 @@ public class ProfileServiceTest {
         profileRepository.save(profile2);
 
         userRepository.save(userRepository.getReferenceById(testUserId2).setActiveProfile(profileRepository.getReferenceById(profileId2)));
+    }
 
+    private void GenerateAllergeneAndIngredientAndTestProfiles() {
+        AllergeneDto allergeneDto = AllergeneDto.AllergeneDtoBuilder.anAllergeneDto().withId(1L).withName("Gluten").build();
+        Allergene savedAllergene = allergeneRepository.save(allergeneMapper.allergeneDtoToAllergene(allergeneDto));
+        allergeneId = savedAllergene.getId();
+
+        IngredientDto ingredientDto = IngredientDto.IngredientDtoBuilder.anIngredientDto().withId(1L).withName("Rice").build();
+        Ingredient savedIngredient = ingredientRepository.save(ingredientMapper.ingredientDtoToIngredient(ingredientDto));
+        ingredientId = savedIngredient.getId();
+
+        var testUser = new ApplicationUser().setId(-1L).setEmail("John@test.at")
+            .setPasswordEncoded("test").setNickname("John Doe")
+            .setUserPicture(Base64.getDecoder().decode("abcd"));
+        testUserId = userRepository.save(testUser).getId();
+
+        var testUser2 = new ApplicationUser().setId(-2L).setEmail("Jane@test.at")
+            .setPasswordEncoded("test").setNickname("Jane Doe")
+            .setUserPicture(Base64.getDecoder().decode("abcd"));
+        testUserId2 = userRepository.save(testUser2).getId();
+
+        ProfileUserDto profileDto = ProfileUserDto.ProfileDtoBuilder.aProfileDto()
+            .withName("Asian")
+            .withAllergens(Collections.singletonList(allergeneMapper.allergeneToAllergeneDto(savedAllergene)))
+            .withIngredient(Collections.singletonList(ingredientMapper.ingredientToIngredientDto(savedIngredient)))
+            .withUser(testUser)
+            .build();
+
+        ProfileUserDto profileDto2 = ProfileUserDto.ProfileDtoBuilder.aProfileDto()
+            .withName("Italian")
+            .withAllergens(Collections.singletonList(allergeneMapper.allergeneToAllergeneDto(savedAllergene)))
+            .withIngredient(Collections.singletonList(ingredientMapper.ingredientToIngredientDto(savedIngredient)))
+            .withUser(testUser)
+            .build();
+
+        ProfileUserDto profileDto3 = ProfileUserDto.ProfileDtoBuilder.aProfileDto()
+            .withName("Indian")
+            .withAllergens(Collections.singletonList(allergeneMapper.allergeneToAllergeneDto(savedAllergene)))
+            .withIngredient(Collections.singletonList(ingredientMapper.ingredientToIngredientDto(savedIngredient)))
+            .withUser(testUser2)
+            .build();
+
+        try {
+            profileId = profileRepository.save(profileMapper.profileDtoToProfile(profileDto)).getId();
+            profileId2 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto2)).getId();
+            profileId3 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto3)).getId();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     @AfterEach
-    public void deleteTestUser() {
-        List<ApplicationUser> users = userRepository.findAll();
-        for (ApplicationUser user : users) {
+    public void deleteTestData() {
+        // Clearing user profiles and active profiles
+        userRepository.findById(testUserId).ifPresent(user -> {
             user.setActiveProfile(null);
             user.getProfiles().clear();
             userRepository.save(user);
-        }
+        });
+        userRepository.findById(testUserId2).ifPresent(user -> {
+            user.setActiveProfile(null);
+            user.getProfiles().clear();
+            userRepository.save(user);
+        });
 
+        // Deleting specific entities by their IDs
         recipeIngredientRepository.deleteById(recipeIngredient1Id);
         recipeIngredientDetailsRepository.deleteById(rd1Id);
+        profileRepository.deleteById(profileId);
+        profileRepository.deleteById(profileId2);
+        profileRepository.deleteById(profileId3);
+        allergeneRepository.deleteById(allergeneId);
         ingredientRepository.deleteById(ingredient1Id);
-
-        profileRepository.deleteAll();
-        allergeneRepository.deleteAll();
-        ingredientRepository.deleteAll();
-        userRepository.deleteAll();
-
+        ingredientRepository.deleteById(ingredientId);
+        userRepository.deleteById(testUserId);
+        userRepository.deleteById(testUserId2);
         recipeRepository.deleteById(recipe1Id);
-
-
     }
+
 
     @Test
     public void searchProfilesWithNameReturnsCorrectResults() {
+        ProfileSearchDto searchDto = new ProfileSearchDto("", "Asia", true, 0, 20);
+        ProfileSearchResultDto result = profileService.searchProfiles(searchDto, testUserId);
+        ProfileDetailDto resultProfile = result.profiles().get(0);
+        assertAll("Search result validation",
+            () -> assertNotNull(result, "Result should not be null"),
+            () -> assertEquals(1, result.profiles().size(), "Result should contain one profile"),
+            () -> assertEquals("Asian", resultProfile.name(), "Profile name should be 'Asian'"),
+            () -> assertEquals(profileId, resultProfile.id(), "Profile ID should match the expected profileId"),
+            () -> assertEquals(testUserId, resultProfile.userId(), "Profile ID should match the expected profileId"),
+            () -> assertEquals("Gluten", resultProfile.allergens().get(0), "First allergen should be 'Gluten'"),
+            () -> assertEquals("Rice", resultProfile.ingredients().get(0), "First ingredient should be 'Rice'")
+        );
+    }
 
-        // Define search parameters
-        ProfileSearchDto searchDto = new ProfileSearchDto("", "Asia", testUserId, 0, 20);
+    @Test
+    public void searchProfilesWithDifferentUserContextsReturnsCorrectResults() {
+        ProfileSearchDto searchDto = new ProfileSearchDto("", "", true, 0, 20);
+        // Search with first user context
+        ProfileSearchResultDto resultUser1 = profileService.searchProfiles(searchDto, testUserId);
+        // Search with second user context
+        ProfileSearchResultDto resultUser2 = profileService.searchProfiles(searchDto, testUserId2);
+        assertAll("Search results validation for different user contexts",
+            () -> assertEquals(2, resultUser1.profiles().size(), "Number of profiles for User1 should match"),
+            () -> assertEquals(1, resultUser2.profiles().size(), "Number of profiles for User2 should match"),
+            () -> assertNotEquals(resultUser1.profiles(), resultUser2.profiles(), "Profiles for User1 and User2 should not be the same")
+        );
+    }
 
-        ProfileSearchResultDto result = profileService.searchProfiles(searchDto);
+    @Test
+    public void searchNotOwnProfilesWithDifferentUserContextsReturnsCorrectResults() {
+        ProfileSearchDto searchDto = new ProfileSearchDto("", "", false, 0, 20);
+        // Search with first user context
+        ProfileSearchResultDto resultUser1 = profileService.searchProfiles(searchDto, testUserId);
+        // Search with second user context
+        ProfileSearchResultDto resultUser2 = profileService.searchProfiles(searchDto, testUserId2);
+        assertAll("Search results validation for different user contexts",
+            () -> assertEquals(1, resultUser1.profiles().size(), "Number of profiles for User1 should match"),
+            () -> assertEquals(2, resultUser2.profiles().size(), "Number of profiles for User2 should match"),
+            () -> assertNotEquals(resultUser1.profiles(), resultUser2.profiles(), "Profiles for User1 and User2 should not be the same")
+        );
+    }
 
-        ProfileListDto resultProfile = result.profiles().get(0);
 
-        Assertions.assertAll("Search result validation",
-            () -> Assertions.assertNotNull(result, "Result should not be null"),
-            () -> Assertions.assertEquals(1, result.profiles().size(), "Result should contain one profile"),
-            () -> Assertions.assertEquals("Asian", resultProfile.name(), "Profile name should be 'Asian'"),
-            () -> Assertions.assertEquals(profileId, resultProfile.userId(), "User ID should match the expected profileId"),
-            () -> Assertions.assertEquals("Gluten", resultProfile.allergens().get(0).getName(), "First allergen should be 'Gluten'"),
-            () -> Assertions.assertEquals("Rice", resultProfile.ingredients().get(0).getName(), "First ingredient should be 'Rice'")
+    @Test
+    public void searchProfilesWithNonExistentNameReturnsNoResults() {
+        String nonExistentName = "NameNotInDatabase12345";
+        ProfileSearchDto searchDto = new ProfileSearchDto("", nonExistentName, false, 0, 20);
+        ProfileSearchResultDto result = profileService.searchProfiles(searchDto, testUserId);
+
+        assertAll("Search result validation for non-existent name",
+            () -> assertNotNull(result, "Result should not be null"),
+            () -> assertTrue(result.profiles().isEmpty(), "Result should contain no profiles")
         );
     }
 
@@ -222,16 +294,19 @@ public class ProfileServiceTest {
             ).withUserId(testUserId).build();
 
         ProfileDto createdProfile = profileService.saveProfile(testProfileDto);
-        //profileId = createdProfile.getId();
 
-        Assertions.assertNotNull(createdProfile);
+        assertNotNull(createdProfile);
 
-        Assertions.assertAll(
-            //   () -> Assertions.assertNotNull(createdProfile.getId()),
-            () -> Assertions.assertEquals(testProfileDto.getName(), createdProfile.getName()),
-            () -> Assertions.assertEquals(testProfileDto.getAllergens().toString(), createdProfile.getAllergens().toString()),
-            () -> Assertions.assertEquals(testProfileDto.getIngredient().toString(), createdProfile.getIngredient().toString())
+        assertAll(
+            () -> assertEquals(testProfileDto.getName(), createdProfile.getName()),
+            () -> assertEquals(testProfileDto.getAllergens().toString(), createdProfile.getAllergens().toString()),
+            () -> assertEquals(testProfileDto.getIngredient().toString(), createdProfile.getIngredient().toString())
         );
+        userRepository.findById(testUserId).ifPresent(user -> {
+            user.setActiveProfile(null);
+            userRepository.save(user);
+        });
+        profileRepository.deleteById(profileRepository.findByName("Profile User test").getId());
     }
 
     @Test
@@ -265,7 +340,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    public void rateRecipeWithExistingProfileAndIncorrectRatingIntegerThrowValidationException(){
+    public void rateRecipeWithExistingProfileAndIncorrectRatingIntegerThrowValidationException() {
         RecipeRatingDto recipeRatingDto = new RecipeRatingDto(recipe1Id, testUserId, 2);
 
         Assertions.assertThrows(ValidationException.class,
@@ -273,14 +348,14 @@ public class ProfileServiceTest {
     }
 
     @Test
-    public void getRatingListsOfExistingProfileReturnsRatingListsOfProfile(){
+    public void getRatingListsOfExistingProfileReturnsRatingListsOfProfile() {
         RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId2);
 
-        Assertions.assertAll("Rating Lists result validation",
-            () -> Assertions.assertNotNull(ratingLists, "Result should not be null"),
-            () -> Assertions.assertEquals(1, ratingLists.dislikes().size(), "The dislikes list should contain one recipe ID"),
-            () -> Assertions.assertEquals(0, ratingLists.likes().size(), "The likes list should contain zero recipe IDs"),
-            () -> Assertions.assertEquals(profileId, ratingLists.dislikes().get(0), recipe1Id)
+        assertAll("Rating Lists result validation",
+            () -> assertNotNull(ratingLists, "Result should not be null"),
+            () -> assertEquals(1, ratingLists.dislikes().size(), "The dislikes list should contain one recipe ID"),
+            () -> assertEquals(0, ratingLists.likes().size(), "The likes list should contain zero recipe IDs"),
+            () -> assertEquals(recipe1Id, ratingLists.dislikes().get(0))
         );
     }
 
