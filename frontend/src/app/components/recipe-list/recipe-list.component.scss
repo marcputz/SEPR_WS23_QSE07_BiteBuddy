@@ -3,6 +3,12 @@
 @import "node_modules/bootstrap/scss/variables";
 @import "node_modules/bootstrap/scss/mixins";
 
+.background-img {
+  width: 100%;
+  height: fit-content;
+  background: var(--app-background-color) url(/assets/images/background_w_circle.svg) !important;
+}
+
 .min-width {
   /* Used to get the actions column in the table to be not wider than necessary */
   width: 0;

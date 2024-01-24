@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {AuthService} from '../../../services/auth.service';
@@ -12,12 +12,12 @@ import {ToastrService} from 'ngx-toastr';
   templateUrl: './change-email.component.html',
   styleUrls: ['./change-email.component.scss']
 })
-export class ChangeEmailComponent {
+export class ChangeEmailComponent implements OnInit {
 
   settingsForm: UntypedFormGroup;
   submitted = false;
   error = false;
-  errorMessage = '';
+  errorMessage = 'Something went wrong, no user settings found. Check if your backend is connected';
 
   isInputFocused: {[key: string]: boolean } = {};
   showPasswords: boolean = false;
@@ -49,7 +49,7 @@ export class ChangeEmailComponent {
         console.error('Error loading user settings', error);
         this.notifications.error('Error loading user settings, try again');
         this.error = true;
-        this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+       //TODO: not working when server down this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
       },
       complete: () => {
       }
