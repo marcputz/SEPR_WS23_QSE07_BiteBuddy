@@ -3,6 +3,9 @@ import {AuthService} from "../../services/auth.service";
 import {ActivatedRoute, NavigationEnd, Router, RouterState} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
+import {SafeUrl} from "@angular/platform-browser";
+import {ImageHandler} from "../../utils/imageHandler";
+import {UserSettingsDto} from "../../dtos/userSettingsDto";
 
 @Component({
   selector: 'app-settings-layout',
@@ -19,11 +22,19 @@ export class SettingsLayoutComponent implements OnInit {
 
   activeNavItem: string = 'account';
 
+  safePictureUrl: SafeUrl = '/assets/icons/user_default.png';
+
+  error = false;
+  errorMessage = '';
+
+  userSettings: UserSettingsDto;
+
   constructor(private authService: AuthService,
               private router: Router,
               private route: ActivatedRoute,
               private notification: ToastrService,
-              private responsive: BreakpointObserver) {
+              private responsive: BreakpointObserver,
+              private imageHandler: ImageHandler) {
     this.accountEmail = null;
     this.accountUsername = null;
   }
@@ -63,6 +74,8 @@ export class SettingsLayoutComponent implements OnInit {
       this.isPhone = state.matches;
     })
 
+    //retrieve then the user image
+    this.getUser();
   }
 
   setActiveNavItem(itemLabel: string) {
@@ -76,6 +89,34 @@ export class SettingsLayoutComponent implements OnInit {
 
   onClickDashboard() {
     this.router.navigate(['/']);
+  }
+
+  private getUser() {
+    this.authService.getUser().subscribe({
+      next: (userSettingsDto: UserSettingsDto) => {
+        this.loadUserPicture(userSettingsDto.userPicture);
+      },
+      error: error => {
+        console.error('Error loading user infos');
+        this.notification.error('Error loading user infos');
+
+        this.error = true;
+        this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+      },
+      complete: () => {
+      }
+    });
+  }
+
+  loadUserPicture(userPictureArray: number[]) {
+    console.info('load user picture');
+    if (userPictureArray === undefined) {
+      console.info('user picture is empty');
+      this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.userSettings.userPicture);
+    } else {
+      console.info('user picture loaded');
+      this.safePictureUrl = this.imageHandler.sanitizeUserImage(userPictureArray);
+    }
   }
 
 }

@@ -3,7 +3,7 @@
     <div class="row-cols-1">
       <div class="profile-sidebar-wrapper">
         <div class="profile-picture">
-          <img class="profile-img" src="/assets/icons/user_default.png" alt="Account Image">
+          <img [src]="safePictureUrl" class="rounded-circle profile-img" alt="Account Image">
         </div>
         <div class="user-info">
           <div class="username">
@@ -39,7 +39,7 @@
         <!--Buttons -->
         <div class="btn-group-vertical">
           <div class="button-wrapper">
-            <button class="button-transparent" routerLink="/dashboard">
+            <button class="button-transparent" (click)="onClickDashboard()">
               <div class="text-container">
               <span class="bb-text-inside-btn-transp">
                 <i class="bi bi-house"></i>
@@ -47,7 +47,7 @@
               </span>
               </div>
             </button>
-            <button class="button-transparent" routerLink="/logout">
+            <button class="button-transparent" (click)="onClickLogout()">
               <div class="text-container">
               <span class="bb-text-inside-btn-transp">
                 <i class="bi bi-box-arrow-left"></i>
