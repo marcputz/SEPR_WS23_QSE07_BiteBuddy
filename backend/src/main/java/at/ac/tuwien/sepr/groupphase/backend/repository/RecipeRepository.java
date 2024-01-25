@@ -22,22 +22,17 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByNameContainingIgnoreCase(String name);
 
-    Set<Recipe> findAllByRecipeIngredientsIngredientId(long l);
-
     @Query("select distinct ri.recipe from RecipeIngredient ri "
-        + "left join Ingredient i on ri.ingredient = i "
-        + "left join AllergeneIngredient ai on ai.ingredient = i "
-        + "join Allergene a on ai.allergene = a "
-        + "where a.id not in (:ids)")
+        + "left join AllergeneIngredient ai on ai.ingredient = ri.ingredient "
+        + "where ai.allergene.id not in (:ids)")
     List<Recipe> getAllWithoutAllergens(@Param("ids") Set<Long> allergeneIds);
 
     @Query("select distinct ri.recipe from RecipeIngredient ri "
-        + "left join Ingredient i on ri.ingredient = i "
-        + "left join AllergeneIngredient ai on ai.ingredient = i "
-        + "join Allergene a on ai.allergene = a "
-        + "where a.id not in (:allergeneIds)"
-        + "and i.id in (:ingredientIds)")
-    List<Recipe> getAllWithIngredientsWithoutAllergens(@Param("ingredientIds") Set<Long> ingredientIds, @Param("allergeneIds") Set<Long> allergeneIds);
+        + "left join RecipeIngredientDetails rid on ri.amount = rid "
+        + "left join AllergeneIngredient ai on ai.ingredient = ri.ingredient "
+        + "where ai.allergene.id not in (:allergeneIds)"
+        + "and (ri.ingredient.name in (:ingredientNames) or rid.ingredient in (:ingredientNames))")
+    List<Recipe> getAllWithIngredientsWithoutAllergens(@Param("ingredientNames") Set<String> ingredientNames, @Param("allergeneIds") Set<Long> allergeneIds);
 
     @Transactional
     default void updateIngredients(Long id, Set<RecipeIngredient> ingredients) {
