@@ -10,7 +10,6 @@ import java.util.List;
 public interface InventoryIngredientRepository extends JpaRepository<InventoryIngredient, Long> {
     List<InventoryIngredient> findAllyByMenuPlanId(long id);
 
-    // TODO: check which inventory status is defined for 'fridge' inventory and replace in SQL query
-    @Query("select i.ingredientId from InventoryIngredient i where i.menuPlanId = :menuplanId and i.inventoryStatus = TRUE ")
-    List<Long> getOwnedIngredientsByMenuPlanId(@Param("menuplanId") long menuplanId);
+    @Query("select i.name from InventoryIngredient i where i.menuPlanId = :menuplanId and i.inventoryStatus = TRUE ")
+    List<String> getOwnedIngredientsByMenuPlanId(@Param("menuplanId") long menuplanId);
 }

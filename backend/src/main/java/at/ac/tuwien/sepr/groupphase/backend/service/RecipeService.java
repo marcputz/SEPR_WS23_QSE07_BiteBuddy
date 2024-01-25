@@ -27,7 +27,7 @@ public interface RecipeService {
 
     List<Recipe> getAllWithoutAllergens(Set<Allergene> allergens);
 
-    List<Recipe> getAllWithIngredientsWithoutAllergens(Set<Ingredient> ingredients, Set<Allergene> allergens);
+    List<Recipe> getAllWithIngredientsWithoutAllergens(Set<String> ingredientNames, Set<Allergene> allergens);
 
     /**
      * Creates a recipe from all the details of the {@link RecipeDetailsDto}.

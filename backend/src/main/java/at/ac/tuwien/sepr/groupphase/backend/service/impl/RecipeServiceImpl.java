@@ -108,7 +108,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public List<Recipe> getAllWithIngredientsWithoutAllergens(Set<Ingredient> ingredients, Set<Allergene> allergens) {
+    public List<Recipe> getAllWithIngredientsWithoutAllergens(Set<String> ingredientNames, Set<Allergene> allergens) {
         Set<Long> allergeneIds = new HashSet<>();
         for (Allergene a : allergens) {
             allergeneIds.add(a.getId());
@@ -118,15 +118,11 @@ public class RecipeServiceImpl implements RecipeService {
             allergeneIds.add(Long.MAX_VALUE); // there should never be any allergen with this ID
         }
 
-        Set<Long> ingredientIds = new HashSet<>();
-        for (Ingredient i : ingredients) {
-            ingredientIds.add(i.getId());
-        }
-        if (ingredientIds.isEmpty()) {
-            ingredientIds.add(Long.MAX_VALUE);
+        if (ingredientNames.isEmpty()) {
+            ingredientNames.add("-");
         }
 
-        return this.recipeRepository.getAllWithIngredientsWithoutAllergens(ingredientIds, allergeneIds);
+        return this.recipeRepository.getAllWithIngredientsWithoutAllergens(ingredientNames, allergeneIds);
     }
 
 

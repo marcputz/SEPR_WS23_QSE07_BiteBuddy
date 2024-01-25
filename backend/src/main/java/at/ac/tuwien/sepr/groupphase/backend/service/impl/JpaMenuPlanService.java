@@ -144,20 +144,17 @@ public class JpaMenuPlanService implements MenuPlanService {
         }
 
         // get fridge contents
-        List<Long> fridgeIngredientsIds = inventoryIngredientRepository.getOwnedIngredientsByMenuPlanId(plan.getId());
-        Set<Ingredient> fridgeIngredients = new HashSet<>();
-        for (Long ingredientId : fridgeIngredientsIds) {
-            Ingredient i = this.ingredientService.getById(ingredientId);
-            if (i != null) {
-                fridgeIngredients.add(i);
-            }
-        }
+        Set<String> fridgeIngredientsNames = new HashSet<>(inventoryIngredientRepository.getOwnedIngredientsByMenuPlanId(plan.getId()));
 
         // get allergenes
         Profile profile = plan.getProfile();
         Set<Allergene> allergens = profile.getAllergens();
         // get profile ingredient preferences
         Set<Ingredient> likedIngredients = profile.getIngredient();
+        Set<String> likedIngredientsNames = new HashSet<>();
+        for (Ingredient i : likedIngredients) {
+            likedIngredientsNames.add(i.getName());
+        }
 
         // get disliked recipes
         Set<Recipe> dislikedRecipes = profile.getDisliked();
@@ -166,9 +163,9 @@ public class JpaMenuPlanService implements MenuPlanService {
         // get available recipes without allergens from data store
         List<Recipe> availableRecipes = this.recipeService.getAllWithoutAllergens(allergens);
         // get recipes with preferred ingredients from data store
-        List<Recipe> preferredRecipes = this.recipeService.getAllWithIngredientsWithoutAllergens(likedIngredients, allergens);
+        List<Recipe> preferredRecipes = this.recipeService.getAllWithIngredientsWithoutAllergens(likedIngredientsNames, allergens);
         // get recipes with owned ingredients from data store
-        List<Recipe> ownedRecipes = this.recipeService.getAllWithIngredientsWithoutAllergens(fridgeIngredients, allergens);
+        List<Recipe> ownedRecipes = this.recipeService.getAllWithIngredientsWithoutAllergens(fridgeIngredientsNames, allergens);
 
         // filter lists for disliked recipes
         availableRecipes = availableRecipes.stream().filter(r -> !dislikedRecipes.contains(r)).toList();
