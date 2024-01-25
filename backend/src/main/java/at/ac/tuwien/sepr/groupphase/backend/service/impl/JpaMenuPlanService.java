@@ -309,6 +309,9 @@ public class JpaMenuPlanService implements MenuPlanService {
             // save menu plan
             MenuPlan savedPlan = this.menuPlanRepository.save(plan);
 
+            // creating inventory
+            this.createInventory(plan.getUser());
+
             // create detail dto and return
             return new MenuPlanDetailDto()
                 .setUserId(savedPlan.getId())
@@ -520,11 +523,25 @@ public class JpaMenuPlanService implements MenuPlanService {
         return dtos;
     }
 
+    /**
+     * This only checks if a value is null, if so it replaces it with -1f
+     *
+     * @param value which we want to check
+     * @return new value which is 100% not null
+     */
+    private float nullFixer(Float value) {
+        if (value == null) {
+            return -1f;
+        }
+        return value;
+    }
+
     /* INVENTORY INGREDIENT FUNCTIONS */
 
     @Override
     public void createFridge(MenuPlan menuPlan, List<String> fridge) throws ValidationException, ConflictException {
-        this.validator.validateFridge(fridge);
+        LOGGER.trace("createFridge({}, {})", menuPlan, fridge);
+        // this.validator.validateFridge(fridge);
 
         ArrayList<InventoryIngredient> newInventory = new ArrayList<>();
 
@@ -537,8 +554,9 @@ public class JpaMenuPlanService implements MenuPlanService {
                 List<RecipeIngredient> recipeIngredients = this.recipeIngredientRepository.findByIngredient_Id(ingredient.getId());
 
                 if (!recipeIngredients.isEmpty()) {
-                    InventoryIngredient newInventoryIngredient = new InventoryIngredient(ingredient.getName(), menuPlan.getId(), recipeIngredients.get(0).getId(),
-                        null, null, true);
+                    InventoryIngredient newInventoryIngredient =
+                        new InventoryIngredient(ingredient.getName(), menuPlan.getId(), recipeIngredients.get(0).getIngredient().getId(),
+                            -1f, null, true);
                     newInventory.add(newInventoryIngredient);
                 }
             }
@@ -549,7 +567,7 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     @Override
     public void createInventory(ApplicationUser user) {
-        // MenuPlan menuPlan = this.menuPlanService.getMenuPlanForUserOnDate(user, LocalDate.now());
+        // MenuPlan menuPlan = this.getMenuPlanForUserOnDate(user, LocalDate.now());
         MenuPlan menuPlan = null;
 
         // TODO this is a workaround since getMenuPlanForUserOnDate is not implemented
@@ -560,50 +578,90 @@ public class JpaMenuPlanService implements MenuPlanService {
         }
 
         if (menuPlan != null) {
-            HashMap<Long, InventoryIngredient> newInventory = new HashMap<>();
-            HashMap<String, InventoryIngredient> newNewInventory = new HashMap<>();
+            HashMap<Long, InventoryIngredient> newNewInventory = new HashMap<>();
+
+            // getting possible existing fridge
+            List<InventoryIngredient> existingFridge = this.inventoryIngredientRepository.findAllyByMenuPlanId(menuPlan.getId());
+            if (!existingFridge.isEmpty()) {
+                for (InventoryIngredient inv: existingFridge) {
+                    newNewInventory.put(inv.getIngredientId(), inv);
+                    this.inventoryIngredientRepository.deleteById(inv.getId());
+                }
+            }
 
             for (MenuPlanContent content : menuPlan.getContent()) {
                 Recipe recipe = content.getRecipe();
 
                 // for each ingredient add it to the inventory
                 for (RecipeIngredient recipeIngredient : recipe.getIngredients()) {
+
+                    /*
+                    possible cases:
+                    - new ingredient
+                    - already exists but not same unit
+                    - already exists but same unit
+                     */
+
                     // if it does not exist we just add it
-                    if (!newNewInventory.containsKey(recipeIngredient.getIngredient().getName())) {
-                        newNewInventory.put(recipeIngredient.getIngredient().getName(), new InventoryIngredient(
-                            recipeIngredient.getIngredient().getName(), menuPlan.getId(), recipeIngredient.getId(),
-                            recipeIngredient.getAmount().getAmount(),
+                    if (!newNewInventory.containsKey(recipeIngredient.getIngredient().getId())) {
+                        newNewInventory.put(recipeIngredient.getIngredient().getId(), new InventoryIngredient(
+                            recipeIngredient.getIngredient().getName(), menuPlan.getId(), recipeIngredient.getIngredient().getId(),
+                            this.nullFixer(recipeIngredient.getAmount().getAmount()),
                             recipeIngredient.getAmount().getUnit(), false
                         ));
-                    } else if (newNewInventory.get(recipeIngredient.getIngredient().getName()).getUnit() == recipeIngredient.getAmount().getUnit()) {
-                        InventoryIngredient existingEntry = newNewInventory.get(recipeIngredient.getIngredient().getName());
-
-                        Float newAmount = existingEntry.getAmount();
-                        // combining them if none of them are null
-                        if (recipeIngredient.getAmount().getAmount() != null && newAmount != null) {
-                            newAmount += recipeIngredient.getAmount().getAmount();
-                        }
-
-                        InventoryIngredient newEntry =
-                            new InventoryIngredient(existingEntry.getName(), menuPlan.getId(), existingEntry.getIngredientId(), newAmount,
-                                existingEntry.getUnit(), false);
-
-                        newNewInventory.put(recipeIngredient.getIngredient().getName(), newEntry);
+                        // already exists
                     } else {
-                        // different unit, not adding them up together
-                        newNewInventory.put(recipeIngredient.getIngredient().getName(), new InventoryIngredient(
-                            recipeIngredient.getIngredient().getName(), menuPlan.getId(), recipeIngredient.getId(),
-                            recipeIngredient.getAmount().getAmount() != null ? recipeIngredient.getAmount().getAmount() : 0.0f,
-                            recipeIngredient.getAmount().getUnit(), false));
+                        InventoryIngredient existingEntry = newNewInventory.get(recipeIngredient.getIngredient().getId());
+
+                        // same units
+                        if (newNewInventory.get(existingEntry.getIngredientId()).getUnit() == recipeIngredient.getAmount().getUnit()) {
+                            float totalAmount = existingEntry.getAmount();
+                            float newAmount = nullFixer(recipeIngredient.getAmount().getAmount());
+
+                            if (newAmount > 0 && totalAmount > 0) {
+                                totalAmount += newAmount;
+                            } else if (newAmount > 0 && totalAmount < 0) {
+                                totalAmount = newAmount;
+                            }
+
+                            InventoryIngredient newEntry =
+                                new InventoryIngredient(existingEntry.getName(), menuPlan.getId(), existingEntry.getIngredientId(), totalAmount,
+                                    existingEntry.getUnit(), existingEntry.getInventoryStatus());
+
+                            newNewInventory.put(recipeIngredient.getIngredient().getId(), newEntry);
+
+                            // different units but at least one unit is null
+                        } else if (newNewInventory.get(existingEntry.getIngredientId()).getUnit() != recipeIngredient.getAmount().getUnit()
+                            && (newNewInventory.get(recipeIngredient.getIngredient().getId()).getUnit() == null ||
+                            recipeIngredient.getAmount().getUnit() == null)
+                        ) {
+                            FoodUnit newUnit = existingEntry.getUnit() != null ? existingEntry.getUnit() : recipeIngredient.getAmount().getUnit();
+                            Float newAmount = existingEntry.getUnit() != null ? existingEntry.getAmount() : nullFixer(recipeIngredient.getAmount().getAmount());
+
+                            InventoryIngredient newEntry =
+                                new InventoryIngredient(existingEntry.getName(), menuPlan.getId(), existingEntry.getIngredientId(), newAmount,
+                                    newUnit, existingEntry.getInventoryStatus());
+
+                            newNewInventory.put(existingEntry.getIngredientId(), newEntry);
+                        }
+                        // different unit, not adding them up together since none are null
+                        else {
+                            newNewInventory.put(recipeIngredient.getIngredient().getId(), new InventoryIngredient(
+                                recipeIngredient.getIngredient().getName(), menuPlan.getId(), recipeIngredient.getIngredient().getId(),
+                                nullFixer(recipeIngredient.getAmount().getAmount()),
+                                recipeIngredient.getAmount().getUnit(), false));
+                        }
                     }
                 }
             }
             this.inventoryIngredientRepository.saveAll(newNewInventory.values());
+            LOGGER.debug("Creating inventory was successful");
         }
     }
 
     @Override
     public InventoryListDto searchInventory(ApplicationUser user, boolean onlyValid) {
+        LOGGER.trace("searchInventory({}, {})", user, onlyValid);
         if (onlyValid) {
             // MenuPlan menuPlan = this.menuPlanService.getMenuPlanForUserOnDate(user, LocalDate.now());
 
@@ -626,6 +684,7 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     @Override
     public InventoryListDto searchInventory(Long menuPlanId) {
+        LOGGER.trace("searchInventory({})", menuPlanId);
         List<InventoryIngredientDto> missing = new ArrayList<>();
         List<InventoryIngredientDto> available = new ArrayList<>();
         if (menuPlanId != null) {
@@ -633,7 +692,8 @@ public class JpaMenuPlanService implements MenuPlanService {
 
             for (InventoryIngredient ingred : inventory) {
                 InventoryIngredientDto newDto =
-                    new InventoryIngredientDto(ingred.getId(), ingred.getName(), ingred.getMenuPlanId(), ingred.getIngredientId(), ingred.getAmount(),
+                    new InventoryIngredientDto(ingred.getId(), ingred.getName(), ingred.getMenuPlanId(), ingred.getIngredientId(),
+                        ingred.getAmount() == null ? -1f : ingred.getAmount(),
                         ingred.getUnit(), ingred.getInventoryStatus());
 
                 if (ingred.getInventoryStatus()) {

@@ -1,30 +1,19 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
 public class InventoryIngredientDto {
-    @NotNull
     private Long id;
-
-    @NotNull
     private String name;
-
-    @NotNull
     private Long menuPlanId;
-
-    @NotNull
     private long ingredientId;
-
-    @NotNull
-    private float amount;
+    private Float amount;
     private FoodUnit unit;
-
     private boolean inventoryStatus;
 
-    public InventoryIngredientDto(Long id, String name, Long menuPlanId, long ingredientId, float amount, FoodUnit unit, boolean inventoryStatus) {
+    public InventoryIngredientDto(Long id, String name, Long menuPlanId, long ingredientId, Float amount, FoodUnit unit, boolean inventoryStatus) {
         this.id = id;
         this.name = name;
         this.menuPlanId = menuPlanId;

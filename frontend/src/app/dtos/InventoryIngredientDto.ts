@@ -16,5 +16,6 @@ export enum FoodUnit {
   pound,
   bunch,
   pinch,
-  slices
+  slices,
+  null
 }

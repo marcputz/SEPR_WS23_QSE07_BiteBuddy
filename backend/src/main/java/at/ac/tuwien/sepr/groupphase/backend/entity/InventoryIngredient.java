@@ -23,7 +23,7 @@ public class InventoryIngredient {
     @Column(nullable = false)
     private Long ingredientId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Float amount;
 
     @Column(nullable = true)
@@ -70,7 +70,7 @@ public class InventoryIngredient {
         return amount;
     }
 
-    public InventoryIngredient setAmount(float amount) {
+    public InventoryIngredient setAmount(Float amount) {
         this.amount = amount;
         return this;
     }
@@ -104,13 +104,13 @@ public class InventoryIngredient {
             InventoryIngredient other = (InventoryIngredient) o;
             return Objects.equals(other.id, id) && Objects.equals(other.menuPlanId, menuPlanId)
                 && Objects.equals(other.ingredientId, ingredientId) && Objects.equals(other.amount, amount)
-                && Objects.equals(other.inventoryStatus, inventoryStatus);
+                && Objects.equals(other.inventoryStatus, inventoryStatus) && Objects.equals(other.unit, unit);
         }
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuPlanId, ingredientId, amount);
+        return Objects.hash(id, menuPlanId, ingredientId, amount, inventoryStatus, unit);
     }
 
     public String getName() {
