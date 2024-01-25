@@ -1,12 +1,9 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {ProfileDto, RecipeRatingDto} from "../dtos/profileDto";
+import {ProfileDto, ProfileSearch, ProfileSearchResultDto, RecipeRatingDto} from "../dtos/profileDto";
 import {catchError, Observable, throwError} from "rxjs";
-import {environment} from 'src/environments/environment';
 import {ErrorFormatterService} from './error-formatter.service';
 import {Globals} from "../global/globals";
-import {UpdateAuthenticationSettingsDto} from "../dtos/updateAuthenticationSettingsDto";
-import {UserSettingsDto} from "../dtos/userSettingsDto";
 import {RecipeRatingListsDto} from "../dtos/recipe";
 
 @Injectable({
@@ -42,6 +39,10 @@ export class ProfileService {
         return throwError(() => new Error(formattedError)) // Re-throw the error so you can handle it in your components
       })
     );
+  }
+
+  public search(searchParams: ProfileSearch): Observable<ProfileSearchResultDto> {
+    return this.http.post<ProfileSearchResultDto>(`${this.baseUri}/search`, searchParams);
   }
 
   createRating(recipeRatingDto: RecipeRatingDto) {

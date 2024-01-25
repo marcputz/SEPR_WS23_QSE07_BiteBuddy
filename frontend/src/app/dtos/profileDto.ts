@@ -13,6 +13,21 @@ export interface ProfileDto {
     userId: number;
 }
 
+export interface ProfileSearch {
+    name: string;
+    creator: string;
+    ownProfiles: boolean;
+    page: number;
+    entriesPerPage: number;
+}
+
+export interface ProfileSearchResultDto {
+    page: number,
+    entriesPerPage: number,
+    numberOfPages: number,
+    profiles: ProfileDetailDto[];
+}
+
 export interface RecipeRatingDto {
     recipeId: number;
     userId: number;

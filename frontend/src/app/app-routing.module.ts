@@ -18,12 +18,14 @@ import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
 import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
+import {ProfileListComponent} from './components/profile-list/profile-list.component';
 
 const routes: Routes = [
   {path: '*', redirectTo: ''}, // Redirection for unknown paths
 
   {path: '', canActivate: mapToCanActivate([AuthGuard]), component: LandingLayoutComponent}, // Landing Page
-  {path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
+  {
+    path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
       {path: 'login', component: LoginComponent}, // Login Page
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
       {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
@@ -44,6 +46,11 @@ const routes: Routes = [
       {path: 'email', canActivate: mapToCanActivate([AuthGuard]), component: ChangeEmailComponent},
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
   ]},
+  {
+    path: 'profiles', children: [
+      {path: '', component: ProfileListComponent}
+    ]
+  },
 ];
 
 @NgModule({

@@ -28,6 +28,7 @@ import { RecipeCreateComponent } from './components/recipe-create/recipe-create.
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 import { ProfileComponent } from './components/dialogs/profile/profile.component';
 import { NavbarLayoutComponent } from './layouts/navbar-layout/navbar-layout.component';
+import { ProfileListComponent } from './components/profile-list/profile-list.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +52,7 @@ import { NavbarLayoutComponent } from './layouts/navbar-layout/navbar-layout.com
     AutocompleteComponent,
     ProfileComponent,
     NavbarLayoutComponent,
+    ProfileListComponent,
   ],
   imports: [
     BrowserModule,
