@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -74,13 +75,18 @@ public class MenuPlanEndpoint {
             // saving fridge
             this.service.createFridge(newPlan, dto.getFridge());
 
-            // generate menu plan content and return
-            return this.service.generateContent(newPlan);
+            try {
+                // generate menu plan content and return
+                return this.service.generateContent(newPlan);
+            } catch (Exception ex) {
+                // if anything goes wrong on content creation, delete the menu plan
+                this.service.deleteMenuPlan(newPlan);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
+            }
 
         } catch (UserNotFoundException e) {
             // this should not happen as the authService verifies the logged-in user
-            LOGGER.warn("Error processing user data, user not found: ", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing user data", e);
+            throw new AuthenticationException("User not found/authorized");
         } catch (NotFoundException e) {
             // profile not found
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find Profile with ID " + dto.getProfileId(), e);

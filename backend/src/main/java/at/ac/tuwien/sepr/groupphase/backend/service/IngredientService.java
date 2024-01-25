@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface IngredientService {
     * @return all ingredients
     */
     List<IngredientDto> getAllIngredients();
+
+    Ingredient getById(long id);
 }

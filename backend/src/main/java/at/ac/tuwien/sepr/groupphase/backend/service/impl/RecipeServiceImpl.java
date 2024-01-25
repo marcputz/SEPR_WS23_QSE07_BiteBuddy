@@ -5,12 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
@@ -98,6 +93,42 @@ public class RecipeServiceImpl implements RecipeService {
     public List<Recipe> getAll() {
         return this.recipeRepository.findAll();
     }
+
+    @Override
+    public List<Recipe> getAllWithoutAllergens(Set<Allergene> allergens) {
+        Set<Long> allergeneIds = new HashSet<>();
+        for (Allergene a : allergens) {
+            allergeneIds.add(a.getId());
+        }
+        // fix a problem with SQL where empty lists will always return empty result set
+        if (allergeneIds.isEmpty()) {
+            allergeneIds.add(Long.MAX_VALUE); // there should never be any allergen with this ID
+        }
+        return this.recipeRepository.getAllWithoutAllergens(allergeneIds);
+    }
+
+    @Override
+    public List<Recipe> getAllWithIngredientsWithoutAllergens(Set<Ingredient> ingredients, Set<Allergene> allergens) {
+        Set<Long> allergeneIds = new HashSet<>();
+        for (Allergene a : allergens) {
+            allergeneIds.add(a.getId());
+        }
+        // fix a problem with SQL where empty lists will always return empty result set
+        if (allergeneIds.isEmpty()) {
+            allergeneIds.add(Long.MAX_VALUE); // there should never be any allergen with this ID
+        }
+
+        Set<Long> ingredientIds = new HashSet<>();
+        for (Ingredient i : ingredients) {
+            ingredientIds.add(i.getId());
+        }
+        if (ingredientIds.isEmpty()) {
+            ingredientIds.add(Long.MAX_VALUE);
+        }
+
+        return this.recipeRepository.getAllWithIngredientsWithoutAllergens(ingredientIds, allergeneIds);
+    }
+
 
     @Override
     public void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException {

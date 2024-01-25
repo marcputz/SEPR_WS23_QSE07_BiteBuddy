@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class IngredientServiceImpl implements IngredientService {
@@ -27,5 +30,11 @@ public class IngredientServiceImpl implements IngredientService {
     public List<IngredientDto> getAllIngredients() {
         LOGGER.trace("getAllIngredients()");
         return ingredientMapper.ingredientToListAllIngredientDtos(ingredientRepository.findAll());
+    }
+
+    @Override
+    public Ingredient getById(long id) {
+        Optional<Ingredient> i = this.ingredientRepository.findById(id);
+        return i.orElse(null);
     }
 }

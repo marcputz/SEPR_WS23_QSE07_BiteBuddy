@@ -100,10 +100,9 @@ public class MenuPlanValidator {
 
     }
 
-    public void validateForCreate(ApplicationUser user, Profile profile, LocalDate fromDate, LocalDate untilDate) throws ValidationException, ConflictException {
+    public void validateForCreate(ApplicationUser user, Profile profile, LocalDate fromDate, LocalDate untilDate) throws ValidationException {
         LOGGER.trace("validateForCreate({},{},{},{})", user, profile, fromDate, untilDate);
         List<String> validationErrors = new ArrayList<>();
-        List<String> conflictErrors = new ArrayList<>();
 
         // check if all values are not null
         if (user == null) {
@@ -129,24 +128,8 @@ public class MenuPlanValidator {
             }
         }
 
-        /*if (fridge != null && !fridge.isEmpty()) {
-            for (String ingredient : fridge) {
-                List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient);
-
-                if (queriedResults.isEmpty()) {
-                    conflictErrors.add("Ingredient " + ingredient + " does not exist");
-                }
-            }
-        } else {
-            LOGGER.debug("Fridge is ignored!");
-        }*/
-
         if (!validationErrors.isEmpty()) {
             throw new ValidationException("Validation of menu plan for create failed", validationErrors);
-        }
-
-        if (!conflictErrors.isEmpty()) {
-            throw new ConflictException("Creation of menu plan has conflict errors", conflictErrors);
         }
 
     }
@@ -154,33 +137,7 @@ public class MenuPlanValidator {
 
     public void validateFridge(List<String> fridge) throws ValidationException, ConflictException {
         LOGGER.trace("validateFridge({})", fridge);
-        List<String> validationErrors = new ArrayList<>();
-        List<String> conflictErrors = new ArrayList<>();
 
-        if (!fridge.isEmpty()) {
-            for (String ingredientStr : fridge) {
-                var result = this.ingredientRepository.findByNameContainingIgnoreCase(ingredientStr);
-
-                if (!result.isEmpty()) {
-                    Ingredient ingredient = result.get(0);
-
-                    List<RecipeIngredient> recipeIngredients = this.recipeIngredientRepository.findByIngredient_Id(ingredient.getId());
-
-                    if (recipeIngredients.isEmpty()) {
-                        conflictErrors.add("Ingredient" + ingredientStr + " is not used in any recipes");
-                    }
-                } else {
-                    validationErrors.add("Ingredient " + ingredientStr + " does not exist");
-                }
-            }
-        }
-
-        if (!validationErrors.isEmpty()) {
-            throw new ValidationException("Validation of menu plan for create failed", validationErrors);
-        }
-
-        if (!conflictErrors.isEmpty()) {
-            throw new ConflictException("Creation of menu plan has conflict errors", conflictErrors);
-        }
+        // TODO: validate
     }
 }

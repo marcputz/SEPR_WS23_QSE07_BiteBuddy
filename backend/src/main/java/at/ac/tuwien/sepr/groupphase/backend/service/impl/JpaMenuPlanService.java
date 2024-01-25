@@ -5,14 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.InventoryIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
-import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.entity.idclasses.MenuPlanContentId;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -22,6 +15,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.InventoryIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
@@ -56,18 +50,20 @@ public class JpaMenuPlanService implements MenuPlanService {
     private final MenuPlanValidator validator;
 
     private final RecipeService recipeService;
+    private final IngredientService ingredientService;
     private final IngredientRepository ingredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final MenuPlanRepository menuPlanRepository;
     private final InventoryIngredientRepository inventoryIngredientRepository;
 
     @Autowired
-    public JpaMenuPlanService(MenuPlanRepository repository, RecipeService recipeService, MenuPlanValidator validator,
+    public JpaMenuPlanService(MenuPlanRepository repository, RecipeService recipeService, IngredientService ingredientService, MenuPlanValidator validator,
                               IngredientRepository ingredientRepository,
                               RecipeIngredientRepository recipeIngredientRepository, InventoryIngredientRepository inventoryIngredientRepository) {
         this.validator = validator;
         this.menuPlanRepository = repository;
         this.recipeService = recipeService;
+        this.ingredientService = ingredientService;
         this.ingredientRepository = ingredientRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.inventoryIngredientRepository = inventoryIngredientRepository;
@@ -130,90 +126,175 @@ public class JpaMenuPlanService implements MenuPlanService {
     public MenuPlanDetailDto generateContent(MenuPlan plan) throws DataStoreException, ConflictException {
         LOGGER.trace("generateContent({})", plan);
 
+        /* algorithm parameters */
+        // this is the chance a recipe with owned ingredients is selected
+        final double chanceOwnedRecipeSelected = 0.6;
+        // these are the chances to use either liked recipes or a recipes with preferred ingredients
+        // both of these should be < 1
+        final double chanceLikedRecipeSelected = 0.15;
+        final double chancePreferredRecipeSelected = 0.5;
+
+        if ((chanceLikedRecipeSelected + chancePreferredRecipeSelected) >= 1.0) {
+            throw new IllegalArgumentException("Chances add up to more than 100%");
+        }
+
         // make sure plan parameter is not NULL
         if (plan == null) {
             throw new IllegalArgumentException("MenuPlan parameter cannot be NULL value");
         }
 
         // get fridge contents
-        List<Long> fridgeIngredientsIds = new ArrayList<>(); // TODO: insert command here
-        List<Ingredient> fridgeIngredients = new ArrayList<>();
+        List<Long> fridgeIngredientsIds = inventoryIngredientRepository.getOwnedIngredientsByMenuPlanId(plan.getId());
+        Set<Ingredient> fridgeIngredients = new HashSet<>();
         for (Long ingredientId : fridgeIngredientsIds) {
-            // TODO: get ingredient object by ID and add to fridgeIngredients list
+            Ingredient i = this.ingredientService.getById(ingredientId);
+            if (i != null) {
+                fridgeIngredients.add(i);
+            }
         }
 
-        // TODO: get allergenes / allergic ingredients
+        // get allergenes
+        Profile profile = plan.getProfile();
+        Set<Allergene> allergens = profile.getAllergens();
+        // get profile ingredient preferences
+        Set<Ingredient> likedIngredients = profile.getIngredient();
 
-        // TODO: get profile ingredient preferences
+        // get disliked recipes
+        Set<Recipe> dislikedRecipes = profile.getDisliked();
+        // get liked recipes
+        Set<Recipe> likedRecipes = profile.getLiked();
+        // get available recipes without allergens from data store
+        List<Recipe> availableRecipes = this.recipeService.getAllWithoutAllergens(allergens);
+        // get recipes with preferred ingredients from data store
+        List<Recipe> preferredRecipes = this.recipeService.getAllWithIngredientsWithoutAllergens(likedIngredients, allergens);
+        // get recipes with owned ingredients from data store
+        List<Recipe> ownedRecipes = this.recipeService.getAllWithIngredientsWithoutAllergens(fridgeIngredients, allergens);
+
+        // filter lists for disliked recipes
+        availableRecipes = availableRecipes.stream().filter(r -> !dislikedRecipes.contains(r)).toList();
+        preferredRecipes = preferredRecipes.stream().filter(r -> !dislikedRecipes.contains(r)).toList();
+        ownedRecipes = ownedRecipes.stream().filter(r -> !dislikedRecipes.contains(r)).toList();
+
+        // combine lists
+        List<Recipe> ownedAndLikedRecipes = new ArrayList<>();
+        for (Recipe r : ownedRecipes) {
+            if (likedRecipes.contains(r)) {
+                ownedAndLikedRecipes.add(r);
+            }
+        }
+        List<Recipe> ownedAndPreferredRecipes = new ArrayList<>();
+        for (Recipe r : ownedRecipes) {
+            if (preferredRecipes.contains(r)) {
+                ownedAndPreferredRecipes.add(r);
+            }
+        }
+
+        // TODO: remove unsuited recipes from lists
 
         // define content sets
         Set<MenuPlanContent> contents = new HashSet<>();
         Set<MenuPlanContentDetailDto> contentDtos = new HashSet<>();
 
-        // get available recipes from data store
-        List<Recipe> availableRecipes = this.recipeService.getAll(); // TODO: replace
-
-        // TODO: remove unsuited recipes from list
-
         // select recipes from list and populate content lists
         int numDays = (int) Duration.between(plan.getFromDate().atStartOfDay(), plan.getUntilDate().atStartOfDay()).toDays() + 1;
         final int timeslotsPerDay = 3; // TODO: make this changeable
-        if (!availableRecipes.isEmpty()) {
+        // set to keep track of already added recipes, so nothing is added twice
+        Set<Long> excludedIds = new HashSet<>();
+        // generate content for each day and each timeslot
+        for (int day = 0; day < numDays; day++) {
+            for (int timeslot = 0; timeslot < timeslotsPerDay; timeslot++) {
 
-            // set to keep track of already added recipes, so nothing is added twice
-            Set<Long> usedIds = new HashSet<>();
+                Recipe selectedRecipe = null;
 
-            for (int day = 0; day < numDays; day++) {
-                for (int timeslot = 0; timeslot < timeslotsPerDay; timeslot++) {
+                // determine which recipe list to use
+                List<Recipe> recipeList = null;
+                boolean useOwnedRecipes = ThreadLocalRandom.current().nextDouble(0.0, 1.0) < chanceOwnedRecipeSelected;
+                boolean useLikedRecipes = ThreadLocalRandom.current().nextDouble(0.0, 1.0) < chanceLikedRecipeSelected;
+                boolean usePreferredRecipes = ThreadLocalRandom.current().nextDouble(0.0, 1.0) < chancePreferredRecipeSelected;
 
-                    // get random recipe from list
-                    Recipe r = null;
-                    final int maxRetries = 30;
-                    int retry = 0;
-                    while (r == null && retry < maxRetries) {
+                if (useOwnedRecipes && !ownedRecipes.isEmpty()) {
+                    if (useLikedRecipes && !ownedAndLikedRecipes.isEmpty()) {
+                        recipeList = ownedAndLikedRecipes;
+                    } else {
+                        if (usePreferredRecipes && !ownedAndPreferredRecipes.isEmpty()) {
+                            recipeList = ownedAndPreferredRecipes;
+                        } else {
+                            recipeList = ownedRecipes;
+                        }
+                    }
+                } else {
+                    if (useLikedRecipes && !likedRecipes.isEmpty()) {
+                        recipeList = new ArrayList<>(likedRecipes);
+                    } else {
+                        if (usePreferredRecipes && !preferredRecipes.isEmpty()) {
+                            recipeList = preferredRecipes;
+                        } else {
+                            recipeList = availableRecipes;
+                        }
+                    }
+                }
+
+                // if recipe list is empty, there are no recipes available
+                if (recipeList.isEmpty()) {
+                    throw new ConflictException("Cannot generate menu plan", List.of("Menu Plan can not find enough content in data store"));
+                }
+
+                // try to get a random recipe from the recipeList
+                final int maxRetries = 20;
+                for (int retry = 0; selectedRecipe == null && retry < maxRetries; retry++) {
+                    // generate random index and get from list
+                    int recipeIdx = ThreadLocalRandom.current().nextInt(0, recipeList.size());
+                    selectedRecipe = recipeList.get(recipeIdx);
+
+                    // check if recipe is already used
+                    if (excludedIds.contains(selectedRecipe.getId())) {
+                        selectedRecipe = null;
+                        continue;
+                    }
+
+                    excludedIds.add(selectedRecipe.getId());
+                }
+
+                // if no recipe could be found, try again with all available recipes
+                if (selectedRecipe == null) {
+                    for (int retry = 0; selectedRecipe == null && retry < maxRetries; retry++) {
                         // generate random index and get from list
                         int recipeIdx = ThreadLocalRandom.current().nextInt(0, availableRecipes.size());
-                        r = availableRecipes.get(recipeIdx);
+                        selectedRecipe = availableRecipes.get(recipeIdx);
 
-                        // make sure no ID is used twice
-                        if (!usedIds.contains(r.getId())) {
-
-                            // TODO: further checks if recipe can be used, if not set r back to NULL and mark as used
-
-                        } else {
-                            // recipe already used, reset to NULL
-                            r = null;
+                        // check if recipe is already used
+                        if (excludedIds.contains(selectedRecipe.getId())) {
+                            selectedRecipe = null;
+                            continue;
                         }
-                        retry++;
+
+                        excludedIds.add(selectedRecipe.getId());
                     }
 
-                    // check if a recipe was found
-                    if (r == null) {
+                    // if again nothing was found, there is not enough content
+                    if (selectedRecipe == null) {
                         throw new ConflictException("Cannot generate menu plan", List.of("Menu Plan can not find enough content in data store"));
                     }
-
-                    usedIds.add(r.getId());
-
-                    // create content entity and add to list
-                    MenuPlanContent content = new MenuPlanContent()
-                        .setRecipe(r)
-                        .setTimeslot(timeslot)
-                        .setDayIdx(day);
-                    contents.add(content);
-
-                    // create content detail dto
-                    MenuPlanContentDetailDto contentDto = new MenuPlanContentDetailDto()
-                        .setDay(day)
-                        .setTimeslot(timeslot)
-                        .setRecipe(new RecipeListDto(
-                            "",
-                            r.getName(),
-                            r.getId(),
-                            r.getPicture()
-                        ));
-                    contentDtos.add(contentDto);
-
                 }
+
+                // create content entity and add to list
+                MenuPlanContent content = new MenuPlanContent()
+                    .setRecipe(selectedRecipe)
+                    .setTimeslot(timeslot)
+                    .setDayIdx(day);
+                contents.add(content);
+
+                // create content detail dto
+                MenuPlanContentDetailDto contentDto = new MenuPlanContentDetailDto()
+                    .setDay(day)
+                    .setTimeslot(timeslot)
+                    .setRecipe(new RecipeListDto(
+                        "",
+                        selectedRecipe.getName(),
+                        selectedRecipe.getId(),
+                        selectedRecipe.getPicture()
+                    ));
+                contentDtos.add(contentDto);
 
             }
         }

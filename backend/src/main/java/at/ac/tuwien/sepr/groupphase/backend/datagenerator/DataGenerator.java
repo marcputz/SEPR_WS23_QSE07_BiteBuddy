@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.datainsert.JsonFileReader;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
@@ -20,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import java.lang.invoke.MethodHandles;
+import java.util.HashSet;
+import java.util.Set;
 
 @Profile("generateData")
 @Component
@@ -106,9 +109,15 @@ public class DataGenerator {
             .setNickname("maxmuster");
         userRepository.save(user1);
 
+        Set<Allergene> allergens1 = new HashSet<>();
+        allergens1.add(allergeneRepository.getReferenceById(1L));
+        allergens1.add(allergeneRepository.getReferenceById(2L));
+        allergens1.add(allergeneRepository.getReferenceById(3L));
+
         at.ac.tuwien.sepr.groupphase.backend.entity.Profile profile1 = new at.ac.tuwien.sepr.groupphase.backend.entity.Profile();
         profile1.setUser(user1);
         profile1.setName("Musterprofil 1");
+        profile1.setAllergens(allergens1);
         profileRepository.save(profile1);
 
         at.ac.tuwien.sepr.groupphase.backend.entity.Profile profile2 = new at.ac.tuwien.sepr.groupphase.backend.entity.Profile();
@@ -124,6 +133,7 @@ public class DataGenerator {
         at.ac.tuwien.sepr.groupphase.backend.entity.Profile profile3 = new at.ac.tuwien.sepr.groupphase.backend.entity.Profile();
         profile3.setUser(user2);
         profile3.setName("Testprofil 1");
+        profile3.setAllergens(allergens1);
         profileRepository.save(profile3);
     }
 }

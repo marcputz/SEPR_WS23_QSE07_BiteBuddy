@@ -12,5 +12,5 @@ public interface InventoryIngredientRepository extends JpaRepository<InventoryIn
 
     // TODO: check which inventory status is defined for 'fridge' inventory and replace in SQL query
     @Query("select i.ingredientId from InventoryIngredient i where i.menuPlanId = :menuplanId and i.inventoryStatus = TRUE ")
-    List<Long> getIngredientIdsInFridgeByMenuPlanId(@Param("menuplanId") long menuplanId);
+    List<Long> getOwnedIngredientsByMenuPlanId(@Param("menuplanId") long menuplanId);
 }

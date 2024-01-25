@@ -4,12 +4,15 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
+import java.util.Set;
 
 public interface RecipeService {
     /**
@@ -21,6 +24,10 @@ public interface RecipeService {
     RecipeSearchResultDto searchRecipes(RecipeSearchDto searchParams);
 
     List<Recipe> getAll();
+
+    List<Recipe> getAllWithoutAllergens(Set<Allergene> allergens);
+
+    List<Recipe> getAllWithIngredientsWithoutAllergens(Set<Ingredient> ingredients, Set<Allergene> allergens);
 
     /**
      * Creates a recipe from all the details of the {@link RecipeDetailsDto}.
