@@ -57,3 +57,8 @@ export interface RecipeRatingListsDto {
   likes: number[];
   dislikes: number[];
 }
+
+export interface RecipeProfileViewDto {
+  id: number,
+  name: string
+}

@@ -13,9 +13,11 @@ import java.util.List;
  */
 
 public class ProfileUserDto {
+
     @JsonProperty("id")
     @NotNull(message = "Id must not be null")
-    private Long Id;
+    private Long id;
+
     @JsonProperty("name")
     @NotNull(message = "Name must not be null")
     @Size(max = 255, min = 1)
@@ -34,11 +36,11 @@ public class ProfileUserDto {
     private ApplicationUser user;
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getName() {

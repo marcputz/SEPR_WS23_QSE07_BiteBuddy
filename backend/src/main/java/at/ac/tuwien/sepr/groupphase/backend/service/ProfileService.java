@@ -1,6 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
@@ -28,7 +33,7 @@ public interface ProfileService {
      * @param profileDto to save
      * @return saved profile entry
      * @throws ValidationException if the profileDto is not valid
-     * @throws NotFoundException if the given user id, at least one of the allergens or at least one of the ingredients can not be found in the database
+     * @throws NotFoundException   if the given user id, at least one of the allergens or at least one of the ingredients can not be found in the database
      */
     ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException, NotFoundException;
 
@@ -51,7 +56,7 @@ public interface ProfileService {
     RecipeRatingListsDto getRatingLists(long id) throws NotFoundException;
 
     /**
-     * Returns a profile's detailed information
+     * Returns a profile's detailed information.
      *
      * @param id contains the profile's id
      * @return the details of a profile (id, name, allergenes, ingredients, liked recipes, disliked recipes
@@ -65,7 +70,7 @@ public interface ProfileService {
      * @param profileDto to edit
      * @return edited profile entry
      * @throws ValidationException if the profileDto is not valid
-     * @throws NotFoundException if the profileDto's contents (profile, ingredients, allergenes, user) does not exist in the database
+     * @throws NotFoundException   if the profileDto's contents (profile, ingredients, allergenes, user) does not exist in the database
      */
     ProfileDto editProfile(ProfileDto profileDto) throws ValidationException, NotFoundException;
 }

@@ -25,6 +25,7 @@ export class PasswordResetComponent implements OnInit {
   submitted: boolean = false;
 
   showPasswords: boolean = false;
+  showPassword1: boolean = false;
 
   urlValid: boolean;
   requestIdValid: boolean;
@@ -32,6 +33,8 @@ export class PasswordResetComponent implements OnInit {
 
   requestSent: boolean = false;
   requestSuccess: boolean = false;
+
+  isInputFocused: {[key: string]: boolean } = {};
 
   protected requestId: string | null;
   protected expirationDate: Date | null;
@@ -135,8 +138,19 @@ export class PasswordResetComponent implements OnInit {
     }
   }
 
-  togglePasswordHide() {
+  togglePasswordVisibility() {
     this.showPasswords = !this.showPasswords;
+  }
+  //TODO: refactor this
+  togglePasswordVisibility1() {
+    this.showPassword1 = !this.showPassword1;
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.passwordForm.get(attribute).value !== '';
   }
 
 }

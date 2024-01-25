@@ -142,4 +142,7 @@ export class RecipeListComponent {
       });
   }
 
+  goToRecipe(recipeId: number) {
+    this.router.navigate(['/recipe', recipeId]);
+  }
 }

@@ -23,13 +23,18 @@ export class RegisterComponent implements OnInit{
   errorMailAlreadyExists: boolean = false;
   errorPasswordsNotSame: boolean = false;
 
+  isInputFocused: {[key: string]: boolean } = {};
+
+  showPasswords: boolean = false;
+  showPassword1: boolean = false;
+
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
               private passwordEncoder: PasswordEncoder,
               private router: Router,
               private notification: ToastrService) {
     this.registerForm = this.formBuilder.group({
-      username: ['', [Validators.required]],
+      username: ['', [Validators.required, Validators.maxLength(255)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       password2: ['', [Validators.required, Validators.minLength(8)]]
@@ -70,7 +75,11 @@ export class RegisterComponent implements OnInit{
     this.authService.registerUser(authRequest).subscribe({
       next: (data) => {
         console.log('Successfully registered user: ' + authRequest.email);
-        this.router.navigate(['/profile']);
+        this.notification.success('You are successfully registered. You are redirect to login now');
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
       },
       error: error => {
         console.log('Could not register user due to:');
@@ -122,6 +131,21 @@ export class RegisterComponent implements OnInit{
   }
 
   ngOnInit() {
+  }
+
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
+  }
+  //TODO: refactor this
+  togglePasswordVisibility1() {
+    this.showPassword1 = !this.showPassword1;
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.registerForm.get(attribute).value !== '';
   }
 
 }

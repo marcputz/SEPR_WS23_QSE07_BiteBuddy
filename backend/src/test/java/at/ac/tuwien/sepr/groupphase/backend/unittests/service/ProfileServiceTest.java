@@ -105,7 +105,7 @@ public class ProfileServiceTest {
     @BeforeEach
     public void generateTestData() {
 
-        GenerateAllergeneAndIngredientAndTestProfiles();
+        generateAllergeneAndIngredientAndTestProfiles();
 
         // creating ingredients
         // adding apple
@@ -146,7 +146,7 @@ public class ProfileServiceTest {
         userRepository.save(userRepository.getReferenceById(testUserId2).setActiveProfile(profileRepository.getReferenceById(profileId2)));
     }
 
-    private void GenerateAllergeneAndIngredientAndTestProfiles() {
+    private void generateAllergeneAndIngredientAndTestProfiles() {
         AllergeneDto allergeneDto = AllergeneDto.AllergeneDtoBuilder.anAllergeneDto().withId(1L).withName("Gluten").build();
         Allergene savedAllergene = allergeneRepository.save(allergeneMapper.allergeneDtoToAllergene(allergeneDto));
         allergeneId = savedAllergene.getId();

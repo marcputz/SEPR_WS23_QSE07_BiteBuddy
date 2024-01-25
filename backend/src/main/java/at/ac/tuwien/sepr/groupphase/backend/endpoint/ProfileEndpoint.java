@@ -79,20 +79,27 @@ public class ProfileEndpoint {
         profileService.rateRecipe(recipeRatingDto);
     }
 
-    @GetMapping("/{ProfileId}")
-    public ProfileDetailDto getProfileDetails(@PathVariable long ProfileId) throws NotFoundException {
+    @GetMapping("/rating/{userId}")
+    public RecipeRatingListsDto get(@PathVariable long userId) throws NotFoundException {
         LOGGER.info("Received Get request on {}", BASE_PATH);
-        LOGGER.debug("Request body for Get:\n{}", ProfileId);
+        LOGGER.debug("Request body for Get:\n{}", userId);
+
+        return profileService.getRatingLists(userId);
+    }
+
+    @GetMapping("/{profileId}")
+    public ProfileDetailDto getProfileDetails(@PathVariable long profileId) throws NotFoundException {
+        LOGGER.info("Received Get request on {}", BASE_PATH);
+        LOGGER.debug("Request body for Get:\n{}", profileId);
 
         return null;
     }
 
-    @GetMapping("/rating/{UserId}")
-    public RecipeRatingListsDto getRatingLists(@PathVariable long UserId) throws NotFoundException {
+    @GetMapping("/userRating/{userId}")
+    public RecipeRatingListsDto getRatingLists(@PathVariable long userId) throws NotFoundException {
         LOGGER.info("Received Get request on {}", BASE_PATH);
-        LOGGER.debug("Request body for Get:\n{}", UserId);
+        LOGGER.debug("Request body for Get:\n{}", userId);
 
-        return profileService.getRatingLists(UserId);
+        return profileService.getRatingLists(userId);
     }
-
 }

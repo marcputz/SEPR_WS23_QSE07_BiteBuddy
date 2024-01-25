@@ -14,24 +14,23 @@ export interface ProfileDto {
 }
 
 export interface RecipeRatingDto {
-  recipeId: number;
-  userId: number;
-  rating: number;
+    recipeId: number;
+    userId: number;
+    rating: number;
 }
 
 export interface CheckRatingDto {
-  recipeId: number;
-  userId: number;
+    recipeId: number;
+    userId: number;
 }
 
 export interface ProfileDetailDto {
-  id: number,
-  name: string,
-  allergens: string[],
-  ingredients: string[],
-  liked: RecipeProfileViewDto[],
-  disliked: RecipeProfileViewDto[],
-  user: string
-  user: string,
-  userId: number
+    id: number,
+    name: string,
+    allergens: string[],
+    ingredients: string[],
+    liked: RecipeProfileViewDto[],
+    disliked: RecipeProfileViewDto[],
+    user: string,
+    userId: number
 }

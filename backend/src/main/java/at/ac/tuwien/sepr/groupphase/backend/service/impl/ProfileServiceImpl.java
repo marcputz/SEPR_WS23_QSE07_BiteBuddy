@@ -7,7 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeProfileViewDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeGetByIdDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
@@ -92,8 +92,8 @@ public class ProfileServiceImpl implements ProfileService {
                 profile.getName(),
                 profile.getAllergens().stream().map(Allergene::getName).collect(Collectors.toCollection(ArrayList::new)),
                 profile.getIngredient().stream().map(Ingredient::getName).collect(Collectors.toCollection(ArrayList::new)),
-                profile.getLiked().stream().map(recipeMapper::recipeToRecipeProfileViewDto).collect(Collectors.toCollection(ArrayList::new)),
-                profile.getDisliked().stream().map(recipeMapper::recipeToRecipeProfileViewDto).collect(Collectors.toCollection(ArrayList::new)),
+                profile.getLiked().stream().map(recipeMapper::recipeToRecipeGetByIdDto).collect(Collectors.toCollection(ArrayList::new)),
+                profile.getDisliked().stream().map(recipeMapper::recipeToRecipeGetByIdDto).collect(Collectors.toCollection(ArrayList::new)),
                 profile.getUser().getNickname(),
                 profile.getUser().getId()
             ))
@@ -143,7 +143,6 @@ public class ProfileServiceImpl implements ProfileService {
         user.get().setActiveProfile(created);
         userRepository.save(user.get());
         return createdDto;
-        //return profileMapper.profileToProfileDto(profileRepository.save(profileMapper.profileDtoToProfile(actualUser)));
     }
 
     public void rateRecipe(RecipeRatingDto recipeRatingDto) throws NotFoundException, ValidationException {
@@ -226,14 +225,14 @@ public class ProfileServiceImpl implements ProfileService {
             }
         }
 
-        ArrayList<RecipeProfileViewDto> liked = new ArrayList<>();
+        ArrayList<RecipeGetByIdDto> liked = new ArrayList<>();
         for (Recipe recipe : profile.getLiked()) {
-            liked.add(new RecipeProfileViewDto(recipe.getId(), recipe.getName()));
+            liked.add(new RecipeGetByIdDto(recipe.getId(), recipe.getName()));
         }
 
-        ArrayList<RecipeProfileViewDto> disliked = new ArrayList<>();
+        ArrayList<RecipeGetByIdDto> disliked = new ArrayList<>();
         for (Recipe recipe : profile.getDisliked()) {
-            disliked.add(new RecipeProfileViewDto(recipe.getId(), recipe.getName()));
+            disliked.add(new RecipeGetByIdDto(recipe.getId(), recipe.getName()));
         }
 
         ProfileDetailDto profileDetails = new ProfileDetailDto(profile.getId(), profile.getName(),
@@ -275,7 +274,6 @@ public class ProfileServiceImpl implements ProfileService {
             throw new NotFoundException("User with id " + profileDto.getUserId() + " does not exist");
         }
 
-        Profile profileToEdit = profileToEditOp.get();
 
         ProfileUserDto actualUser = new ProfileUserDto();
         actualUser.setId(profileDto.getId());
@@ -284,6 +282,7 @@ public class ProfileServiceImpl implements ProfileService {
         actualUser.setAllergens(profileDto.getAllergens());
         actualUser.setUser(user.get());
 
+        Profile profileToEdit = profileToEditOp.get();
         Profile editedProfile = profileMapper.profileDtoToProfile(actualUser);
         profileToEdit.setAllergens(editedProfile.getAllergens());
         profileToEdit.setIngredient(editedProfile.getIngredient());

@@ -1,15 +1,55 @@
-.image-container {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  margin-top: 10px;
+.setting-header {
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+
+  margin-top: 16% !important;
+  margin-bottom: 10%;
 }
 
-.btn-primary {
-  position: absolute;
-  bottom: -15px;
-  right: -15px;
-  border-radius: 50%; /* Make it circular */
-  padding-left: 10px;
-  padding-right: 10px;
+.register-form {
+  margin-bottom: 20%;
+}
+
+.filled-input {
+  color: black;
+}
+
+.input-error-general {
+  margin-top: 5%;
+}
+
+.bb-form-button, .bb-text-under-button {
+  margin-top: 10%;
+}
+
+.image-container {
+  position: relative;
+  width: 35%;
+  margin: 5% 40%;
+}
+
+.label-picture {
+  margin-left: 40%;
+}
+
+img {
+  width: 60%;
+  height: auto;
+}
+
+.form-group {
+  margin-bottom: 10%;
+
+  height: fit-content;
+}
+
+.button-upload {
+  background-color: var(--button-background-color);
+  border-radius: 50%;
+  color: white;
+  margin-left: -15%;
+  z-index: 1;
+  transform: translateY(50px);
 }

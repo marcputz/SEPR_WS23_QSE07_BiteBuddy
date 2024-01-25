@@ -1,7 +1,20 @@
-input, button {
-  margin-top: 1.4rem;
+.title-margin {
+  margin-top: 35%;
 }
 
-#forgotPasswordContainer {
-  margin-top: 1rem;
+.register-form {
+  margin-top: 10%;
+  margin-bottom: 20%;
+}
+
+.filled-input {
+  color: black;
+}
+
+.input-error-general {
+  margin-top: 5%;
+}
+
+.bb-form-button, .bb-text-under-button {
+  margin-top: 10%;
 }

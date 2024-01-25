@@ -27,6 +27,7 @@ import { NgOptimizedImage } from "@angular/common";
 import { RecipeCreateComponent } from './components/recipe-create/recipe-create.component';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 import { ProfileComponent } from './components/dialogs/profile/profile.component';
+import { NavbarLayoutComponent } from './layouts/navbar-layout/navbar-layout.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { ProfileComponent } from './components/dialogs/profile/profile.component
     RecipeCreateComponent,
     AutocompleteComponent,
     ProfileComponent,
+    NavbarLayoutComponent,
   ],
   imports: [
     BrowserModule,
