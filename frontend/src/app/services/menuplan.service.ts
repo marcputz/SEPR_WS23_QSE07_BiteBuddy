@@ -30,7 +30,7 @@ export class MenuPlanService {
   }
 
   createInventory() {
-    return this.httpClient.get(this.baseUri + "/inventory/create");
+    return this.httpClient.get<InventoryIngredientDto>(this.baseUri + "/inventory/create/");
   }
 
   getInventory() {

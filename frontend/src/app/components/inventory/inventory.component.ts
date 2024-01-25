@@ -3,6 +3,7 @@ import {InventoryListDto} from "../../dtos/InventoryListDto";
 import {InventoryIngredientDto} from "../../dtos/InventoryIngredientDto";
 import {ToastrService} from "ngx-toastr";
 import {MenuPlanService} from "../../services/menuplan.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-inventory',
@@ -10,11 +11,15 @@ import {MenuPlanService} from "../../services/menuplan.service";
   styleUrls: ['./inventory.component.scss']
 })
 export class InventoryComponent {
-  inventory: InventoryListDto
+  inventory: InventoryListDto = {
+    missing: [],
+    available: []
+  }
 
   constructor(
     private service: MenuPlanService,
     private notification: ToastrService,
+    private router: Router,
   ) {
   }
 
@@ -27,13 +32,34 @@ export class InventoryComponent {
     });
   }
 
+
+
   public getInventory() {
-    this.service.getInventory().subscribe(
-      (value: InventoryListDto) => {
+    this.service.getInventory().subscribe({
+      next: value => {
+        console.log(value);
         this.inventory = value;
         this.notification.success("Loaded inventory successfully");
+      },
+      error: error => {
+        console.error(error);
+
+        let errorObject;
+        if (typeof error.error === 'object') {
+          errorObject = error.error;
+        } else {
+          errorObject = error;
+        }
+
+        let status = errorObject.status;
+
+        switch(status) {
+          case 401:
+            this.notification.error("Please log in again", "Login Timeout");
+            this.router.navigate(['/login']);
+        }
       }
-    )
+    });
   }
 
   public markAsChecked(inv: InventoryIngredientDto) {
@@ -72,9 +98,9 @@ export class InventoryComponent {
 
   public formatInventoryIngredient(ingred: InventoryIngredientDto): string {
     if (ingred != null) {
-      if (ingred.unit == null && ingred.amount != null) {
+      if (ingred.unit == null && ingred.amount != -1) {
         return ingred.amount.toString() + " " + ingred.name;
-      } else if (ingred.unit == null || ingred.amount == null) {
+      } else if (ingred.unit == null || ingred.amount == -1) {
         return ingred.name;
       } else {
         return ingred.name + ", " + ingred.amount.toFixed(1) + " " + ingred.unit;
@@ -85,5 +111,9 @@ export class InventoryComponent {
 
   private reload() {
     this.getInventory();
+  }
+
+  public ngOnInit() {
+    this.reload();
   }
 }

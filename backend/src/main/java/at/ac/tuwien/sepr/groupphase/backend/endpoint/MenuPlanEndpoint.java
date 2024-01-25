@@ -25,6 +25,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -145,29 +146,29 @@ public class MenuPlanEndpoint {
         }
     }
 
-    @GetMapping("/create")
-    public void createInventory(@RequestHeader HttpHeaders headers) throws UserNotFoundException, AuthenticationException {
+    @GetMapping("/inventory/create/")
+    public InventoryListDto createInventory(@RequestHeader HttpHeaders headers) throws UserNotFoundException, AuthenticationException {
+        // TODO this will be removed soon
+        LOGGER.trace("createInventory()");
+
         this.authService.verifyAuthenticated(headers);
         String authToken = headers.getFirst("Authorization");
         Long currentUserId = AuthTokenUtils.getUserId(authToken);
         ApplicationUser user = this.userService.getUserById(currentUserId);
 
         this.service.createInventory(user);
+        return this.service.searchInventory(user, true);
     }
 
     @GetMapping("/inventory/")
-    public InventoryListDto getInventory(@RequestHeader HttpHeaders headers) throws AuthenticationException, UserNotFoundException {
+    public ResponseEntity<InventoryListDto> getInventory(@RequestHeader HttpHeaders headers) throws AuthenticationException, UserNotFoundException {
         LOGGER.trace("getInventory()");
         this.authService.verifyAuthenticated(headers);
         String authToken = headers.getFirst("Authorization");
         Long currentUserId = AuthTokenUtils.getUserId(authToken);
         ApplicationUser user = this.userService.getUserById(currentUserId);
 
-        if (currentUserId != null) {
-            return this.service.searchInventory(user, true);
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
+        return ResponseEntity.ok(this.service.searchInventory(user, true));
     }
 
     @PutMapping("/inventory/update")
