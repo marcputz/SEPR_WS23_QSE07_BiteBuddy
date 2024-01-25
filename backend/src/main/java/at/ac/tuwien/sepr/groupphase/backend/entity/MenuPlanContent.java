@@ -10,6 +10,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.util.Objects;
 
+/**
+ * JPA Entity for Menu Plan Content.
+ *
+ * @author Marc Putz
+ */
 @Entity
 @IdClass(MenuPlanContentId.class)
 public class MenuPlanContent {

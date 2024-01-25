@@ -38,6 +38,9 @@ import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * REST Endpoint for Menu Plan (and Inventory) methods.
+ */
 @RestController
 @RequestMapping(value = MenuPlanEndpoint.BASE_PATH)
 public class MenuPlanEndpoint {
@@ -57,6 +60,17 @@ public class MenuPlanEndpoint {
         this.profileService = profileService;
     }
 
+    /**
+     * REST endpoint to generate a menu plan.
+     *
+     * @param headers the HTTP headers from the request.
+     * @param dto the create dto to use for menu plan generation.
+     * @return a detail dto of the created and generated menu plan.
+     * @throws AuthenticationException if the user cannot be authenticated.
+     * @throws ConflictException if the data given by the user is in conflict with the current state of the system.
+     * @throws ValidationException if the data given by the user is invalid.
+     * @author Marc Putz
+     */
     @PostMapping("/generate")
     public MenuPlanDetailDto generateMenuPlan(@RequestHeader HttpHeaders headers, @RequestBody @Valid MenuPlanCreateDto dto) throws AuthenticationException, ConflictException, ValidationException {
         authService.verifyAuthenticated(headers);

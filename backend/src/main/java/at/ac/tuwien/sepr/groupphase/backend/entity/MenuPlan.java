@@ -17,6 +17,11 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * JPA Entity for Menu Plans.
+ *
+ * @author Marc Putz
+ */
 @Entity
 public class MenuPlan {
     @Id
@@ -27,8 +32,7 @@ public class MenuPlan {
     @ManyToOne(fetch = FetchType.LAZY)
     private ApplicationUser user;
 
-    // TODO: add not null constraint back once profiles are implemented
-    // @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Profile profile;
 

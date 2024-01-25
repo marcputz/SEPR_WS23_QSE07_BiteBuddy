@@ -5,7 +5,15 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.InventoryIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.idclasses.MenuPlanContentId;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -25,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -39,8 +46,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * JPA implementation of MenuPlanService interface.
- *
- * @author Marc Putz
  */
 @Service
 public class JpaMenuPlanService implements MenuPlanService {
@@ -84,6 +89,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         return menuPlanRepository.getAllByUser(user);
     }
 
+    @Override
     public List<MenuPlanDetailDto> getAllMenuPlansofUserDetailDto(ApplicationUser user) {
         List<MenuPlan> plans = menuPlanRepository.getAllByUser(user);
         List<MenuPlanDetailDto> details = new ArrayList<>();
@@ -185,8 +191,6 @@ public class JpaMenuPlanService implements MenuPlanService {
                 ownedAndPreferredRecipes.add(r);
             }
         }
-
-        // TODO: remove unsuited recipes from lists
 
         // define content sets
         Set<MenuPlanContent> contents = new HashSet<>();

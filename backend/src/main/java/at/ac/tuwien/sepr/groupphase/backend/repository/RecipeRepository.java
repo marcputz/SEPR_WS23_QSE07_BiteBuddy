@@ -22,8 +22,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByNameContainingIgnoreCase(String name);
 
-    Set<Recipe> findAllByRecipeIngredientsIngredientId(long l);
-
     @Query("select distinct ri.recipe from RecipeIngredient ri "
         + "left join AllergeneIngredient ai on ai.ingredient = ri.ingredient "
         + "where ai.allergene.id not in (:ids)")

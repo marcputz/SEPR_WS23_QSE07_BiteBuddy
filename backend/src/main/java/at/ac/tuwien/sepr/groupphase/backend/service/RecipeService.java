@@ -23,10 +23,31 @@ public interface RecipeService {
      */
     RecipeSearchResultDto searchRecipes(RecipeSearchDto searchParams);
 
+    /**
+     * Gets all recipes in the data store.
+     *
+     * @return a list of recipes
+     * @author Marc Putz
+     */
     List<Recipe> getAll();
 
+    /**
+     * Gets all recipes in the data store which do not contain any allergens listed in the parameter.
+     *
+     * @param allergens a list of allergens which to filter recipes by.
+     * @return a list of recipes.
+     * @author Marc Putz
+     */
     List<Recipe> getAllWithoutAllergens(Set<Allergene> allergens);
 
+    /**
+     * Gets all recipes from the data store which uses one or more ingredients from the given parameter and which do not contain any allergens listen in the second parameter list.
+     *
+     * @param ingredientNames a list of ingredient names to search recipes by.
+     * @param allergens a list of allergens which to filter recipes by.
+     * @return a list of recipes.
+     * @author Marc Putz
+     */
     List<Recipe> getAllWithIngredientsWithoutAllergens(Set<String> ingredientNames, Set<Allergene> allergens);
 
     /**
