@@ -24,7 +24,6 @@ import java.util.Set;
  *
  * @author Marc Putz
  */
-@Service
 public interface MenuPlanService {
 
     /**

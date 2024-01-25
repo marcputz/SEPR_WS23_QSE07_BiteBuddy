@@ -30,28 +30,32 @@ public class MenuPlanCreateDto {
         return profileId;
     }
 
-    public void setProfileId(Long profileId) {
+    public MenuPlanCreateDto setProfileId(Long profileId) {
         this.profileId = profileId;
+        return this;
     }
 
     public LocalDate getFromTime() {
         return fromTime;
     }
 
-    public void setFromTime(LocalDate fromTime) {
+    public MenuPlanCreateDto setFromTime(LocalDate fromTime) {
         this.fromTime = fromTime;
+        return this;
     }
 
     public LocalDate getUntilTime() {
         return untilTime;
     }
 
-    public void setUntilTime(LocalDate untilTime) {
+    public MenuPlanCreateDto setUntilTime(LocalDate untilTime) {
         this.untilTime = untilTime;
+        return this;
     }
 
-    public void setFridge(List<String> fridge) {
+    public MenuPlanCreateDto setFridge(List<String> fridge) {
         this.fridge = fridge;
+        return this;
     }
 
     public List<String> getFridge() {

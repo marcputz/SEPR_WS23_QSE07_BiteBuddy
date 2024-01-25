@@ -32,6 +32,7 @@ import org.hibernate.JDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
@@ -348,7 +349,11 @@ public class JpaMenuPlanService implements MenuPlanService {
             .setUser(user)
             .setProfile(profile);
 
-        return this.menuPlanRepository.save(menuPlan);
+        try {
+            return this.menuPlanRepository.save(menuPlan);
+        } catch (JDBCException | DataIntegrityViolationException e) {
+            throw new DataStoreException("Unable to create new MenuPlan entity", e);
+        }
     }
 
     @Override

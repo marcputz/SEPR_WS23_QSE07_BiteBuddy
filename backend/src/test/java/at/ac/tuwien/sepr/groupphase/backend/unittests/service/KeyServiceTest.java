@@ -20,7 +20,7 @@ import java.security.spec.X509EncodedKeySpec;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class KeyServiceTest implements TestData {
+public class KeyServiceTest {
 
     private static final String PRIVATE_KEY =
         "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCuFMrhD6RgQFvy"
