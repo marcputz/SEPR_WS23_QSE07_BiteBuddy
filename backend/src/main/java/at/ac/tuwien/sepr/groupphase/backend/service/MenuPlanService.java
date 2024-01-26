@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdateRecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
@@ -13,7 +14,6 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -92,7 +92,7 @@ public interface MenuPlanService {
      * @param plan the menu plan to fill with content
      * @return the menu plan with generated contents as a detail DTO object.
      * @throws DataStoreException if the data store is unable to process the new entity.
-     * @throws ConflictException if the current state of the data store does not allow generating content (e.g. not enough recipes available).
+     * @throws ConflictException  if the current state of the data store does not allow generating content (e.g. not enough recipes available).
      */
     MenuPlanDetailDto generateContent(MenuPlan plan) throws DataStoreException, ConflictException;
 
@@ -101,13 +101,13 @@ public interface MenuPlanService {
      * The created menu plan will have no contents yet, these can be generated with the {@code generateContent} function.
      * Only one menu plan can be created for a specific timeframe, otherwise a {@link ConflictException} will be thrown.
      *
-     * @param user the user for which to create a new menu plan for.
+     * @param user    the user for which to create a new menu plan for.
      * @param profile the profile to use for creating the menu plan.
-     * @param from the start time for this menu plan to be valid (inclusive).
-     * @param until the end time for this menu plan to be valid (inclusive).
+     * @param from    the start time for this menu plan to be valid (inclusive).
+     * @param until   the end time for this menu plan to be valid (inclusive).
      * @return the created (empty) menu plan entity.
-     * @throws DataStoreException if the data store is unable to process the new entity.
-     * @throws ConflictException if the new entity is in conflict with the current state of the data store (e.g. another menu plan is already defined during the specified timeframe).
+     * @throws DataStoreException  if the data store is unable to process the new entity.
+     * @throws ConflictException   if the new entity is in conflict with the current state of the data store (e.g. another menu plan is already defined during the specified timeframe).
      * @throws ValidationException if the parameters provided are invalid and cannot be used for menu plan creation.
      */
     MenuPlan createEmptyMenuPlan(ApplicationUser user, Profile profile, LocalDate from, LocalDate until)
@@ -142,6 +142,16 @@ public interface MenuPlanService {
      * @author Marc Putz
      */
     MenuPlanDetailDto updateMenuPlan(MenuPlan toUpdate) throws DataStoreException, ValidationException, ConflictException;
+
+    /**
+     * Updates one content of a menu plan in the data store. Uses the menu plan's ID to identify the entity.
+     *
+     * @param menuPlan the menu plan to update.
+     * @return the updated menu plan entity.
+     * @throws DataStoreException if the data store is unable to process the request.
+     * @author Anton Nather
+     */
+    MenuPlan updateMenuPlanByChangingOneRecepy(ApplicationUser user, MenuPlanUpdateRecipeDto menuPlan);
 
     /**
      * Gets a list of all recipes contained in a menu plan.

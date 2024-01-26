@@ -9,6 +9,7 @@ import {RecipeService} from "../../services/recipe.service";
 import {RecipeListDto} from "../../dtos/recipe";
 import {forEach} from "lodash";
 import {Logger} from "jasmine-spec-reporter/built/display/logger";
+import {MenuPlanUpdateRecipeDto} from "../../dtos/menuplan/menuPlanUpdateRecipeDto";
 
 @Component({
   selector: 'app-menu-plan-lookup',
@@ -24,6 +25,7 @@ export class MenuPlanLookupComponent {
   contents: MenuPlanContentDetailDto[];
   searchChangedObservable = new Subject<void>();
   recipes: RecipeListDto[] = [];
+  updateValue: MenuPlanUpdateRecipeDto;
 
 
 
@@ -34,6 +36,7 @@ export class MenuPlanLookupComponent {
   ) {
   }
   ngOnInit() {
+    this.updateValue = null;
     this.searchday = new Date().toString();
     this.getMenuPlans();
     this.getMenuPlan();
@@ -80,6 +83,55 @@ export class MenuPlanLookupComponent {
   }
   searchChanged(): void {
     this.searchChangedObservable.next();
+  }
+
+  likeRecipe( c: MenuPlanContentDetailDto) {
+    // Call your like function logic here
+
+    console.log('Recipe liked!');
+    this.updateValue = new class implements MenuPlanUpdateRecipeDto {
+      day: number;
+      menuPlanId: number;
+      timeslot: number;
+      dislike: boolean
+    }
+    this.updateValue.day = c.day;
+    this.updateValue.timeslot = c.timeslot;
+    this.updateValue.menuPlanId = this.menuplan.id;
+    this.updateValue.dislike = false;
+    this.service.updateRecepyInMenuPlan(this.updateValue).subscribe({
+      next: data => {
+        console.log("plans available plans: ");
+      },
+      error: err => {
+        this.notification.error('Error fetching recipes', err)
+      }
+    })
+    this.getMenuPlan();
+    this.searchChanged();
+  }
+
+  dislikeRecipe(c: MenuPlanContentDetailDto) {
+    this.updateValue = new class implements MenuPlanUpdateRecipeDto {
+      day: number;
+      menuPlanId: number;
+      timeslot: number;
+      dislike: boolean
+    }
+    this.updateValue.day = c.day;
+    this.updateValue.timeslot = c.timeslot;
+    this.updateValue.menuPlanId = this.menuplan.id;
+    this.updateValue.dislike = true;
+    this.service.updateRecepyInMenuPlan(this.updateValue).subscribe({
+      next: data => {
+        console.log("plans available plans: ");
+      },
+      error: err => {
+        this.notification.error('Error fetching recipes', err)
+      }
+    })
+    this.getMenuPlan();
+    this.searchChanged();
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {

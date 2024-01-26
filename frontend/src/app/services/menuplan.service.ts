@@ -6,6 +6,7 @@ import {Observable} from "rxjs";
 import {MenuPlanDetailDto} from "../dtos/menuplan/menuPlanDetailDto";
 import {formatDate} from "@angular/common";
 import {InventoryIngredientDto} from "../dtos/InventoryIngredientDto";
+import {MenuPlanUpdateRecipeDto} from "../dtos/menuplan/menuPlanUpdateRecipeDto";
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,9 @@ export class MenuPlanService {
 
   updateInventoryIngredient(ingredient: InventoryIngredientDto) {
     return this.httpClient.put(this.baseUri + "/inventory/update", ingredient);
+  }
+  updateRecepyInMenuPlan(menuPlan: MenuPlanUpdateRecipeDto){
+    return this.httpClient.put(this.baseUri + "/update", menuPlan);
   }
 
 }

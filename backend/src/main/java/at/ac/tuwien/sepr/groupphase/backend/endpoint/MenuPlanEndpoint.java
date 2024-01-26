@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdateRecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
@@ -24,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -144,6 +144,17 @@ public class MenuPlanEndpoint {
             LOGGER.warn("Error processing user data, user not found: ", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing user data", e);
         }
+    }
+
+    @PutMapping("/update")
+    public void updateRecepyInMenuPlan(@RequestHeader HttpHeaders headers, @RequestBody MenuPlanUpdateRecipeDto menuPlan)
+        throws AuthenticationException, UserNotFoundException {
+        LOGGER.info("update({})", menuPlan);
+        this.authService.verifyAuthenticated(headers);
+        String authToken = headers.getFirst("Authorization");
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+        ApplicationUser user = this.userService.getUserById(currentUserId);
+        this.service.updateMenuPlanByChangingOneRecepy(user, menuPlan);
     }
 
     @GetMapping("/inventory/create/")

@@ -42,12 +42,10 @@
                aria-label="Show recipe details">
               <i class="bi bi-info-lg"></i>
             </a>
-            <a class="btn btn-sm btn-success"
-               aria-label="Like Recipe">
-              <i class="bi bi-hand-thumbs-up"></i>
+            <a class="btn btn-sm btn-success" (click)="likeRecipe(content)" aria-label="Like Recipe">
+              <i class="bi bi-arrow-clockwise"></i>
             </a>
-            <a class="btn btn-sm btn-danger"
-               aria-label="Dislike Recipe">
+            <a class="btn btn-sm btn-danger" (click)="dislikeRecipe(content)" aria-label="Dislike Recipe">
               <i class="bi bi-hand-thumbs-down"></i>
             </a>
           </div>

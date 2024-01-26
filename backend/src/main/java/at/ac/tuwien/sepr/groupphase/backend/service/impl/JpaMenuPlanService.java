@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdateRecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
@@ -35,19 +36,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * JPA implementation of MenuPlanService interface.
+ *
+ * @author Marc Putz
  */
 @Service
 public class JpaMenuPlanService implements MenuPlanService {
@@ -99,7 +98,7 @@ public class JpaMenuPlanService implements MenuPlanService {
             MenuPlanDetailDto detail = new MenuPlanDetailDto();
             //Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(plan);
             detail.setUserId(user.getId()).setFromTime(plan.getFromDate());  // .setContents(contents)
-            detail.setUntilTime(plan.getUntilDate()).setNumDays(7);
+            detail.setUntilTime(plan.getUntilDate()).setNumDays(7).setId(plan.getId());
             details.add(detail);
         }
         return details;
@@ -115,7 +114,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         }
         Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(menuPlan);
         menuPlanDetailDto.setUserId(user.getId()).setContents(contents).setFromTime(menuPlan.getFromDate());
-        menuPlanDetailDto.setUntilTime(menuPlan.getUntilDate());
+        menuPlanDetailDto.setUntilTime(menuPlan.getUntilDate()).setId(menuPlan.getId());
         LOGGER.info("get menuplan: " + menuPlanDetailDto.toString());
         return menuPlanDetailDto;
     }
@@ -374,6 +373,30 @@ public class JpaMenuPlanService implements MenuPlanService {
         }
     }
 
+
+    @Override
+    public MenuPlan updateMenuPlanByChangingOneRecepy(ApplicationUser user, MenuPlanUpdateRecipeDto updateDto) {
+
+        // the menuplan only has 1 Content which is the one to be changed
+        LOGGER.trace("updateMenuPlanByChangingOneRecepy({},{})", user, updateDto);
+
+        MenuPlan oldPlan = this.getById(updateDto.getMenuPlanId());
+        for (MenuPlanContent content : oldPlan.getContent()) {
+            if (content.getDayIdx() == updateDto.getDay() && content.getTimeslot() == updateDto.getTimeslot()) {
+                long oldId = content.getRecipe().getId();
+                Random rand = new Random();
+                int i = 1;
+                do {
+                    i = rand.nextInt(99) + 1;
+                } while (i == oldId);
+                Recipe recipe = recipeService.getRecipeById(i);
+                content.setRecipe(recipe);
+            }
+        }
+        menuPlanRepository.save(oldPlan);
+        return oldPlan;
+    }
+
     @Override
     public MenuPlanDetailDto updateMenuPlan(MenuPlan toUpdate) throws DataStoreException, ValidationException, ConflictException {
         // validate input
@@ -531,7 +554,7 @@ public class JpaMenuPlanService implements MenuPlanService {
     }
 
     /**
-     * This only checks if a value is null, if so it replaces it with -1f
+     * This only checks if a value is null, if so it replaces it with -1f.
      *
      * @param value which we want to check
      * @return new value which is 100% not null
@@ -590,7 +613,7 @@ public class JpaMenuPlanService implements MenuPlanService {
             // getting possible existing fridge
             List<InventoryIngredient> existingFridge = this.inventoryIngredientRepository.findAllyByMenuPlanId(menuPlan.getId());
             if (!existingFridge.isEmpty()) {
-                for (InventoryIngredient inv: existingFridge) {
+                for (InventoryIngredient inv : existingFridge) {
                     newNewInventory.put(inv.getIngredientId(), inv);
                     this.inventoryIngredientRepository.deleteById(inv.getId());
                 }
