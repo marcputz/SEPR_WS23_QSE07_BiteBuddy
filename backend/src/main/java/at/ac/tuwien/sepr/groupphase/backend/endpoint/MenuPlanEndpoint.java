@@ -172,7 +172,7 @@ public class MenuPlanEndpoint {
     @PutMapping("/inventory/update")
     @ResponseStatus(HttpStatus.OK)
     public void updateInventoryIngredient(@RequestHeader HttpHeaders headers, @RequestBody InventoryIngredientDto updatedIngredient)
-        throws AuthenticationException, NotFoundException, ConflictException {
+        throws AuthenticationException, NotFoundException, ConflictException, ValidationException {
         LOGGER.trace("update({},{})", headers, updatedIngredient);
 
         this.authService.verifyAuthenticated(headers);

@@ -37,6 +37,20 @@ public class InventoryIngredientDto {
         return this;
     }
 
+    public InventoryIngredientDto setAmount(Float amount) {
+        this.amount = amount;
+        return this;
+    }
+
+    public String getDetailedName() {
+        return detailedName;
+    }
+
+    public InventoryIngredientDto setDetailedName(String detailedName) {
+        this.detailedName = detailedName;
+        return this;
+    }
+
     public Long getId() {
         return id;
     }

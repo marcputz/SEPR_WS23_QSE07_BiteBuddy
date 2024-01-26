@@ -1,7 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -261,4 +261,332 @@ public class MenuPlanServiceTest {
         assertThrows(ConflictException.class, () -> service.generateContent(plan));
     }
 
+    @Test
+    void testCreateFridgeSuccessful() throws Exception {
+        MenuPlan plan = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+
+        // create fridge
+        List<String> fridge = new ArrayList<>();
+        fridge.add("Rice");
+        fridge.add("thing");
+        this.service.createFridge(plan, fridge);
+
+        assertEquals(2, this.service.searchInventory(plan.getId()).available().size());
+    }
+
+    @Test
+    void testCheckCorrectInventoryCombination() throws Exception {
+        // Checks that if we have a base ingredient it marks everything as bought from detailed ingredients
+        // Creating needed data for that
+        Recipe r = new Recipe();
+        r.setName("A bunch of chicken");
+        r.setInstructions("Recipe Instructions");
+        r = recipeRepository.save(r);
+
+        // adding chicken
+        var ing = new Ingredient();
+        ing.setName("Chicken");
+        ingredientRepository.save(ing);
+
+        // adding rids
+        Set<RecipeIngredient> ris = new HashSet<>();
+        List<RecipeIngredientDetails> rids = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            RecipeIngredientDetails rid = new RecipeIngredientDetails();
+            rid.setDescriber("some");
+            rid.setAmount(1.5f);
+            rid.setUnit(FoodUnit.ounce);
+            rid.setIngredient("Chicken TESTED");
+            rids.add(recipeIngredientDetailsRepository.save(rid));
+
+            RecipeIngredient ri = new RecipeIngredient();
+            ri.setIngredient(ing);
+            ri.setAmount(rid);
+            ri.setRecipe(r);
+            recipeIngredientRepository.save(ri);
+        }
+
+        r.setIngredients(ris);
+        recipeRepository.save(r);
+
+        Recipe recipe = recipeRepository.findByNameContainingIgnoreCase("A bunch of chicken").get(0);
+
+        // create fridge & menuPlan
+        MenuPlan plan = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+        List<String> fridge = new ArrayList<>();
+        fridge.add("Chicken");
+        this.service.createFridge(plan, fridge);
+
+        // custom MenuPlanContent
+        plan.addContent(new MenuPlanContent(plan, 1, 1, recipe));
+        plan = this.menuPlanRepository.save(plan);
+
+        this.service.createInventory(plan.getUser());
+
+        InventoryListDto inventory = this.service.searchInventory(plan.getId());
+        assertEquals(2, inventory.available().size());
+
+        assertEquals(4.5f,inventory.available().get(1).getAmount());
+    }
+
+    @Test
+    void testCheckCorrectInventoryChecking() throws Exception {
+        // Checks that if we have a base ingredient it marks everything as bought from detailed ingredients
+        // Creating needed data for that
+        Recipe r = new Recipe();
+        r.setName("A bunch of chicken");
+        r.setInstructions("Recipe Instructions");
+        r = recipeRepository.save(r);
+
+        // adding chicken
+        var ing = new Ingredient();
+        ing.setName("Chicken");
+        ingredientRepository.save(ing);
+
+        // adding rids
+        Set<RecipeIngredient> ris = new HashSet<>();
+        List<RecipeIngredientDetails> rids = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            RecipeIngredientDetails rid = new RecipeIngredientDetails();
+            rid.setDescriber("some");
+            rid.setAmount(1.5f);
+            rid.setUnit(FoodUnit.values()[i]);
+            rid.setIngredient("Chicken TESTED");
+            rids.add(recipeIngredientDetailsRepository.save(rid));
+
+            RecipeIngredient ri = new RecipeIngredient();
+            ri.setIngredient(ing);
+            ri.setAmount(rid);
+            ri.setRecipe(r);
+            recipeIngredientRepository.save(ri);
+        }
+
+        r.setIngredients(ris);
+        recipeRepository.save(r);
+
+        Recipe recipe = recipeRepository.findByNameContainingIgnoreCase("A bunch of chicken").get(0);
+
+        // create fridge & menuPlan
+        MenuPlan plan = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+        List<String> fridge = new ArrayList<>();
+        fridge.add("Chicken");
+        this.service.createFridge(plan, fridge);
+
+        // custom MenuPlanContent
+        plan.addContent(new MenuPlanContent(plan, 1, 1, recipe));
+        plan = this.menuPlanRepository.save(plan);
+
+        this.service.createInventory(plan.getUser());
+
+        InventoryListDto inventory = this.service.searchInventory(plan.getId());
+        assertEquals(4, inventory.available().size());
+    }
+
+    @Test
+    void testCreateInventoryWithMissingAndAvailableIngredients() throws Exception {
+        // Checks that if we have a base ingredient it marks everything as bought from detailed ingredients
+        // Creating needed data for that
+        Recipe r = new Recipe();
+        r.setName("A bunch of chicken");
+        r.setInstructions("Recipe Instructions");
+        r = recipeRepository.save(r);
+
+        // adding chicken
+        var ing = new Ingredient();
+        ing.setName("Chicken");
+        ingredientRepository.save(ing);
+
+        // adding rids
+        Set<RecipeIngredient> ris = new HashSet<>();
+        List<RecipeIngredientDetails> rids = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            RecipeIngredientDetails rid = new RecipeIngredientDetails();
+            rid.setDescriber("some");
+            rid.setAmount(1.5f);
+            rid.setUnit(FoodUnit.ounce);
+            rid.setIngredient("Chicken TESTED");
+            rids.add(recipeIngredientDetailsRepository.save(rid));
+
+            RecipeIngredient ri = new RecipeIngredient();
+            ri.setIngredient(ing);
+            ri.setAmount(rid);
+            ri.setRecipe(r);
+            recipeIngredientRepository.save(ri);
+        }
+
+        r.setIngredients(ris);
+        recipeRepository.save(r);
+
+        Recipe recipe = recipeRepository.findByNameContainingIgnoreCase("A bunch of chicken").get(0);
+
+        // create fridge & menuPlan
+        MenuPlan plan = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+        List<String> fridge = new ArrayList<>();
+        fridge.add("Chicken");
+        this.service.createFridge(plan, fridge);
+
+        // custom MenuPlanContent
+        plan.addContent(new MenuPlanContent(plan, 1, 1, recipe));
+
+        recipe = recipeRepository.findByNameContainingIgnoreCase("Recipe 1").get(0);
+        plan.addContent(new MenuPlanContent(plan, 1, 2, recipe));
+        plan = this.menuPlanRepository.save(plan);
+
+        this.service.createInventory(plan.getUser());
+
+        InventoryListDto inventory = this.service.searchInventory(plan.getId());
+        assertEquals(2, inventory.available().size());
+        assertEquals(1, inventory.missing().size());
+        assertEquals(4.5f,inventory.available().get(1).getAmount());
+    }
+
+    @Test
+    void testWrongIngredientThrowsException() throws Exception {
+        MenuPlan plan = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+
+        // create fridge
+        List<String> fridge = new ArrayList<>();
+        fridge.add("RiceASD");
+        fridge.add("AThing");
+
+        assertThrows(ValidationException.class, () -> this.service.createFridge(plan, fridge));
+    }
+
+    @Test
+    void updateSuccessfulInventoryIngredient() throws Exception {
+        // Creating Inventory
+        Recipe r = new Recipe();
+        r.setName("A bunch of chicken");
+        r.setInstructions("Recipe Instructions");
+        r = recipeRepository.save(r);
+
+        // adding chicken
+        var ing = new Ingredient();
+        ing.setName("Chicken");
+        ingredientRepository.save(ing);
+
+        // adding rids
+        Set<RecipeIngredient> ris = new HashSet<>();
+        List<RecipeIngredientDetails> rids = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            RecipeIngredientDetails rid = new RecipeIngredientDetails();
+            rid.setDescriber("some");
+            rid.setAmount(1.5f);
+            rid.setUnit(FoodUnit.ounce);
+            rid.setIngredient("Chicken TESTED");
+            rids.add(recipeIngredientDetailsRepository.save(rid));
+
+            RecipeIngredient ri = new RecipeIngredient();
+            ri.setIngredient(ing);
+            ri.setAmount(rid);
+            ri.setRecipe(r);
+            recipeIngredientRepository.save(ri);
+        }
+
+        r.setIngredients(ris);
+        recipeRepository.save(r);
+
+        Recipe recipe = recipeRepository.findByNameContainingIgnoreCase("A bunch of chicken").get(0);
+
+        // create fridge & menuPlan
+        MenuPlan plan = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+        List<String> fridge = new ArrayList<>();
+        fridge.add("Chicken");
+        this.service.createFridge(plan, fridge);
+
+        // custom MenuPlanContent
+        plan.addContent(new MenuPlanContent(plan, 1, 1, recipe));
+
+        recipe = recipeRepository.findByNameContainingIgnoreCase("Recipe 1").get(0);
+        plan.addContent(new MenuPlanContent(plan, 1, 2, recipe));
+        plan = this.menuPlanRepository.save(plan);
+
+        this.service.createInventory(plan.getUser());
+
+        InventoryListDto inventory = this.service.searchInventory(plan.getId());
+
+        this.service.updateInventoryIngredient(plan.getUser(), inventory.available().get(0).setInventoryStatus(false));
+        inventory = this.service.searchInventory(plan.getId());
+
+        assertEquals(1, inventory.available().size());
+        assertEquals(2, inventory.missing().size());
+
+        this.service.updateInventoryIngredient(plan.getUser(), inventory.missing().get(0).setInventoryStatus(true));
+        inventory = this.service.searchInventory(plan.getId());
+
+        assertEquals(2, inventory.available().size());
+        assertEquals(1, inventory.missing().size());
+    }
+
+    @Test
+    void updateInvalidInventoryIngredient() throws Exception {
+        // Creating Inventory
+        Recipe r = new Recipe();
+        r.setName("A bunch of chicken");
+        r.setInstructions("Recipe Instructions");
+        r = recipeRepository.save(r);
+
+        // adding chicken
+        var ing = new Ingredient();
+        ing.setName("Chicken");
+        ingredientRepository.save(ing);
+
+        // adding rids
+        Set<RecipeIngredient> ris = new HashSet<>();
+        List<RecipeIngredientDetails> rids = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            RecipeIngredientDetails rid = new RecipeIngredientDetails();
+            rid.setDescriber("some");
+            rid.setAmount(1.5f);
+            rid.setUnit(FoodUnit.ounce);
+            rid.setIngredient("Chicken TESTED");
+            rids.add(recipeIngredientDetailsRepository.save(rid));
+
+            RecipeIngredient ri = new RecipeIngredient();
+            ri.setIngredient(ing);
+            ri.setAmount(rid);
+            ri.setRecipe(r);
+            recipeIngredientRepository.save(ri);
+        }
+
+        r.setIngredients(ris);
+        recipeRepository.save(r);
+
+        Recipe recipe = recipeRepository.findByNameContainingIgnoreCase("A bunch of chicken").get(0);
+
+        // create fridge & menuPlan
+        MenuPlan plan = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+        List<String> fridge = new ArrayList<>();
+        fridge.add("Chicken");
+        this.service.createFridge(plan, fridge);
+
+        // custom MenuPlanContent
+        plan.addContent(new MenuPlanContent(plan, 1, 1, recipe));
+
+        recipe = recipeRepository.findByNameContainingIgnoreCase("Recipe 1").get(0);
+        plan.addContent(new MenuPlanContent(plan, 1, 2, recipe));
+        plan = this.menuPlanRepository.save(plan);
+
+        this.service.createInventory(plan.getUser());
+
+        InventoryListDto inventory = this.service.searchInventory(plan.getId());
+
+        this.service.updateInventoryIngredient(plan.getUser(), inventory.available().get(0).setInventoryStatus(false));
+        inventory = this.service.searchInventory(plan.getId());
+
+        assertEquals(1, inventory.available().size());
+        assertEquals(2, inventory.missing().size());
+
+        this.service.updateInventoryIngredient(plan.getUser(), inventory.missing().get(0).setInventoryStatus(true));
+        inventory = this.service.searchInventory(plan.getId());
+
+        assertEquals(2, inventory.available().size());
+        assertEquals(1, inventory.missing().size());
+
+        InventoryIngredientDto rogueOne = inventory.missing().get(0);
+        rogueOne.setName("Rogue");
+
+        MenuPlan finalPlan = plan;
+        assertThrows(ValidationException.class, () -> this.service.updateInventoryIngredient(finalPlan.getUser(), rogueOne));
+    }
 }

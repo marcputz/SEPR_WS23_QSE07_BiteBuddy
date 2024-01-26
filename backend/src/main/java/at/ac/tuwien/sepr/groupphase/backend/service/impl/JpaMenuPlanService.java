@@ -567,7 +567,7 @@ public class JpaMenuPlanService implements MenuPlanService {
     @Override
     public void createFridge(MenuPlan menuPlan, List<String> fridge) throws ValidationException, ConflictException {
         LOGGER.trace("createFridge({}, {})", menuPlan, fridge);
-        // this.validator.validateFridge(fridge);
+        this.validator.validateFridge(fridge);
 
         ArrayList<InventoryIngredient> newInventory = new ArrayList<>();
 
@@ -664,7 +664,7 @@ public class JpaMenuPlanService implements MenuPlanService {
                     } else {
                         InventoryIngredient existingIngredient = detailedInventory.get(recipeIngredient.getAmount().getFridgeStringIdentifier());
                         // detailed same unit and ingredient --> combining them
-                        if (detailedInventory.containsKey(recipeIngredient.getAmount().getIngredient())) {
+                        if (detailedInventory.containsKey(recipeIngredient.getAmount().getFridgeStringIdentifier())) {
                             float combinedAmount = existingIngredient.getAmount();
                             float newAmount = nullFixer(recipeIngredient.getAmount().getAmount());
                             if (newAmount > 0) {
@@ -746,8 +746,11 @@ public class JpaMenuPlanService implements MenuPlanService {
     }
 
     @Override
-    public void updateInventoryIngredient(ApplicationUser user, InventoryIngredientDto updatedIngredientDto) throws NotFoundException, ConflictException {
-        // TODO Validation
+    public void updateInventoryIngredient(ApplicationUser user, InventoryIngredientDto updatedIngredientDto)
+        throws NotFoundException, ConflictException, ValidationException {
+        LOGGER.trace("updateInventoryIngredient({}, {})", user, updatedIngredientDto);
+        this.validator.validateInventoryIngredientForUpdate(updatedIngredientDto, searchInventory(updatedIngredientDto.getMenuPlanId()));
+
         InventoryIngredient toSave = this.inventoryIngredientRepository.findById(updatedIngredientDto.getId()).get();
         toSave.setInventoryStatus(updatedIngredientDto.isInventoryStatus());
         this.inventoryIngredientRepository.save(toSave);
