@@ -1,12 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.auth.SessionManager;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -57,7 +57,7 @@ public class AuthenticationService {
                 // wrong password
                 throw new AuthenticationException("Wrong Password");
             }
-        } catch (UserNotFoundException ex) {
+        } catch (NotFoundException ex) {
             // login email not found
             throw new AuthenticationException("User '" + loginDto.getEmail() + "' does not exist");
         }
@@ -90,10 +90,10 @@ public class AuthenticationService {
      *
      * @param id       The ID of the user whose credentials are to be checked.
      * @param password The password to validate against the user's stored password.
-     * @throws UserNotFoundException if no user is found with the provided ID.
+     * @throws NotFoundException if no user is found with the provided ID.
      * @throws AuthenticationException if the provided password is invalid for the given user
      */
-    public void verifyUserPassword(Long id, String password) throws UserNotFoundException, AuthenticationException {
+    public void verifyUserPassword(Long id, String password) throws NotFoundException, AuthenticationException {
         ApplicationUser user = userService.getUserById(id);
 
         // Encode the provided password to compare with the stored password hash

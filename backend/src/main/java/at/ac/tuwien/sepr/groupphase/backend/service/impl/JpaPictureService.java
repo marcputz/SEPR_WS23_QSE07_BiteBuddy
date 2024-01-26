@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PictureDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PictureRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.PictureService;
 import org.hibernate.JDBCException;
@@ -10,9 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.sql.SQLException;
+import java.util.function.Supplier;
 
 /**
  * JPA implementation of Picture Service.
@@ -32,13 +36,13 @@ public class JpaPictureService implements PictureService {
     }
 
     @Override
-    public Picture getById(long id) {
+    public Picture getById(long id) throws NotFoundException {
         LOGGER.trace("getById({})", id);
-        return repo.findById(id).orElse(null);
+        return repo.findById(id).orElseThrow(() -> new NotFoundException("Picture ID " + id + " not found"));
     }
 
     @Override
-    public PictureDto getByIdAsDto(long id) {
+    public PictureDto getByIdAsDto(long id) throws NotFoundException {
         LOGGER.trace("getByIdAsDto({})", id);
         return entityToDto(this.getById(id));
     }

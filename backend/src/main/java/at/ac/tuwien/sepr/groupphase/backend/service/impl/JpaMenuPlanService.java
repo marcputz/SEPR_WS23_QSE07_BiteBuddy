@@ -375,7 +375,7 @@ public class JpaMenuPlanService implements MenuPlanService {
 
 
     @Override
-    public MenuPlan updateMenuPlanByChangingOneRecepy(ApplicationUser user, MenuPlanUpdateRecipeDto updateDto) {
+    public MenuPlan updateMenuPlanByChangingOneRecipe(ApplicationUser user, MenuPlanUpdateRecipeDto updateDto) {
 
         // the menuplan only has 1 Content which is the one to be changed
         LOGGER.trace("updateMenuPlanByChangingOneRecepy({},{})", user, updateDto);

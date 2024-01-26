@@ -6,7 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPassw
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -36,35 +36,35 @@ public class JpaUserService implements UserService {
     }
 
     @Override
-    public ApplicationUser getUserByEmail(String email) throws UserNotFoundException {
+    public ApplicationUser getUserByEmail(String email) throws NotFoundException {
         LOGGER.trace("getUserByEmail({})", email);
 
         ApplicationUser user = userRepository.findByEmailIgnoreCase(email);
         if (user == null) {
             // no user found
-            throw new UserNotFoundException("User with email '" + email + "' could not be found");
+            throw new NotFoundException("User with email '" + email + "' could not be found");
         }
 
         return user;
     }
 
     @Override
-    public ApplicationUser getUserByNickname(String nickname) throws UserNotFoundException {
+    public ApplicationUser getUserByNickname(String nickname) throws NotFoundException {
         LOGGER.trace("getUserByNickname({})", nickname);
 
         ApplicationUser user = userRepository.findByNickname(nickname);
         if (user == null) {
             // no user found
-            throw new UserNotFoundException("User with Nickname '" + nickname + "' could not be found");
+            throw new NotFoundException("User with Nickname '" + nickname + "' could not be found");
         }
 
         return user;
     }
 
     @Override
-    public ApplicationUser getUserById(Long userId) throws UserNotFoundException {
+    public ApplicationUser getUserById(Long userId) throws NotFoundException {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " could not be found"));
+            .orElseThrow(() -> new NotFoundException("User with id " + userId + " could not be found"));
     }
 
 
@@ -91,11 +91,11 @@ public class JpaUserService implements UserService {
 
     @Override
     public ApplicationUser updateEmailAndPassword(UserUpdateEmailAndPasswordDto userUpdateEmailAndPasswordDto, Long currentUserId)
-        throws UserNotFoundException, ValidationException, ConflictException {
+        throws NotFoundException, ValidationException, ConflictException {
         LOGGER.trace("updateEmailAndPassword({})", userUpdateEmailAndPasswordDto);
 
         ApplicationUser existingUser = userRepository.findById(currentUserId)
-            .orElseThrow(() -> new UserNotFoundException("User with Id '" + currentUserId + "' could not be found"));
+            .orElseThrow(() -> new NotFoundException("User with Id '" + currentUserId + "' could not be found"));
         if (userUpdateEmailAndPasswordDto.getEmail() != null && !userUpdateEmailAndPasswordDto.getEmail().isEmpty() && !userUpdateEmailAndPasswordDto.getEmail()
             .equals(existingUser.getEmail())) {
             existingUser.setEmail(userUpdateEmailAndPasswordDto.getEmail());
@@ -112,11 +112,11 @@ public class JpaUserService implements UserService {
 
     @Override
     public ApplicationUser updateSettings(UserUpdateSettingsDto userUpdateSettingsDto, Long currentUserId)
-        throws UserNotFoundException, ValidationException, ConflictException {
+        throws NotFoundException, ValidationException, ConflictException {
         LOGGER.trace("updateSettings({})", userUpdateSettingsDto);
 
         ApplicationUser existingUser = userRepository.findById(currentUserId)
-            .orElseThrow(() -> new UserNotFoundException("User with Id '" + currentUserId + "' could not be found"));
+            .orElseThrow(() -> new NotFoundException("User with Id '" + currentUserId + "' could not be found"));
         if (userUpdateSettingsDto.getNickname() != null && !userUpdateSettingsDto.getNickname().isEmpty() && !userUpdateSettingsDto.getNickname()
             .equals(existingUser.getNickname())) {
             existingUser.setNickname(userUpdateSettingsDto.getNickname());
@@ -129,10 +129,10 @@ public class JpaUserService implements UserService {
 
     @Override
     public ApplicationUser updateApplicationUser(ApplicationUser userToUpdate)
-        throws UserNotFoundException, ValidationException, ConflictException {
+        throws NotFoundException, ValidationException, ConflictException {
         LOGGER.trace("updateApplicationUser({})", userToUpdate);
         if (userToUpdate.getId() == null || !userRepository.existsById(userToUpdate.getId())) {
-            throw new UserNotFoundException("User with Id '" + userToUpdate.getId() + "' could not be found");
+            throw new NotFoundException("User with Id '" + userToUpdate.getId() + "' could not be found");
         }
         validator.validateForUpdate(userToUpdate);
         checkUniqueConstraints(userToUpdate, true);

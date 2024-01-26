@@ -11,7 +11,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
@@ -26,14 +25,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
@@ -73,124 +65,121 @@ public class MenuPlanEndpoint {
      * @author Marc Putz
      */
     @PostMapping("/generate")
-    public MenuPlanDetailDto generateMenuPlan(@RequestHeader HttpHeaders headers, @RequestBody @Valid MenuPlanCreateDto dto) throws AuthenticationException, ConflictException, ValidationException {
+    @ResponseStatus(HttpStatus.CREATED)
+    public MenuPlanDetailDto generateMenuPlan(@RequestHeader HttpHeaders headers, @RequestBody @Valid MenuPlanCreateDto dto)
+        throws AuthenticationException, ConflictException, ValidationException, NotFoundException {
+        LOGGER.trace("generateMenuPlan({},{})", headers, dto);
+
         authService.verifyAuthenticated(headers);
 
+        // get user
+        Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
+        ApplicationUser thisUser = this.userService.getUserById(thisUserId);
+
+        // get profile
+        Profile profile = this.profileService.getById(dto.getProfileId());
+
+        // create menu plan
+        MenuPlan newPlan = this.service.createEmptyMenuPlan(thisUser, profile, dto.getFromTime(), dto.getUntilTime());
+
+        // saving fridge
+        this.service.createFridge(newPlan, dto.getFridge());
+
         try {
-            // get user
-            Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
-            ApplicationUser thisUser = this.userService.getUserById(thisUserId);
-
-            // get profile
-            Profile profile = this.profileService.getById(dto.getProfileId());
-
-            // create menu plan
-            MenuPlan newPlan = this.service.createEmptyMenuPlan(thisUser, profile, dto.getFromTime(), dto.getUntilTime());
-
-            // saving fridge
-            this.service.createFridge(newPlan, dto.getFridge());
-
-            try {
-                // generate menu plan content and return
-                return this.service.generateContent(newPlan);
-            } catch (Exception ex) {
-                // if anything goes wrong on content creation, delete the menu plan
-                this.service.deleteMenuPlan(newPlan);
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
-            }
-
-        } catch (UserNotFoundException e) {
-            // this should not happen as the authService verifies the logged-in user
-            throw new AuthenticationException("User not found/authorized");
-        } catch (NotFoundException e) {
-            // profile not found
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find Profile with ID " + dto.getProfileId(), e);
+            // generate menu plan content and return
+            return this.service.generateContent(newPlan);
+        } catch (Exception ex) {
+            // if anything goes wrong on content creation, delete the menu plan
+            this.service.deleteMenuPlan(newPlan);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), ex);
         }
     }
 
     @GetMapping("/forDate")
-    public MenuPlanDetailDto getMenuPlanDetails(@RequestHeader HttpHeaders headers, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) throws AuthenticationException {
+    @ResponseStatus(HttpStatus.OK)
+    public MenuPlanDetailDto getMenuPlanOnDate(@RequestHeader HttpHeaders headers,
+                                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
+        throws AuthenticationException, NotFoundException {
+        LOGGER.trace("getMenuPlanOnDate({},{})", headers, date);
+
         authService.verifyAuthenticated(headers);
-        LOGGER.info("date: " + date.toString());
-        try {
-            // get user
-            Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
-            ApplicationUser thisUser = this.userService.getUserById(thisUserId);
 
-            // generate menu plan
-            return this.service.getMenuPlanForUserOnDateDetailDto(thisUser, date);
+        // get user
+        Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
+        ApplicationUser thisUser = this.userService.getUserById(thisUserId);
 
-        } catch (UserNotFoundException e) {
-            // this should not happen as the authService verifies the logged-in user
-            LOGGER.warn("Error processing user data, user not found: ", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing user data", e);
-        }
+        // generate menu plan
+        return this.service.getMenuPlanForUserOnDateDetailDto(thisUser, date);
     }
 
     @GetMapping()
-    public List<MenuPlanDetailDto> getMenuPlans(@RequestHeader HttpHeaders headers) throws AuthenticationException {
-        LOGGER.info("Get menuplans called in backend");
+    @ResponseStatus(HttpStatus.OK)
+    public List<MenuPlanDetailDto> getMenuPlans(@RequestHeader HttpHeaders headers) throws AuthenticationException, NotFoundException {
+        LOGGER.trace("getMenuPlans({})", headers);
+
         authService.verifyAuthenticated(headers);
-        try {
-            // get user
-            Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
-            ApplicationUser thisUser = this.userService.getUserById(thisUserId);
 
-            // generate menu plan
-            return this.service.getAllMenuPlansofUserDetailDto(thisUser);
+        // get user
+        Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
+        ApplicationUser thisUser = this.userService.getUserById(thisUserId);
 
-        } catch (UserNotFoundException e) {
-            // this should not happen as the authService verifies the logged-in user
-            LOGGER.warn("Error processing user data, user not found: ", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing user data", e);
-        }
+        // generate menu plan
+        return this.service.getAllMenuPlansofUserDetailDto(thisUser);
     }
 
     @PutMapping("/update")
-    public void updateRecepyInMenuPlan(@RequestHeader HttpHeaders headers, @RequestBody MenuPlanUpdateRecipeDto menuPlan)
-        throws AuthenticationException, UserNotFoundException {
-        LOGGER.info("update({})", menuPlan);
+    @ResponseStatus(HttpStatus.OK)
+    public void updateRecipeInMenuPlan(@RequestHeader HttpHeaders headers, @RequestBody MenuPlanUpdateRecipeDto menuPlan)
+        throws AuthenticationException, NotFoundException {
+        LOGGER.info("updateRecipe({},{})", headers, menuPlan);
+
         this.authService.verifyAuthenticated(headers);
-        String authToken = headers.getFirst("Authorization");
-        Long currentUserId = AuthTokenUtils.getUserId(authToken);
-        ApplicationUser user = this.userService.getUserById(currentUserId);
-        this.service.updateMenuPlanByChangingOneRecepy(user, menuPlan);
+
+        Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
+        ApplicationUser thisUser = this.userService.getUserById(thisUserId);
+
+        this.service.updateMenuPlanByChangingOneRecipe(thisUser, menuPlan);
     }
 
     @GetMapping("/inventory/create/")
-    public InventoryListDto createInventory(@RequestHeader HttpHeaders headers) throws UserNotFoundException, AuthenticationException {
+    @ResponseStatus(HttpStatus.CREATED)
+    public InventoryListDto createInventory(@RequestHeader HttpHeaders headers) throws NotFoundException, AuthenticationException {
         // TODO this will be removed soon
-        LOGGER.trace("createInventory()");
+        LOGGER.trace("createInventory({})", headers);
 
         this.authService.verifyAuthenticated(headers);
-        String authToken = headers.getFirst("Authorization");
-        Long currentUserId = AuthTokenUtils.getUserId(authToken);
-        ApplicationUser user = this.userService.getUserById(currentUserId);
 
-        this.service.createInventory(user);
-        return this.service.searchInventory(user, true);
+        Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
+        ApplicationUser thisUser = this.userService.getUserById(thisUserId);
+
+        this.service.createInventory(thisUser);
+        return this.service.searchInventory(thisUser, true);
     }
 
     @GetMapping("/inventory/")
-    public ResponseEntity<InventoryListDto> getInventory(@RequestHeader HttpHeaders headers) throws AuthenticationException, UserNotFoundException {
-        LOGGER.trace("getInventory()");
-        this.authService.verifyAuthenticated(headers);
-        String authToken = headers.getFirst("Authorization");
-        Long currentUserId = AuthTokenUtils.getUserId(authToken);
-        ApplicationUser user = this.userService.getUserById(currentUserId);
+    @ResponseStatus(HttpStatus.OK)
+    public InventoryListDto getInventory(@RequestHeader HttpHeaders headers) throws AuthenticationException, NotFoundException {
+        LOGGER.trace("getInventory({})", headers);
 
-        return ResponseEntity.ok(this.service.searchInventory(user, true));
+        this.authService.verifyAuthenticated(headers);
+
+        Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
+        ApplicationUser thisUser = this.userService.getUserById(thisUserId);
+
+        return this.service.searchInventory(thisUser, true);
     }
 
     @PutMapping("/inventory/update")
+    @ResponseStatus(HttpStatus.OK)
     public void updateInventoryIngredient(@RequestHeader HttpHeaders headers, @RequestBody InventoryIngredientDto updatedIngredient)
-        throws AuthenticationException, UserNotFoundException, ConflictException {
-        LOGGER.trace("update({})", updatedIngredient);
-        this.authService.verifyAuthenticated(headers);
-        String authToken = headers.getFirst("Authorization");
-        Long currentUserId = AuthTokenUtils.getUserId(authToken);
-        ApplicationUser user = this.userService.getUserById(currentUserId);
+        throws AuthenticationException, NotFoundException, ConflictException {
+        LOGGER.trace("update({},{})", headers, updatedIngredient);
 
-        this.service.updateInventoryIngredient(user, updatedIngredient);
+        this.authService.verifyAuthenticated(headers);
+
+        Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
+        ApplicationUser thisUser = this.userService.getUserById(thisUserId);
+
+        this.service.updateInventoryIngredient(thisUser, updatedIngredient);
     }
 }

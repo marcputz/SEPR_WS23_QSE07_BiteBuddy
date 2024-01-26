@@ -2,16 +2,17 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PictureDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
+import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PictureService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -33,16 +34,18 @@ public class PictureEndpoint {
         this.service = service;
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping()
-    public PictureDto getPicture(@RequestParam long id) {
+    public PictureDto getPicture(@RequestParam long id) throws NotFoundException {
         LOGGER.trace("getPicture({})", id);
 
         return this.service.getByIdAsDto(id);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PutMapping()
-    public PictureDto setPicture(@RequestBody PictureDto pictureDto) {
-        LOGGER.trace("setPicture({})", pictureDto);
+    public PictureDto createPicture(@RequestBody PictureDto pictureDto) throws DataStoreException {
+        LOGGER.trace("createPicture({})", pictureDto);
 
         Picture p = this.service.createPicture(pictureDto.getData(), pictureDto.getDescription());
         return this.service.getByIdAsDto(p.getId());
