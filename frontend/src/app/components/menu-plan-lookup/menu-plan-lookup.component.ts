@@ -10,6 +10,7 @@ import {RecipeListDto} from "../../dtos/recipe";
 import {forEach} from "lodash";
 import {Logger} from "jasmine-spec-reporter/built/display/logger";
 import {MenuPlanUpdateRecipeDto} from "../../dtos/menuplan/menuPlanUpdateRecipeDto";
+import {PictureService} from "../../services/picture.service";
 
 @Component({
   selector: 'app-menu-plan-lookup',
@@ -26,6 +27,8 @@ export class MenuPlanLookupComponent {
   searchChangedObservable = new Subject<void>();
   recipes: RecipeListDto[] = [];
   updateValue: MenuPlanUpdateRecipeDto;
+  recipeImages: Map<RecipeListDto, number[]> = null;
+
 
 
 
@@ -33,6 +36,8 @@ export class MenuPlanLookupComponent {
     private service: MenuPlanService,
     private sanitizer: DomSanitizer,
     private notification: ToastrService,
+    private pictureService: PictureService,
+
   ) {
   }
   ngOnInit() {
@@ -56,6 +61,14 @@ export class MenuPlanLookupComponent {
       }
     })
   }
+
+  getImageFor(recipe: RecipeListDto) {
+    if (this.recipeImages.has(recipe)) {
+      return this.recipeImages.get(recipe);
+    } else {
+      return null;
+    }
+  }
   getMenuPlan() {
     console.log("before sending getMenuPlan date: " + this.searchday);
     this.service.getMenuPlanForDay(this.searchday).subscribe({
@@ -70,6 +83,18 @@ export class MenuPlanLookupComponent {
           }
         });
         this.maxTimeslots = Math.max(...this.contents.map(content => content.timeslot)) + 1;
+
+        this.recipeImages = new Map<RecipeListDto, number[]>();
+        for (let dto of this.contents) {
+          this.pictureService.getPicture(dto.recipe.pictureId).subscribe({
+            next: (pictureDto) => {
+              this.recipeImages.set(dto.recipe, pictureDto.data);
+            },
+            error: error => {
+              console.error(error);
+            }
+          });
+        }
       },
       error: err => {
         this.notification.error('Error fetching recipes for 1 menuplan', err)
