@@ -63,7 +63,6 @@ img {
 }
 
 .user-info {
-
 }
 
 .user-icon {
@@ -114,3 +113,19 @@ img {
     @include button-variant($value, $value);
   }
 }
+
+.card-title-link-disa {
+  color: var(--bs-card-title-color);
+  text-decoration: none;
+}
+
+.card-title-link-disa:hover {
+  color: var(--bs-card-title-color);
+  text-decoration: underline;
+}
+
+.userinfo-buttons-space {
+  display: flex;
+  justify-content: space-between;
+}
+

@@ -126,7 +126,22 @@ export class RecipeListComponent {
           .subscribe({
               next: data => {
                   this.notification.success("Successfully rated new recipe!");
-                  window.location.reload();
+                  this.authService.getUser().subscribe(
+                      (settings: UserSettingsDto) => {
+                          this.profileService.getRatingLists(settings.id)
+                              .subscribe({
+                                  next: data => {
+                                      this.likes = data.likes;
+                                      this.dislikes = data.dislikes
+                                  },
+                                  error: error => {
+                                      console.error('Error getting rating list', error);
+                                      const errorMessage = error?.message || 'Unknown error occured';
+                                      this.notification.error(`Error getting rating lists: ${errorMessage}`);
+                                  }
+                              });
+                      },
+                  );
               },
               error: error => {
                 console.log(error)
