@@ -5,7 +5,6 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
@@ -56,7 +55,7 @@ public class ProfileEndpoint {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created"),
         @ApiResponse(responseCode = "422", description = "Unable to process the data, because contains invalid data"),
-        @ApiResponse(responseCode = "400", description = "Illegal arguments in the request body") })
+        @ApiResponse(responseCode = "400", description = "Illegal arguments in the request body")})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProfileDto post(@Valid @RequestBody ProfileDto toCreateProfile) throws ValidationException {
@@ -91,7 +90,8 @@ public class ProfileEndpoint {
         profileService.rateRecipe(recipeRatingDto);
     }
 
-    @GetMapping("/rating/{UserId}")
+
+    @GetMapping("/rating/{userId}")
     public RecipeRatingListsDto get(@PathVariable long userId) throws NotFoundException {
         LOGGER.info("Received Get request on {}", BASE_PATH);
         LOGGER.debug("Request body for Get:\n{}", userId);

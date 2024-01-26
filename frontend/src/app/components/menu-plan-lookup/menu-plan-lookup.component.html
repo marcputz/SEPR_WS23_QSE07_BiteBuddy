@@ -30,7 +30,7 @@
       <h3 *ngIf="(i+2) % maxTimeslots !== 0" class="text-center">&#8203;</h3>
       <h3 class="text-center">Timeslot {{content.timeslot + 1}}</h3>
       <div class="card border-primary">
-        <img class="card-img-top img-thumbnail" [src]="sanitizeImage(content.recipe.picture)" alt="Image of recipe">
+        <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail" [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
         <h5 class="card-title m-1">{{content.recipe.name}}</h5>
         <h5 class="card-title m-1">{{content.day + 1}}</h5>
         <h5 class="card-title m-1">{{content.timeslot + 1}}</h5>
@@ -42,12 +42,10 @@
                aria-label="Show recipe details">
               <i class="bi bi-info-lg"></i>
             </a>
-            <a class="btn btn-sm btn-success"
-               aria-label="Like Recipe">
-              <i class="bi bi-hand-thumbs-up"></i>
+            <a class="btn btn-sm btn-success" (click)="likeRecipe(content)" aria-label="Like Recipe">
+              <i class="bi bi-arrow-clockwise"></i>
             </a>
-            <a class="btn btn-sm btn-danger"
-               aria-label="Dislike Recipe">
+            <a class="btn btn-sm btn-danger" (click)="dislikeRecipe(content)" aria-label="Dislike Recipe">
               <i class="bi bi-hand-thumbs-down"></i>
             </a>
           </div>

@@ -2,10 +2,20 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdateRecipeDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.InventoryIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.idclasses.MenuPlanContentId;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -29,17 +39,13 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * JPA implementation of MenuPlanService interface.
+ *
+ * @author Marc Putz
  */
 @Service
 public class JpaMenuPlanService implements MenuPlanService {
@@ -88,7 +94,7 @@ public class JpaMenuPlanService implements MenuPlanService {
             MenuPlanDetailDto detail = new MenuPlanDetailDto();
             //Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(plan);
             detail.setUserId(user.getId()).setFromTime(plan.getFromDate());  // .setContents(contents)
-            detail.setUntilTime(plan.getUntilDate()).setNumDays(7);
+            detail.setUntilTime(plan.getUntilDate()).setNumDays(7).setId(plan.getId());
             details.add(detail);
         }
         return details;
@@ -99,13 +105,12 @@ public class JpaMenuPlanService implements MenuPlanService {
         MenuPlanDetailDto menuPlanDetailDto = new MenuPlanDetailDto();
         MenuPlan menuPlan = getMenuPlanForUserOnDate(user, date);
         if (menuPlan == null) {
-            LOGGER.info("no Menuplan at this time: " + date.toString() + " and user id: " + user.getId() + " email: " + user.getEmail() + " nickname: " +
-                user.getNickname() + " password: " + user.getPasswordEncoded());
+            LOGGER.info("no Menuplan at this time: " + date.toString() + " and user id: " + user.getId() + " email: " + user.getEmail() + " nickname: " + user.getNickname() + " password: " + user.getPasswordEncoded());
             return null;
         }
         Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(menuPlan);
         menuPlanDetailDto.setUserId(user.getId()).setContents(contents).setFromTime(menuPlan.getFromDate());
-        menuPlanDetailDto.setUntilTime(menuPlan.getUntilDate());
+        menuPlanDetailDto.setUntilTime(menuPlan.getUntilDate()).setId(menuPlan.getId());
         LOGGER.info("get menuplan: " + menuPlanDetailDto.toString());
         return menuPlanDetailDto;
     }
@@ -285,7 +290,7 @@ public class JpaMenuPlanService implements MenuPlanService {
                         "",
                         selectedRecipe.getName(),
                         selectedRecipe.getId(),
-                        selectedRecipe.getPicture()
+                        selectedRecipe.getPictureId()
                     ));
                 contentDtos.add(contentDto);
 
@@ -362,6 +367,30 @@ public class JpaMenuPlanService implements MenuPlanService {
         } catch (JDBCException e) {
             throw new DataStoreException(e.getErrorMessage(), e);
         }
+    }
+
+
+    @Override
+    public MenuPlan updateMenuPlanByChangingOneRecepy(ApplicationUser user, MenuPlanUpdateRecipeDto updateDto) {
+
+        // the menuplan only has 1 Content which is the one to be changed
+        LOGGER.trace("updateMenuPlanByChangingOneRecepy({},{})", user, updateDto);
+
+        MenuPlan oldPlan = this.getById(updateDto.getMenuPlanId());
+        for (MenuPlanContent content : oldPlan.getContent()) {
+            if (content.getDayIdx() == updateDto.getDay() && content.getTimeslot() == updateDto.getTimeslot()) {
+                long oldId = content.getRecipe().getId();
+                Random rand = new Random();
+                int i = 1;
+                do {
+                    i = rand.nextInt(99) + 1;
+                } while (i == oldId);
+                Recipe recipe = recipeService.getRecipeById(i);
+                content.setRecipe(recipe);
+            }
+        }
+        menuPlanRepository.save(oldPlan);
+        return oldPlan;
     }
 
     @Override
@@ -496,7 +525,7 @@ public class JpaMenuPlanService implements MenuPlanService {
      */
     private MenuPlanContentDetailDto convertContentToDetailDto(MenuPlanContent c) {
         Recipe r = c.getRecipe();
-        RecipeListDto recipeListDto = new RecipeListDto("", r.getName(), r.getId(), r.getPicture());
+        RecipeListDto recipeListDto = new RecipeListDto("", r.getName(), r.getId(), r.getPictureId());
 
         return new MenuPlanContentDetailDto()
             .setDay(c.getDayIdx())
@@ -521,7 +550,7 @@ public class JpaMenuPlanService implements MenuPlanService {
     }
 
     /**
-     * This only checks if a value is null, if so it replaces it with -1f
+     * This only checks if a value is null, if so it replaces it with -1f.
      *
      * @param value which we want to check
      * @return new value which is 100% not null

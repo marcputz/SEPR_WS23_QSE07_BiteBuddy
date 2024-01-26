@@ -1,6 +1,7 @@
 import {MenuPlanContentDetailDto} from "./menuPlanContentDetailDto";
 
 export interface MenuPlanDetailDto {
+  id: number;
   userId: number;
   profileId: number;
   profileName: string;

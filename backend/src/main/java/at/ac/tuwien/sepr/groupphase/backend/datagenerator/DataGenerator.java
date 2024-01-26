@@ -9,12 +9,14 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PictureRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ProfileRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRatingRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.PictureService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ public class DataGenerator {
     private final RecipeRatingRepository recipeRatingRepository;
     private final PasswordResetRequestRepository passwordResetRepository;
     private final RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
+    private final PictureRepository pictureRepository;
 
     public DataGenerator(UserRepository userRepository,
                          MenuPlanRepository menuPlanRepository,
@@ -52,7 +55,8 @@ public class DataGenerator {
                          RecipeIngredientRepository recipeIngredientRepository,
                          RecipeRatingRepository recipeRatingRepository,
                          PasswordResetRequestRepository passwordResetRepository,
-                         RecipeIngredientDetailsRepository recipeIngredientDetailsRepository) {
+                         RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
+                         PictureRepository pictureRepository) {
         this.userRepository = userRepository;
         this.menuPlanRepository = menuPlanRepository;
         this.recipeRepository = recipeRepository;
@@ -64,6 +68,7 @@ public class DataGenerator {
         this.recipeRatingRepository = recipeRatingRepository;
         this.passwordResetRepository = passwordResetRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
+        this.pictureRepository = pictureRepository;
     }
 
     @PostConstruct
@@ -97,7 +102,7 @@ public class DataGenerator {
     private void insertRecipeData() {
         JsonFileReader jsonDataInsert = new JsonFileReader(recipeRepository, ingredientRepository,
             allergeneRepository, allergeneIngredientRepository,
-            recipeIngredientRepository, recipeIngredientDetailsRepository);
+            recipeIngredientRepository, recipeIngredientDetailsRepository, pictureRepository);
         jsonDataInsert.putFoodDataInDataBase();
     }
 

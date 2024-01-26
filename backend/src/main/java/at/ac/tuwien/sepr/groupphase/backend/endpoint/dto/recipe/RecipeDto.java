@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe;
 
 import java.time.LocalDateTime;
 
@@ -8,6 +8,6 @@ public record RecipeDto(
     String creator,
     String name,
     String instructions,
-    byte[] picture
+    Long pictureId
 ) {
 }

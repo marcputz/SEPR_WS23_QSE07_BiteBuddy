@@ -10,7 +10,7 @@
   </div>
   <div class="row">
     <div class="center">
-      <img [src]="sanitizeImage(recipeDetails.picture)" class="img-thumbnail">
+      <img *ngIf="recipePicture !== null" [src]="sanitizeImage(recipePicture)" class="img-thumbnail">
     </div>
   </div>
 
@@ -25,10 +25,10 @@
         >
           <ng-container *ngFor="let ingredient of recipeDetails.ingredients">
             <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit !== null">
-              {{ingredient.name + ", " + (isInteger(ingredient.amount) ? ingredient.amount : (ingredient.amount | number:'1.2-2'))  + " " + ingredient.unit}}
+              {{ingredient.name + ", " + ingredient.amount + " " + ingredient.unit}}
             </div>
             <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit === null">
-              {{ingredient.name + ", " + (isInteger(ingredient.amount) ? ingredient.amount : (ingredient.amount | number:'1.2-2'))  }}
+              {{ingredient.name + ", " + ingredient.amount }}
             </div>
             <div class="model" *ngIf="ingredient.amount === null && ingredient.unit === null">
               {{ingredient.name}}

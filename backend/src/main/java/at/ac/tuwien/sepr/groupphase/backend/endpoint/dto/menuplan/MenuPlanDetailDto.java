@@ -6,6 +6,8 @@ import java.util.Set;
 
 public class MenuPlanDetailDto {
 
+    private Long id;
+
     private Long userId;
 
     private Long profileId;
@@ -21,6 +23,15 @@ public class MenuPlanDetailDto {
     private Set<MenuPlanContentDetailDto> contents;
 
     /* GETTER and SETTER */
+
+    public Long getId() {
+        return id;
+    }
+
+    public MenuPlanDetailDto setId(Long id) {
+        this.id = id;
+        return this;
+    }
 
     public Long getUserId() {
         return userId;

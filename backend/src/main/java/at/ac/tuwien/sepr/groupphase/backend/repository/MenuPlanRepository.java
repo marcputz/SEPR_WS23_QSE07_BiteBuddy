@@ -10,12 +10,15 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MenuPlanRepository extends JpaRepository<MenuPlan, Long> {
 
     @Transactional
     void deleteAllByUser(ApplicationUser user);
+
+    Optional<MenuPlan> findById(Long id);
 
     List<MenuPlan> getAllByUser(ApplicationUser user);
 

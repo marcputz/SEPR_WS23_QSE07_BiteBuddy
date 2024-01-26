@@ -7,6 +7,8 @@ import {AuthService} from "../../services/auth.service";
 import {ProfileService} from "../../services/profile.service";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {CheckRatingDto} from "../../dtos/profileDto";
+import {PictureService} from "../../services/picture.service";
+import {PictureDto} from "../../dtos/pictureDto";
 
 @Component({
   selector: 'app-recipe-detail',
@@ -21,8 +23,10 @@ export class RecipeDetailComponent implements OnInit{
     id: -1,
     ingredients: null,
     allergens: null,
-    picture: null
+    pictureId: null
   }
+
+  recipePicture: number[] = null;
 
   userId: number = -1;
   likes: number[] = [];
@@ -33,6 +37,7 @@ export class RecipeDetailComponent implements OnInit{
     private service: RecipeService,
     private authService: AuthService,
     private profileService: ProfileService,
+    private pictureService: PictureService,
     private router: Router,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer
@@ -46,6 +51,16 @@ export class RecipeDetailComponent implements OnInit{
       (recipeDetails: RecipeDetailsDto) => {
         this.recipeDetails = recipeDetails;
         console.log(recipeDetails);
+
+        // load image
+        this.pictureService.getPicture(this.recipeDetails.pictureId).subscribe({
+          next: pictureDto => {
+            this.recipePicture = pictureDto.data;
+          },
+          error: error => {
+            console.error(error);
+          }
+        })
       },
     );
 
