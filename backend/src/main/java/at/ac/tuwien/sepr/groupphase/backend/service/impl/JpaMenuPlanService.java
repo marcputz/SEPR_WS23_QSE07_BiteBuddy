@@ -1,5 +1,4 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
-
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
@@ -8,7 +7,6 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetail
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdateRecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.InventoryIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
@@ -379,16 +377,28 @@ public class JpaMenuPlanService implements MenuPlanService {
         MenuPlan oldPlan = this.getById(updateDto.getMenuPlanId());
         for (MenuPlanContent content : oldPlan.getContent()) {
             if (content.getDayIdx() == updateDto.getDay() && content.getTimeslot() == updateDto.getTimeslot()) {
-                long oldId = content.getRecipe().getId();
-                Random rand = new Random();
-                int i = 1;
-                do {
-                    i = rand.nextInt(99) + 1;
-                } while (i == oldId);
-                Recipe recipe = recipeService.getRecipeById(i);
-                content.setRecipe(recipe);
+                Set<Allergene> allergenes = user.getActiveProfile().getAllergens();
+                List<Recipe> recipes = recipeService.getAllWithoutAllergens(allergenes);
+                Random random = new Random();
+                LOGGER.trace("before randomIndex size of recepys: " + recipes.size());
+                Set<Recipe> oldDisliked = user.getActiveProfile().getDisliked();
+
+                int randomIndex = random.nextInt(recipes.size());
+                Recipe randomRecipe = recipes.get(randomIndex);
+                while (Objects.equals(content.getRecipe().getId(), randomRecipe.getId()) || oldDisliked.contains(randomRecipe)) {
+                    randomIndex = random.nextInt(recipes.size());
+                    randomRecipe = recipes.get(randomIndex);
+                }
+                content.setRecipe(randomRecipe);
+                LOGGER.trace("before dislike");
+                if (updateDto.isDislike()) {
+                    Set<Recipe> disliked = user.getActiveProfile().getDisliked();
+                    disliked.add(content.getRecipe());
+                    user.getActiveProfile().setDisliked(disliked);
+                }
             }
         }
+
         menuPlanRepository.save(oldPlan);
         return oldPlan;
     }
@@ -677,8 +687,8 @@ public class JpaMenuPlanService implements MenuPlanService {
                                 basicIngrededientExists ? basicIngrededientExists : existingIngredient.getInventoryStatus());
 
                             detailedInventory.put(existingIngredient.getFridgeStringIdentifier(), combinedInvIngredient);
-                        // if detailed name matches, existing unit is null and available (= was put into the fridge)
-                        // we do not combine but mark as available
+                            // if detailed name matches, existing unit is null and available (= was put into the fridge)
+                            // we do not combine but mark as available
                         } else if (existingIngredient.getDetailedIngredientName().equals(recipeIngredient.getAmount().getIngredient())
                             && existingIngredient.getUnit() == null && existingIngredient.getInventoryStatus()) {
                             detailedInventory.put(recipeIngredient.getAmount().getFridgeStringIdentifier(),
