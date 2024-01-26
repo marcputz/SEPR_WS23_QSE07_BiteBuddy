@@ -294,7 +294,7 @@ public class JpaMenuPlanService implements MenuPlanService {
                         "",
                         selectedRecipe.getName(),
                         selectedRecipe.getId(),
-                        selectedRecipe.getPictureId() == null ? -1L : selectedRecipe.getPictureId()
+                        selectedRecipe.getPictureId()
                     ));
                 contentDtos.add(contentDto);
 

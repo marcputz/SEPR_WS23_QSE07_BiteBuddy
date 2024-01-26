@@ -6,6 +6,6 @@ public record RecipeListDto(
     String creator,
     String name,
     Long id,
-    long pictureId
+    Long pictureId
 ) {
 }

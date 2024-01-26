@@ -8,6 +8,6 @@ public record RecipeDto(
     String creator,
     String name,
     String instructions,
-    long pictureId
+    Long pictureId
 ) {
 }

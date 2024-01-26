@@ -8,5 +8,5 @@ public record RecipeDetailsDto(
     String description,
     ArrayList<RecipeIngredientDto> ingredients,
     ArrayList<String> allergens,
-    long pictureId
+    Long pictureId
 ){}
