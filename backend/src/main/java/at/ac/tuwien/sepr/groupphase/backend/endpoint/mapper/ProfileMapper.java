@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 /**
@@ -20,6 +21,7 @@ public interface ProfileMapper {
      * @return the mapped profileDto
      */
     @Named("profileToProfileDto")
+    @Mapping(source = "user.id", target = "userId")
     ProfileDto profileToProfileDto(Profile profile);
 
     /**
