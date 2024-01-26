@@ -1,9 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -17,10 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
@@ -37,7 +34,7 @@ public class RecipeEndpoint {
     }
 
     @PostMapping()
-    public List<RecipeListDto> searchRecipes(@RequestBody RecipeSearchDto searchParams) {
+    public RecipeSearchResultDto searchRecipes(@RequestBody RecipeSearchDto searchParams) {
         LOGGER.info("POST " + BASE_PATH);
         LOGGER.debug("request body: {}", searchParams);
         return this.recipeService.searchRecipes(searchParams);
@@ -45,7 +42,13 @@ public class RecipeEndpoint {
 
     @GetMapping("/ingredient/{name}")
     public List<String> findMatchingIngredients(@PathVariable String name) {
-        LOGGER.info("GET " + BASE_PATH + name);
+        LOGGER.info("GET " + BASE_PATH + "/ingredient/" + name);
+        return this.recipeService.findMatchingIngredients(name);
+    }
+
+    @GetMapping("/ingredient/basic/{name}")
+    public List<String> findOnlyBasicMatchingIngredients(@PathVariable String name) {
+        LOGGER.info("GET " + BASE_PATH + "/ingredient/" + name);
         return this.recipeService.findMatchingIngredients(name);
     }
 
@@ -68,7 +71,7 @@ public class RecipeEndpoint {
 
     @GetMapping("/{id}")
     public RecipeDetailsDto getDetailedRecipe(@PathVariable long id) {
-        LOGGER.info("GET " + BASE_PATH + id);
+        LOGGER.info("GET " + BASE_PATH + "/" + id);
         try {
             return this.recipeService.getDetailedRecipe(id);
         } catch (NotFoundException e) {

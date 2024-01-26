@@ -11,7 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.UserMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
@@ -105,12 +105,12 @@ public class AuthenticationEndpoint {
      * @throws AuthenticationException if the authentication fails due to invalid token or incorrect current password.
      * @throws ValidationException     if the provided new email or password fails validation checks.
      * @throws ConflictException       if the new email conflicts with another user's email.
-     * @throws UserNotFoundException   if no user is found with the provided ID in the JWT token.
+     * @throws NotFoundException   if no user is found with the provided ID in the JWT token.
      */
     @PutMapping("/settings/authentication")
     public ResponseEntity<UserSettingsDto> updateEmailAndPasswordSettings(@RequestBody UserUpdateEmailAndPasswordDto userUpdateEmailAndPasswordDto,
                                                                           @RequestHeader HttpHeaders headers)
-        throws AuthenticationException, ValidationException, ConflictException, UserNotFoundException {
+        throws AuthenticationException, ValidationException, ConflictException, NotFoundException {
         LOGGER.trace("updateEmailAndPasswordSettings({})", userUpdateEmailAndPasswordDto);
 
         this.authenticationService.verifyAuthenticated(headers);
@@ -136,7 +136,7 @@ public class AuthenticationEndpoint {
     @PutMapping("/settings")
     public ResponseEntity<UserSettingsDto> updateUserSettings(@RequestBody UserUpdateSettingsDto userUpdateSettingsDto,
                                                               @RequestHeader HttpHeaders headers)
-        throws AuthenticationException, ValidationException, ConflictException, UserNotFoundException {
+        throws AuthenticationException, ValidationException, ConflictException, NotFoundException {
         LOGGER.trace("updateUserSettings({})", userUpdateSettingsDto);
 
         this.authenticationService.verifyAuthenticated(headers);
@@ -164,7 +164,7 @@ public class AuthenticationEndpoint {
      * @param headers HTTP headers from the request, containing the JWT token.
      * @return a ResponseEntity containing the UserSettingsDto of the authenticated user.
      * @throws AuthenticationException if the user is not authenticated or the authentication token is invalid.
-     * @throws UserNotFoundException   if the user corresponding to the ID in the JWT token is not found.
+     * @throws NotFoundException   if the user corresponding to the ID in the JWT token is not found.
      */
     @GetMapping("/settings")
     public ResponseEntity<UserSettingsDto> getSettings(@RequestHeader HttpHeaders headers) throws AuthenticationException {
@@ -179,7 +179,7 @@ public class AuthenticationEndpoint {
             UserSettingsDto userSettingsDto = userMapper.toUserSettingsDto(currentUser);
             LOGGER.trace("getSettings() return: {}", userSettingsDto);
             return ResponseEntity.ok(userSettingsDto);
-        } catch (UserNotFoundException e) {
+        } catch (NotFoundException e) {
             LOGGER.warn("User not found: ", e);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found", e);
         }
@@ -223,7 +223,7 @@ public class AuthenticationEndpoint {
                 passwordResetService.requestPasswordReset(email);
                 return new ResponseEntity<>(true, HttpStatus.OK);
 
-            } catch (UserNotFoundException ex) {
+            } catch (NotFoundException ex) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User '" + email + "' does not exist");
 
             } catch (MessagingException ex) {

@@ -3,7 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -80,8 +80,8 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserByEmail_NotFound_ThrowsUserNotFoundException() {
-        assertThrows(UserNotFoundException.class, () -> {
+    public void testGetUserByEmail_NotFound_ThrowsNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
             userService.getUserByEmail("test@shouldnotexist.at");
         });
     }
@@ -101,8 +101,8 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserByNickname_NotFound_ThrowsUserNotFoundException() {
-        assertThrows(UserNotFoundException.class, () -> {
+    public void testGetUserByNickname_NotFound_ThrowsNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
             userService.getUserByNickname("shouldNotExist");
         });
     }
@@ -124,13 +124,13 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateUser_NonExistentUser_ThrowsUserNotFoundException() {
+    public void testUpdateUser_NonExistentUser_ThrowsNotFoundException() {
         ApplicationUser nonExistentUser = new ApplicationUser()
             .setId(Long.MIN_VALUE) // An ID that does not exist in the database
             .setEmail("nonexistent.email@test.at")
             .setNickname("nonexistentNickname");
 
-        assertThrows(UserNotFoundException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             userService.updateApplicationUser(nonExistentUser);
         });
     }
@@ -176,14 +176,18 @@ public class UserServiceTest {
     @Test
     public void testUpdateUser_DuplicateNicknameAndEmail_ThrowsConflictException() {
         generateSecondTestUser();
-        testUser.setEmail(secondTestUser.getEmail());
-        testUser.setNickname(secondTestUser.getNickname());
-        ConflictException conflictException = assertThrows(ConflictException.class, () -> userService.updateApplicationUser(testUser),
-            "Expected ConflictException for duplicate email");
-        List<String> expectedErrors = List.of(
-            "Email '" + testUser.getEmail() + "' is already in use",
-            "Nickname '" + testUser.getNickname() + "' is already in use");
-        assertTrue(conflictException.errors().containsAll(expectedErrors), "Conflict errors should contain messages for duplicate email and nickname");
+        try {
+            testUser.setEmail(secondTestUser.getEmail());
+            testUser.setNickname(secondTestUser.getNickname());
+            ConflictException conflictException = assertThrows(ConflictException.class, () -> userService.updateApplicationUser(testUser),
+                "Expected ConflictException for duplicate email");
+            List<String> expectedErrors = List.of(
+                "Email '" + testUser.getEmail() + "' is already in use",
+                "Nickname '" + testUser.getNickname() + "' is already in use");
+            assertTrue(conflictException.errors().containsAll(expectedErrors), "Conflict errors should contain messages for duplicate email and nickname");
+        } finally {
+            userRepository.deleteById(testUserId);
+        }
     }
 
     @Test

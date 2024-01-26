@@ -1,10 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
-@import url("https://fonts.googleapis.com/css?family=Jost:500,400,700|Roboto:400|Open+Sans:400");
+@import url("https://fonts.googleapis.com/css?family=Jost:300,500,400,700|Roboto:400|Open+Sans:400");
 
 :root {
   --app-background-color: rgb(241, 241, 221);
+
+  --app-header-text-color: rgba(15,23,42);
 
   --button-background-color: rgba(80, 50, 5, 1);
   --button-background-color-hover: rgba(60, 30, 4, 1);
@@ -46,6 +48,60 @@ body {
   background-position: left;
   background-attachment: fixed;
   background-size: cover;
+  font-family: 'Jost-Regular', sans-serif !important;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Jost-Medium', sans-serif !important;
+  color: var(--button-background-color) !important;
+}
+
+.header {
+  color: var(--app-header-text-color);
+}
+
+.button-transparent {
+  background-color: rgba(255, 255, 255, 0); /* Fully transparent */
+  color: var(--button-background-color);
+  display: flex;
+  width: 150px;
+  padding: 12px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 2px solid #594338;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.07), 0px 1px 3px 0px rgba(0, 0, 0, 0.10);
+}
+
+.button-transparent:hover,
+.button-transparent:hover .bb-text-inside-btn-transp {
+  background-color: var(--button-background-color);
+  color: white;
+}
+
+.bb-text-inside-btn-transp {
+  color: inherit;
+}
+
+.bb-text-inside-btn-transp i {
+  margin-right: 0.3rem;
+}
+
+.button-full {
+  background-color: var(--button-background-color);
+  display: flex;
+  width: 150px;
+  padding: 12px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  margin-bottom: 5%;
+  border: 2px solid #594338;
+  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.07), 0px 1px 3px 0px rgba(0, 0, 0, 0.10);
+}
+
+.button-full:hover {
+  background-color: var(--button-background-color-hover);
 }
 
 .bb-selectable {
@@ -53,18 +109,28 @@ body {
 }
 
 .bb-link {
+  color: var(--button-background-color);
+  text-decoration: none;
   cursor: pointer;
-
-  color: var(--link-color) !important;
-
-  text-decoration-line: underline !important;
-  text-decoration-style: solid !important;
-
-  font-weight: 500;
 }
 
 .bb-link:hover {
-  color: var(--link-color-hover) !important;
+  color: var(--button-background-color-hover);
+  text-decoration: underline;
+}
+
+.bb-back-route {
+  color: var(--button-background-color-hover);
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 100px !important;
+}
+
+.bb-back-route:hover {
+  color: var(--button-background-color-hover);
+  text-decoration: underline;
 }
 
 .bb-card {
@@ -84,9 +150,9 @@ body {
 }
 
 .bb-input-textfield {
-  display: block;
+  //display: block;
   width: 100%;
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.75rem;
 
   font-size: 1rem;
   line-height: 1.5;
@@ -195,4 +261,66 @@ body {
 
 .bb-settings-box button {
   margin-top: 1.5rem;
+}
+
+.bb-transition-label {
+  position: relative;
+  color: var(--button-background-color);
+  transition: transform 0.2s ease-out, font-size 0.2s ease-out, color 0.2s ease-out;
+}
+
+.bb-input-error {
+  margin-top: -6%;
+  margin-bottom: 3%;
+  margin-left: 2%;
+}
+
+.bb-input {
+  margin-top: 0.6%;
+  margin-bottom: 8%;
+  background-color: white;
+  color: rgba(0, 0, 0, 0.30);
+}
+
+.bb-form-button {
+  color: white;
+  width: 100%;
+  margin-top: 0.6%;
+  margin-top: 8%;
+}
+
+.bb-title {
+  color: #594338;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+
+  margin-top: 12%;
+  margin-left: 15%;
+}
+
+.bb-text-under-button {
+  margin-top: 8%;
+  color: rgba(0, 0, 0, 0.30);
+}
+
+/* Important for putting the icon inside the input */
+.bb-input-container {
+  position: relative;
+}
+
+.bb-toggle-password {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.bi-eye, .bi-eye-slash {
+  font-size: 1.8em;
+  color: lightgray;
 }

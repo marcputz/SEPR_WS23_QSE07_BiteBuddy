@@ -23,10 +23,14 @@ import {ChangeEmailComponent} from './components/user-settings/change-email/chan
 import {ChangePasswordComponent} from './components/user-settings/change-password/change-password.component';
 import {ChangeSettingsComponent} from './components/user-settings/change-settings/change-settings.component';
 import { SettingsLayoutComponent } from './layouts/settings-layout/settings-layout.component';
-import { NgOptimizedImage } from "@angular/common";
+import { DatePipe, NgOptimizedImage} from "@angular/common";
 import { RecipeCreateComponent } from './components/recipe-create/recipe-create.component';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 import { ProfileComponent } from './components/dialogs/profile/profile.component';
+import { MenuPlanComponent } from './components/menu-plan/menu-plan.component';
+import { InventoryComponent } from './components/inventory/inventory.component';
+import { MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
+import { NavbarLayoutComponent } from './layouts/navbar-layout/navbar-layout.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +53,10 @@ import { ProfileComponent } from './components/dialogs/profile/profile.component
     RecipeCreateComponent,
     AutocompleteComponent,
     ProfileComponent,
+    MenuPlanComponent,
+    InventoryComponent,
+    MenuPlanLookupComponent,
+    NavbarLayoutComponent,
   ],
   imports: [
     BrowserModule,
@@ -61,7 +69,10 @@ import { ProfileComponent } from './components/dialogs/profile/profile.component
     ToastrModule.forRoot(),
     NgOptimizedImage,
   ],
-  providers: [httpInterceptorProviders],
+  providers: [
+    httpInterceptorProviders,
+    DatePipe
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

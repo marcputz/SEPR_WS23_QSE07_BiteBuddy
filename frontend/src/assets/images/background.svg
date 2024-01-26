@@ -2,7 +2,7 @@
 
  <g>
   <title>Layer 1</title>
-  <rect id="svg_6" height="1080" width="1920" y="-1.81063" x="-1.81063" stroke-width="0" stroke="#000" fill="#f2f2dd"/>
+  <rect id="svg_6" height="1080" width="1920" y="-1.81063" x="-1.81063" stroke-width="0" stroke="#000" fill="#f8f8ee"/>
   <rect stroke-width="0" rx="100" transform="rotate(-20, 209.596, 139.845)" id="svg_1" height="419.66582" width="810.46935" y="-69.98744" x="-195.63841" stroke="#000" fill="#ffb600"/>
   <ellipse ry="300" rx="300" id="svg_5" cy="1151.12083" cx="1742.36961" stroke-width="0" stroke="#000" fill="#e0dbd5"/>
  </g>

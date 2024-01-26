@@ -1,17 +1,21 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
@@ -20,9 +24,11 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validation.RecipeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,30 +41,33 @@ public class RecipeServiceImpl implements RecipeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private RecipeRepository recipeRepository;
     private RecipeIngredientRepository recipeIngredientRepository;
-    private IngredientRepository ingredientRepository;
+    private RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
     private AllergeneIngredientRepository allergeneIngredientRepository;
     private AllergeneRepository allergeneRepository;
     private RecipeValidator validator;
+    private IngredientServiceImpl ingredientService;
 
     @Autowired
     public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeIngredientRepository recipeIngredientRepository,
-                             IngredientRepository ingredientRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                             AllergeneRepository allergeneRepository, RecipeValidator validator) {
+                             RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
+                             AllergeneIngredientRepository allergeneIngredientRepository,
+                             AllergeneRepository allergeneRepository, RecipeValidator validator, IngredientServiceImpl ingredientService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
-        this.ingredientRepository = ingredientRepository;
+        this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.allergeneRepository = allergeneRepository;
         this.validator = validator;
+        this.ingredientService = ingredientService;
     }
 
     @Override
-    public List<RecipeListDto> searchRecipes(RecipeSearchDto searchParams) {
+    public RecipeSearchResultDto searchRecipes(RecipeSearchDto searchParams) {
         LOGGER.debug("search recipes");
 
         String name = "";
         int pageSelector = 0;
-        int entriesPerPage = 25;
+        int entriesPerPage = 21;
 
         // checking searchParams
         if (searchParams != null) {
@@ -68,21 +77,58 @@ public class RecipeServiceImpl implements RecipeService {
                 pageSelector = searchParams.page();
             }
 
-            if (searchParams.entriesPerPage() >= 1) {
+            if (searchParams.entriesPerPage() >= 22) {
                 entriesPerPage = searchParams.entriesPerPage();
             }
         }
 
         Pageable page = PageRequest.of(pageSelector, entriesPerPage);
-        List<Recipe> recipes = this.recipeRepository.findByNameContainingIgnoreCase(name, page);
+        Page<Recipe> recipes = this.recipeRepository.findByNameContainingIgnoreCase(name, page);
 
         ArrayList<RecipeListDto> recipeDtos = new ArrayList<>();
         for (Recipe recipe : recipes) {
-            recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId(), recipe.getPicture()));
+            recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId(), recipe.getPictureId()));
         }
 
-        return recipeDtos;
+        return new RecipeSearchResultDto(pageSelector, entriesPerPage, recipes.getTotalPages(), recipeDtos);
     }
+
+    @Override
+    public List<Recipe> getAll() {
+        return this.recipeRepository.findAll();
+    }
+
+    @Override
+    public List<Recipe> getAllWithoutAllergens(Set<Allergene> allergens) {
+        Set<Long> allergeneIds = new HashSet<>();
+        for (Allergene a : allergens) {
+            allergeneIds.add(a.getId());
+        }
+        // fix a problem with SQL where empty lists will always return empty result set
+        if (allergeneIds.isEmpty()) {
+            allergeneIds.add(Long.MAX_VALUE); // there should never be any allergen with this ID
+        }
+        return this.recipeRepository.getAllWithoutAllergens(allergeneIds);
+    }
+
+    @Override
+    public List<Recipe> getAllWithIngredientsWithoutAllergens(Set<String> ingredientNames, Set<Allergene> allergens) {
+        Set<Long> allergeneIds = new HashSet<>();
+        for (Allergene a : allergens) {
+            allergeneIds.add(a.getId());
+        }
+        // fix a problem with SQL where empty lists will always return empty result set
+        if (allergeneIds.isEmpty()) {
+            allergeneIds.add(Long.MAX_VALUE); // there should never be any allergen with this ID
+        }
+
+        if (ingredientNames.isEmpty()) {
+            ingredientNames.add("-");
+        }
+
+        return this.recipeRepository.getAllWithIngredientsWithoutAllergens(ingredientNames, allergeneIds);
+    }
+
 
     @Override
     public void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException {
@@ -96,30 +142,36 @@ public class RecipeServiceImpl implements RecipeService {
 
         // creating database entry
         Recipe newRecipe = new Recipe();
-        newRecipe.setPicture(recipe.picture());
+        newRecipe.setPictureId(recipe.pictureId());
         newRecipe.setName(recipe.name());
         newRecipe.setInstructions(recipe.description());
         newRecipe.setIngredients(ingredients);
         this.recipeRepository.save(newRecipe);
 
-        Pageable page = PageRequest.of(0, 20);
         // getting recipe id & checking if we can find the RecipeIngredients
-        Recipe queriedRecipe = this.recipeRepository.findByNameContainingIgnoreCase(recipe.name(), page).get(0);
+        Recipe queriedRecipe = this.recipeRepository.findByNameContainingIgnoreCase(recipe.name()).get(0);
 
         // update recipe with the correct ingredients
         ingredients = new HashSet<>();
-        for (String ingredient : recipe.ingredients()) {
-            List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient);
+        for (RecipeIngredientDto ingredient : recipe.ingredients()) {
+            List<Ingredient> queriedResults = this.ingredientService.getByNameMatching(ingredient.name());
 
             if (!queriedResults.isEmpty()) {
+                RecipeIngredientDetails r = new RecipeIngredientDetails();
+                r.setDescriber("test Describer");
+                r.setUnit(ingredient.unit());
+                r.setIngredient(ingredient.name());
+                r.setAmount(ingredient.amount());
+
                 RecipeIngredient ing = new RecipeIngredient();
-                ing.setAmount("wenig");
+                ing.setAmount(r);
                 ing.setIngredient(queriedResults.get(0));
                 ing.setRecipe(queriedRecipe);
                 ingredients.add(ing);
+                this.recipeIngredientDetailsRepository.save(r);
                 this.recipeIngredientRepository.save(ing);
             } else {
-                conflictList.add("Ingredient " + ingredient + "does not exist");
+                conflictList.add("Ingredient " + ingredient.name() + "does not exist");
             }
         }
 
@@ -134,18 +186,67 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public long getHighestRecipeId() {
+        LOGGER.trace("getHighestRecipeId()");
+
+        Recipe r = this.recipeRepository.findFirstByOrderByIdDesc();
+        return r.getId();
+    }
+
+    @Override
+    public long getLowestRecipeId() {
+        LOGGER.trace("getLowestRecipeId()");
+
+        Recipe r = this.recipeRepository.findFirstByOrderByIdAsc();
+        return r.getId();
+    }
+
+    @Override
+    public Recipe getRecipeById(long id) throws NotFoundException {
+        LOGGER.trace("getRecipeById({})", id);
+
+        Optional<Recipe> recipe = this.recipeRepository.findById(id);
+        if (recipe.isEmpty()) {
+            throw new NotFoundException("The searched for recipe does not exist in the database.");
+        } else {
+            return recipe.get();
+        }
+    }
+
+    @Override
     public List<String> findMatchingIngredients(String name) {
-        // TODO when we have ingredients with working amount and units we should return a dto of ingredients
+        LOGGER.trace("findMatchingIngredients({})", name);
 
         ArrayList<String> matchingIngredients = new ArrayList<>();
-        List<Ingredient> ingredients = this.ingredientRepository.findByNameContainingIgnoreCase(name);
+        List<Ingredient> ingredients = this.ingredientService.getByNameMatching(name);
+        List<RecipeIngredientDetails> detailedIngredients = this.recipeIngredientDetailsRepository.findByIngredientContainingIgnoreCase(name);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             if (ingredients.size() > i) {
                 matchingIngredients.add(ingredients.get(i).getName());
             }
+
+            if (detailedIngredients.size() > i) {
+                matchingIngredients.add(detailedIngredients.get(i).getIngredient());
+            }
         }
-        return matchingIngredients;
+        return matchingIngredients.stream().sorted().toList();
+    }
+
+    @Override
+    public List<RecipeIngredient> findMatchingRecipeIngredients(String name) {
+        List<RecipeIngredientDetails> rids = this.recipeIngredientDetailsRepository.findByIngredientContainingIgnoreCase(name);
+        List<RecipeIngredient> results = new ArrayList<>();
+
+        for (RecipeIngredientDetails details: rids) {
+            List<RecipeIngredient> queryResult = this.recipeIngredientRepository.findByAmountEquals(details);
+
+            if (!queryResult.isEmpty()) {
+                results.add(queryResult.get(0));
+            }
+        }
+
+        return results;
     }
 
     @Override
@@ -154,27 +255,29 @@ public class RecipeServiceImpl implements RecipeService {
 
     }
 
-
-    @SuppressWarnings("checkstyle:CommentsIndentation")
+    @Override
     public RecipeDetailsDto getDetailedRecipe(long id) {
-        // TODO check if ID is valid (not null)
+
         LOGGER.trace("details({})", id);
         Optional<Recipe> recipe = this.recipeRepository.findById(id);
         if (recipe.isEmpty()) {
             throw new NotFoundException("The searched for recipe does not exist in the database anymore.");
         } else {
-            //TODO: make dtos for allergenes and ingredients, which contain the information needed to display them in details, when the database is working.
-            // Ingredients require name and amount, allergenes only the name (and id additionally for both if acces would be required in the future).
-            // Transform data into those dtos and add a list of both to the recipedetails dto
             List<RecipeIngredient> ingredients = this.recipeIngredientRepository.findByRecipe(recipe.get());
             ArrayList<String> ingredientsAndAmount = new ArrayList<>();
+            ArrayList<RecipeIngredientDto> newIngredients = new ArrayList<>();
             for (RecipeIngredient ingredient : ingredients) {
                 Ingredient currentIngredient = ingredient.getIngredient();
                 ingredientsAndAmount.add(currentIngredient.getName() + ": " + ingredient.getAmount());
+
+                newIngredients.add(new RecipeIngredientDto(
+                    ingredient.getAmount().getIngredient(),
+                    ingredient.getAmount().getAmount(),
+                    ingredient.getAmount().getUnit()));
             }
 
 
-            if (ingredients.isEmpty()) {
+            if (newIngredients.isEmpty()) {
                 throw new NotFoundException("The searched for recipe does not have any ingredients");
             } else {
                 ArrayList<String> allergens = new ArrayList<>();
@@ -184,12 +287,14 @@ public class RecipeServiceImpl implements RecipeService {
                     System.out.println(allergensIngredient);
                     for (AllergeneIngredient allergene : allergensIngredient) {
                         System.out.println(allergene.getAllergene().getName());
-                        allergens.add(allergene.getAllergene().getName());
+                        if (!allergens.contains(allergene.getAllergene().getName())) {
+                            allergens.add(allergene.getAllergene().getName());
+                        }
                     }
                 }
                 RecipeDetailsDto detailsDto =
-                        new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions(), ingredientsAndAmount, allergens,
-                            recipe.get().getPicture());
+                    new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions(), newIngredients, allergens,
+                        recipe.get().getPictureId());
                 return detailsDto;
             }
         }

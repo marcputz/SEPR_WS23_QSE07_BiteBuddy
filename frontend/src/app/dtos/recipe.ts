@@ -6,7 +6,9 @@ export interface RecipeSearch {
 }
 
 export interface RecipeIngredientDto {
-
+  name: string,
+  amount: number,
+  unit: string;
 }
 
 export interface RecipeDto {
@@ -15,21 +17,65 @@ export interface RecipeDto {
   creator?: string;
   name: string;
   instructions?: string;
-  picture: number[];
+  pictureId: number;
 }
 
 export interface RecipeListDto {
   creator: string;
   name: string;
   id: number;
-  picture: number[];
+  pictureId: number;
 }
 
 export interface RecipeDetailsDto {
   name: string;
   description: string;
   id: number;
-  ingredients: string[];
+  ingredients: RecipeIngredientDto[];
+  allergens: string[];
+  pictureId: number;
+}
+
+export interface RecipeDetailsViewDto {
+  name: string;
+  description: string;
+  id: number;
+  ingredients: RecipeIngredientDto[];
+  allergens: string[];
+  pictureId: number;
+  rating: number;
+}
+
+export interface RecipeSearchResultDto {
+  page: number,
+  entriesPerPage: number,
+  numberOfPages: number,
+  recipes: RecipeListDto[];
+}
+
+export interface RecipeRatingListsDto {
+  likes: number[];
+  dislikes: number[];
+}
+
+export interface RecipeDetailsViewDto {
+  name: string;
+  description: string;
+  id: number;
+  ingredients: RecipeIngredientDto[];
   allergens: string[];
   picture: number[];
+  rating: number;
+}
+
+export interface RecipeSearchResultDto {
+  page: number,
+  entriesPerPage: number,
+  numberOfPages: number,
+  recipes: RecipeListDto[];
+}
+
+export interface RecipeRatingListsDto {
+  likes: number[];
+  dislikes: number[];
 }

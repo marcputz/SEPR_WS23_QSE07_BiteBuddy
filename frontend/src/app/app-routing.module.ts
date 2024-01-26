@@ -17,10 +17,12 @@ import {ChangePasswordComponent} from './components/user-settings/change-passwor
 import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout.component";
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
+import {MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
+import {InventoryComponent} from "./components/inventory/inventory.component";
+import {MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
+import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
 
 const routes: Routes = [
-  //{path: '', component: HomeComponent},
-
   {path: '*', redirectTo: ''}, // Redirection for unknown paths
 
   {path: '', canActivate: mapToCanActivate([AuthGuard]), component: LandingLayoutComponent}, // Landing Page
@@ -28,21 +30,26 @@ const routes: Routes = [
       {path: 'login', component: LoginComponent}, // Login Page
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
       {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
-      {path: 'register', component: RegisterComponent},
       {path: 'profile', component: ProfileComponent}
     ]},
-  {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent}, // TODO: add dashboard component
+  {path: 'register', component: RegisterComponent}, // Register Page
+  {path: '', component: NavbarLayoutComponent, children: [ // Pages using Navbar Layout
+      {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent}, // TODO: add dashboard component
+      {path: 'recipes', children: [
+          {path: '', component: RecipeListComponent},
+          {path: 'create', component: RecipeCreateComponent},
+          {path: ':id', component: RecipeDetailComponent},
+        ]},
+    ]},
   {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
       {path: '', pathMatch: 'full', redirectTo: 'user'},
       {path: 'user', canActivate: mapToCanActivate([AuthGuard]), component: ChangeSettingsComponent},
       {path: 'email', canActivate: mapToCanActivate([AuthGuard]), component: ChangeEmailComponent},
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
   ]},
-  {path: 'recipes', children: [
-      {path: '', component: RecipeListComponent},
-      {path: 'create', component: RecipeCreateComponent},
-      {path: ':id', component: RecipeDetailComponent},
-  ]},
+  {path: 'menuplan', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent},
+  {path: 'menuplanLookup', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanLookupComponent},
+  {path: 'inventory', canActivate: mapToCanActivate([AuthGuard]), component: InventoryComponent},
 ];
 
 @NgModule({

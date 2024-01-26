@@ -1,8 +1,17 @@
 import {Component} from '@angular/core';
 import {RecipeService} from "../../services/recipe.service";
-import {RecipeListDto, RecipeSearch} from "../../dtos/recipe";
+import {RecipeListDto, RecipeSearch, RecipeSearchResultDto} from "../../dtos/recipe";
 import {debounceTime, Subject} from "rxjs";
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {ToastrService} from "ngx-toastr";
+import {RecipeRatingDto} from "../../dtos/profileDto";
+import {AuthService} from "../../services/auth.service";
+import {UserSettingsDto} from "../../dtos/userSettingsDto";
+import {ProfileService} from "../../services/profile.service";
+import {ErrorFormatterService} from "../../services/error-formatter.service";
+import {Router} from "@angular/router";
+import {PictureService} from "../../services/picture.service";
+import {PictureDto} from "../../dtos/pictureDto";
 
 @Component({
   selector: 'app-recipe-list',
@@ -11,16 +20,33 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 })
 export class RecipeListComponent {
   recipes: RecipeListDto[] = [];
+  recipeImages: Map<RecipeListDto, number[]> = null;
+  maxPages: number = 5;
   searchChangedObservable = new Subject<void>();
   searchParams: RecipeSearch = {
     creator: "",
     name: "",
     page: 0,
-    entriesPerPage: 25
+    entriesPerPage: 21,
+  };
+
+  searchResponse: RecipeSearchResultDto;
+
+  recipeRating: RecipeRatingDto = {
+    recipeId: -100,
+    userId: -100,
+    rating: -1
   };
 
   constructor(
-    private service: RecipeService, private sanitizer: DomSanitizer
+    private service: RecipeService,
+    private authService: AuthService,
+    private profileService: ProfileService,
+    private pictureService: PictureService,
+    private sanitizer: DomSanitizer,
+    private notification: ToastrService,
+    private errorFormatter: ErrorFormatterService,
+    private router: Router,
   ) {
   }
 
@@ -39,14 +65,38 @@ export class RecipeListComponent {
   reloadRecipes() {
     this.service.search(this.searchParams).subscribe({
       next: data => {
-        console.log(data);
-        this.recipes = data;
+        this.searchResponse = data;
+        this.recipes = data.recipes;
+        this.maxPages = data.numberOfPages;
+        this.searchParams.page = data.page;
+        console.log("number of pages: " + data.numberOfPages);
+        console.log("recipes available: " + data.recipes.length);
+
+        // load recipe images
+        this.recipeImages = new Map<RecipeListDto, number[]>();
+        for (let dto of this.recipes) {
+          this.pictureService.getPicture(dto.pictureId).subscribe({
+            next: (pictureDto) => {
+              this.recipeImages.set(dto, pictureDto.data);
+            },
+            error: error => {
+              console.error(error);
+            }
+          });
+        }
       },
       error: err => {
-        console.log('Error fetching recipes', err)
-        // TODO notification service
+        this.notification.error('Error fetching recipes', err)
       }
     })
+  }
+
+  getImageFor(recipe: RecipeListDto) {
+    if (this.recipeImages.has(recipe)) {
+      return this.recipeImages.get(recipe);
+    } else {
+      return null;
+    }
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {
@@ -64,8 +114,40 @@ export class RecipeListComponent {
     }
   }
 
-  pageCounter(change: number) {
-    this.searchParams.page += change;
+  pageChanger(newPageNumber: number) {
+    this.searchParams.page = newPageNumber;
     this.reloadRecipes()
+  }
+
+  rateRecipe(recipeId: number, rating: number) {
+    this.recipeRating.recipeId = recipeId;
+    this.recipeRating.rating = rating;
+    this.authService.getUser().subscribe(
+      (settings: UserSettingsDto) => {
+        this.recipeRating.userId = settings.id;
+        console.log(settings);
+        console.log(this.recipeRating)
+        this.profileService.createRating(this.recipeRating)
+          .subscribe({
+              next: data => {
+                this.notification.success("Successfully rated new recipe!")
+                this.router.navigate(['/recipes']);
+              },
+              error: error => {
+                console.log(error)
+                console.error(error.message, error);
+                let title = "Could not rate recipe!";
+                this.notification.error(this.errorFormatter.format(error), title, {
+                  enableHtml: true,
+                  timeOut: 5000,
+                });
+              }
+            }
+          );
+      });
+  }
+
+  goToRecipe(recipeId: number) {
+    this.router.navigate(['/recipe', recipeId]);
   }
 }

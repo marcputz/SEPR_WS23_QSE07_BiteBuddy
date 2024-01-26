@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, ElementRef, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {AuthService} from '../../../services/auth.service';
@@ -14,12 +14,14 @@ import {ImageHandler} from '../../../utils/imageHandler';
   templateUrl: './change-settings.component.html',
   styleUrls: ['./change-settings.component.scss']
 })
-export class ChangeSettingsComponent {
+export class ChangeSettingsComponent implements OnInit {
 
   settingsForm: UntypedFormGroup;
   submitted = false;
   error = false;
-  errorMessage = '';
+  errorMessage = 'Something went wrong, no user settings found. Check if your backend is connected';
+
+  isInputFocused: {[key: string]: boolean } = {};
 
   originalUserSettings: UserSettingsDto;
   newUserSettings: UpdateUserSettingsDto = new UpdateUserSettingsDto("", null);
@@ -84,7 +86,10 @@ export class ChangeSettingsComponent {
         this.notifications.error('Error loading user settings');
 
         this.error = true;
-        this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+
+        if( (error.error).errorMessage != undefined || (error.error.error).errorMessage != undefined) {
+          this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+        }
       },
       complete: () => {
       }
@@ -120,12 +125,13 @@ export class ChangeSettingsComponent {
             console.log('User settings updated successfully');
             this.notifications.success('User settings updated successfully');
             this.getUser();
+            //TODO: add notifier for all the pictures
           },
           error: error => {
             console.error('Error updating user settings', error);
-            let errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+            this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
 
-            this.notifications.error(errorMessage, 'Error loading user settings: ');
+            this.notifications.error(this.errorMessage, 'Error loading user settings: ');
           }
         });
       } else {
@@ -135,5 +141,12 @@ export class ChangeSettingsComponent {
     } else {
       console.log('Invalid input');
     }
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.settingsForm.get(attribute).value !== '';
   }
 }

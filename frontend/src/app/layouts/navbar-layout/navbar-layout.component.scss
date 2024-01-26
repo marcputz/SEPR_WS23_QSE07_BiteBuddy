@@ -1,0 +1,55 @@
+nav {
+  background-color: #f8f8ee;
+}
+
+.secondary-navbar {
+  display: flex;
+  position: absolute;
+  top: 100%; /* Position it below the main navbar item */
+  left: 0;
+  width: 100%; /* Make it cover the entire width of the page */
+  border-top: 1px solid var(--button-background-color);
+  padding: 0.1rem;
+  flex-direction: row;
+  z-index: 1000; /* Adjust as needed to ensure it's above other elements */
+}
+
+.glassy-background {
+  background-color: rgba(224, 219, 213, 21%); /* Adjust the alpha channel for transparency */
+  backdrop-filter: blur(10px);
+}
+
+.secondary-navbar .first-item {
+  margin-left: 5%;
+}
+
+.secondary-navbar a {
+  margin-right: 5%;
+  color: #333;
+}
+
+.text-header {
+  letter-spacing: 0;
+  line-height: 35.2px !important;
+  white-space: nowrap;
+  position: relative;
+}
+
+.nav-item {
+  margin-left: 1.5rem;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(224, 219, 213, 21%); /* Adjust the alpha channel for transparency */
+  backdrop-filter: blur(10px);
+}
+
+.dropdown-toggle::after {
+  cursor: pointer;
+  content: none !important;
+}
+
+img {
+  width: 40px;
+  height: 40px;
+}

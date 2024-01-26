@@ -1,10 +1,13 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {ProfileDto} from "../dtos/profileDto";
+import {ProfileDto, ProfileListDto, RecipeRatingDto} from "../dtos/profileDto";
 import {catchError, Observable, throwError} from "rxjs";
 import {environment} from 'src/environments/environment';
 import { ErrorFormatterService } from './error-formatter.service';
 import {Globals} from "../global/globals";
+import {UpdateAuthenticationSettingsDto} from "../dtos/updateAuthenticationSettingsDto";
+import {UserSettingsDto} from "../dtos/userSettingsDto";
+import {RecipeRatingListsDto} from "../dtos/recipe";
 
 @Injectable({
     providedIn: 'root'
@@ -17,7 +20,7 @@ export class ProfileService {
     constructor(
         private globals: Globals,
         private http: HttpClient,
-        private errorFormatterService: ErrorFormatterService
+        private errorFormatterService: ErrorFormatterService,
     ) { }
 
     /**
@@ -27,7 +30,7 @@ export class ProfileService {
      * @return Observable for the created profile
      */
     create(profile: ProfileDto | undefined): Observable<ProfileDto> {
-        console.log('Create profile: ' + profile);
+        console.log('Create profile: ' + profile.name);
         return this.http.post<ProfileDto>(
             this.baseUri,
             profile
@@ -39,4 +42,16 @@ export class ProfileService {
             })
         );
     }
+
+  getAllProfilesOfUser(): Observable<ProfileListDto[]> {
+      return this.http.get<ProfileListDto[]>(this.baseUri);
+  }
+
+  createRating(recipeRatingDto: RecipeRatingDto){
+    return this.http.put(`${this.baseUri}/rating/${recipeRatingDto.recipeId}`, recipeRatingDto);
+  }
+
+  getRatingLists(userId: number): Observable<RecipeRatingListsDto>{
+    return this.http.get<RecipeRatingListsDto>(`${this.baseUri}/rating/${userId}`);
+  }
 }

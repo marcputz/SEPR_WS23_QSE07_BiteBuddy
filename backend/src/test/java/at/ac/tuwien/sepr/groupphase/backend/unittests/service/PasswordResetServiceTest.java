@@ -6,10 +6,10 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,10 +45,14 @@ public class PasswordResetServiceTest {
 
     @BeforeEach
     void init() {
-        passwordResetRequestRepository.deleteAll();
-        userRepository.deleteAll();
         ApplicationUser createdUser = userRepository.save(testuser);
         testuser.setId(createdUser.getId());
+    }
+
+    @AfterEach
+    void breakdown() {
+        passwordResetRequestRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -58,7 +62,7 @@ public class PasswordResetServiceTest {
 
     @Test
     void testRequestPasswordReset_WithInvalidEmail_DoesThrow() {
-        assertThrows(UserNotFoundException.class, () -> service.requestPasswordReset("doesNotExist@asdf.com"));
+        assertThrows(NotFoundException.class, () -> service.requestPasswordReset("doesNotExist@asdf.com"));
     }
 
     @Test

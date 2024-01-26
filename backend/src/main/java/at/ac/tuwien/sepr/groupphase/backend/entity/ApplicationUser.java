@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -18,6 +19,7 @@ import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -44,6 +46,8 @@ public class ApplicationUser {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private List<Profile> profiles = new ArrayList<>();
+    @OneToOne
+    private Profile activeProfile;
 
     public ApplicationUser() {
     }
@@ -101,6 +105,15 @@ public class ApplicationUser {
         return this;
     }
 
+    public Profile getActiveProfile() {
+        return activeProfile;
+    }
+
+    public ApplicationUser setActiveProfile(Profile activeProfile) {
+        this.activeProfile = activeProfile;
+        return this;
+    }
+
     public byte[] getUserPicture() {
         return userPicture;
     }
@@ -130,5 +143,34 @@ public class ApplicationUser {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ApplicationUser applicationUser)) {
+            return false;
+        }
+        return Objects.equals(id, applicationUser.id)
+            && Objects.equals(email, applicationUser.email)
+            && Objects.equals(passwordEncoded, applicationUser.passwordEncoded)
+            && Objects.equals(nickname, applicationUser.nickname);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, passwordEncoded, nickname);
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationUser{"
+            + "id=" + id
+            + "email=" + email
+            + "passwordEncoded=" + passwordEncoded
+            + "nickname=" + nickname
+            + '}';
     }
 }

@@ -7,7 +7,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
@@ -47,7 +46,7 @@ public class JpaPasswordResetService implements PasswordResetService {
     }
 
     @Override
-    public void requestPasswordReset(String email) throws UserNotFoundException, MessagingException {
+    public void requestPasswordReset(String email) throws NotFoundException, MessagingException {
         ApplicationUser user = userService.getUserByEmail(email);
         requestPasswordReset(user);
     }
@@ -137,7 +136,7 @@ public class JpaPasswordResetService implements PasswordResetService {
         } catch (LazyInitializationException | JDBCException ex) {
             // could not fetch request entry from data store
             throw new NotFoundException("Request ID invalid or not found");
-        } catch (UserNotFoundException ex) {
+        } catch (NotFoundException ex) {
             // this should NEVER happen
             throw new AuthenticationException("Could not find user");
         } catch (ConflictException ex) {
