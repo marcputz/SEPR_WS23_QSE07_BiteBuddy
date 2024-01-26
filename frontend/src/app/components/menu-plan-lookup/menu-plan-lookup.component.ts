@@ -10,7 +10,8 @@ import {RecipeListDto} from "../../dtos/recipe";
 import {forEach} from "lodash";
 import {Logger} from "jasmine-spec-reporter/built/display/logger";
 import {MenuPlanUpdateRecipeDto} from "../../dtos/menuplan/menuPlanUpdateRecipeDto";
-import {PictureService} from "../../services/picture.service";
+import {PictureService} from "../../services/picture.service"
+
 
 @Component({
   selector: 'app-menu-plan-lookup',
@@ -20,7 +21,7 @@ import {PictureService} from "../../services/picture.service";
 export class MenuPlanLookupComponent {
 
   menuplan: MenuPlanDetailDto;
-  searchday: string;
+  searchday: string = new Date().toString();
   menuplans: MenuPlanDetailDto[];
   maxTimeslots: number;
   contents: MenuPlanContentDetailDto[];
@@ -171,6 +172,38 @@ export class MenuPlanLookupComponent {
     } catch (error) {
       console.error('Error sanitizing image:', error);
       return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
+    }
+  }
+
+  formatDate(inputDate: string, plusDay: number): string {
+    const months = [
+      'January', 'February', 'March', 'April',
+      'May', 'June', 'July', 'August',
+      'September', 'October', 'November', 'December'
+    ];
+
+    let [year, month, day] = inputDate.split('-').map(Number);
+    const monthName = months[month - 1];
+    day = day + plusDay;
+    const dayOrdinal = this.getDayOrdinal(day);
+
+    return `${monthName} ${day}${dayOrdinal}`;
+  }
+
+   getDayOrdinal(day: number): string {
+    if (day >= 11 && day <= 13) {
+      return 'th';
+    }
+
+    switch (day % 10) {
+      case 1:
+        return 'st';
+      case 2:
+        return 'nd';
+      case 3:
+        return 'rd';
+      default:
+        return 'th';
     }
   }
 

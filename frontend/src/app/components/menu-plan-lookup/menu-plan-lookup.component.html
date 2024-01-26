@@ -1,17 +1,18 @@
 <div class="container">
   <div class="row justify-content-center">
-    <h1 class="text-center">My Menuplan</h1>
+    <h1 class="text-center">My Menuplans</h1>
   </div>
 </div>
 
 
 <div class="row">
   <label for="menuplans" class="col-form-label text-md-start text-muted">
-    Which menuplan do you want to see?
+    <span style="font-weight: bold;">Which menuplan do you want to see?</span>
     <span class="required-asterisk">*</span>
   </label>
-  <select multiple class="form-select"
+  <select multiple class="form-select custom-select"
           id="menuplans"
+          style="font-weight: bold;"
           formControlName="menuplans"
           (change)="onMenuPlanSelected($event)"
           required>
@@ -26,14 +27,14 @@
 <div class="container">
   <div class="row">
     <div class="col-md-auto p-3" *ngFor="let content of contents; let i = index">
-      <h3 *ngIf="(i+2) % maxTimeslots === 0" class="text-center">Day {{content.day + 1}}</h3>
-      <h3 *ngIf="(i+2) % maxTimeslots !== 0" class="text-center">&#8203;</h3>
-      <h3 class="text-center">Timeslot {{content.timeslot + 1}}</h3>
+      <h3 *ngIf="(i+2) % maxTimeslots === 0" class="text-center">{{formatDate(menuplan.fromTime, content.day)}} - lunch</h3>
+      <h3 *ngIf="(i+2) % maxTimeslots === 1" class="text-center">{{formatDate(menuplan.fromTime, content.day)}} - dinner</h3>
+      <h3 *ngIf="(i+2) % maxTimeslots === 2" class="text-center">{{formatDate(menuplan.fromTime, content.day)}} - breakfast</h3>
       <div class="card border-primary">
         <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail" [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
         <h5 class="card-title m-1">{{content.recipe.name}}</h5>
-        <h5 class="card-title m-1">{{content.day + 1}}</h5>
-        <h5 class="card-title m-1">{{content.timeslot + 1}}</h5>
+        <!-- <h5 class="card-title m-1">{{content.day + 1}}</h5>
+        <h5 class="card-title m-1">{{content.timeslot + 1}}</h5> -->
         <p class="card-text m-1">Preview of the recipe, but currently not implemented</p>
         <div class="row-cols-3">
           <div class="btn-group">
