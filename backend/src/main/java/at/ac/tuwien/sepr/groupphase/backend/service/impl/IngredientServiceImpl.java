@@ -3,7 +3,6 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
-import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import org.slf4j.Logger;
@@ -14,6 +13,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class IngredientServiceImpl implements IngredientService {
@@ -29,8 +29,15 @@ public class IngredientServiceImpl implements IngredientService {
 
     @Override
     public List<IngredientDto> getAllIngredients() {
-        LOGGER.trace("getAllIngredients()");
-        return ingredientMapper.ingredientToListAllIngredientDtos(ingredientRepository.findAll());
+        List<Ingredient> allIngredients = ingredientRepository.findAll();
+
+        // Filter out ingredients with "Filler" in the name
+        List<Ingredient> filteredIngredients = allIngredients.stream()
+            .filter(ingredient -> !ingredient.getName().contains("Filler"))
+            .collect(Collectors.toList());
+
+        // Map the filtered ingredients to DTOs
+        return ingredientMapper.ingredientToListAllIngredientDtos(filteredIngredients);
     }
 
     @Override
