@@ -1,37 +1,48 @@
-@use "sass:map";
-@import "node_modules/bootstrap/scss/functions";
-@import "node_modules/bootstrap/scss/variables";
-@import "node_modules/bootstrap/scss/mixins";
-
 .background-img {
   width: 100%;
   height: fit-content;
   background: var(--app-background-color) url(/assets/images/background_w_circle.svg) !important;
 }
 
-.title-margin {
-  margin: 2%;
-  margin-left: 28%;
+.input-button {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  flex-direction: row;
+  align-content: center;
+  justify-content: flex-start;
+}
+
+.input-field:hover {
+  border-color: var(--button-background-color);
 }
 
 .input-field {
   border-radius: 15px;
-  background-color: #D9D9D9;
+  padding-left: 5px;
+  padding: 8px;
+  background-color: rgba(224, 219, 213, 60%);
+  backdrop-filter: blur(10px);
 }
 
 .row-title {
   flex-direction: row;
   align-content: center;
-  align-items: center;
+  align-self: center;
   justify-content: center;
+
+  margin: 5% 0;
 }
 
 .row-form {
-  margin: 5% 10%;
+  margin: 5% 8%;
 }
 
 .button-create {
-  border-radius: 15% !important;
+  margin-left: 8%;
+  padding: 8px;
 }
 
 .button-create {
@@ -40,22 +51,31 @@
 }
 
 .recipe-card {
-  width: fit-content;
   height: fit-content;
   border-radius: 12px;
   border: none;
+
+  cursor: pointer;
+}
+
+.col-recipe {
+  margin-right: -3rem !important;
 }
 
 img {
-  width: 270px;
-  height: 11rem;
+  height: 15rem;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
+}
+
+.card-body {
+  min-height: 9.5rem;
+  max-height: fit-content;
 }
 
 .recipe-card:hover {
-  transform: scale(0.8);
-  transition: transform 0.4s ease;
+  transform: scale(1.1);
+  transition: transform 0.5s ease;
 }
 
 .pagination {
@@ -63,7 +83,7 @@ img {
 }
 
 .user-info {
-
+  margin-bottom: 0.2rem;
 }
 
 .user-icon {
@@ -79,38 +99,19 @@ img {
   font-size: 14px;
 }
 
-
-//Old code
-.min-width {
-  /* Used to get the actions column in the table to be not wider than necessary */
-  width: 0;
+.page-link {
+  color: var(--button-background-color);
 }
 
-.center-td > td {
-  vertical-align: middle;
+.page-link:hover {
+  background-color: rgba(224, 219, 213, 21%);
+  backdrop-filter: blur(10px);
 }
 
-.responsive-info-button, .responsive-warning-button, .responsive-danger-button, .responsive-dark-button, .responsive-tree-button {
-  @include button-variant($light, $light);
-}
-
-.img-thumbnail {
-  width: auto;
-  height: 200px;
-  object-fit: contain;
-}
-
-.card {
-  transition: all 0.3s;
-}
-
-.card:hover {
-  transform: scale(1.1);
-}
-
-@each $color in (info, warning, danger) {
-  $value: map.get($theme-colors, $color);
-  tr:hover .responsive-#{$color}-button {
-    @include button-variant($value, $value);
-  }
+/* Change color pagination full square from bootstrap 5 */
+.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span {
+  background-color: var(--button-background-color);
+  border-color: var(--button-background-color);
+  backdrop-filter: blur(10px);
+  color: white;
 }

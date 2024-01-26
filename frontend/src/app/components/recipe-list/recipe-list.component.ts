@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RecipeService} from "../../services/recipe.service";
 import {RecipeListDto, RecipeSearch, RecipeSearchResultDto} from "../../dtos/recipe";
 import {debounceTime, Subject} from "rxjs";
@@ -16,7 +16,7 @@ import {Router} from "@angular/router";
   templateUrl: './recipe-list.component.html',
   styleUrls: ['./recipe-list.component.scss']
 })
-export class RecipeListComponent {
+export class RecipeListComponent implements OnInit {
   recipes: RecipeListDto[] = [];
   maxPages: number = 5;
   searchChangedObservable = new Subject<void>();
@@ -24,7 +24,7 @@ export class RecipeListComponent {
     creator: "",
     name: "",
     page: 0,
-    entriesPerPage: 21,
+    entriesPerPage: 30,
   };
 
   searchResponse: RecipeSearchResultDto;
@@ -122,7 +122,7 @@ export class RecipeListComponent {
       });
   }
 
-  goToRecipe(recipeId: number) {
-    this.router.navigate(['/recipe', recipeId]);
+  redirectToRecipe(recipeId: number) {
+    this.router.navigate(['/recipes', recipeId]);
   }
 }

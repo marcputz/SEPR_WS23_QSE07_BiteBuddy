@@ -1,17 +1,23 @@
-<div class="background-img">
-  <div class="container-fluid">
+<div class="background-img container-fluid">
+  <div class="row-form">
     <div class="row row-title">
-      <div class="col-md-3">
+      <!-- Title -->
+      <div class="col-md-2 col-lg-2 col-sm-4">
         <h2 class="bb-dialog-box-header title-margin">Discover Recipes</h2>
       </div>
-      <div class="col-md-6">
+      <!-- Search bar -->
+      <div class="col-md-5 col-lg-8 col-sm-4">
         <div class="input-group">
-          <input type="text" class="form-control input-field" placeholder="Search recipes...">
+          <input type="text" id="searchRecipeName"  name="searchRecipeName"
+                 class="form-control input-field"
+                 placeholder="Search recipes..."
+                 [(ngModel)]="searchParams.name"
+                 (ngModelChange)="searchChanged()">
         </div>
       </div>
-      <div class="col-md-2">
-        <div class="input-group">
-          <button type="submit" class="button-create">
+      <div class="col-md-4 col-lg-2 col-sm-4">
+        <div class="input-button">
+          <button type="submit" [routerLink]="['/recipes/create']" class="button-create button-transparent" aria-label="Add Recipe">
             <i class="bi bi-plus">
               Add recipe
             </i>
@@ -19,10 +25,10 @@
         </div>
       </div>
     </div>
-
-    <div class="row row-form">
-      <div class="col-md-3 mb-5" *ngFor="let recipe of recipes">
-        <div class="card recipe-card">
+    <!-- Card layout -->
+    <div class="row">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 mb-4 row-gap-6" *ngFor="let recipe of recipes">
+        <div class="card recipe-card" (click)="redirectToRecipe(recipe.id)">
           <img [src]="sanitizeImage(recipe.picture)" class="card-img-top rounded-top img-zoom" alt="Recipe Image">
           <div class="card-body">
             <h5 class="card-title">{{ recipe.name }}</h5>
@@ -35,52 +41,92 @@
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
-
-  </div>
-</div>
-
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-auto">
-      <div class="container">
-        <ul class="pagination">
-          <li class="page-item">
-            <a class="page-link" (click)="pageChanger(0)" aria-label="First">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li class="page-item"><a class="page-link" *ngIf="this.searchParams.page - 1 > 0" (click)="pageChanger(this.searchParams.page - 2)">{{this.searchParams.page - 1}}</a></li>
-          <li class="page-item"><a class="page-link" *ngIf="this.searchParams.page > 0" (click)="pageChanger(this.searchParams.page - 1)">{{this.searchParams.page}}</a></li>
-          <li class="page-item active"><a class="page-link">{{this.searchParams.page + 1}}</a></li>
-          <li class="page-item" *ngIf="maxPages > this.searchParams.page + 1" ><a class="page-link" (click)="pageChanger(this.searchParams.page + 1)">{{this.searchParams.page + 2}}</a></li>
-          <li class="page-item" *ngIf="maxPages > this.searchParams.page + 2" ><a class="page-link" (click)="pageChanger(this.searchParams.page + 2)">{{this.searchParams.page + 3}}</a></li>
-          <li class="page-item">
-            <a class="page-link" (click)="pageChanger(maxPages - 1)" aria-label="Last">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
+    <div class="row justify-content-center">
+      <div class="col-md-auto">
+        <div class="container">
+          <ul class="pagination mb-4 mt-4">
+            <li class="page-item" [class.disabled]="this.searchParams.page === 0">
+              <a class="page-link" (click)="pageChanger(0)" aria-label="First">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item" *ngIf="this.searchParams.page - 1 > 0">
+              <a class="page-link" (click)="pageChanger(this.searchParams.page - 2)">{{this.searchParams.page - 1}}</a>
+            </li>
+            <li class="page-item" *ngIf="this.searchParams.page > 0">
+              <a class="page-link" (click)="pageChanger(this.searchParams.page - 1)">{{this.searchParams.page}}</a>
+            </li>
+            <li class="page-item active"><a class="page-link">{{this.searchParams.page + 1}}</a></li>
+            <li class="page-item" *ngIf="maxPages > this.searchParams.page + 1">
+              <a class="page-link" (click)="pageChanger(this.searchParams.page + 1)">{{this.searchParams.page + 2}}</a>
+            </li>
+            <li class="page-item" *ngIf="maxPages > this.searchParams.page + 2">
+              <a class="page-link" (click)="pageChanger(this.searchParams.page + 2)">{{this.searchParams.page + 3}}</a>
+            </li>
+            <li class="page-item" [class.disabled]="this.searchParams.page === maxPages - 1">
+              <a class="page-link" (click)="pageChanger(maxPages - 1)" aria-label="Last">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-    <!--
-    <div class="col-md-auto">
-      <button class="btn btn-success rounded-pill" [routerLink]="['/recipes/create']" aria-label="Create Recipe">
-        <i class="bi-plus-square"></i>
-        Create Recipe
-      </button>
-    </div>
-    <div class="col-md-auto">
-        <i class="bi bi-search mr-4"></i>
-        <input type="text" id="searchRecipeName" name="searchRecipeName" placeholder="Enter a recipe"
-             class="form-control rounded-pill"
-             [(ngModel)]="searchParams.name"
-             (ngModelChange)="searchChanged()">
+  </div>
+</div>
+<!--
+<div class="container">
+ <div class="row justify-content-center">
+   <div class="col-md-auto">
+     <div class="container">
+       <ul class="pagination">
+         <li class="page-item" [class.disabled]="this.searchParams.page === 0">
+           <a class="page-link" (click)="pageChanger(0)" aria-label="First">
+             <span aria-hidden="true">&laquo;</span>
+           </a>
+         </li>
+         <li class="page-item" *ngIf="this.searchParams.page - 1 > 0">
+           <a class="page-link" (click)="pageChanger(this.searchParams.page - 2)">{{this.searchParams.page - 1}}</a>
+         </li>
+         <li class="page-item" *ngIf="this.searchParams.page > 0">
+           <a class="page-link" (click)="pageChanger(this.searchParams.page - 1)">{{this.searchParams.page}}</a>
+         </li>
+         <li class="page-item active"><a class="page-link">{{this.searchParams.page + 1}}</a></li>
+         <li class="page-item" *ngIf="maxPages > this.searchParams.page + 1">
+           <a class="page-link" (click)="pageChanger(this.searchParams.page + 1)">{{this.searchParams.page + 2}}</a>
+         </li>
+         <li class="page-item" *ngIf="maxPages > this.searchParams.page + 2">
+           <a class="page-link" (click)="pageChanger(this.searchParams.page + 2)">{{this.searchParams.page + 3}}</a>
+         </li>
+         <li class="page-item" [class.disabled]="this.searchParams.page === maxPages - 1">
+           <a class="page-link" (click)="pageChanger(maxPages - 1)" aria-label="Last">
+             <span aria-hidden="true">&raquo;</span>
+           </a>
+         </li>
+       </ul>
+     </div>
+   </div>
+
+   <div class="col-md-auto">
+     <button class="btn btn-success rounded-pill" [routerLink]="['/recipes/create']" aria-label="Create Recipe">
+       <i class="bi-plus-square"></i>
+       Create Recipe
+     </button>
+   </div>
+   <div class="col-md-auto">
+       <i class="bi bi-search mr-4"></i>
+       <input type="text" id="searchRecipeName" name="searchRecipeName" placeholder="Enter a recipe"
+            class="form-control rounded-pill"
+            [(ngModel)]="searchParams.name"
+            (ngModelChange)="searchChanged()">
+   </div>
+
     </div>
     -->
-    </div>
 <!--
   <div class="row">
     <div class="col-md-auto p-3" *ngFor="let recipe of recipes">
@@ -110,5 +156,5 @@
       </div>
     </div>
   </div>
-  -->
 </div>
+ -->
