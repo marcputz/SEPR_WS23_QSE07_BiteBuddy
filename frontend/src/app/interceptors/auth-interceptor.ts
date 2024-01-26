@@ -12,11 +12,16 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-    const authBaseUri = this.globals.backendUri + '/authentication';
-    const logoutUri = authBaseUri + '/logout';
+    const uriExceptions: string[] = [
+      this.globals.backendUri + '/authentication/login',
+      this.globals.backendUri + '/authentication/register',
+      this.globals.backendUri + '/authentication/request_password_reset',
+      this.globals.backendUri + '/authentication/password_reset',
+    ];
+
 
     // Do not intercept authentication (login) requests
-    if (req.url.startsWith(authBaseUri) && req.url != logoutUri) {
+    if (uriExceptions.includes(req.url)) {
       return next.handle(req);
     }
 

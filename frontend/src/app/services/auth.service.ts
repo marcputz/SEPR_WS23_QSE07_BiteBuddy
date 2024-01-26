@@ -10,6 +10,7 @@ import {UserSettingsDto} from '../dtos/userSettingsDto';
 import {UpdateAuthenticationSettingsDto} from '../dtos/updateAuthenticationSettingsDto';
 import {ResetPasswordDto} from "../dtos/resetPasswordDto";
 import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';
+import {ApiErrorHandler} from "./apiErrorHandler";
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class AuthService {
 
   private authBaseUri: string = this.globals.backendUri + '/authentication';
 
-  constructor(private httpClient: HttpClient, private globals: Globals) {
+  constructor(private httpClient: HttpClient, private globals: Globals, private apiErrorHandler: ApiErrorHandler) {
   }
 
   /**
@@ -27,7 +28,7 @@ export class AuthService {
    * @param authRequest User data
    */
   loginUser(authRequest: LoginDto): Observable<string> {
-    console.debug("Logging in as '" + authRequest.email + "'");
+    console.trace("Logging in as '" + authRequest.email + "'");
     return this.httpClient.post(this.authBaseUri + "/login", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
@@ -35,7 +36,7 @@ export class AuthService {
   }
 
   registerUser(authRequest: RegisterDto): Observable<string> {
-    console.debug("Registering as '" + authRequest.email + "'" + authRequest.name + "'" + authRequest.passwordEncoded);
+    console.trace("Registering as '" + authRequest.email + "'");
     return this.httpClient.post(this.authBaseUri + "/register", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
@@ -45,37 +46,20 @@ export class AuthService {
   getUser(): Observable<UserSettingsDto> {
     console.debug("Retrieving current user settings");
 
-    const authToken = this.getToken();
-    if (!authToken) {
-      throw new Error('Authorization token not found');
-    }
-
-    const headers = new HttpHeaders({
-      'Authorization': `${authToken}`
-    });
-
-    return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`, {headers});
+    return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`);
   }
 
   updateUserAuthentication(updateAuthenticationSettingsDto: UpdateAuthenticationSettingsDto): Observable<UserSettingsDto> {
-    const headers = new HttpHeaders({
-      'Authorization': `${this.getToken()}`
-    });
     return this.httpClient.put<UserSettingsDto>(
       this.authBaseUri + "/settings/authentication",
       updateAuthenticationSettingsDto,
-      {headers}
     );
   }
 
   updateUserSettings(updateUserSettingsDto: UpdateUserSettingsDto): Observable<UserSettingsDto> {
-    const headers = new HttpHeaders({
-      'Authorization': `${this.getToken()}`
-    });
     return this.httpClient.put<UserSettingsDto>(
       this.authBaseUri + "/settings",
       updateUserSettingsDto,
-      {headers}
     );
   }
 
@@ -85,16 +69,13 @@ export class AuthService {
     this.httpClient.post(this.authBaseUri + "/logout", this.getToken())
       .subscribe({
         next: success => {
-          if (success) {
             console.log("Logged out from backend");
-          } else {
-            console.warn("Backend denied logout, rely on client-side logout only");
-          }
         },
         error: error => {
-          console.warn("Could not log out from backend, rely on client-side logout only", error);
+          this.apiErrorHandler.handleApiError(error);
         }
       })
+
     localStorage.removeItem('authToken');
   }
 

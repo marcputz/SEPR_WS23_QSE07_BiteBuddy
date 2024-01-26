@@ -131,7 +131,7 @@ public class JpaPasswordResetService implements PasswordResetService {
 
             // save new password to user
             userToChange.setPasswordEncoded(PasswordEncoder.encode(dto.getNewPassword(), userToChange.getEmail()));
-            userService.updateApplicationUser(userToChange);
+            userService.updateUser(userToChange);
 
         } catch (LazyInitializationException | JDBCException ex) {
             // could not fetch request entry from data store

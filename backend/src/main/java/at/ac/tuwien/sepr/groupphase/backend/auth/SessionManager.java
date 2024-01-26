@@ -176,13 +176,13 @@ public final class SessionManager {
 
         @Override
         public void run() {
-            LOGGER.trace("run()");
+            LOGGER.debug("UserSession Cleanup Thread has started");
 
             while (!this.isInterrupted()) {
                 try {
                     LocalDateTime nextCheckTime = lastChecked.plusMinutes(CLEANUP_INTERVAL_IN_MINUTES);
                     if (LocalDateTime.now().isEqual(nextCheckTime) || LocalDateTime.now().isAfter(nextCheckTime)) {
-                        LOGGER.trace("Cleaning up expired user sessions");
+
 
                         // check token expiration dates
                         List<String> expiredTokens = Collections.synchronizedList(new ArrayList<>());
@@ -193,15 +193,10 @@ public final class SessionManager {
                             }
                         });
 
-                        if (expiredTokens.size() > 0) {
-                            LOGGER.debug("Timeout for " + expiredTokens.size() + " token(s)");
-                        }
-
                         // stop sessions of expired tokens
                         expiredTokens.forEach(token -> {
-                            LOGGER.trace("Stopping session '" + token + "'");
                             if (!manager.stopUserSession(token)) {
-                                LOGGER.warn("Unable to stop session '" + token + "'");
+                                LOGGER.warn("Unable to stop expired user session '" + token + "'");
                             }
                         });
 
@@ -214,6 +209,8 @@ public final class SessionManager {
                     this.interrupt();
                 }
             }
+
+            LOGGER.debug("UserSession Cleanup Thread was interrupted");
         }
     }
 }

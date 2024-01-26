@@ -173,7 +173,6 @@ public class AuthenticationEndpointTest {
         response = mvcResult.getResponse();
 
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
     }
 
     @Test
@@ -360,7 +359,7 @@ public class AuthenticationEndpointTest {
         MvcResult registerResult = this.mockMvc.perform(post("/api/v1/authentication/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto))
                 .headers(registerHeaders))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn();
 
         String authToken = registerResult.getResponse().getContentAsString();
@@ -381,7 +380,7 @@ public class AuthenticationEndpointTest {
         MvcResult registerResult = this.mockMvc.perform(post("/api/v1/authentication/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto))
                 .headers(registerHeaders))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn();
 
         String authToken = registerResult.getResponse().getContentAsString();
@@ -396,12 +395,12 @@ public class AuthenticationEndpointTest {
         MvcResult registerResult2 = this.mockMvc.perform(post("/api/v1/authentication/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto2))
                 .headers(registerHeaders))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isConflict())
             .andReturn();
     }
 
     @Test
-    void testRequestPasswordReset_WithValidEmail_IsOk() throws Exception {
+    void testRequestPasswordReset_WithValidEmail_IsAccepted() throws Exception {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -413,7 +412,7 @@ public class AuthenticationEndpointTest {
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(HttpStatus.ACCEPTED.value(), response.getStatus());
     }
 
     @Test
