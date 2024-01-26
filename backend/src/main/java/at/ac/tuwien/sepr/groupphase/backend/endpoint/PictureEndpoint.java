@@ -2,14 +2,17 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PictureDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
+import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PictureService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +32,12 @@ public class PictureEndpoint {
 
     private final PictureService service;
 
+    private final AuthenticationService authService;
+
     @Autowired
-    public PictureEndpoint(PictureService service) {
+    public PictureEndpoint(PictureService service, AuthenticationService authService) {
         this.service = service;
+        this.authService = authService;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -44,8 +50,10 @@ public class PictureEndpoint {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PutMapping()
-    public PictureDto createPicture(@RequestBody PictureDto pictureDto) throws DataStoreException {
+    public PictureDto createPicture(@RequestHeader HttpHeaders headers, @RequestBody PictureDto pictureDto) throws AuthenticationException, DataStoreException {
         LOGGER.trace("createPicture({})", pictureDto);
+
+        this.authService.verifyAuthenticated(headers);
 
         Picture p = this.service.createPicture(pictureDto.getData(), pictureDto.getDescription());
         return this.service.getByIdAsDto(p.getId());
