@@ -9,6 +9,7 @@ import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
 import {PictureService} from "../../services/picture.service";
+import {IngredientService} from "../../services/ingredient.service";
 
 @Component({
   selector: 'app-recipe-create',
@@ -32,6 +33,7 @@ export class RecipeCreateComponent {
   constructor(
     private service: RecipeService,
     private pictureService: PictureService,
+    private ingredientService: IngredientService,
     private sanitizer: DomSanitizer,
     private router: Router,
     private notification: ToastrService,
@@ -154,5 +156,5 @@ export class RecipeCreateComponent {
 
   ingredientSuggestions = (input: string) => (input === '')
     ? of([])
-    : this.service.searchRecipeIngredientsMatching(input);
+    : this.ingredientService.searchRecipeIngredientsMatching(input);
 }

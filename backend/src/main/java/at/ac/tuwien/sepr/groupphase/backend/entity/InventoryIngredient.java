@@ -21,7 +21,10 @@ public class InventoryIngredient {
     private Long menuPlanId;
 
     @Column(nullable = false)
-    private Long ingredientId;
+    private Long basicIngredientId;
+
+    @Column(nullable = true)
+    private String detailedIngredientName;
 
     @Column(nullable = true)
     private Float amount;
@@ -35,10 +38,11 @@ public class InventoryIngredient {
     public InventoryIngredient() {
     }
 
-    public InventoryIngredient(String name, Long menuPlanId, Long ingredientId, Float amount, FoodUnit unit, boolean inventoryStatus) {
+    public InventoryIngredient(String name, Long menuPlanId, Long basicIngredientId, String detailedIngredientName, Float amount, FoodUnit unit, boolean inventoryStatus) {
         this.name = name;
         this.menuPlanId = menuPlanId;
-        this.ingredientId = ingredientId;
+        this.basicIngredientId = basicIngredientId;
+        this.detailedIngredientName = detailedIngredientName;
         this.amount = amount;
         this.unit = unit;
         this.inventoryStatus = inventoryStatus;
@@ -57,12 +61,21 @@ public class InventoryIngredient {
         return this;
     }
 
-    public Long getIngredientId() {
-        return ingredientId;
+    public Long getBasicIngredientId() {
+        return basicIngredientId;
     }
 
-    public InventoryIngredient setIngredientId(Long ingredientId) {
-        this.ingredientId = ingredientId;
+    public InventoryIngredient setBasicIngredientId(Long basicIngredientId) {
+        this.basicIngredientId = basicIngredientId;
+        return this;
+    }
+
+    public String getDetailedIngredientName() {
+        return detailedIngredientName;
+    }
+
+    public InventoryIngredient setDetailedIngredientName(String detailedIngredientName) {
+        this.detailedIngredientName = detailedIngredientName;
         return this;
     }
 
@@ -93,6 +106,14 @@ public class InventoryIngredient {
         return this;
     }
 
+    /**
+     * This is needed since we want a custom way to index ingredients with just name and FoodUnit
+     * @return
+     */
+    public String getFridgeStringIdentifier() {
+        return detailedIngredientName + " " + (getUnit() != null ? getUnit().toString() : "");
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -103,14 +124,15 @@ public class InventoryIngredient {
         } else {
             InventoryIngredient other = (InventoryIngredient) o;
             return Objects.equals(other.id, id) && Objects.equals(other.menuPlanId, menuPlanId)
-                && Objects.equals(other.ingredientId, ingredientId) && Objects.equals(other.amount, amount)
-                && Objects.equals(other.inventoryStatus, inventoryStatus) && Objects.equals(other.unit, unit);
+                && Objects.equals(other.basicIngredientId, basicIngredientId) && Objects.equals(other.amount, amount)
+                && Objects.equals(other.inventoryStatus, inventoryStatus) && Objects.equals(other.unit, unit)
+                && Objects.equals(other.detailedIngredientName, detailedIngredientName);
         }
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuPlanId, ingredientId, amount, inventoryStatus, unit);
+        return Objects.hash(id, menuPlanId, basicIngredientId, detailedIngredientName, amount, inventoryStatus, unit);
     }
 
     public String getName() {

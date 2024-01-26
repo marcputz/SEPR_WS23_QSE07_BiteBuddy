@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,5 +37,27 @@ public class IngredientServiceImpl implements IngredientService {
     public Ingredient getById(long id) {
         Optional<Ingredient> i = this.ingredientRepository.findById(id);
         return i.orElse(null);
+    }
+
+    @Override
+    public List<Ingredient> getByNameMatching(String name) {
+        LOGGER.trace("getByNameMatching({})", name);
+        return this.ingredientRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    @Override
+    public List<String> getNamesMatching(String name) {
+        List<Ingredient> matchingOnes = this.getByNameMatching(name);
+        List<String> result = new ArrayList<>();
+
+        for (Ingredient ing: matchingOnes) {
+            result.add(ing.getName());
+
+            if (result.size() >= 10) {
+                return result;
+            }
+        }
+
+        return result;
     }
 }

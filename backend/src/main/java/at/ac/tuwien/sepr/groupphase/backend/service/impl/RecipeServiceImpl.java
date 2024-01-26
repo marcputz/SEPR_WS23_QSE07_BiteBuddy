@@ -15,7 +15,6 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
@@ -29,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,23 +42,23 @@ public class RecipeServiceImpl implements RecipeService {
     private RecipeRepository recipeRepository;
     private RecipeIngredientRepository recipeIngredientRepository;
     private RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
-    private IngredientRepository ingredientRepository;
     private AllergeneIngredientRepository allergeneIngredientRepository;
     private AllergeneRepository allergeneRepository;
     private RecipeValidator validator;
+    private IngredientServiceImpl ingredientService;
 
     @Autowired
     public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeIngredientRepository recipeIngredientRepository,
                              RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
-                             IngredientRepository ingredientRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                             AllergeneRepository allergeneRepository, RecipeValidator validator) {
+                             AllergeneIngredientRepository allergeneIngredientRepository,
+                             AllergeneRepository allergeneRepository, RecipeValidator validator, IngredientServiceImpl ingredientService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
-        this.ingredientRepository = ingredientRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.allergeneRepository = allergeneRepository;
         this.validator = validator;
+        this.ingredientService = ingredientService;
     }
 
     @Override
@@ -154,7 +154,7 @@ public class RecipeServiceImpl implements RecipeService {
         // update recipe with the correct ingredients
         ingredients = new HashSet<>();
         for (RecipeIngredientDto ingredient : recipe.ingredients()) {
-            List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient.name());
+            List<Ingredient> queriedResults = this.ingredientService.getByNameMatching(ingredient.name());
 
             if (!queriedResults.isEmpty()) {
                 RecipeIngredientDetails r = new RecipeIngredientDetails();
@@ -215,17 +215,38 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public List<String> findMatchingIngredients(String name) {
-        // TODO when we have ingredients with working amount and units we should return a dto of ingredients
+        LOGGER.trace("findMatchingIngredients({})", name);
 
         ArrayList<String> matchingIngredients = new ArrayList<>();
-        List<Ingredient> ingredients = this.ingredientRepository.findByNameContainingIgnoreCase(name);
+        List<Ingredient> ingredients = this.ingredientService.getByNameMatching(name);
+        List<RecipeIngredientDetails> detailedIngredients = this.recipeIngredientDetailsRepository.findByIngredientContainingIgnoreCase(name);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             if (ingredients.size() > i) {
                 matchingIngredients.add(ingredients.get(i).getName());
             }
+
+            if (detailedIngredients.size() > i) {
+                matchingIngredients.add(detailedIngredients.get(i).getIngredient());
+            }
         }
-        return matchingIngredients;
+        return matchingIngredients.stream().sorted().toList();
+    }
+
+    @Override
+    public List<RecipeIngredient> findMatchingRecipeIngredients(String name) {
+        List<RecipeIngredientDetails> rids = this.recipeIngredientDetailsRepository.findByIngredientContainingIgnoreCase(name);
+        List<RecipeIngredient> results = new ArrayList<>();
+
+        for (RecipeIngredientDetails details: rids) {
+            List<RecipeIngredient> queryResult = this.recipeIngredientRepository.findByAmountEquals(details);
+
+            if (!queryResult.isEmpty()) {
+                results.add(queryResult.get(0));
+            }
+        }
+
+        return results;
     }
 
     @Override

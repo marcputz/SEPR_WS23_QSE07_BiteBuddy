@@ -12,11 +12,13 @@ public class InventoryIngredientDto {
     private Float amount;
     private FoodUnit unit;
     private boolean inventoryStatus;
+    private String detailedName;
 
-    public InventoryIngredientDto(Long id, String name, Long menuPlanId, long ingredientId, Float amount, FoodUnit unit, boolean inventoryStatus) {
+    public InventoryIngredientDto(Long id, String name, Long menuPlanId, long ingredientId, String detailedName, Float amount, FoodUnit unit, boolean inventoryStatus) {
         this.id = id;
         this.name = name;
         this.menuPlanId = menuPlanId;
+        this.detailedName = detailedName;
         this.ingredientId = ingredientId;
         this.amount = amount;
         this.unit = unit;
