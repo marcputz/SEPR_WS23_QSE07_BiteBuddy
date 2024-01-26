@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {ProfileDto, ProfileSearch, ProfileSearchResultDto, RecipeRatingDto} from "../dtos/profileDto";
+import {ProfileDetailDto, ProfileDto, ProfileEditDto, RecipeRatingDto, ProfileSearchResultDto, ProfileSearch} from "../dtos/profileDto";
 import {catchError, Observable, throwError} from "rxjs";
 import {ErrorFormatterService} from './error-formatter.service';
 import {Globals} from "../global/globals";
@@ -51,5 +51,15 @@ export class ProfileService {
 
   getRatingLists(userId: number): Observable<RecipeRatingListsDto> {
     return this.http.get<RecipeRatingListsDto>(`${this.baseUri}/userRating/${userId}`);
+  }
+
+  getProfileDetails(profileId: number): Observable<ProfileDetailDto>{
+      console.log(`${this.baseUri}/${profileId}`)
+      return this.http.get<ProfileDetailDto>(`${this.baseUri}/${profileId}`)
+  }
+
+  editProfile(profileDto: ProfileDto): Observable<ProfileDto>{
+    console.log(`${this.baseUri}/edit/${profileDto.id}`);
+    return this.http.put<ProfileDto>(`${this.baseUri}/edit/${profileDto.id}`, profileDto)
   }
 }

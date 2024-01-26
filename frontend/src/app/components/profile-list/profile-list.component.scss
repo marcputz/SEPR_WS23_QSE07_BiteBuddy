@@ -27,3 +27,13 @@
 .card {
   margin-bottom: 30px;
 }
+
+.card-title-link-disa:hover {
+  color: var(--bs-card-title-color);
+  text-decoration: underline;
+}
+
+.card-title-link-disa {
+  color: var(--bs-card-title-color);
+  text-decoration: none;
+}

@@ -19,6 +19,8 @@ import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.co
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
 import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
 import {ProfileListComponent} from './components/profile-list/profile-list.component';
+import {ProfileEditComponent} from "./components/profile-edit/profile-edit.component";
+import {ProfileDetailsComponent} from "./components/profile-details/profile-details.component";
 
 const routes: Routes = [
   {path: '*', redirectTo: ''}, // Redirection for unknown paths
@@ -48,7 +50,10 @@ const routes: Routes = [
   ]},
   {
     path: 'profiles', children: [
-      {path: '', component: ProfileListComponent}
+      {path: '', component: ProfileListComponent},
+      {path: ':id', component: ProfileDetailsComponent},
+      {path: '', component: DialogLayoutComponent, children: [
+      {path: 'edit/:id', component: ProfileEditComponent}]}
     ]
   },
 ];

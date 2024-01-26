@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
@@ -19,15 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.lang.invoke.MethodHandles;
 
@@ -73,26 +66,28 @@ public class ProfileEndpoint {
 
     @PutMapping("/rating/{RecipeId}")
     public void post(@Valid @RequestBody RecipeRatingDto recipeRatingDto) throws ValidationException, NotFoundException {
-        LOGGER.info("Received POST request on {}", BASE_PATH);
-        LOGGER.debug("Request body for POST:\n{}", recipeRatingDto);
+        LOGGER.info("Received PUT request on {}", BASE_PATH);
+        LOGGER.debug("Request body for PUT:\n{}", recipeRatingDto);
 
         profileService.rateRecipe(recipeRatingDto);
     }
 
-    @GetMapping("/rating/{userId}")
-    public RecipeRatingListsDto get(@PathVariable long userId) throws NotFoundException {
-        LOGGER.info("Received Get request on {}", BASE_PATH);
-        LOGGER.debug("Request body for Get:\n{}", userId);
 
-        return profileService.getRatingLists(userId);
-    }
 
     @GetMapping("/{profileId}")
     public ProfileDetailDto getProfileDetails(@PathVariable long profileId) throws NotFoundException {
         LOGGER.info("Received Get request on {}", BASE_PATH);
         LOGGER.debug("Request body for Get:\n{}", profileId);
 
-        return null;
+        return profileService.getProfileDetails(profileId);
+    }
+
+    @PutMapping("/edit/{id}")
+    public ProfileDto editProfile(@RequestBody ProfileDto profileDto) throws ValidationException, NotFoundException {
+        LOGGER.info("Received PUT request on {}", BASE_PATH);
+        LOGGER.debug("Request body for PUT:\n{}", profileDto);
+
+        return profileService.editProfile(profileDto);
     }
 
     @GetMapping("/userRating/{userId}")
@@ -101,5 +96,13 @@ public class ProfileEndpoint {
         LOGGER.debug("Request body for Get:\n{}", userId);
 
         return profileService.getRatingLists(userId);
+    }
+
+    @DeleteMapping("/{profileId}/delete")
+    public void deleteProfile(@PathVariable long profileId) throws NotFoundException, ConflictException {
+        LOGGER.info("Received Delete request on {}", BASE_PATH);
+        LOGGER.debug("Request body for DELETE :\n{}", profileId);
+
+        profileService.deleteProfile(profileId);
     }
 }

@@ -29,6 +29,8 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
 import { ProfileComponent } from './components/dialogs/profile/profile.component';
 import { NavbarLayoutComponent } from './layouts/navbar-layout/navbar-layout.component';
 import { ProfileListComponent } from './components/profile-list/profile-list.component';
+import { ProfileEditComponent } from './components/profile-edit/profile-edit.component';
+import { ProfileDetailsComponent } from './components/profile-details/profile-details.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +55,8 @@ import { ProfileListComponent } from './components/profile-list/profile-list.com
     ProfileComponent,
     NavbarLayoutComponent,
     ProfileListComponent,
+    ProfileEditComponent,
+    ProfileDetailsComponent,
   ],
   imports: [
     BrowserModule,

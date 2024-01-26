@@ -359,4 +359,59 @@ public class ProfileServiceTest {
         );
     }
 
+    @Test
+    public void getRatingListsOfNonExistingProfileThrowsNotFoundException() {
+        RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId2);
+
+        Assertions.assertThrows(NotFoundException.class,
+            () -> profileService.getRatingLists(-1));
+    }
+
+    @Test
+    public void editProfileWithValidProfileDtoReturnsEditedProfile() throws ValidationException, NotFoundException{
+        ProfileDto testProfileDto = ProfileDto.ProfileDtoBuilder.aProfileDto()
+            .withName("Profile User test")
+            .withAllergens(List.of(
+                AllergeneDto.AllergeneDtoBuilder.anAllergeneDto().withId(allergeneId).withName("Gluten").build())
+            )
+            .withIngredient(List.of(
+                IngredientDto.IngredientDtoBuilder.anIngredientDto().withId(ingredientId).withName("Rice").build())
+            ).withUserId(testUserId).build();
+
+        testProfileDto.setId(profileId);
+
+        ProfileDto createdProfile = profileService.editProfile(testProfileDto);
+
+        assertNotNull(createdProfile);
+
+        assertAll(
+            () -> assertEquals(testProfileDto.getId(), createdProfile.getId()),
+            () -> assertEquals(testProfileDto.getName(), createdProfile.getName()),
+            () -> assertEquals(testProfileDto.getAllergens().toString(), createdProfile.getAllergens().toString()),
+            () -> assertEquals(testProfileDto.getIngredient().toString(), createdProfile.getIngredient().toString())
+        );
+        userRepository.findById(testUserId).ifPresent(user -> {
+            user.setActiveProfile(null);
+            userRepository.save(user);
+        });
+        profileRepository.deleteById(profileRepository.findByName("Profile User test").getId());
+    }
+
+    @Test
+    public void editProfileWithInValidProfileIdReturnsNotNullException() throws ValidationException, NotFoundException{
+        ProfileDto testProfileDto = ProfileDto.ProfileDtoBuilder.aProfileDto()
+            .withName("Profile User test")
+            .withAllergens(List.of(
+                AllergeneDto.AllergeneDtoBuilder.anAllergeneDto().withId(allergeneId).withName("Gluten").build())
+            )
+            .withIngredient(List.of(
+                IngredientDto.IngredientDtoBuilder.anIngredientDto().withId(ingredientId).withName("Rice").build())
+            ).withUserId(testUserId).build();
+
+        testProfileDto.setId(-1L);
+
+        Assertions.assertThrows(NotFoundException.class,
+            () -> profileService.editProfile(testProfileDto));
+    }
+
 }

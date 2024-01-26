@@ -293,4 +293,15 @@ public class ProfileServiceImpl implements ProfileService {
         editedDto.setId(edited.getId());
         return editedDto;
     }
+
+    @Override
+    public void deleteProfile(Long profileId) throws NotFoundException {
+        Optional<Profile> profileToDelete = profileRepository.findById(profileId);
+
+        if (profileToDelete.isEmpty()) {
+            throw new NotFoundException("Profile does not exist");
+        }
+
+        profileRepository.delete(profileToDelete.get());
+    }
 }

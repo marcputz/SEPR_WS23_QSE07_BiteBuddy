@@ -49,3 +49,11 @@ export interface ProfileDetailDto {
     user: string,
     userId: number
 }
+
+export interface ProfileEditDto {
+  id: number;
+  name: string;
+  allergens: AllergeneDto[];
+  ingredient: IngredientDto[];
+  userId: number;
+}

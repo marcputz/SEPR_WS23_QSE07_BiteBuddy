@@ -73,4 +73,13 @@ public interface ProfileService {
      * @throws NotFoundException   if the profileDto's contents (profile, ingredients, allergenes, user) does not exist in the database
      */
     ProfileDto editProfile(ProfileDto profileDto) throws ValidationException, NotFoundException;
+
+    /**
+     * Deletes a single profile entry.
+     *
+     * @param profileId to edit
+     * @throws NotFoundException if the profile does not exist in the database
+     */
+    void deleteProfile(Long profileId) throws NotFoundException;
+
 }
