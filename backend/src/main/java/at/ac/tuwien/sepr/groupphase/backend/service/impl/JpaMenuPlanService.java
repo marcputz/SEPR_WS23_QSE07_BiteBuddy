@@ -2,10 +2,19 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.InventoryIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.idclasses.MenuPlanContentId;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -286,7 +295,7 @@ public class JpaMenuPlanService implements MenuPlanService {
                         "",
                         selectedRecipe.getName(),
                         selectedRecipe.getId(),
-                        selectedRecipe.getPicture()
+                        selectedRecipe.getPictureId()
                     ));
                 contentDtos.add(contentDto);
 
@@ -497,7 +506,7 @@ public class JpaMenuPlanService implements MenuPlanService {
      */
     private MenuPlanContentDetailDto convertContentToDetailDto(MenuPlanContent c) {
         Recipe r = c.getRecipe();
-        RecipeListDto recipeListDto = new RecipeListDto("", r.getName(), r.getId(), r.getPicture());
+        RecipeListDto recipeListDto = new RecipeListDto("", r.getName(), r.getId(), r.getPictureId());
 
         return new MenuPlanContentDetailDto()
             .setDay(c.getDayIdx())

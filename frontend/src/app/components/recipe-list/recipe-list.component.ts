@@ -10,6 +10,8 @@ import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {ProfileService} from "../../services/profile.service";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
 import {Router} from "@angular/router";
+import {PictureService} from "../../services/picture.service";
+import {PictureDto} from "../../dtos/pictureDto";
 
 @Component({
   selector: 'app-recipe-list',
@@ -18,6 +20,7 @@ import {Router} from "@angular/router";
 })
 export class RecipeListComponent {
   recipes: RecipeListDto[] = [];
+  recipeImages: Map<RecipeListDto, number[]> = null;
   maxPages: number = 5;
   searchChangedObservable = new Subject<void>();
   searchParams: RecipeSearch = {
@@ -39,6 +42,7 @@ export class RecipeListComponent {
     private service: RecipeService,
     private authService: AuthService,
     private profileService: ProfileService,
+    private pictureService: PictureService,
     private sanitizer: DomSanitizer,
     private notification: ToastrService,
     private errorFormatter: ErrorFormatterService,
@@ -67,11 +71,32 @@ export class RecipeListComponent {
         this.searchParams.page = data.page;
         console.log("number of pages: " + data.numberOfPages);
         console.log("recipes available: " + data.recipes.length);
+
+        // load recipe images
+        this.recipeImages = new Map<RecipeListDto, number[]>();
+        for (let dto of this.recipes) {
+          this.pictureService.getPicture(dto.pictureId).subscribe({
+            next: (pictureDto) => {
+              this.recipeImages.set(dto, pictureDto.data);
+            },
+            error: error => {
+              console.error(error);
+            }
+          });
+        }
       },
       error: err => {
         this.notification.error('Error fetching recipes', err)
       }
     })
+  }
+
+  getImageFor(recipe: RecipeListDto) {
+    if (this.recipeImages.has(recipe)) {
+      return this.recipeImages.get(recipe);
+    } else {
+      return null;
+    }
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {

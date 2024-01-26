@@ -17,14 +17,14 @@ export interface RecipeDto {
   creator?: string;
   name: string;
   instructions?: string;
-  picture: number[];
+  pictureId: number;
 }
 
 export interface RecipeListDto {
   creator: string;
   name: string;
   id: number;
-  picture: number[];
+  pictureId: number;
 }
 
 export interface RecipeDetailsDto {
@@ -33,7 +33,7 @@ export interface RecipeDetailsDto {
   id: number;
   ingredients: RecipeIngredientDto[];
   allergens: string[];
-  picture: number[];
+  pictureId: number;
 }
 
 export interface RecipeDetailsViewDto {
@@ -42,7 +42,7 @@ export interface RecipeDetailsViewDto {
   id: number;
   ingredients: RecipeIngredientDto[];
   allergens: string[];
-  picture: number[];
+  pictureId: number;
   rating: number;
 }
 
