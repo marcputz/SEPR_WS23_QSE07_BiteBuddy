@@ -50,7 +50,7 @@ public class IngredientServiceImpl implements IngredientService {
         List<Ingredient> matchingOnes = this.getByNameMatching(name);
         List<String> result = new ArrayList<>();
 
-        for (Ingredient ing: matchingOnes) {
+        for (Ingredient ing : matchingOnes) {
             result.add(ing.getName());
 
             if (result.size() >= 10) {

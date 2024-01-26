@@ -238,7 +238,7 @@ public class RecipeServiceImpl implements RecipeService {
         List<RecipeIngredientDetails> rids = this.recipeIngredientDetailsRepository.findByIngredientContainingIgnoreCase(name);
         List<RecipeIngredient> results = new ArrayList<>();
 
-        for (RecipeIngredientDetails details: rids) {
+        for (RecipeIngredientDetails details : rids) {
             List<RecipeIngredient> queryResult = this.recipeIngredientRepository.findByAmountEquals(details);
 
             if (!queryResult.isEmpty()) {

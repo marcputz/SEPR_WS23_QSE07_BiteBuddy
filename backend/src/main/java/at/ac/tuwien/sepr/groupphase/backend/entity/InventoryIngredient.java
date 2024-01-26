@@ -38,7 +38,8 @@ public class InventoryIngredient {
     public InventoryIngredient() {
     }
 
-    public InventoryIngredient(String name, Long menuPlanId, Long basicIngredientId, String detailedIngredientName, Float amount, FoodUnit unit, boolean inventoryStatus) {
+    public InventoryIngredient(String name, Long menuPlanId, Long basicIngredientId, String detailedIngredientName, Float amount, FoodUnit unit,
+                               boolean inventoryStatus) {
         this.name = name;
         this.menuPlanId = menuPlanId;
         this.basicIngredientId = basicIngredientId;
@@ -107,8 +108,9 @@ public class InventoryIngredient {
     }
 
     /**
-     * This is needed since we want a custom way to index ingredients with just name and FoodUnit
-     * @return
+     * This is needed since we want a custom way to index ingredients with just name and FoodUnit.
+     *
+     * @return String which identifiers the ingredient.
      */
     public String getFridgeStringIdentifier() {
         return detailedIngredientName + " " + (getUnit() != null ? getUnit().toString() : "");

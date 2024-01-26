@@ -10,6 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+
 import java.util.List;
 import java.util.Set;
 
@@ -102,7 +103,8 @@ public interface RecipeService {
     List<String> findMatchingIngredients(String name);
 
     /**
-     * Finds all RecipeIngredients which match the name of the detailed ingredient
+     * Finds all RecipeIngredients which match the name of the detailed ingredient.
+     *
      * @param name detailed ingredients name
      * @return List of RecipeIngredients
      */

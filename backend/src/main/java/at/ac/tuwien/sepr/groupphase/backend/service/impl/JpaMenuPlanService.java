@@ -1,4 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
@@ -103,7 +104,8 @@ public class JpaMenuPlanService implements MenuPlanService {
         MenuPlanDetailDto menuPlanDetailDto = new MenuPlanDetailDto();
         MenuPlan menuPlan = getMenuPlanForUserOnDate(user, date);
         if (menuPlan == null) {
-            LOGGER.info("no Menuplan at this time: " + date.toString() + " and user id: " + user.getId() + " email: " + user.getEmail() + " nickname: " + user.getNickname() + " password: " + user.getPasswordEncoded());
+            LOGGER.info("no Menuplan at this time: " + date.toString() + " and user id: " + user.getId() + " email: " + user.getEmail() + " nickname: " +
+                user.getNickname() + " password: " + user.getPasswordEncoded());
             return null;
         }
         Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(menuPlan);

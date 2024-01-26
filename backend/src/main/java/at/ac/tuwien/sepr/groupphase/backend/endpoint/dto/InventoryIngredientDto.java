@@ -82,11 +82,6 @@ public class InventoryIngredientDto {
         return amount;
     }
 
-    public InventoryIngredientDto setAmount(float amount) {
-        this.amount = amount;
-        return this;
-    }
-
     public FoodUnit getUnit() {
         return unit;
     }
