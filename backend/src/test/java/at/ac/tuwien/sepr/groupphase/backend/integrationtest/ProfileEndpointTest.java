@@ -5,7 +5,6 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapperImpl;
@@ -23,6 +22,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +36,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +52,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public class ProfileEndpointTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -67,11 +71,8 @@ public class ProfileEndpointTest {
     @Autowired
     private ProfileRepository profileRepository;
     private Long testUserId;
-    private String testUserPassword;
     private String testUserAuthToken;
-    private Long allergeneId;
     private Long profileId;
-    private Long ingredientId;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -79,12 +80,10 @@ public class ProfileEndpointTest {
     public void generateTestData() throws Exception {
         AllergeneDto allergeneDto = AllergeneDto.AllergeneDtoBuilder.anAllergeneDto().withId(1L).withName("Gluten").build();
         Allergene savedAllergene = allergeneRepository.save(allergeneMapper.allergeneDtoToAllergene(allergeneDto));
-        allergeneId = savedAllergene.getId();
 
         IngredientDto ingredientDto = IngredientDto.IngredientDtoBuilder.anIngredientDto().withId(1L).withName("Rice").build();
         Ingredient savedIngredient = ingredientRepository.save(ingredientMapper.ingredientDtoToIngredient(ingredientDto));
-        ingredientId = savedIngredient.getId();
-        testUserPassword = "test";
+        String testUserPassword = "test";
         var testUser = new ApplicationUser().setId(-1L).setEmail("John@test.at")
             .setPasswordEncoded(PasswordEncoder.encode(testUserPassword, "John@test.at")).setNickname("John Doe")
             .setUserPicture(Base64.getDecoder().decode("abcd"));
@@ -118,15 +117,31 @@ public class ProfileEndpointTest {
     }
 
     @AfterEach
-    public void deleteTestData() throws Exception {
-        //Logout
+    public void deleteTestData() {
+        // Logout
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         requestHeaders.set("authorization", testUserAuthToken);
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/logout")
-                .headers(requestHeaders))
-            .andReturn();
+        try {
+            this.mockMvc.perform(post("/api/v1/authentication/logout")
+                    .headers(requestHeaders))
+                .andReturn();
+        } catch (Exception e) {
+            LOGGER.error("Error at deleteTestData logout", e);
+        }
+
+        // Clear data in users
+        userRepository.findAll().forEach(user -> {
+            user.setActiveProfile(null);
+            user.getProfiles().clear();
+            userRepository.save(user);
+        });
+
+        profileRepository.deleteAll();
+        userRepository.deleteAll();
+        allergeneRepository.deleteAll();
+        ingredientRepository.deleteAll();
     }
 
     @Test
@@ -135,8 +150,6 @@ public class ProfileEndpointTest {
         updateHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         updateHeaders.setContentType(MediaType.APPLICATION_JSON);
         updateHeaders.set("Authorization", testUserAuthToken);
-
-        ProfileSearchDto searchDto = new ProfileSearchDto("", "Asia", true, 0, 20);
 
         // Perform update request
         var searchResult = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/profiles/search")
@@ -167,4 +180,27 @@ public class ProfileEndpointTest {
         );
     }
 
+    @Test
+    public void copyToOwn_ShouldCopyProfileSuccessfully() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        Long profileToCopyId = profileId;
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/profiles/copyToOwn/" + profileToCopyId)
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        ProfileDetailDto resultProfileDto = objectMapper.readValue(response.getContentAsString(), ProfileDetailDto.class);
+
+        assertNotNull(resultProfileDto, "Copied profile should not be null");
+        assertEquals("Asian", resultProfileDto.name(), "Profile name should be 'Asian'");
+        assertEquals(testUserId, resultProfileDto.userId(), "User Id should be same as testUserId");
+        profileRepository.deleteById(resultProfileDto.id());
+    }
 }

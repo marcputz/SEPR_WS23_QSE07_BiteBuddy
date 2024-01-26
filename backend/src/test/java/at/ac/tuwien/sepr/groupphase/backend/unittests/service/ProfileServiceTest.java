@@ -31,7 +31,6 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
@@ -92,15 +92,9 @@ public class ProfileServiceTest {
     private Long ingredientId;
     private Long profileId;
     private Long profileId2;
-    private Long profileId3;
-
     private Long testUserId;
     private Long testUserId2;
-
     private long recipe1Id;
-    private long recipeIngredient1Id;
-    private long ingredient1Id;
-    private long rd1Id;
 
     @BeforeEach
     public void generateTestData() {
@@ -111,7 +105,7 @@ public class ProfileServiceTest {
         // adding apple
         Ingredient ingredient1 = new Ingredient();
         ingredient1.setName("Apple");
-        ingredient1Id = ingredientRepository.save(ingredient1).getId();
+        ingredientRepository.save(ingredient1);
 
         // creating recipes without ingredients
         Recipe recipe1 = new Recipe();
@@ -125,14 +119,14 @@ public class ProfileServiceTest {
         r1.setUnit(FoodUnit.tablespoon);
         r1.setIngredient("sugar");
         r1.setAmount(1);
-        rd1Id = recipeIngredientDetailsRepository.save(r1).getId();
+        recipeIngredientDetailsRepository.save(r1);
 
         // creating recipeIngredients
         RecipeIngredient recipeIngredient1 = new RecipeIngredient();
         recipeIngredient1.setIngredient(ingredient1);
         recipeIngredient1.setAmount(r1);
         recipeIngredient1.setRecipe(recipe1);
-        recipeIngredient1Id = recipeIngredientRepository.save(recipeIngredient1).getId();
+        recipeIngredientRepository.save(recipeIngredient1);
 
         // updating recipes with ingredients
         Set<RecipeIngredient> ringredients1 = new HashSet<>();
@@ -189,7 +183,7 @@ public class ProfileServiceTest {
         try {
             profileId = profileRepository.save(profileMapper.profileDtoToProfile(profileDto)).getId();
             profileId2 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto2)).getId();
-            profileId3 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto3)).getId();
+            profileRepository.save(profileMapper.profileDtoToProfile(profileDto3));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -199,29 +193,19 @@ public class ProfileServiceTest {
     @AfterEach
     public void deleteTestData() {
         // Clearing user profiles and active profiles
-        userRepository.findById(testUserId).ifPresent(user -> {
-            user.setActiveProfile(null);
-            user.getProfiles().clear();
-            userRepository.save(user);
-        });
-        userRepository.findById(testUserId2).ifPresent(user -> {
+        userRepository.findAll().forEach(user -> {
             user.setActiveProfile(null);
             user.getProfiles().clear();
             userRepository.save(user);
         });
 
-        // Deleting specific entities by their IDs
-        recipeIngredientRepository.deleteById(recipeIngredient1Id);
-        recipeIngredientDetailsRepository.deleteById(rd1Id);
-        profileRepository.deleteById(profileId);
-        profileRepository.deleteById(profileId2);
-        profileRepository.deleteById(profileId3);
-        allergeneRepository.deleteById(allergeneId);
-        ingredientRepository.deleteById(ingredient1Id);
-        ingredientRepository.deleteById(ingredientId);
-        userRepository.deleteById(testUserId);
-        userRepository.deleteById(testUserId2);
-        recipeRepository.deleteById(recipe1Id);
+        recipeIngredientRepository.deleteAll();
+        recipeIngredientDetailsRepository.deleteAll();
+        profileRepository.deleteAll();
+        allergeneRepository.deleteAll();
+        ingredientRepository.deleteAll();
+        userRepository.deleteAll();
+        recipeRepository.deleteAll();
     }
 
 
@@ -320,7 +304,7 @@ public class ProfileServiceTest {
                 IngredientDto.IngredientDtoBuilder.anIngredientDto().withId(1L).withName("Rice").build())
             ).withUserId(testUserId).build();
 
-        Assertions.assertThrows(NotFoundException.class,
+        assertThrows(NotFoundException.class,
             () -> profileService.saveProfile(testProfileDto));
     }
 
@@ -335,15 +319,51 @@ public class ProfileServiceTest {
                 IngredientDto.IngredientDtoBuilder.anIngredientDto().withId(4L).withName("Rice").build())
             ).withUserId(testUserId).build();
 
-        Assertions.assertThrows(NotFoundException.class,
+        assertThrows(NotFoundException.class,
             () -> profileService.saveProfile(testProfileDto));
+    }
+
+    @Test
+    public void copyToUser_ShouldCopyProfile_WhenProfileAndUserExist() {
+        Long existingProfileId = profileId;
+        Long existingUserId = testUserId;
+
+        Profile originalProfile = profileRepository.getReferenceById(existingProfileId);
+
+        ProfileDetailDto copiedProfileDto = profileService.copyToUser(existingProfileId, existingUserId);
+
+        assertAll("Verify all properties of the copied profile",
+            () -> assertNotNull(copiedProfileDto, "Copied profile should not be null"),
+            () -> assertEquals(originalProfile.getName(), copiedProfileDto.name(), "Name should be the same as original"),
+            () -> assertEquals(existingUserId, copiedProfileDto.userId(), "User ID should match the expected user ID")
+        );
+    }
+
+    @Test
+    public void copyToUser_ShouldThrowNotFoundException_WhenProfileDoesNotExist() {
+        Long nonExistentProfileId = -1000L;
+        Long existingUserId = testUserId;
+
+        assertThrows(NotFoundException.class,
+            () -> profileService.copyToUser(nonExistentProfileId, existingUserId),
+            "Should throw NotFoundException for non-existent profile");
+    }
+
+    @Test
+    public void copyToUser_ShouldThrowNotFoundException_WhenUserDoesNotExist() {
+        Long existingProfileId = profileId;
+        Long nonExistentUserId = -1000L;
+
+        assertThrows(NotFoundException.class,
+            () -> profileService.copyToUser(existingProfileId, nonExistentUserId),
+            "Should throw NotFoundException for non-existent user");
     }
 
     @Test
     public void rateRecipeWithExistingProfileAndIncorrectRatingIntegerThrowValidationException() {
         RecipeRatingDto recipeRatingDto = new RecipeRatingDto(recipe1Id, testUserId, 2);
 
-        Assertions.assertThrows(ValidationException.class,
+        assertThrows(ValidationException.class,
             () -> profileService.rateRecipe(recipeRatingDto));
     }
 
@@ -361,14 +381,14 @@ public class ProfileServiceTest {
 
     @Test
     public void getRatingListsOfNonExistingProfileThrowsNotFoundException() {
-        RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId2);
+        profileService.getRatingLists(testUserId2);
 
-        Assertions.assertThrows(NotFoundException.class,
+        assertThrows(NotFoundException.class,
             () -> profileService.getRatingLists(-1));
     }
 
     @Test
-    public void editProfileWithValidProfileDtoReturnsEditedProfile() throws ValidationException, NotFoundException{
+    public void editProfileWithValidProfileDtoReturnsEditedProfile() throws ValidationException, NotFoundException {
         ProfileDto testProfileDto = ProfileDto.ProfileDtoBuilder.aProfileDto()
             .withName("Profile User test")
             .withAllergens(List.of(
@@ -398,7 +418,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    public void editProfileWithInValidProfileIdReturnsNotNullException() throws ValidationException, NotFoundException{
+    public void editProfileWithInValidProfileIdReturnsNotNullException() throws ValidationException, NotFoundException {
         ProfileDto testProfileDto = ProfileDto.ProfileDtoBuilder.aProfileDto()
             .withName("Profile User test")
             .withAllergens(List.of(
@@ -410,7 +430,7 @@ public class ProfileServiceTest {
 
         testProfileDto.setId(-1L);
 
-        Assertions.assertThrows(NotFoundException.class,
+        assertThrows(NotFoundException.class,
             () -> profileService.editProfile(testProfileDto));
     }
 

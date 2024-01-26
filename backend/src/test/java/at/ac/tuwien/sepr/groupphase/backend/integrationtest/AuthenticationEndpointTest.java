@@ -73,17 +73,15 @@ public class AuthenticationEndpointTest {
 
     private long testUserId;
 
-    private long testUserId2;
-
     @BeforeEach
     public void beforeEach() throws UserNotFoundException, MessagingException {
         testUserId = userRepository.save(testuser).getId();
-        testUserId2 = userRepository.save(testuser2).getId();
+        userRepository.save(testuser2);
     }
 
     @AfterEach
     public void afterEach() {
-        passwordResetRequestRepository.deleteByUser(testuser.setId(testUserId));
+        passwordResetRequestRepository.deleteAll();
         userRepository.deleteAll();
     }
 
