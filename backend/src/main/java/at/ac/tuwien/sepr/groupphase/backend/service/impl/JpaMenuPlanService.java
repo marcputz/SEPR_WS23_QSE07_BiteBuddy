@@ -38,7 +38,14 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -104,8 +111,8 @@ public class JpaMenuPlanService implements MenuPlanService {
         MenuPlanDetailDto menuPlanDetailDto = new MenuPlanDetailDto();
         MenuPlan menuPlan = getMenuPlanForUserOnDate(user, date);
         if (menuPlan == null) {
-            LOGGER.info("no Menuplan at this time: " + date.toString() + " and user id: " + user.getId() + " email: " + user.getEmail() + " nickname: " +
-                user.getNickname() + " password: " + user.getPasswordEncoded());
+            LOGGER.info("no Menuplan at this time: " + date.toString() + " and user id: " + user.getId() + " email: " + user.getEmail() + " nickname: "
+                + user.getNickname() + " password: " + user.getPasswordEncoded());
             return null;
         }
         Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(menuPlan);

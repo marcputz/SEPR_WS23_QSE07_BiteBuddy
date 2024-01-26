@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
@@ -64,6 +65,14 @@ public class ProfileEndpoint {
         return profileService.saveProfile(toCreateProfile);
     }
 
+    @PutMapping("/rating/{RecipeId}")
+    public void post(@Valid @RequestBody RecipeRatingDto recipeRatingDto) throws ValidationException, NotFoundException {
+        LOGGER.info("Received POST request on {}", BASE_PATH);
+        LOGGER.debug("Request body for POST:\n{}", recipeRatingDto);
+
+        profileService.rateRecipe(recipeRatingDto);
+    }
+
     @GetMapping
     public List<ProfileListDto> getAllForUser(@RequestHeader HttpHeaders headers) throws AuthenticationException {
         LOGGER.trace("getAllForUser({})", headers);
@@ -81,21 +90,13 @@ public class ProfileEndpoint {
         }
     }
 
-    @PutMapping("/rating/{RecipeId}")
-    public void post(@Valid @RequestBody RecipeRatingDto recipeRatingDto) throws ValidationException, NotFoundException {
-        LOGGER.info("Received POST request on {}", BASE_PATH);
-        LOGGER.debug("Request body for POST:\n{}", recipeRatingDto);
-
-        profileService.rateRecipe(recipeRatingDto);
-    }
-
-
-    @GetMapping("/rating/{userId}")
+    @GetMapping("/rating/{UserId}")
     public RecipeRatingListsDto get(@PathVariable long userId) throws NotFoundException {
         LOGGER.info("Received Get request on {}", BASE_PATH);
         LOGGER.debug("Request body for Get:\n{}", userId);
 
         return profileService.getRatingLists(userId);
     }
+
 
 }

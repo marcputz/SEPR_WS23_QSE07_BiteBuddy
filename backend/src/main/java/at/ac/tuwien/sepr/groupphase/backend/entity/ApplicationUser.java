@@ -1,14 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -17,9 +14,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -147,7 +142,8 @@ public class ApplicationUser {
             return false;
         }
         ApplicationUser that = (ApplicationUser) o;
-        return id.equals(that.id) && email.equals(that.email) && passwordEncoded.equals(that.passwordEncoded) && nickname.equals(that.nickname) && Arrays.equals(userPicture, that.userPicture) && createdAt.equals(that.createdAt) && updatedAt.equals(that.updatedAt) && Objects.equals(activeProfile, that.activeProfile);
+        return id.equals(that.id) && email.equals(that.email) && passwordEncoded.equals(that.passwordEncoded)
+            && nickname.equals(that.nickname) && Arrays.equals(userPicture, that.userPicture) && createdAt.equals(that.createdAt) && updatedAt.equals(that.updatedAt) && Objects.equals(activeProfile, that.activeProfile);
     }
 
     @Override
