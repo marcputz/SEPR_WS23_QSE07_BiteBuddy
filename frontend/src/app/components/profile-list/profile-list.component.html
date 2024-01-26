@@ -90,6 +90,7 @@
                   </ng-container>
                   <li *ngIf="profile.disliked.length > 3">...</li>
                 </ul>
+                <button class="btn btn-primary btn-edit">Edit</button>
               </div>
             </div>
           </div>
@@ -190,10 +191,8 @@
                   </ng-container>
                   <li *ngIf="profile.disliked.length > 3">...</li>
                 </ul>
+                <button class="btn btn-primary btn-add-to-own" (click)="addToOwn(profile.id)">+ Add to Own</button>
               </div>
-            </div>
-            <!-- Todo Add to card css - Spacing between cards -->
-            <div style="margin-top: 30px;">
             </div>
           </div>
         </div>
