@@ -25,8 +25,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validation.ProfileValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import javax.swing.text.html.Option;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;

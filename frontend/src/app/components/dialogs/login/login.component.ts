@@ -17,8 +17,14 @@ export class LoginComponent implements OnInit {
   // After first submission attempt, form validation will start
   submitted = false;
 
+  showPasswords: boolean = false;
+
   errorEmailNotFound: boolean = false;
   errorPasswordWrong: boolean = false;
+
+  isInputFocused: {[key: string]: boolean } = {};
+
+  loginError: boolean = false;
 
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
@@ -79,12 +85,14 @@ export class LoginComponent implements OnInit {
               // user does not exist
               console.warn("User does not exist");
               this.loginForm.controls['email'].setErrors({userNotFound: true});
+              this.loginError = true;
               break;
             }
             if (message.indexOf("Wrong Password") >= 0) {
               // password wrong error
               console.warn("Wrong password");
               this.loginForm.controls['password'].setErrors({wrongPassword: true});
+              this.loginError = true;
               break;
             }
             // other type of authentication error
@@ -98,6 +106,17 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.loginForm.get(attribute).value !== '';
   }
 
 }

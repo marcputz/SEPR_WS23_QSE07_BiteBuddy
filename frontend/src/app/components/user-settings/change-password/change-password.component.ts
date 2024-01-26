@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {AuthService} from '../../../services/auth.service';
@@ -12,12 +12,17 @@ import {ToastrService} from 'ngx-toastr';
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss']
 })
-export class ChangePasswordComponent {
+export class ChangePasswordComponent implements OnInit {
 
   settingsForm: UntypedFormGroup;
   submitted = false;
   error = false;
-  errorMessage = '';
+  errorMessage = 'Something went wrong, no user settings found. Check if your backend is connected';
+
+  isInputFocused: {[key: string]: boolean } = {};
+  showPasswords: boolean = false;
+  showPassword1: boolean = false;
+  showPassword2: boolean = false;
 
   originalUserSettings: UserSettingsDto;
 
@@ -31,6 +36,26 @@ export class ChangePasswordComponent {
 
   vanishError() {
     this.error = false;
+  }
+
+  ngOnInit(): void {
+    this.getUser();
+  }
+
+  private getUser() {
+    this.authService.getUser().subscribe({
+      next: (settings: UserSettingsDto) => {
+        this.originalUserSettings = settings;
+      },
+      error: error => {
+        console.error('Error loading user settings', error);
+        this.notifications.error('Error loading user settings, try again');
+        this.error = true;
+        //TODO: not working when server down this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+      },
+      complete: () => {
+      }
+    });
   }
 
   public updateUserSettings() {
@@ -68,5 +93,22 @@ export class ChangePasswordComponent {
       console.log('Invalid input');
       this.notifications.error('Invalid input');
     }
+  }
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
+  }
+
+  togglePasswordVisibility1() {
+    this.showPassword1 = !this.showPassword1;
+  }
+
+  togglePasswordVisibility2() {
+    this.showPassword2 = !this.showPassword2;
+  }
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.settingsForm.get(attribute).value !== '';
   }
 }

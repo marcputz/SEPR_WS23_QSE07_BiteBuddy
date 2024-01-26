@@ -9,12 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.*;
 import at.ac.tuwien.sepr.groupphase.backend.service.PictureService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
@@ -51,19 +46,19 @@ public class JsonFileReader {
     private final AllergeneIngredientRepository allergeneIngredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
-    private final PictureService pictureService;
+    private final PictureRepository pictureRepository;
 
     public JsonFileReader(RecipeRepository recipeRepository, IngredientRepository ingredientRepository,
                           AllergeneRepository allergeneRepository, AllergeneIngredientRepository allergeneIngredientRepository,
                           RecipeIngredientRepository recipeIngredientRepository, RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
-                          PictureService pictureService) {
+                          PictureRepository pictureRepository) {
         this.recipeRepository = recipeRepository;
         this.ingredientRepository = ingredientRepository;
         this.allergeneRepository = allergeneRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
-        this.pictureService = pictureService;
+        this.pictureRepository = pictureRepository;
     }
 
     @PostConstruct
@@ -98,8 +93,10 @@ public class JsonFileReader {
                 for (Recipe recipe : recipes) {
                     Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".png");
                     byte[] imgData = Files.readAllBytes(path);
-                    Picture picture = this.pictureService.createPicture(imgData);
-                    recipe.setPictureId(picture.getId());
+                    Picture picture = new Picture()
+                        .setData(imgData);
+                    long picId = this.pictureRepository.save(picture).getId();
+                    recipe.setPictureId(picId);
                     recipeRepository.save(recipe);
                     pictureCount++;
                 }

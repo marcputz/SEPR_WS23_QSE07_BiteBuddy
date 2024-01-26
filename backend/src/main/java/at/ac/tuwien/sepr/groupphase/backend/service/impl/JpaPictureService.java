@@ -45,7 +45,7 @@ public class JpaPictureService implements PictureService {
 
     @Override
     public Picture createPicture(byte[] imgData, String description) throws DataStoreException {
-        LOGGER.trace("createPicture({},{})", imgData, description);
+        LOGGER.trace("createPicture()"); // do NOT show img data in logger!
 
         Picture p = new Picture()
             .setData(imgData)
@@ -60,7 +60,7 @@ public class JpaPictureService implements PictureService {
 
     @Override
     public Picture createPicture(byte[] imgData) throws DataStoreException {
-        LOGGER.trace("createPicture({})", imgData);
+        LOGGER.trace("createPicture()"); // do NOT show img data in logger
 
         return this.createPicture(imgData, null);
     }

@@ -45,8 +45,6 @@ public class DataGenerator {
     private final RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
     private final PictureRepository pictureRepository;
 
-    private final PictureService pictureService;
-
     public DataGenerator(UserRepository userRepository,
                          MenuPlanRepository menuPlanRepository,
                          RecipeRepository recipeRepository,
@@ -58,8 +56,7 @@ public class DataGenerator {
                          RecipeRatingRepository recipeRatingRepository,
                          PasswordResetRequestRepository passwordResetRepository,
                          RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
-                         PictureRepository pictureRepository,
-                         PictureService pictureService) {
+                         PictureRepository pictureRepository) {
         this.userRepository = userRepository;
         this.menuPlanRepository = menuPlanRepository;
         this.recipeRepository = recipeRepository;
@@ -72,7 +69,6 @@ public class DataGenerator {
         this.passwordResetRepository = passwordResetRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
         this.pictureRepository = pictureRepository;
-        this.pictureService = pictureService;
     }
 
     @PostConstruct
@@ -106,7 +102,7 @@ public class DataGenerator {
     private void insertRecipeData() {
         JsonFileReader jsonDataInsert = new JsonFileReader(recipeRepository, ingredientRepository,
             allergeneRepository, allergeneIngredientRepository,
-            recipeIngredientRepository, recipeIngredientDetailsRepository, pictureService);
+            recipeIngredientRepository, recipeIngredientDetailsRepository, pictureRepository);
         jsonDataInsert.putFoodDataInDataBase();
     }
 
