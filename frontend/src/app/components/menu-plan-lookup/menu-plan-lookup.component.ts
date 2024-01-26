@@ -5,10 +5,7 @@ import {ToastrService} from "ngx-toastr";
 import {MenuPlanService} from "../../services/menuplan.service";
 import {MenuPlanDetailDto} from "../../dtos/menuplan/menuPlanDetailDto";
 import {MenuPlanContentDetailDto} from "../../dtos/menuplan/menuPlanContentDetailDto";
-import {RecipeService} from "../../services/recipe.service";
 import {RecipeListDto} from "../../dtos/recipe";
-import {forEach} from "lodash";
-import {Logger} from "jasmine-spec-reporter/built/display/logger";
 import {MenuPlanUpdateRecipeDto} from "../../dtos/menuplan/menuPlanUpdateRecipeDto";
 import {PictureService} from "../../services/picture.service"
 
@@ -125,7 +122,7 @@ export class MenuPlanLookupComponent {
     this.updateValue.timeslot = c.timeslot;
     this.updateValue.menuPlanId = this.menuplan.id;
     this.updateValue.dislike = false;
-    this.service.updateRecepyInMenuPlan(this.updateValue).subscribe({
+    this.service.updateRecipeInMenuPlan(this.updateValue).subscribe({
       next: data => {
         console.log("plans available plans: ");
       },
@@ -148,7 +145,7 @@ export class MenuPlanLookupComponent {
     this.updateValue.timeslot = c.timeslot;
     this.updateValue.menuPlanId = this.menuplan.id;
     this.updateValue.dislike = true;
-    this.service.updateRecepyInMenuPlan(this.updateValue).subscribe({
+    this.service.updateRecipeInMenuPlan(this.updateValue).subscribe({
       next: data => {
         console.log("plans available plans: ");
       },

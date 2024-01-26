@@ -41,7 +41,7 @@ export class MenuPlanService {
   updateInventoryIngredient(ingredient: InventoryIngredientDto) {
     return this.httpClient.put(this.baseUri + "/inventory/update", ingredient);
   }
-  updateRecepyInMenuPlan(menuPlan: MenuPlanUpdateRecipeDto){
+  updateRecipeInMenuPlan(menuPlan: MenuPlanUpdateRecipeDto){
     return this.httpClient.put(this.baseUri + "/update", menuPlan);
   }
 
