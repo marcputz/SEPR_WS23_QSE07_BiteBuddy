@@ -20,7 +20,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
 
@@ -41,8 +50,8 @@ public class ProfileEndpoint {
 
     @PostMapping("/search")
     public ProfileSearchResultDto searchProfiles(@Valid @RequestBody ProfileSearchDto searchParams, @RequestHeader HttpHeaders headers) {
-        LOGGER.info("Received POST request for profile search on {}", BASE_PATH);
-        LOGGER.debug("Search parameters: {}", searchParams);
+        LOGGER.info("Received POST request on {}", BASE_PATH + "/search");
+        LOGGER.debug("Request body for POST:\n{}", searchParams);
 
         String authToken = this.authenticationService.getAuthToken(headers);
         Long currentUserId = AuthTokenUtils.getUserId(authToken);
@@ -64,6 +73,16 @@ public class ProfileEndpoint {
         return profileService.saveProfile(toCreateProfile);
     }
 
+    @PostMapping("/copyToOwn/{profileId}")
+    public ProfileDetailDto post(@PathVariable Long profileId, @RequestHeader HttpHeaders headers) {
+        LOGGER.info("Received POST request on {}", BASE_PATH + "/copyToOwn");
+        LOGGER.debug("Request body for POST:\n{}", profileId);
+
+        String authToken = this.authenticationService.getAuthToken(headers);
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+        return profileService.copyToUser(profileId, currentUserId);
+    }
+
     @PutMapping("/rating/{RecipeId}")
     public void post(@Valid @RequestBody RecipeRatingDto recipeRatingDto) throws ValidationException, NotFoundException {
         LOGGER.info("Received PUT request on {}", BASE_PATH);
@@ -71,7 +90,6 @@ public class ProfileEndpoint {
 
         profileService.rateRecipe(recipeRatingDto);
     }
-
 
 
     @GetMapping("/{profileId}")

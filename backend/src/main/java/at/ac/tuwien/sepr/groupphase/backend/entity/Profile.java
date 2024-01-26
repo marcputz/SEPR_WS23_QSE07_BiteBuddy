@@ -105,4 +105,15 @@ public class Profile {
         return user;
     }
 
+    public Profile copyForAnotherUser(ApplicationUser newUser) {
+        Profile newProfile = new Profile();
+        newProfile.setId(0L);
+        newProfile.setName(this.name); // Copy the name
+        newProfile.setAllergens(new HashSet<>(this.allergens)); // Deep copy of allergens
+        newProfile.setIngredient(new HashSet<>(this.ingredient)); // Deep copy of ingredients
+        newProfile.setLiked(new HashSet<>(this.liked)); // Deep copy of liked recipes
+        newProfile.setDisliked(new HashSet<>(this.disliked)); // Deep copy of disliked recipes
+        newProfile.setUser(newUser); // Set to the new user
+        return newProfile;
+    }
 }

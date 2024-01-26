@@ -39,7 +39,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProfileServiceImpl implements ProfileService {
@@ -87,16 +86,7 @@ public class ProfileServiceImpl implements ProfileService {
             : profileRepository.findByNameContainingIgnoreCaseAndCreatorAndNotUserId(name, creator, currentUserId, page);
         List<Profile> profiles = profilesPage.getContent().stream().toList();
         List<ProfileDetailDto> profileDtos = profiles.stream()
-            .map(profile -> new ProfileDetailDto(
-                profile.getId(),
-                profile.getName(),
-                profile.getAllergens().stream().map(Allergene::getName).collect(Collectors.toCollection(ArrayList::new)),
-                profile.getIngredient().stream().map(Ingredient::getName).collect(Collectors.toCollection(ArrayList::new)),
-                profile.getLiked().stream().map(recipeMapper::recipeToRecipeGetByIdDto).collect(Collectors.toCollection(ArrayList::new)),
-                profile.getDisliked().stream().map(recipeMapper::recipeToRecipeGetByIdDto).collect(Collectors.toCollection(ArrayList::new)),
-                profile.getUser().getNickname(),
-                profile.getUser().getId()
-            ))
+            .map(profileMapper::profileToProfileDetailDto)
             .toList();
 
         return new ProfileSearchResultDto(pageSelector, entriesPerPage, profilesPage.getTotalPages(), profileDtos);
@@ -143,6 +133,24 @@ public class ProfileServiceImpl implements ProfileService {
         user.get().setActiveProfile(created);
         userRepository.save(user.get());
         return createdDto;
+    }
+
+
+    public ProfileDetailDto copyToUser(Long profileId, Long userId) {
+        LOGGER.trace("copyToUser({}, {})", profileId, userId);
+        Optional<Profile> profileOptional = profileRepository.findById(profileId);
+        Profile profile;
+        if (profileOptional.isEmpty()) {
+            throw new NotFoundException("Profile could not be found");
+        } else {
+            profile = profileOptional.get();
+        }
+        Optional<ApplicationUser> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new NotFoundException("User with id " + userId + " does not exist");
+        }
+        Profile copy = profileRepository.save(profile.copyForAnotherUser(user.get()));
+        return profileMapper.profileToProfileDetailDto(copy);
     }
 
     public void rateRecipe(RecipeRatingDto recipeRatingDto) throws NotFoundException, ValidationException {

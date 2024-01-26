@@ -38,6 +38,16 @@ public interface ProfileService {
     ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException, NotFoundException;
 
     /**
+     * Creates a copy of an existing profile for a specified user.
+     *
+     * @param profileId The ID of the profile to be copied.
+     * @param userId    The ID of the user for whom the profile will be copied.
+     * @return A {@link ProfileDetailDto} object representing the newly created profile copy.
+     * @throws NotFoundException if either the profile or the user specified by their IDs are not found in the database.
+     */
+    ProfileDetailDto copyToUser(Long profileId, Long userId);
+
+    /**
      * Likes or Dislikes a Recipe with a given Profile.
      *
      * @param recipeRatingDto contains the profile id of the rating profile, recipe id of the recipe that needs to be rated and its rating (1 like, 0 dislike)
