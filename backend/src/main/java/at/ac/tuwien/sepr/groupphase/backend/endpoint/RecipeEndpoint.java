@@ -47,6 +47,12 @@ public class RecipeEndpoint {
         return this.recipeService.findMatchingIngredients(name);
     }
 
+    @GetMapping("/ingredient/basic/{name}")
+    public List<String> findOnlyBasicMatchingIngredients(@PathVariable String name) {
+        LOGGER.info("GET " + BASE_PATH + "/ingredient/" + name);
+        return this.recipeService.findMatchingIngredients(name);
+    }
+
     @PostMapping("/create")
     public void createRecipe(@RequestBody RecipeDetailsDto recipe) {
         LOGGER.info("POST " + BASE_PATH + "/create");

@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -44,7 +45,7 @@ public interface RecipeService {
      * Gets all recipes from the data store which uses one or more ingredients from the given parameter and which do not contain any allergens listen in the second parameter list.
      *
      * @param ingredientNames a list of ingredient names to search recipes by.
-     * @param allergens a list of allergens which to filter recipes by.
+     * @param allergens       a list of allergens which to filter recipes by.
      * @return a list of recipes.
      * @author Marc Putz
      */
@@ -95,11 +96,19 @@ public interface RecipeService {
 
     /**
      * Finds the first 10 ingredients matching a name. It is not positional, upper/lower case-sensitive.
+     * This finds basic and detailed ingredients.
      *
      * @param name which needs to be a substring of the ingredient.
      * @return list of matching ingredients.
      */
     List<String> findMatchingIngredients(String name);
+
+    /**
+     * Finds all RecipeIngredients which match the name of the detailed ingredient
+     * @param name detailed ingredients name
+     * @return List of RecipeIngredients
+     */
+    List<RecipeIngredient> findMatchingRecipeIngredients(String name);
 
     /**
      * Creates a Rating, based on the int rating for the recipe with id recipeID from the user with the id userID.

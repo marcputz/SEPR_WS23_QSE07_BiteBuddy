@@ -29,4 +29,8 @@ export class IngredientService {
                 })
             );
     }
+
+  searchRecipeIngredientsMatching(term: string) {
+    return this.http.get(`${this.baseUri}/${term}`);
+  }
 }

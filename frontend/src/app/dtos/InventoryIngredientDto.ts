@@ -1,6 +1,7 @@
 export interface InventoryIngredientDto {
   name?: string,
   id?: number,
+  detailedNamed?: string,
   menuPlanId?: number,
   amount?: number,
   unit?: FoodUnit,
