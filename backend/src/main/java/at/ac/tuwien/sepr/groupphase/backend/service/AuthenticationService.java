@@ -48,7 +48,7 @@ public class AuthenticationService {
             String encodedPassword = PasswordEncoder.encode(loginDto.getPassword(), loginDto.getEmail());
 
             // Check password data
-            if (user.checkPasswordMatch(encodedPassword)) {
+            if (user.getPasswordEncoded().equals(encodedPassword)) {
 
                 // login
                 return this.loginUser(user);
@@ -100,7 +100,7 @@ public class AuthenticationService {
         String encodedPassword = PasswordEncoder.encode(password, user.getEmail());
 
         // Return true if the passwords match, false otherwise
-        if (!user.checkPasswordMatch(encodedPassword)) {
+        if (!user.getPasswordEncoded().equals(encodedPassword)) {
             throw new AuthenticationException("Password not valid");
         }
     }

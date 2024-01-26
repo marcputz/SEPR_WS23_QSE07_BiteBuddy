@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.config;
 
-import at.ac.tuwien.sepr.groupphase.backend.auth.AuthenticationInterceptor;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -28,7 +27,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthenticationInterceptor(authService));
         WebMvcConfigurer.super.addInterceptors(registry);
     }
 }

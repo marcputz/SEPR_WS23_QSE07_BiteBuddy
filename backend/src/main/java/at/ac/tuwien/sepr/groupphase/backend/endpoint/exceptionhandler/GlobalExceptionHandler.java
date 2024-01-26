@@ -2,8 +2,10 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.exceptionhandler;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ErrorDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.*;
+import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -57,6 +59,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.warn(ex.getMessage());
 
         ErrorDto errorDto = new ErrorDto(HttpStatus.UNAUTHORIZED, ex);
+        return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
+    }
+
+    /**
+     * Handles {@link jakarta.mail.MessagingException}s occuring in REST endpoints.
+     *
+     * @param ex        the exception
+     * @param request   the request where the exception occurred
+     * @return a RepsonseEntity to send back to the client
+     * @author Marc Putz
+     */
+    @ExceptionHandler(value = {MessagingException.class})
+    protected ResponseEntity<Object> handleMessagingError(MessagingException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+
+        ErrorDto errorDto = new ErrorDto(HttpStatus.SERVICE_UNAVAILABLE, ex);
         return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
     }
 
