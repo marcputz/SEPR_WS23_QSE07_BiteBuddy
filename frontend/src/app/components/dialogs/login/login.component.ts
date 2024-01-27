@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: UserService,
-              private apiErrorHandler: ErrorHandler,
+              private errorHandler: ErrorHandler,
               private passwordEncoder: PasswordEncoder,
               private router: Router,
               private notification: ToastrService) {
@@ -71,23 +71,15 @@ export class LoginComponent implements OnInit {
       },
       error: error => {
 
-        let errorJson = JSON.parse(error.error);
+        let errorObj = this.errorHandler.getErrorObject(error);
 
-        if (errorJson == undefined || errorJson["statusCode"] == undefined) {
-          this.apiErrorHandler.handleApiError(error);
+        if (errorObj.status == 401) {
+          // unauthorized -> invalid credentials
+          console.warn("Invalid Credentials");
+          this.loginError = true;
+          this.notification.warning("Wrong password or user doesn't exist");
         } else {
-
-          switch (errorJson["statusCode"]) {
-            case 401: // unauthorized -> invalid credentials
-              console.warn("Invalid Credentials");
-              this.loginError = true;
-              this.notification.warning("Wrong password or user doesn't exist");
-              break;
-            default:
-              this.apiErrorHandler.handleApiError(error);
-              break;
-          }
-
+          this.errorHandler.handleApiError(errorObj);
         }
 
       }

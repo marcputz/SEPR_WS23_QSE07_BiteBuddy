@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {ToastrService} from "ngx-toastr";
 import {ErrorDto} from "../dtos/errorDto";
 import {toNumber} from "lodash";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import {toNumber} from "lodash";
 
 export class ErrorHandler {
 
-  constructor(protected notifications: ToastrService) {}
+  constructor(protected router: Router, protected notifications: ToastrService) {}
 
   getErrorObject(error: any): ErrorDto {
 
@@ -50,10 +51,39 @@ export class ErrorHandler {
   }
 
   handleApiError(error: ErrorDto) {
+    console.warn("BiteBuddy Service replied with an error: ", error);
 
-    console.error("BiteBuddy Service replied with an error: ", error);
+    switch (error.status) {
+      case 400: // bad request
+        this.notifications.warning("We couldn't process your request, as its format wasn't known to our servers. Please check your inputs and try again!");
+        break;
+      case 401: // Unauthorized
+        this.notifications.info("You were forcefully logged-out by the server, please log in again");
+        this.router.navigate(['login']);
+        break;
+      case 404: // not found
+        this.notifications.warning("We couldn't find the resource you were looking for, please check your inputs and try again!");
+        break;
+      case 409: // conflict
+        this.notifications.warning("Your input is in conflict with already existing data, please change your inputs and try again!");
+        break;
+      case 422: // validation
+        this.notifications.warning("Your inputs are invalid or do not match the requirements, please change your inputs and try again!");
+        break;
+      case 500: // internal server error
+        this.notifications.error("Something went wrong on our side, please try again later!");
+        break;
+      case 503: // service unavailable
+        this.notifications.error("This function isn't available right now, please try again later!");
+        break;
 
-    // TODO: handle the error object
+
+      // TODO: handle other status codes
+
+      default:
+        this.notifications.error(error.reason != undefined ? error.reason : "Something went wrong, please try again!");
+        break;
+    }
   }
 
   protected statusCodeToStatusText(code: number): string {
