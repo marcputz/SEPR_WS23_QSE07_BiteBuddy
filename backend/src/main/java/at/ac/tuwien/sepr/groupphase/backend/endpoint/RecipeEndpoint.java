@@ -64,15 +64,15 @@ public class RecipeEndpoint {
     }
 
     @PostMapping("/create")
-    public void createRecipe(@RequestBody RecipeDetailsDto recipe, @RequestHeader HttpHeaders headers) throws AuthenticationException {
-        // checking for logged in and valid user
-        this.authenticationService.verifyAuthenticated(headers);
-        String authToken = headers.getFirst("Authorization");
-        Long currentUserId = AuthTokenUtils.getUserId(authToken);
-
+    public void createRecipe(@RequestBody RecipeDetailsDto recipe, @RequestHeader HttpHeaders headers) {
         LOGGER.info("POST " + BASE_PATH + "/create");
         LOGGER.debug("request body: {}", recipe);
         try {
+            // checking for logged in and valid user
+            this.authenticationService.verifyAuthenticated(headers);
+            String authToken = headers.getFirst("Authorization");
+            Long currentUserId = AuthTokenUtils.getUserId(authToken);
+
             this.recipeService.createRecipe(recipe, currentUserId);
         } catch (ConflictException e) {
             HttpStatus status = HttpStatus.CONFLICT;
@@ -81,6 +81,10 @@ public class RecipeEndpoint {
         } catch (ValidationException e) {
             HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
             logClientError(status, "Recipe parameters where not valid", e);
+            throw new ResponseStatusException(status, e.getMessage(), e);
+        } catch (AuthenticationException e) {
+            HttpStatus status = HttpStatus.UNAUTHORIZED;
+            logClientError(status, "Not authorized", e);
             throw new ResponseStatusException(status, e.getMessage(), e);
         }
     }

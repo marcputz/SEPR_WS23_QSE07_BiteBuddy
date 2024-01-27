@@ -8,7 +8,6 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
-import {PictureService} from "../../services/picture.service";
 import {IngredientService} from "../../services/ingredient.service";
 
 @Component({
@@ -20,12 +19,12 @@ export class RecipeCreateComponent {
   ingredient: string = '';
   recipe: RecipeDetailsDto = {
     name: '',
-    pictureId: null,
     creatorName: '',
     description: '',
     id: null,
     ingredients: [],
     allergens: [],
+    picture: null,
   }
   recipePicture: number[] = null;
   pictureSelected: File = null;
@@ -33,7 +32,6 @@ export class RecipeCreateComponent {
 
   constructor(
     private service: RecipeService,
-    private pictureService: PictureService,
     private ingredientService: IngredientService,
     private sanitizer: DomSanitizer,
     private router: Router,
@@ -59,6 +57,7 @@ export class RecipeCreateComponent {
       const byteArray = Array.from(new Uint8Array(arrayBuffer));
 
       this.recipePicture = byteArray;
+      this.recipe.picture = this.recipePicture;
     }
     reader.readAsDataURL(this.pictureSelected);
   }
@@ -82,34 +81,21 @@ export class RecipeCreateComponent {
 
       console.log(this.recipe);
 
-      this.pictureService.uploadPicture(this.recipePicture).subscribe({
+      this.service.createRecipe(this.recipe).subscribe({
         next: data => {
-
-          this.recipe.id = data.id;
-
-          this.service.createRecipe(this.recipe).subscribe({
-              next: data => {
-                this.notification.success("Successfully created new recipe!")
-
-                this.router.navigate(['/recipes']);
-              },
-              error: error => {
-                console.log(error)
-                console.error(error.message, error);
-                let title = "Could not create recipe!";
-                this.notification.error(this.errorFormatter.format(error), title, {
-                  enableHtml: true,
-                  timeOut: 5000,
-                });
-              }
-            }
-          );
-
+          this.notification.success("Successfully created new recipe!")
+          this.router.navigate(['/recipes']);
         },
         error: error => {
-          console.error(error);
+          console.log(error)
+          console.error(error.message, error);
+          let title = "Could not create recipe!";
+          this.notification.error(this.errorFormatter.format(error), title, {
+            enableHtml: true,
+            timeOut: 5000,
+          });
         }
-      })
+      });
     }
   }
 

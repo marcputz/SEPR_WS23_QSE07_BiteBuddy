@@ -11,6 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+
 import java.util.List;
 import java.util.Set;
 
@@ -55,6 +56,7 @@ public interface RecipeService {
      * Before creating, it checks that every ingredient already exists in the database. If one does not an exception is thrown.
      *
      * @param recipe we want to store.
+     * @author Frederik Skiera
      */
     void createRecipe(RecipeDetailsDto recipe, Long userId) throws ConflictException, ValidationException;
 
@@ -104,6 +106,7 @@ public interface RecipeService {
 
     /**
      * Finds all RecipeIngredients which match the name of the detailed ingredient
+     *
      * @param name detailed ingredients name
      * @return List of RecipeIngredients
      */

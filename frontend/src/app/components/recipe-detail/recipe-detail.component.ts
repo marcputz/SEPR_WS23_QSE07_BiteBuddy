@@ -15,7 +15,7 @@ import {PictureDto} from "../../dtos/pictureDto";
   templateUrl: './recipe-detail.component.html',
   styleUrls: ['./recipe-detail.component.scss']
 })
-export class RecipeDetailComponent implements OnInit{
+export class RecipeDetailComponent implements OnInit {
 
   recipeDetails: RecipeDetailsDto = {
     name: "",
@@ -24,6 +24,7 @@ export class RecipeDetailComponent implements OnInit{
     id: -1,
     ingredients: null,
     allergens: null,
+    picture: null,
     pictureId: null
   }
 
@@ -34,6 +35,7 @@ export class RecipeDetailComponent implements OnInit{
   dislikes: number[] = [];
   rating: number = -1;
   ratingStatus: String = "";
+
   constructor(
     private service: RecipeService,
     private authService: AuthService,
@@ -45,6 +47,7 @@ export class RecipeDetailComponent implements OnInit{
   ) {
 
   }
+
   ngOnInit(): void {
     const routeParams = this.route.snapshot.paramMap;
     this.recipeDetails.id = Number(routeParams.get('id'));
@@ -71,17 +74,17 @@ export class RecipeDetailComponent implements OnInit{
         console.log(settings);
         this.profileService.getRatingLists(this.userId)
           .subscribe(
-              (recipeRatingListsDto: RecipeRatingListsDto) => {
-                this.likes = recipeRatingListsDto.likes;
-                this.dislikes = recipeRatingListsDto.dislikes;
-                if(recipeRatingListsDto.likes.includes(this.recipeDetails.id)){
-                  this.rating = 1;
-                  this.ratingStatus = "Liked";
-                }
-                if(recipeRatingListsDto.dislikes.includes(this.recipeDetails.id)){
-                  this.rating = 0;
-                  this.ratingStatus = "Disliked"
-                }
+            (recipeRatingListsDto: RecipeRatingListsDto) => {
+              this.likes = recipeRatingListsDto.likes;
+              this.dislikes = recipeRatingListsDto.dislikes;
+              if (recipeRatingListsDto.likes.includes(this.recipeDetails.id)) {
+                this.rating = 1;
+                this.ratingStatus = "Liked";
+              }
+              if (recipeRatingListsDto.dislikes.includes(this.recipeDetails.id)) {
+                this.rating = 0;
+                this.ratingStatus = "Disliked"
+              }
             }
           );
       });
@@ -99,6 +102,7 @@ export class RecipeDetailComponent implements OnInit{
       return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
     }
   }
+
   isInteger(value: number): boolean {
     return Number.isInteger(value);
   }

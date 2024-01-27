@@ -1,3 +1,5 @@
+import {PictureDto} from "./pictureDto";
+
 export interface RecipeSearch {
   creator?: string;
   name?: string;
@@ -34,7 +36,8 @@ export interface RecipeDetailsDto {
   id: number;
   ingredients: RecipeIngredientDto[];
   allergens: string[];
-  pictureId: number;
+  picture?: number[];
+  pictureId?: number;
 }
 
 export interface RecipeDetailsViewDto {

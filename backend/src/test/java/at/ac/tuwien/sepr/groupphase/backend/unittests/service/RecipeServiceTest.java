@@ -302,7 +302,7 @@ public class RecipeServiceTest {
         ingredients.add(new RecipeIngredientDto("Apple", 1f, null));
 
         RecipeDetailsDto newRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
-            ingredients, new ArrayList<>(), -1L);
+            ingredients, new ArrayList<>(), null, null);
 
         this.recipeService.createRecipe(newRecipe, user.getId());
 
@@ -329,14 +329,14 @@ public class RecipeServiceTest {
         ingredients.add(new RecipeIngredientDto("Chhhhhhhhhh", 1f, null));
 
         RecipeDetailsDto newRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
-            ingredients, new ArrayList<>(), -1L);
+            ingredients, new ArrayList<>(), null, null);
 
         assertThatExceptionOfType(ConflictException.class).isThrownBy(
             () -> this.recipeService.createRecipe(newRecipe, 1L)
         );
 
         RecipeDetailsDto finalNewRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
-            new ArrayList<>(), new ArrayList<>(), -1L);
+            new ArrayList<>(), new ArrayList<>(), null, null);
 
         assertThatExceptionOfType(ValidationException.class).isThrownBy(
             () -> this.recipeService.createRecipe(finalNewRecipe, 1L)

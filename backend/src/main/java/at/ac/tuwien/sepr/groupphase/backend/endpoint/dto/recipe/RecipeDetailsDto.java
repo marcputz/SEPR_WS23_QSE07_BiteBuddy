@@ -9,5 +9,7 @@ public record RecipeDetailsDto(
     String description,
     ArrayList<RecipeIngredientDto> ingredients,
     ArrayList<String> allergens,
-    Long pictureId
-){}
+    Long pictureId,
+    byte[] picture
+) {
+}

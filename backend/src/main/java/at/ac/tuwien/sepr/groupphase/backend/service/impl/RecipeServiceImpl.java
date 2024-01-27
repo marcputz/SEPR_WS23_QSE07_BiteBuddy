@@ -9,16 +9,19 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.PictureService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.RecipeValidator;
@@ -47,11 +50,12 @@ public class RecipeServiceImpl implements RecipeService {
     private RecipeValidator validator;
     private IngredientServiceImpl ingredientService;
     private JpaUserService userService;
+    private PictureService pictureService;
 
     @Autowired
     public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeIngredientRepository recipeIngredientRepository,
                              RecipeIngredientDetailsRepository recipeIngredientDetailsRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                             RecipeValidator validator, IngredientServiceImpl ingredientService, JpaUserService userService) {
+                             RecipeValidator validator, IngredientServiceImpl ingredientService, JpaUserService userService, PictureService pictureService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
@@ -59,6 +63,7 @@ public class RecipeServiceImpl implements RecipeService {
         this.validator = validator;
         this.ingredientService = ingredientService;
         this.userService = userService;
+        this.pictureService = pictureService;
     }
 
     @Override
@@ -138,7 +143,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public void createRecipe(RecipeDetailsDto recipe, Long userId) throws ConflictException, ValidationException {
-        LOGGER.debug("createRecipe");
+        LOGGER.debug("createRecipe({}, {})", recipe, userId);
 
         // validate recipe
         this.validator.validateForCreate(recipe);
@@ -146,9 +151,20 @@ public class RecipeServiceImpl implements RecipeService {
         ArrayList<String> conflictList = new ArrayList<>();
         Set<RecipeIngredient> ingredients = new HashSet<>();
 
+        // creating picture
+        Long pictureId = null;
+        if (recipe.picture() != null) {
+            try {
+                Picture pic = this.pictureService.createPicture(recipe.picture());
+                pictureId = pic.getId();
+            } catch (DataStoreException e) {
+                LOGGER.warn("Image sent was not valid");
+            }
+        }
+
         // creating database entry
         Recipe newRecipe = new Recipe();
-        newRecipe.setPictureId(recipe.pictureId());
+        newRecipe.setPictureId(pictureId);
         newRecipe.setName(recipe.name());
         newRecipe.setInstructions(recipe.description());
         newRecipe.setIngredients(ingredients);
@@ -308,7 +324,7 @@ public class RecipeServiceImpl implements RecipeService {
 
                 RecipeDetailsDto detailsDto =
                     new RecipeDetailsDto(id, recipe.get().getName(), creatorName, recipe.get().getInstructions(), newIngredients, allergens,
-                        recipe.get().getPictureId());
+                        recipe.get().getPictureId(), null);
                 return detailsDto;
             }
         }
