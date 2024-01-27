@@ -12,7 +12,7 @@ import {ToastrService} from "ngx-toastr";
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit{
+export class RegisterComponent implements OnInit {
 
   registerForm: UntypedFormGroup;
   // After first submission attempt, form validation will start
@@ -23,13 +23,18 @@ export class RegisterComponent implements OnInit{
   errorMailAlreadyExists: boolean = false;
   errorPasswordsNotSame: boolean = false;
 
+  isInputFocused: {[key: string]: boolean } = {};
+
+  showPasswords: boolean = false;
+  showPassword1: boolean = false;
+
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
               private passwordEncoder: PasswordEncoder,
               private router: Router,
               private notification: ToastrService) {
     this.registerForm = this.formBuilder.group({
-      username: ['', [Validators.required]],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       password2: ['', [Validators.required, Validators.minLength(8)]]
@@ -43,9 +48,9 @@ export class RegisterComponent implements OnInit{
   registerUser() {
     this.submitted = true;
     if (this.registerForm.valid && this.registerForm.controls.password.value == this.registerForm.controls.password2.value) {
-      const name: string = <string> this.registerForm.controls.username.value;
-      const email: string = <string> this.registerForm.controls.email.value;
-      const password: string = <string> this.registerForm.controls.password.value;
+      const name: string = <string>this.registerForm.controls.username.value;
+      const email: string = <string>this.registerForm.controls.email.value;
+      const password: string = <string>this.registerForm.controls.password.value;
       const encodedPassword = this.passwordEncoder.encodePassword(password);
 
       const registerDto: RegisterDto = new RegisterDto(email, name, encodedPassword);
@@ -66,11 +71,15 @@ export class RegisterComponent implements OnInit{
    * @param authRequest authentication data from the user login form
    */
   authenticateUser(authRequest: RegisterDto) {
-    console.log('Try to register user: ' + authRequest.name + ' with email: ' + authRequest.email + ' with encoded password ' + authRequest.passwordEncoded );
+    console.log('Try to register user: ' + authRequest.name + ' with email: ' + authRequest.email + ' with encoded password ' + authRequest.passwordEncoded);
     this.authService.registerUser(authRequest).subscribe({
       next: (data) => {
         console.log('Successfully registered user: ' + authRequest.email);
-        this.router.navigate(['/profile']);
+        this.notification.success('You are successfully registered. You are redirect to login now');
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
       },
       error: error => {
         console.log('Could not register user due to:');
@@ -108,7 +117,9 @@ export class RegisterComponent implements OnInit{
               this.registerForm.controls['username'].setErrors({userAlreadyExists: true});
               break;
             }
-          default: this.notification.error("Error while logging in, try again later."); break;
+          default:
+            this.notification.error("Error while logging in, try again later.");
+            break;
         }
       }
     });
@@ -122,6 +133,21 @@ export class RegisterComponent implements OnInit{
   }
 
   ngOnInit() {
+  }
+
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
+  }
+  //TODO: refactor this
+  togglePasswordVisibility1() {
+    this.showPassword1 = !this.showPassword1;
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.registerForm.get(attribute).value !== '';
   }
 
 }

@@ -1,9 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeIngredientDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
@@ -31,14 +31,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -147,24 +146,24 @@ public class RecipesTest {
         recipeIngredient2Id = recipeIngredientRepository.save(recipeIngredient2).getId();
 
         // updating recipes with ingredients
-        Set<RecipeIngredient> ringredients1 = new HashSet<>();
-        ringredients1.add(recipeIngredient1);
-        ringredients1.add(recipeIngredient2);
-        recipeRepository.updateIngredients(recipe1Id, ringredients1);
+        Set<RecipeIngredient> rIngredients1 = new HashSet<>();
+        rIngredients1.add(recipeIngredient1);
+        rIngredients1.add(recipeIngredient2);
+        recipeRepository.updateIngredients(recipe1Id, rIngredients1);
 
-        Set<RecipeIngredient> ringredients2 = new HashSet<>();
-        ringredients2.add(recipeIngredient2);
-        recipe2.setIngredients(ringredients2);
-        recipeRepository.updateIngredients(recipe2Id, ringredients2);
+        Set<RecipeIngredient> rIngredients2 = new HashSet<>();
+        rIngredients2.add(recipeIngredient2);
+        recipe2.setIngredients(rIngredients2);
+        recipeRepository.updateIngredients(recipe2Id, rIngredients2);
 
         Allergene allergene1 = new Allergene();
         allergene1.setName("Fructose");
-        Set<AllergeneIngredient> aingredients = new HashSet<>();
+        Set<AllergeneIngredient> aIngredients = new HashSet<>();
         AllergeneIngredient allergeneIngredient1 = new AllergeneIngredient();
         allergeneIngredient1.setAllergene(allergene1);
 
-        aingredients.add(allergeneIngredient1);
-        allergene1.setIngredients(aingredients);
+        aIngredients.add(allergeneIngredient1);
+        allergene1.setIngredients(aIngredients);
         allergeneIngredient1.setIngredient(ingredient1);
 
         allergene1Id = allergeneRepository.save(allergene1).getId();
@@ -191,7 +190,7 @@ public class RecipesTest {
     }
 
     @Test
-    public void getAllRecipes() throws Exception {
+    public void getAllAddedRecipes() throws Exception {
         // creating request
         var body = mockMvc
             .perform(MockMvcRequestBuilders
@@ -199,10 +198,10 @@ public class RecipesTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
-                    "name": "",
+                    "name": "recipe",
                     "creator": "",
                     "page": 0,
-                    "entriesPerPage": 1000
+                    "entriesPerPage": 21
                     }
                     """)
                 .accept(MediaType.APPLICATION_JSON)
@@ -392,20 +391,20 @@ public class RecipesTest {
                     """)
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().is4xxClientError());
-        String tooLongName = "Eine Prise Testwe" + "f".repeat(255);
+
         // creating request with too long name
         mockMvc
             .perform(MockMvcRequestBuilders
                 .post("/api/v1/recipes/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(String.format("""
+                .content("""
                     {
-                        "name": "%s",
-                        "description": "Man nehme einen Test 1313üaääw",
-                        "ingredients": [],
-                        "picture": ""
+                    "name": "Eine Prise Testwefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                    "description": "Man nehme einen Test 1313üaääw",
+                    "ingredients": [],
+                    "picture": ""
                     }
-                    """, tooLongName))
+                    """)
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().is4xxClientError());
     }

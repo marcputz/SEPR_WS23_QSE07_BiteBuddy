@@ -14,7 +14,7 @@
   </div>
 
   <!-- Sometimes it works, sometime it does not, really depends on the png file....-->
-  <img *ngIf="this.recipe.picture" [src]="sanitizeImage(this.recipe.picture)" alt="Selected Picture" class="img-thumbnail">
+  <img *ngIf="this.recipePicture" [src]="sanitizeImage(recipePicture)" alt="Selected Picture" class="img-thumbnail">
 
   <div class="d-flex flex-row w-auto mb-3">
     <div class="col">

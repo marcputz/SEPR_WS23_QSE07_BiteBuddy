@@ -23,6 +23,8 @@ export class RequestPasswordResetComponent implements OnInit {
 
   protected errorMessage: string | null;
 
+  isInputFocused: {[key: string]: boolean } = {};
+
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
               private passwordEncoder: PasswordEncoder,
@@ -35,6 +37,13 @@ export class RequestPasswordResetComponent implements OnInit {
 
   ngOnInit(): void {
 
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.emailForm.get(attribute).value !== '';
   }
 
   onSubmit() {

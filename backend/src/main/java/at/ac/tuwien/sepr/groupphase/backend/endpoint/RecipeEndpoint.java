@@ -1,11 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
@@ -55,7 +52,13 @@ public class RecipeEndpoint {
 
     @GetMapping("/ingredient/{name}")
     public List<String> findMatchingIngredients(@PathVariable String name) {
-        LOGGER.info("GET " + BASE_PATH + name);
+        LOGGER.info("GET " + BASE_PATH + "/ingredient/" + name);
+        return this.recipeService.findMatchingIngredients(name);
+    }
+
+    @GetMapping("/ingredient/basic/{name}")
+    public List<String> findOnlyBasicMatchingIngredients(@PathVariable String name) {
+        LOGGER.info("GET " + BASE_PATH + "/ingredient/" + name);
         return this.recipeService.findMatchingIngredients(name);
     }
 

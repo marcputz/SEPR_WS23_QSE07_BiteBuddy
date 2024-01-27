@@ -5,6 +5,8 @@ import {AuthService} from '../../../services/auth.service';
 import {LoginDto} from '../../../dtos/loginDto';
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {ToastrService} from "ngx-toastr";
+import {ApiErrorHandler} from "../../../services/apiErrorHandler";
+import {ErrorDto} from "../../../dtos/errorDto";
 
 @Component({
   selector: 'app-login',
@@ -17,11 +19,18 @@ export class LoginComponent implements OnInit {
   // After first submission attempt, form validation will start
   submitted = false;
 
+  showPasswords: boolean = false;
+
   errorEmailNotFound: boolean = false;
   errorPasswordWrong: boolean = false;
 
+  isInputFocused: {[key: string]: boolean } = {};
+
+  loginError: boolean = false;
+
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: AuthService,
+              private apiErrorHandler: ApiErrorHandler,
               private passwordEncoder: PasswordEncoder,
               private router: Router,
               private notification: ToastrService) {
@@ -61,36 +70,24 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/dashboard']);
       },
       error: error => {
-        console.error('Could not log in', error);
 
-        let errorObject;
-        if (typeof error.error === 'object') {
-          errorObject = error.error;
+        let errorJson = JSON.parse(error.error);
+
+        if (errorJson == undefined || errorJson["statusCode"] == undefined) {
+          this.apiErrorHandler.handleApiError(error);
         } else {
-          errorObject = error;
-        }
 
-        let message: string = errorObject.error;
-        let status = errorObject.status;
-
-        switch (status) {
-          case 401:
-            if (message.indexOf("does not exist") >= 0) {
-              // user does not exist
-              console.warn("User does not exist");
-              this.loginForm.controls['email'].setErrors({userNotFound: true});
+          switch (errorJson["statusCode"]) {
+            case 401: // unauthorized -> invalid credentials
+              console.warn("Invalid Credentials");
+              this.loginError = true;
+              this.notification.warning("Wrong password or user doesn't exist");
               break;
-            }
-            if (message.indexOf("Wrong Password") >= 0) {
-              // password wrong error
-              console.warn("Wrong password");
-              this.loginForm.controls['password'].setErrors({wrongPassword: true});
+            default:
+              this.apiErrorHandler.handleApiError(error);
               break;
-            }
-            // other type of authentication error
-            this.notification.error(message); break;
+          }
 
-          default: this.notification.error("Error while logging in, try again later."); break;
         }
 
       }
@@ -98,6 +95,17 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  togglePasswordVisibility() {
+    this.showPasswords = !this.showPasswords;
+  }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.loginForm.get(attribute).value !== '';
   }
 
 }

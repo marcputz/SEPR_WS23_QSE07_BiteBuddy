@@ -6,11 +6,13 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPassw
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.UserValidator;
+import org.hibernate.JDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class JpaUserService implements UserService {
@@ -36,133 +39,140 @@ public class JpaUserService implements UserService {
     }
 
     @Override
-    public ApplicationUser getUserByEmail(String email) throws UserNotFoundException {
+    public ApplicationUser getUserByEmail(String email) throws NotFoundException {
         LOGGER.trace("getUserByEmail({})", email);
 
-        ApplicationUser user = userRepository.findByEmailIgnoreCase(email);
-        if (user == null) {
-            // no user found
-            throw new UserNotFoundException("User with email '" + email + "' could not be found");
-        }
-
-        return user;
+        Optional<ApplicationUser> userOpt = userRepository.findByEmailIgnoreCase(email);
+        return userOpt.orElseThrow(() -> new NotFoundException("User with email '" + email + "' could not be found"));
     }
 
     @Override
-    public ApplicationUser getUserByNickname(String nickname) throws UserNotFoundException {
+    public ApplicationUser getUserByNickname(String nickname) throws NotFoundException {
         LOGGER.trace("getUserByNickname({})", nickname);
 
-        ApplicationUser user = userRepository.findByNickname(nickname);
-        if (user == null) {
-            // no user found
-            throw new UserNotFoundException("User with Nickname '" + nickname + "' could not be found");
-        }
-
-        return user;
+        Optional<ApplicationUser> userOpt = userRepository.findByNickname(nickname);
+        return userOpt.orElseThrow(() -> new NotFoundException("User with nickname '" + nickname + "' could not be found"));
     }
 
     @Override
-    public ApplicationUser getUserById(Long userId) throws UserNotFoundException {
+    public ApplicationUser getUserById(Long userId) throws NotFoundException {
+        LOGGER.trace("getUserById({})", userId);
+
         return userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " could not be found"));
+            .orElseThrow(() -> new NotFoundException("User with ID " + userId + " could not be found"));
     }
 
 
     @Override
-    public ApplicationUser create(UserRegisterDto registerDto) throws ValidationException {
+    public ApplicationUser create(UserRegisterDto registerDto) throws DataStoreException, ConflictException, ValidationException {
         LOGGER.trace("create({})", registerDto);
-        ApplicationUser applicationUser = new ApplicationUser(registerDto.getEmail(), registerDto.getPasswordEncoded());
-        applicationUser.setNickname(registerDto.getName());
+
+        // check if no other user has this email and nickname
+        Optional<ApplicationUser> sameNickname = this.userRepository.findByNickname(registerDto.getName());
+        Optional<ApplicationUser> sameEmail = this.userRepository.findByEmail(registerDto.getEmail());
+
+        if (sameNickname.isPresent()) {
+            throw new ConflictException("Unable to create new user as it is in conflict with other user entities",
+                List.of("User with nickname '" + registerDto.getName() + "' already exists"));
+        }
+        if (sameEmail.isPresent()) {
+            throw new ConflictException("Unable to create new user as it is in conflict with other user entities",
+                List.of("User with email '" + registerDto.getEmail() + "' already exists"));
+        }
+
+        ApplicationUser applicationUser = new ApplicationUser(registerDto.getEmail(), registerDto.getPasswordEncoded())
+            .setNickname(registerDto.getName())
+            .setUserPicture(null)
+            .setActiveProfile(null);
+
         validator.validateForCreate(applicationUser);
-        ApplicationUser existingUser1 = userRepository.findByEmailIgnoreCase(applicationUser.getEmail());
-        ApplicationUser existingUser2 = userRepository.findByNickname(applicationUser.getNickname());
-        List<String> validationErrors = new ArrayList<>();
-        if (existingUser1 != null) {
-            LOGGER.info("existingUser1({})", existingUser1);
-            throw new ValidationException("User with this Email already exists", validationErrors);
+
+        try {
+            return userRepository.save(applicationUser);
+        } catch (JDBCException | DataIntegrityViolationException ex) {
+            throw new DataStoreException(ex.getMessage(), ex);
         }
-        if (existingUser2 != null) {
-            LOGGER.info("existingUser2({})", existingUser2);
-            throw new ValidationException("User with this Name already exists", validationErrors);
-        }
-        LOGGER.info("existingUserAfter({})", existingUser2);
-        return userRepository.save(applicationUser);
     }
 
     @Override
-    public ApplicationUser updateEmailAndPassword(UserUpdateEmailAndPasswordDto userUpdateEmailAndPasswordDto, Long currentUserId)
-        throws UserNotFoundException, ValidationException, ConflictException {
-        LOGGER.trace("updateEmailAndPassword({})", userUpdateEmailAndPasswordDto);
+    public ApplicationUser updateEmailAndPassword(UserUpdateEmailAndPasswordDto dto, long userId)
+        throws NotFoundException, DataStoreException, ValidationException, ConflictException {
+        LOGGER.trace("updateEmailAndPassword({},{})", dto, userId);
 
-        ApplicationUser existingUser = userRepository.findById(currentUserId)
-            .orElseThrow(() -> new UserNotFoundException("User with Id '" + currentUserId + "' could not be found"));
-        if (userUpdateEmailAndPasswordDto.getEmail() != null && !userUpdateEmailAndPasswordDto.getEmail().isEmpty() && !userUpdateEmailAndPasswordDto.getEmail()
-            .equals(existingUser.getEmail())) {
-            existingUser.setEmail(userUpdateEmailAndPasswordDto.getEmail());
-        }
-        String newPassword = userUpdateEmailAndPasswordDto.getNewPassword() == null || userUpdateEmailAndPasswordDto.getNewPassword().isEmpty()
-            ? userUpdateEmailAndPasswordDto.getCurrentPassword()
-            : userUpdateEmailAndPasswordDto.getNewPassword();
-        if (newPassword != null) {
-            existingUser.setPasswordEncoded(PasswordEncoder.encode(newPassword, existingUser.getEmail()));
-        }
-        return updateApplicationUser(existingUser);
-    }
+        Optional<ApplicationUser> userOpt = userRepository.findById(userId);
+        ApplicationUser user = userOpt.orElseThrow(() -> new NotFoundException("User with ID " + userId + " was not found"));
 
+        // set new email
+        String newEmail = dto.getEmail() == null || dto.getEmail().isEmpty()
+            ? user.getEmail()
+            : dto.getEmail();
 
-    @Override
-    public ApplicationUser updateSettings(UserUpdateSettingsDto userUpdateSettingsDto, Long currentUserId)
-        throws UserNotFoundException, ValidationException, ConflictException {
-        LOGGER.trace("updateSettings({})", userUpdateSettingsDto);
+        user.setEmail(newEmail);
 
-        ApplicationUser existingUser = userRepository.findById(currentUserId)
-            .orElseThrow(() -> new UserNotFoundException("User with Id '" + currentUserId + "' could not be found"));
-        if (userUpdateSettingsDto.getNickname() != null && !userUpdateSettingsDto.getNickname().isEmpty() && !userUpdateSettingsDto.getNickname()
-            .equals(existingUser.getNickname())) {
-            existingUser.setNickname(userUpdateSettingsDto.getNickname());
-        }
-        if (userUpdateSettingsDto.getUserPicture() != null && userUpdateSettingsDto.getUserPicture().length != 0) {
-            existingUser.setUserPicture(userUpdateSettingsDto.getUserPicture());
-        }
-        return updateApplicationUser(existingUser);
+        // set new password
+        String newPassword = dto.getNewPassword() == null || dto.getNewPassword().isEmpty()
+            ? dto.getCurrentPassword()
+            : dto.getNewPassword();
+
+        user.setPasswordEncoded(PasswordEncoder.encode(newPassword, user.getEmail()));
+
+        return this.updateUser(user);
     }
 
     @Override
-    public ApplicationUser updateApplicationUser(ApplicationUser userToUpdate)
-        throws UserNotFoundException, ValidationException, ConflictException {
+    public ApplicationUser updateSettings(UserUpdateSettingsDto dto, long userId)
+        throws NotFoundException, DataStoreException, ValidationException, ConflictException {
+        LOGGER.trace("updateSettings({},{})", dto, userId);
+
+        Optional<ApplicationUser> userOpt = this.userRepository.findById(userId);
+        ApplicationUser user = userOpt.orElseThrow(() -> new NotFoundException("User with ID " + userId + " was not found"));
+
+        String newNickname = dto.getNickname() == null || dto.getNickname().isEmpty()
+            ? user.getNickname()
+            : dto.getNickname();
+
+        user.setNickname(newNickname);
+
+        byte[] newPicture = dto.getUserPicture() == null || dto.getUserPicture().length <= 0
+            ? user.getUserPicture()
+            : dto.getUserPicture();
+
+        user.setUserPicture(newPicture);
+
+        return this.updateUser(user);
+    }
+
+    @Override
+    public ApplicationUser updateUser(ApplicationUser userToUpdate)
+        throws NotFoundException, ValidationException, ConflictException {
         LOGGER.trace("updateApplicationUser({})", userToUpdate);
-        if (userToUpdate.getId() == null || !userRepository.existsById(userToUpdate.getId())) {
-            throw new UserNotFoundException("User with Id '" + userToUpdate.getId() + "' could not be found");
-        }
+
+        // validate user input
         validator.validateForUpdate(userToUpdate);
-        checkUniqueConstraints(userToUpdate, true);
+
+        // check if user with same nickname already exists
+        Optional<ApplicationUser> sameNickname = this.userRepository.findByNickname(userToUpdate.getNickname());
+        if (sameNickname.isPresent() && !sameNickname.get().getId().equals(userToUpdate.getId())) {
+            throw new ConflictException("Can not update user settings as it is in conflict with another user entity",
+                List.of("User with nickname '" + userToUpdate.getNickname() + "' already exists"));
+        }
+
+        // check if user with same email already exists
+        Optional<ApplicationUser> sameEmail = this.userRepository.findByEmail(userToUpdate.getEmail());
+        if (sameEmail.isPresent() && !sameEmail.get().getId().equals(userToUpdate.getId())) {
+            throw new ConflictException("Can not update user settings as it is in conflict with another user entity",
+                List.of("User with email '" + userToUpdate.getEmail() + "' already exists"));
+        }
+
+        // check if given ID exists in the data store
+        if (userToUpdate.getId() == null || !userRepository.existsById(userToUpdate.getId())) {
+            throw new NotFoundException("User with ID '" + userToUpdate.getId() + "' could not be found");
+        }
+
         try {
             return userRepository.save(userToUpdate);
-        } catch (DataIntegrityViolationException e) {
-            LOGGER.error("DataIntegrityViolationException occurred during update: ", e);
-            throw new ConflictException("We encountered an unexpected issue while updating your account. Please try again", new ArrayList<>());
-        }
-    }
-
-
-    private void checkUniqueConstraints(ApplicationUser user, boolean isUpdate) throws ConflictException {
-        LOGGER.trace("checkUniqueConstraints({})", user);
-        List<String> conflictErrors = new ArrayList<>();
-
-        // Email conflict check
-        ApplicationUser userWithSameEmail = userRepository.findByEmailIgnoreCase(user.getEmail());
-        if (userWithSameEmail != null && (!isUpdate || !userWithSameEmail.getId().equals(user.getId()))) {
-            conflictErrors.add("Email '" + user.getEmail() + "' is already in use");
-        }
-
-        // Nickname conflict check
-        ApplicationUser userWithSameNickname = userRepository.findByNickname(user.getNickname());
-        if (userWithSameNickname != null && (!isUpdate || !userWithSameNickname.getId().equals(user.getId()))) {
-            conflictErrors.add("Nickname '" + user.getNickname() + "' is already in use");
-        }
-        if (!conflictErrors.isEmpty()) {
-            String operation = isUpdate ? "update" : "creation";
-            throw new ConflictException("User " + operation + " failed due to data conflicts", conflictErrors);
+        } catch (JDBCException | DataIntegrityViolationException e) {
+            throw new DataStoreException("The data store was unable to process the request", e);
         }
     }
 }

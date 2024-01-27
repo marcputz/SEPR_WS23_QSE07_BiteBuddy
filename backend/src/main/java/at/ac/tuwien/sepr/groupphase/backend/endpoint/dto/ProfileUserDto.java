@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.util.List;/**
-    * Data object transfer for Profile entity to send information through the network and between layers.
-    * To create java boilerplate code use lombok.
-    */
+import java.util.List;
+
+/**
+ * Data object transfer for Profile entity to send information through the network and between layers.
+ * To create java boilerplate code use lombok.
+ */
 
 public class ProfileUserDto {
 
@@ -76,7 +78,8 @@ public class ProfileUserDto {
         private List<AllergeneDto> allergens;
         private List<IngredientDto> ingredient;
 
-        private ProfileDtoBuilder() {}
+        private ProfileDtoBuilder() {
+        }
 
         public static ProfileDtoBuilder aProfileDto() {
             return new ProfileDtoBuilder();

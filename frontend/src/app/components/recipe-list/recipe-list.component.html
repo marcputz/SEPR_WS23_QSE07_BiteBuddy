@@ -1,8 +1,44 @@
-<!-- TEMPORARY HEADER -->
-<div style="display: flex; flex-direction: row; padding: 1rem; background-color: whitesmoke;">
-  <span style="margin-right: 2rem;">TEMPORARY NAVIGATION HEADER (MR2)</span>
-  <a [routerLink]="['/settings']" style="margin-right: 1rem;">Settings</a>
-  <a [routerLink]="['/profile']">Profile</a>
+<div class="background-img">
+  <div class="container-fluid">
+    <div class="row row-title">
+      <div class="col-md-3">
+        <h2 class="bb-dialog-box-header title-margin">Discover Recipes</h2>
+      </div>
+      <div class="col-md-6">
+        <div class="input-group">
+          <input type="text" class="form-control input-field" placeholder="Search recipes...">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="input-group">
+          <button type="submit" class="button-create">
+            <i class="bi bi-plus">
+              Add recipe
+            </i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-form">
+      <div class="col-md-3 mb-5" *ngFor="let recipe of recipes">
+        <div class="card recipe-card">
+          <img *ngIf="getImageFor(recipe) !== null" [src]="sanitizeImage(getImageFor(recipe))" class="card-img-top rounded-top img-zoom" alt="Recipe Image">
+          <div class="card-body">
+            <h5 class="card-title">{{ recipe.name }}</h5>
+            <p class="card-text">Number of Persons: 4 persons | </p>
+            <div class="user-info d-flex align-items-center">
+              <img src="assets/icons/user_default.png" class="rounded-circle user-icon" alt="User Icon">
+              <div class="user-details ms-3">
+                <p class="user-name">user name</p>
+               <!-- <button class="btn btn-primary btn-add-to-list">+ Add to List</button> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="container">
@@ -28,13 +64,13 @@
         </ul>
       </div>
     </div>
+    <!--
     <div class="col-md-auto">
       <button class="btn btn-success rounded-pill" [routerLink]="['/recipes/create']" aria-label="Create Recipe">
         <i class="bi-plus-square"></i>
         Create Recipe
       </button>
     </div>
-    <!-- TODO: this should all be in at the same height, but somehow its not -->
     <div class="col-md-auto">
         <i class="bi bi-search mr-4"></i>
         <input type="text" id="searchRecipeName" name="searchRecipeName" placeholder="Enter a recipe"
@@ -42,8 +78,9 @@
              [(ngModel)]="searchParams.name"
              (ngModelChange)="searchChanged()">
     </div>
+    -->
     </div>
-
+<!--
   <div class="row">
     <div class="col-md-auto p-3" *ngFor="let recipe of recipes">
       <div class="card border-primary">
@@ -72,5 +109,5 @@
       </div>
     </div>
   </div>
+  -->
 </div>
-

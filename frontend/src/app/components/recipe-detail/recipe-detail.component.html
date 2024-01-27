@@ -10,7 +10,7 @@
   </div>
   <div class="row">
     <div class="center">
-      <img [src]="sanitizeImage(recipeDetails.picture)" class="img-thumbnail">
+      <img *ngIf="recipePicture !== null" [src]="sanitizeImage(recipePicture)" class="img-thumbnail">
     </div>
   </div>
 

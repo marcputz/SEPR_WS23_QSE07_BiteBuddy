@@ -1,9 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import jakarta.mail.MessagingException;
 
@@ -19,11 +18,11 @@ public interface PasswordResetService {
      * Method will log the reset request and send a verification email to the user.
      *
      * @param email the email of the user to request a password change
-     * @throws UserNotFoundException If the email specified does not match a user in the data store
+     * @throws NotFoundException If the email specified does not match a user in the data store
      * @throws MessagingException If the email service cannot send an email to the user
      * @author Marc Putz
      */
-    public void requestPasswordReset(String email) throws UserNotFoundException, MessagingException;
+    public void requestPasswordReset(String email) throws NotFoundException, MessagingException;
 
     /**
      * Performs a password reset with the user data given in the DTO object.

@@ -1,12 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.exceptionhandler;
 
-import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ErrorDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.*;
+import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -33,12 +32,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
-     * Use the @ExceptionHandler annotation to write handler for custom exceptions.
+     * Handles {@link NotFoundException}s occuring in REST endpoints.
+     *
+     * @param ex        the exception.
+     * @param request   the request where the exception occurred.
+     * @return          a ResponseEntity to send back to the client
      */
     @ExceptionHandler(value = {NotFoundException.class})
     protected ResponseEntity<Object> handleNotFound(RuntimeException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+
+        ErrorDto errorDto = new ErrorDto(HttpStatus.NOT_FOUND, ex);
+        return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
     }
 
     /**
@@ -52,7 +57,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {AuthenticationException.class})
     protected ResponseEntity<Object> handleAuthenticationError(AuthenticationException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+
+        ErrorDto errorDto = new ErrorDto(HttpStatus.UNAUTHORIZED, ex);
+        return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
+    }
+
+    /**
+     * Handles {@link jakarta.mail.MessagingException}s occuring in REST endpoints.
+     *
+     * @param ex        the exception
+     * @param request   the request where the exception occurred
+     * @return a RepsonseEntity to send back to the client
+     * @author Marc Putz
+     */
+    @ExceptionHandler(value = {MessagingException.class})
+    protected ResponseEntity<Object> handleMessagingError(MessagingException ex, WebRequest request) {
+        LOGGER.warn(ex.getMessage());
+
+        ErrorDto errorDto = new ErrorDto(HttpStatus.SERVICE_UNAVAILABLE, ex);
+        return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
     }
 
     /**
@@ -66,7 +89,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {DataStoreException.class})
     protected ResponseEntity<Object> handleDataStoreError(DataStoreException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+
+        ErrorDto errorDto = new ErrorDto(HttpStatus.SERVICE_UNAVAILABLE, ex);
+        return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
     }
 
     /**
@@ -79,7 +104,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {ConflictException.class})
     protected ResponseEntity<Object> handleConflictError(ConflictException ex, WebRequest request) {
         LOGGER.warn("Conflict detected: {}", ex.getMessage());
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.CONFLICT, request);
+
+        ErrorDto errorDto = new ErrorDto(HttpStatus.CONFLICT, ex);
+        return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
     }
 
     /**
@@ -92,7 +119,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {ValidationException.class})
     protected ResponseEntity<Object> handleValidationError(ValidationException ex, WebRequest request) {
         LOGGER.warn("Validation error: {}", ex.getMessage());
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
+
+        ErrorDto errorDto = new ErrorDto(HttpStatus.UNPROCESSABLE_ENTITY, ex);
+        return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
     }
 
     /**
@@ -105,27 +134,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {IllegalArgumentException.class})
     protected ResponseEntity<Object> handleIllegalArgument(RuntimeException ex, WebRequest request) {
         LOGGER.warn(ex.getMessage());
-        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+
+        ErrorDto errorDto = new ErrorDto(HttpStatus.BAD_REQUEST, ex);
+        return super.handleExceptionInternal(ex, errorDto, new HttpHeaders(), errorDto.getStatus(), request);
     }
 
-    /**
-     * Override methods from ResponseEntityExceptionHandler to send a customized HTTP response for a know exception
-     * from e.g. Spring
-     */
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status, WebRequest request) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        //Get all errors
-        List<String> errors = ex.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .map(err -> err.getField() + " " + err.getDefaultMessage())
-            .collect(Collectors.toList());
-        body.put("Validation errors", errors);
-
-        return new ResponseEntity<>(body.toString(), headers, status);
-
-    }
 }

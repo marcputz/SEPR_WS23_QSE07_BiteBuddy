@@ -12,6 +12,12 @@ export interface ProfileDto {
     userId: number;
 }
 
+export interface ProfileListDto {
+  id: number;
+  name: string;
+  userId: number;
+}
+
 export interface RecipeRatingDto {
   recipeId: number;
   userId: number;

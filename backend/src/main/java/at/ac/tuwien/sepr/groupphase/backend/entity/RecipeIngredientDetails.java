@@ -81,6 +81,14 @@ public class RecipeIngredientDetails {
             && Objects.equals(describer, recipeIngredientDetails.describer);
     }
 
+    /**
+     * This is needed since we want a custom way to index ingredients with just name and FoodUnit
+     * @return
+     */
+    public String getFridgeStringIdentifier() {
+        return ingredient + " " + (getUnit() != null ? getUnit().toString() : "");
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, amount, unit, ingredient, describer);
