@@ -87,14 +87,6 @@ public class ProfileEndpoint {
         return profileService.copyToUser(profileId, currentUserId);
     }
 
-    @PutMapping("/rating/{RecipeId}")
-    public void post(@Valid @RequestBody RecipeRatingDto recipeRatingDto) throws ValidationException, NotFoundException {
-        LOGGER.info("Received POST request on {}", BASE_PATH);
-        LOGGER.debug("Request body for POST:\n{}", recipeRatingDto);
-
-        profileService.rateRecipe(recipeRatingDto);
-    }
-
     @GetMapping
     public List<ProfileListDto> getAllForUser(@RequestHeader HttpHeaders headers) throws AuthenticationException {
         LOGGER.trace("getAllForUser({})", headers);
