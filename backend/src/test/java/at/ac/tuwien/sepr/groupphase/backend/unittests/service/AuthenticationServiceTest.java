@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -29,23 +29,28 @@ public class AuthenticationServiceTest {
     AuthenticationService service;
 
     @Autowired
-    UserRepository user;
+    UserRepository userRepository;
 
     private ApplicationUser testuser = new ApplicationUser()
         .setId(1L)
         .setNickname("testuser_authservicetest")
         .setEmail("test.user@authservice.test")
         .setPasswordEncoded(PasswordEncoder.encode("password", "test.user@authservice.test"));
+    private ApplicationUser testuser2 = new ApplicationUser()
+        .setId(2L)
+        .setNickname("testuser2_authservicetest")
+        .setEmail("another.test@authservice.net")
+        .setPasswordEncoded(PasswordEncoder.encode("password2", "another.test@authservice.net"));
 
     @BeforeEach
     void beforeEach() {
-        long newId = user.save(testuser).getId();
-        testuser.setId(newId);
+        testuser = userRepository.save(testuser);
+        testuser2 = userRepository.save(testuser2);
     }
 
     @AfterEach
     void afterEach() {
-        user.deleteById(testuser.getId());
+        userRepository.deleteAll();
     }
 
     @Test
@@ -61,12 +66,37 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    void testLogin_WithInvalidData_ThrowsAuthenticationError() {
+    void testLogin_WithInvalidEmail_ThrowsAuthenticationError() {
         LoginDto dto = new LoginDto()
             .setEmail("thisEmailDoesNotExist@authenticationtest.test")
             .setPassword("password");
 
         assertThrows(AuthenticationException.class, () -> service.loginUser(dto));
+    }
+
+    @Test
+    void testLogin_WithInvalidPassword_ThrowsAuthenticationError() {
+        LoginDto dto = new LoginDto()
+            .setEmail(testuser.getEmail())
+            .setPassword("thisIsAWrongPassword");
+
+        assertThrows(AuthenticationException.class, () -> service.loginUser(dto));
+    }
+
+    @Test
+    void testLogin_WithTwoUsers_Returns() throws Exception {
+        LoginDto dto1 = new LoginDto()
+            .setEmail(testuser.getEmail())
+            .setPassword("password");
+
+        LoginDto dto2 = new LoginDto()
+            .setEmail(testuser2.getEmail())
+            .setPassword("password2");
+
+        assertAll(
+            () -> assertDoesNotThrow(() -> service.loginUser(dto1)),
+            () -> assertDoesNotThrow(() -> service.loginUser(dto2))
+        );
     }
 
     @Test
