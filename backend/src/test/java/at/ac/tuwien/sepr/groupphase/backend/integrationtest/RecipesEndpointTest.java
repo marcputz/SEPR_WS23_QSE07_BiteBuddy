@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;

@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
@@ -15,7 +15,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
-import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
