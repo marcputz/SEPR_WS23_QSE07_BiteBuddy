@@ -38,8 +38,8 @@ export class RecipeListComponent {
     rating: -1
   };
 
-  likes: number[];
-  dislikes: number[];
+  likes: number[] = [];
+  dislikes: number[] = [];
 
   constructor(
     private service: RecipeService,
@@ -60,22 +60,22 @@ export class RecipeListComponent {
       .pipe(debounceTime(300))
       .subscribe({next: () => this.reloadRecipes()});
 
-      this.authService.getUser().subscribe(
-          (settings: UserSettingsDto) => {
-              this.profileService.getRatingLists(settings.id)
-                  .subscribe({
-                      next: data => {
-                          this.likes = data.likes;
-                          this.dislikes = data.dislikes
-                      },
-                      error: error => {
-                          console.error('Error getting rating list', error);
-                          const errorMessage = error?.message || 'Unknown error occured';
-                          this.notification.error(`Error getting rating lists: ${errorMessage}`);
-                      }
-                  });
-          },
-      );
+    this.authService.getUser().subscribe(
+      (settings: UserSettingsDto) => {
+        this.profileService.getRatingLists(settings.id)
+          .subscribe({
+            next: data => {
+              this.likes = data.likes;
+              this.dislikes = data.dislikes
+            },
+            error: error => {
+              console.error('Error getting rating list', error);
+              const errorMessage = error?.message || 'Unknown error occured';
+              this.notification.error(`Error getting rating lists: ${errorMessage}`);
+            }
+          });
+      },
+    );
   }
 
   searchChanged(): void {
@@ -150,23 +150,23 @@ export class RecipeListComponent {
         this.profileService.createRating(this.recipeRating)
           .subscribe({
               next: data => {
-                  this.notification.success("Successfully rated new recipe!");
-                  this.authService.getUser().subscribe(
-                      (settings: UserSettingsDto) => {
-                          this.profileService.getRatingLists(settings.id)
-                              .subscribe({
-                                  next: data => {
-                                      this.likes = data.likes;
-                                      this.dislikes = data.dislikes
-                                  },
-                                  error: error => {
-                                      console.error('Error getting rating list', error);
-                                      const errorMessage = error?.message || 'Unknown error occured';
-                                      this.notification.error(`Error getting rating lists: ${errorMessage}`);
-                                  }
-                              });
-                      },
-                  );
+                this.notification.success("Successfully rated new recipe!");
+                this.authService.getUser().subscribe(
+                  (settings: UserSettingsDto) => {
+                    this.profileService.getRatingLists(settings.id)
+                      .subscribe({
+                        next: data => {
+                          this.likes = data.likes;
+                          this.dislikes = data.dislikes
+                        },
+                        error: error => {
+                          console.error('Error getting rating list', error);
+                          const errorMessage = error?.message || 'Unknown error occured';
+                          this.notification.error(`Error getting rating lists: ${errorMessage}`);
+                        }
+                      });
+                  },
+                );
               },
               error: error => {
                 console.log(error)
