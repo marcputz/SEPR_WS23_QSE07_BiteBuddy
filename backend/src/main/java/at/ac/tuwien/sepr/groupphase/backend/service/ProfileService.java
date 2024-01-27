@@ -2,14 +2,14 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
@@ -104,4 +104,5 @@ public interface ProfileService {
      */
     ProfileDto deleteProfile(Long profileId, Long userId) throws NotFoundException, ConflictException;
 
+    void setActiveProfile(Long profileId, Long currentUserId) throws ConflictException;
 }

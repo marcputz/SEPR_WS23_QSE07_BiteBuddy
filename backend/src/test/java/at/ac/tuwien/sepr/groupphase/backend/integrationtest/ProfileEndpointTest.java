@@ -204,5 +204,23 @@ public class ProfileEndpointTest {
         profileRepository.deleteById(resultProfileDto.id());
     }
 
+    @Test
+    public void setActiveProfile_ShouldSetActiveProfileSuccessfully() throws Exception {
+        // Given
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        Long profileToSetActiveId = profileId;
+
+        this.mockMvc.perform(post("/api/v1/profiles/setActive/" + profileToSetActiveId)
+                .headers(headers))
+            .andExpect(status().isOk());
+
+        ApplicationUser updatedUser = userRepository.findById(testUserId).orElseThrow();
+        assertNotNull(updatedUser.getActiveProfile(), "Active profile should not be null");
+        assertEquals(profileToSetActiveId, updatedUser.getActiveProfile().getId(), "Active profile ID should match the set profile ID");
+    }
 
 }
