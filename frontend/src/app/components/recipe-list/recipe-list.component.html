@@ -2,20 +2,20 @@
   <div class="row-form">
     <div class="row row-title">
       <!-- Title -->
-      <div class="col-md-2 col-lg-2 col-sm-4">
+      <div class="col-md-2 col-lg-5 col-sm-4 col-xl-4 col-xxl-3">
         <h1 class="bb-dialog-box-header title-margin">Discover Recipes</h1>
       </div>
       <!-- Search bar -->
-      <div class="col-md-5 col-lg-8 col-sm-4">
+      <div class="col-md-5 col-lg-5 col-sm-4 col-xl-5 col-xxl-6">
         <div class="input-group">
-          <input type="text" id="searchRecipeName"  name="searchRecipeName"
+          <input type="text" id="searchRecipeName" name="searchRecipeName"
                  class="form-control input-field"
                  placeholder="Search recipes..."
                  [(ngModel)]="searchParams.name"
                  (ngModelChange)="searchChanged()">
         </div>
       </div>
-      <div class="col-md-4 col-lg-2 col-sm-4">
+      <div class="col-md-4 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
         <div class="input-button">
           <button type="submit" [routerLink]="['/recipes/create']" class="button-create button-transparent" aria-label="Add Recipe">
             <i class="bi bi-plus">
@@ -27,7 +27,7 @@
     </div>
     <!-- Card layout -->
     <div class="row">
-      <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-2 mb-4 row-gap-6" *ngFor="let recipe of recipes">
+      <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6" *ngFor="let recipe of recipes">
         <div class="card recipe-card" (click)="redirectToRecipe(recipe.id)">
           <img [src]="sanitizeImage(getImageFor(recipe))" class="card-img-top rounded-top img-zoom" alt="Recipe Image">
           <div class="card-body">

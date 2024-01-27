@@ -46,8 +46,8 @@ export class ProfileEditComponent {
     // Initialize the form in the constructor
     this.form = this.fb.group({
       name: ['', Validators.required],
-      allergens: [[], Validators.required],
-      ingredient: [[], Validators.required],
+      allergens: [[]],
+      ingredient: [[]],
     });
   }
 
