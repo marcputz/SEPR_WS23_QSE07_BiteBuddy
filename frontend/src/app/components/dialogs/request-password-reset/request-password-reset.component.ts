@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
-import {AuthService} from "../../../services/auth.service";
+import {UserService} from "../../../services/user.service";
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {Router} from "@angular/router";
 import {isBoolean} from "lodash";
@@ -26,7 +26,7 @@ export class RequestPasswordResetComponent implements OnInit {
   isInputFocused: {[key: string]: boolean } = {};
 
   constructor(private formBuilder: UntypedFormBuilder,
-              private authService: AuthService,
+              private authService: UserService,
               private passwordEncoder: PasswordEncoder,
               private router: Router,
               private notifications: ToastrService) {

@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
-import {AuthService} from '../../../services/auth.service';
+import {UserService} from '../../../services/user.service';
 import {PasswordEncoder} from '../../../utils/passwordEncoder';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
@@ -31,7 +31,7 @@ export class ChangeSettingsComponent implements OnInit {
 
   constructor(
     private formBuilder: UntypedFormBuilder,
-    private authService: AuthService,
+    private authService: UserService,
     private router: Router,
     private notifications: ToastrService,
     private imageHandler: ImageHandler

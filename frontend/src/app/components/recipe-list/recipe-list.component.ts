@@ -5,7 +5,7 @@ import {debounceTime, Subject} from "rxjs";
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {ToastrService} from "ngx-toastr";
 import {RecipeRatingDto} from "../../dtos/profileDto";
-import {AuthService} from "../../services/auth.service";
+import {UserService} from "../../services/user.service";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {ProfileService} from "../../services/profile.service";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
@@ -43,7 +43,7 @@ export class RecipeListComponent implements OnInit {
 
   constructor(
     private service: RecipeService,
-    private authService: AuthService,
+    private authService: UserService,
     private profileService: ProfileService,
     private pictureService: PictureService,
     private sanitizer: DomSanitizer,

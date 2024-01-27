@@ -3,7 +3,7 @@ import {RecipeDetailsDto, RecipeRatingListsDto} from "../../dtos/recipe";
 import {RecipeService} from "../../services/recipe.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
-import {AuthService} from "../../services/auth.service";
+import {UserService} from "../../services/user.service";
 import {ProfileService} from "../../services/profile.service";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {CheckRatingDto} from "../../dtos/profileDto";
@@ -35,7 +35,7 @@ export class RecipeDetailComponent implements OnInit{
   ratingStatus: String = "";
   constructor(
     private service: RecipeService,
-    private authService: AuthService,
+    private authService: UserService,
     private profileService: ProfileService,
     private pictureService: PictureService,
     private router: Router,

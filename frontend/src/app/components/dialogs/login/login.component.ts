@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {AuthService} from '../../../services/auth.service';
+import {UserService} from '../../../services/user.service';
 import {LoginDto} from '../../../dtos/loginDto';
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {ToastrService} from "ngx-toastr";
@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
   loginError: boolean = false;
 
   constructor(private formBuilder: UntypedFormBuilder,
-              private authService: AuthService,
+              private authService: UserService,
               private apiErrorHandler: ApiErrorHandler,
               private passwordEncoder: PasswordEncoder,
               private router: Router,

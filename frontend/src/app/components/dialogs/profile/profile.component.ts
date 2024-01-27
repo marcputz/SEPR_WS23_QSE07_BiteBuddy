@@ -8,7 +8,7 @@ import {AllergeneDto} from "../../../dtos/allergeneDto";
 import {IngredientDto} from "../../../dtos/ingredientDto";
 import {IngredientService} from "../../../services/ingredient.service";
 import {AllergensService} from "../../../services/allergens.service";
-import {AuthService} from "../../../services/auth.service";
+import {UserService} from "../../../services/user.service";
 import {UserSettingsDto} from "../../../dtos/userSettingsDto";
 import {Observable} from "rxjs";
 import {RecipeDetailsDto} from "../../../dtos/recipe";
@@ -42,7 +42,7 @@ export class ProfileComponent {
       private router: Router,
       private route: ActivatedRoute,
       private notification: ToastrService,
-      private authService: AuthService
+      private authService: UserService
   ) {
       // Initialize the form in the constructor
       this.form = this.fb.group({

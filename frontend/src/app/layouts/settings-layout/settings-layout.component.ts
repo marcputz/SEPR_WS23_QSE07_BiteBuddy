@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService} from "../../services/auth.service";
+import {UserService} from "../../services/user.service";
 import {ActivatedRoute, NavigationEnd, Router, RouterState} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
@@ -29,7 +29,7 @@ export class SettingsLayoutComponent implements OnInit {
 
   userSettings: UserSettingsDto;
 
-  constructor(private authService: AuthService,
+  constructor(private authService: UserService,
               private router: Router,
               private route: ActivatedRoute,
               private notification: ToastrService,
