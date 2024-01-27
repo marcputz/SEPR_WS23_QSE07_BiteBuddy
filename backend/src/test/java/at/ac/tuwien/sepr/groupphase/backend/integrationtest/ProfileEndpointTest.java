@@ -3,20 +3,22 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapperImpl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapperImpl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapperImpl;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ProfileRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,6 +72,8 @@ public class ProfileEndpointTest {
     private ProfileMapperImpl profileMapper;
     @Autowired
     private ProfileRepository profileRepository;
+    @Autowired
+    private AuthenticationService authenticationService;
     private Long testUserId;
     private String testUserAuthToken;
     private Long profileId;
@@ -101,18 +105,16 @@ public class ProfileEndpointTest {
         } catch (Exception e) {
             throw new RuntimeException("Exception while Generating Test Data, SaveProfile", e);
         }
+
         //Login
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
-        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
-                .content((new ObjectMapper()).writeValueAsString(new LoginDto()
-                    .setEmail(testUser.getEmail())
-                    .setPassword(testUserPassword)))
-                .headers(requestHeaders)).andExpect(status().isOk())
-            .andReturn();
-        MockHttpServletResponse response = mvcResult.getResponse();
-        testUserAuthToken = response.getContentAsString();
+        LoginDto loginDto = new LoginDto()
+            .setEmail(testUser.getEmail())
+            .setPassword(testUserPassword);
+        try {
+            testUserAuthToken = authenticationService.loginUser(loginDto);
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Exception while logging in test user", e);
+        }
     }
 
     @AfterEach
