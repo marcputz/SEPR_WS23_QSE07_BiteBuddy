@@ -87,7 +87,13 @@ public class RecipeServiceImpl implements RecipeService {
 
         ArrayList<RecipeListDto> recipeDtos = new ArrayList<>();
         for (Recipe recipe : recipes) {
-            recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId(), recipe.getPictureId()));
+            String nickname = "BiteBuddy";
+
+            if (recipe.getCreatorId() != null && recipe.getCreatorId() > 0) {
+                nickname = this.userService.getUserById(recipe.getCreatorId()).getNickname();
+            }
+
+            recipeDtos.add(new RecipeListDto(nickname, recipe.getName(), recipe.getId(), recipe.getPictureId()));
         }
 
         return new RecipeSearchResultDto(pageSelector, entriesPerPage, recipes.getTotalPages(), recipeDtos);
