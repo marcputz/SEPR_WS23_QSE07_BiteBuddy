@@ -448,10 +448,11 @@ public class UserEndpointTest {
         MockHttpServletResponse response = mvcResult.getResponse();
 
         // then
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-
         ApplicationUser updatedUser = userRepository.getReferenceById(testuser.getId());
-        assertEquals(PasswordEncoder.encode("newPassword", testuser.getEmail()), updatedUser.getPasswordEncoded());
+        assertAll(
+            () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
+            () -> assertEquals(PasswordEncoder.encode("newPassword", testuser.getEmail()), updatedUser.getPasswordEncoded())
+        );
     }
 
     @Test
