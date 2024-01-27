@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class AuthenticationEndpointTest {
+public class UserEndpointTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -91,7 +91,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
@@ -115,7 +115,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail("doesNotExist@shouldFail.net")
                     .withPassword(testUserPassword)
@@ -135,7 +135,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(testuser.getEmail())
                     .withPassword("thisIsAWrongPassword")
@@ -155,7 +155,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/login")
                 .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
@@ -166,9 +166,9 @@ public class AuthenticationEndpointTest {
         MockHttpServletResponse response = mvcResult.getResponse();
 
         String authToken = response.getContentAsString();
-        requestHeaders.set("authorization", authToken);
+        requestHeaders.set("Authorization", authToken);
 
-        mvcResult = this.mockMvc.perform(post("/api/v1/authentication/logout")
+        mvcResult = this.mockMvc.perform(post("/api/v1/user/logout")
                 .headers(requestHeaders))
             .andDo(print())
             .andReturn();
@@ -182,9 +182,9 @@ public class AuthenticationEndpointTest {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        requestHeaders.set("authorization", "Token nonexistingauthtoken");
+        requestHeaders.set("Authorization", "Token nonexistingauthtoken");
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/logout")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/logout")
                 .headers(requestHeaders))
             .andDo(print())
             .andReturn();
@@ -201,7 +201,7 @@ public class AuthenticationEndpointTest {
         loginHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         loginHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/user/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
@@ -226,7 +226,7 @@ public class AuthenticationEndpointTest {
         updateHeaders.set("Authorization", authToken);
 
         // Perform update request
-        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings/authentication")
+        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/user/settings/authentication")
                 .content(new ObjectMapper().writeValueAsString(updateDto))
                 .headers(updateHeaders))
             .andExpect(status().isOk())
@@ -246,7 +246,7 @@ public class AuthenticationEndpointTest {
         loginHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         loginHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/user/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
@@ -273,7 +273,7 @@ public class AuthenticationEndpointTest {
         updateHeaders.set("Authorization", authToken);
 
         // Perform update request
-        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings/authentication")
+        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/user/settings/authentication")
                 .content(new ObjectMapper().writeValueAsString(updateDto))
                 .headers(updateHeaders))
             .andExpect(status().isOk())
@@ -289,14 +289,14 @@ public class AuthenticationEndpointTest {
         logoutHeaders.setContentType(MediaType.APPLICATION_JSON);
         logoutHeaders.set("Authorization", authToken);
 
-        MvcResult logoutResult = this.mockMvc.perform(post("/api/v1/authentication/logout")
+        MvcResult logoutResult = this.mockMvc.perform(post("/api/v1/user/logout")
                 .headers(logoutHeaders))
             .andExpect(status().isOk())
             .andReturn();
         assertEquals(HttpStatus.OK.value(), logoutResult.getResponse().getStatus());
 
         // Perform another login with the new data
-        MvcResult secondLoginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+        MvcResult secondLoginResult = this.mockMvc.perform(post("/api/v1/user/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(newEmail) // Use the new email for the second login
                     .withPassword(newPassword) // Use the new password for the second login
@@ -316,7 +316,7 @@ public class AuthenticationEndpointTest {
         loginHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         loginHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/authentication/login")
+        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/user/login")
                 .content(new ObjectMapper().writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
                     .withEmail(testuser.getEmail())
                     .withPassword(testUserPassword)
@@ -337,7 +337,7 @@ public class AuthenticationEndpointTest {
         updateHeaders.set("Authorization", authToken);
 
         // Perform update request
-        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/authentication/settings/authentication")
+        MvcResult updateResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/user/settings/authentication")
                 .content(new ObjectMapper().writeValueAsString(updateDto))
                 .headers(updateHeaders))
             .andReturn();
@@ -358,7 +358,7 @@ public class AuthenticationEndpointTest {
         registerDto.setName("testName");
         registerDto.setEmail("testEmail@email.com");
         registerDto.setPasswordEncoded("testPassword");
-        MvcResult registerResult = this.mockMvc.perform(post("/api/v1/authentication/register")
+        MvcResult registerResult = this.mockMvc.perform(post("/api/v1/user/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto))
                 .headers(registerHeaders))
             .andExpect(status().isCreated())
@@ -379,7 +379,7 @@ public class AuthenticationEndpointTest {
         registerDto.setName("testName");
         registerDto.setEmail("testEmail@email.com");
         registerDto.setPasswordEncoded("testPassword");
-        MvcResult registerResult = this.mockMvc.perform(post("/api/v1/authentication/register")
+        MvcResult registerResult = this.mockMvc.perform(post("/api/v1/user/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto))
                 .headers(registerHeaders))
             .andExpect(status().isCreated())
@@ -394,7 +394,7 @@ public class AuthenticationEndpointTest {
         registerDto2.setName("testName");
         registerDto2.setEmail("testEmail@email2.com");
         registerDto2.setPasswordEncoded("testPassword2");
-        MvcResult registerResult2 = this.mockMvc.perform(post("/api/v1/authentication/register")
+        MvcResult registerResult2 = this.mockMvc.perform(post("/api/v1/user/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto2))
                 .headers(registerHeaders))
             .andExpect(status().isConflict())
@@ -407,7 +407,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/request_password_reset")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/request_password_reset")
                 .content("{\"email\":\"" + testuser.getEmail() + "\"}")
                 .headers(requestHeaders))
             .andDo(print())
@@ -423,7 +423,7 @@ public class AuthenticationEndpointTest {
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/request_password_reset")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/request_password_reset")
                 .content("{\"email\":\"" + "thisEmailShouldNotExist@asdf.org" + "\"}")
                 .headers(requestHeaders))
             .andDo(print())
@@ -452,7 +452,7 @@ public class AuthenticationEndpointTest {
         ResetPasswordDto resetDto = new ResetPasswordDto();
         resetDto.setResetId(requestId);
         resetDto.setNewPassword("newPassword");
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/password_reset")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/password_reset")
                 .content((new ObjectMapper()).writeValueAsString(resetDto))
                 .headers(requestHeaders))
             .andDo(print())
@@ -485,7 +485,7 @@ public class AuthenticationEndpointTest {
         ResetPasswordDto resetDto = new ResetPasswordDto();
         resetDto.setResetId("wrongrequestid");
         resetDto.setNewPassword("newPassword");
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/password_reset")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/password_reset")
                 .content((new ObjectMapper()).writeValueAsString(resetDto))
                 .headers(requestHeaders))
             .andDo(print())
@@ -515,7 +515,7 @@ public class AuthenticationEndpointTest {
         ResetPasswordDto resetDto = new ResetPasswordDto();
         resetDto.setResetId(requestId);
         resetDto.setNewPassword("newPassword");
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/password_reset")
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/password_reset")
                 .content((new ObjectMapper()).writeValueAsString(resetDto))
                 .headers(requestHeaders))
             .andDo(print())
