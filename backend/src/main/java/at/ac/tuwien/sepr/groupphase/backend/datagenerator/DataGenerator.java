@@ -16,12 +16,12 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepositor
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRatingRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.PictureService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
 import java.util.Set;
@@ -96,6 +96,7 @@ public class DataGenerator {
         ingredientRepository.deleteAll();
         allergeneRepository.deleteAll();
         profileRepository.deleteAll();
+        passwordResetRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -110,7 +111,8 @@ public class DataGenerator {
         LOGGER.debug("Generating user data");
 
         ApplicationUser user1 = new ApplicationUser().setId(-1L).setEmail("max.mustermann@test.at")
-            .setPasswordEncoded(PasswordEncoder.encode("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", "max.mustermann@test.at")) // "password"
+            .setPasswordEncoded(
+                PasswordEncoder.encode("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8", "max.mustermann@test.at")) // "password"
             .setNickname("maxmuster");
         userRepository.save(user1);
 
@@ -123,7 +125,9 @@ public class DataGenerator {
         profile1.setUser(user1);
         profile1.setName("Musterprofil 1");
         profile1.setAllergens(allergens1);
-        profileRepository.save(profile1);
+        var profile = profileRepository.save(profile1);
+        user1.setActiveProfile(profile);
+        userRepository.save(user1);
 
         at.ac.tuwien.sepr.groupphase.backend.entity.Profile profile2 = new at.ac.tuwien.sepr.groupphase.backend.entity.Profile();
         profile2.setUser(user1);
@@ -139,6 +143,8 @@ public class DataGenerator {
         profile3.setUser(user2);
         profile3.setName("Testprofil 1");
         profile3.setAllergens(allergens1);
-        profileRepository.save(profile3);
+        profile = profileRepository.save(profile3);
+        user2.setActiveProfile(profile);
+        userRepository.save(user2);
     }
 }
