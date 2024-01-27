@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
-import {AuthService} from '../../../services/auth.service';
+import {UserService} from '../../../services/user.service';
 import {PasswordEncoder} from '../../../utils/passwordEncoder';
 import {Router} from '@angular/router';
 import {UpdateAuthenticationSettingsDto} from '../../../dtos/updateAuthenticationSettingsDto';
@@ -26,7 +26,7 @@ export class ChangePasswordComponent implements OnInit {
 
   originalUserSettings: UserSettingsDto;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
     this.settingsForm = this.formBuilder.group({
       currentPassword: ['', [Validators.required, Validators.minLength(8)]],
       password: ['', [Validators.required, Validators.minLength(8)]],

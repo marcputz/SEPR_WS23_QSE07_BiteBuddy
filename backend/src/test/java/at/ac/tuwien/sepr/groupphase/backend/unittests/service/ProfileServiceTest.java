@@ -93,6 +93,7 @@ public class ProfileServiceTest {
     private Long ingredientId;
     private Long profileId;
     private Long profileId2;
+    private Long profileId3;
     private Long testUserId;
     private Long testUserId2;
     private long recipe1Id;
@@ -138,7 +139,8 @@ public class ProfileServiceTest {
         profile2.getDisliked().add(recipe1);
         profileRepository.save(profile2);
 
-        userRepository.save(userRepository.getReferenceById(testUserId2).setActiveProfile(profileRepository.getReferenceById(profileId2)));
+        userRepository.save(userRepository.getReferenceById(testUserId).setActiveProfile(profileRepository.getReferenceById(profileId2)));
+        userRepository.save(userRepository.getReferenceById(testUserId2).setActiveProfile(profileRepository.getReferenceById(profileId3)));
     }
 
     private void generateAllergeneAndIngredientAndTestProfiles() {
@@ -184,7 +186,7 @@ public class ProfileServiceTest {
         try {
             profileId = profileRepository.save(profileMapper.profileDtoToProfile(profileDto)).getId();
             profileId2 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto2)).getId();
-            profileRepository.save(profileMapper.profileDtoToProfile(profileDto3));
+            profileId3 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto3)).getId();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -370,7 +372,7 @@ public class ProfileServiceTest {
 
     @Test
     public void getRatingListsOfExistingProfileReturnsRatingListsOfProfile() {
-        RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId2);
+        RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId);
 
         assertAll("Rating Lists result validation",
             () -> assertNotNull(ratingLists, "Result should not be null"),
@@ -438,7 +440,7 @@ public class ProfileServiceTest {
     @Test
     public void deleteExistingProfile() throws ConflictException {
 
-        ProfileDto deletedProfile = this.profileService.deleteProfile(profileId, testUserId);
+        ProfileDto deletedProfile = profileService.deleteProfile(profileId, testUserId);
 
         assertAll(
             () -> assertEquals(deletedProfile.getId(), profileId),
@@ -449,7 +451,40 @@ public class ProfileServiceTest {
     @Test
     public void deleteProfileNotExistingProfile() {
         assertThrows(NotFoundException.class,
-            () -> this.profileService.deleteProfile(-1L, testUserId));
+            () -> profileService.deleteProfile(-1L, testUserId));
+    }
+
+    @Test
+    public void setActiveProfile_ShouldSucceed_WhenProfileExistsAndBelongsToUser() throws ConflictException, NotFoundException {
+        Long existingUserId = testUserId;
+        Long existingProfileId = profileId;
+
+        profileService.setActiveProfile(existingProfileId, existingUserId);
+
+        ApplicationUser user = userRepository.findById(existingUserId).orElseThrow();
+        assertEquals(existingProfileId, user.getActiveProfile().getId(), "Active profile ID should match the set profile ID");
+    }
+
+    @Test
+    public void setActiveProfile_ShouldThrowNotFoundException_WhenProfileDoesNotExist() {
+        // Assume
+        Long existingUserId = testUserId;
+        Long nonExistentProfileId = -1000L;
+
+        // Act and Assert
+        assertThrows(NotFoundException.class, () -> profileService.setActiveProfile(nonExistentProfileId, existingUserId),
+            "Should throw NotFoundException when profile does not exist");
+    }
+
+    @Test
+    public void setActiveProfile_ShouldThrowConflictException_WhenProfileDoesNotBelongToUser() {
+        // Assume
+        Long existingUserId = testUserId;
+        Long otherUsersProfileId = profileId3;
+
+        // Act and Assert
+        assertThrows(ConflictException.class, () -> profileService.setActiveProfile(otherUsersProfileId, existingUserId),
+            "Should throw ConflictException when profile does not belong to user");
     }
 
 }

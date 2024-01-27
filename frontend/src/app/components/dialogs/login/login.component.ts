@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {AuthService} from '../../../services/auth.service';
+import {UserService} from '../../../services/user.service';
 import {LoginDto} from '../../../dtos/loginDto';
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {ToastrService} from "ngx-toastr";
-import {ApiErrorHandler} from "../../../services/apiErrorHandler";
+import {ErrorHandler} from "../../../services/errorHandler";
 import {ErrorDto} from "../../../dtos/errorDto";
 
 @Component({
@@ -29,8 +29,8 @@ export class LoginComponent implements OnInit {
   loginError: boolean = false;
 
   constructor(private formBuilder: UntypedFormBuilder,
-              private authService: AuthService,
-              private apiErrorHandler: ApiErrorHandler,
+              private authService: UserService,
+              private errorHandler: ErrorHandler,
               private passwordEncoder: PasswordEncoder,
               private router: Router,
               private notification: ToastrService) {
@@ -71,23 +71,15 @@ export class LoginComponent implements OnInit {
       },
       error: error => {
 
-        let errorJson = JSON.parse(error.error);
+        let errorObj = this.errorHandler.getErrorObject(error);
 
-        if (errorJson == undefined || errorJson["statusCode"] == undefined) {
-          this.apiErrorHandler.handleApiError(error);
+        if (errorObj.status == 401) {
+          // unauthorized -> invalid credentials
+          console.warn("Invalid Credentials");
+          this.loginError = true;
+          this.notification.warning("Wrong password or user doesn't exist");
         } else {
-
-          switch (errorJson["statusCode"]) {
-            case 401: // unauthorized -> invalid credentials
-              console.warn("Invalid Credentials");
-              this.loginError = true;
-              this.notification.warning("Wrong password or user doesn't exist");
-              break;
-            default:
-              this.apiErrorHandler.handleApiError(error);
-              break;
-          }
-
+          this.errorHandler.handleApiError(errorObj);
         }
 
       }

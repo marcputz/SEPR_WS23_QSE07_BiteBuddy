@@ -29,26 +29,26 @@ public class SessionManagerTest {
 
     @Order(1)
     @Test
-    public void testStartAndStopSessionWithValidData() {
+    public void testStartAndStopSession_WithValidData_Returns() {
         assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
         assertTrue(SessionManager.getInstance().stopUserSession(testuserAuthtoken));
     }
 
     @Test
-    public void testStartSessionWithNoTokenThrowsException() {
+    public void testStartSession_WithNoToken_ThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
             SessionManager.getInstance().startUserSession(testuser.getId(), null);
         });
     }
 
     @Test
-    public void testStopNonExistingSessionReturnsNull() {
+    public void testStop_WithNonExistingSession_ReturnsNull() {
         String nonExistingSessionToken = AuthTokenUtils.createToken(new ApplicationUser().setId(-1000L).setNickname("test"));
         assertFalse(SessionManager.getInstance().stopUserSession(nonExistingSessionToken));
     }
 
     @Test
-    public void testGetUserFromStartedSession() {
+    public void testGetUser_FromStartedSession_Returns() {
         assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
         assertEquals(testuser.getId(), SessionManager.getInstance().getUserFromAuthToken(testuserAuthtoken));
 
@@ -57,13 +57,13 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testGetUserFromNonExistingSessionReturnsNull() {
+    public void testGetUser_FromNonExistingSession_ReturnsNull() {
         String nonExistingSessionToken = AuthTokenUtils.createToken(new ApplicationUser().setId(-1000L).setNickname("test"));
         assertNull(SessionManager.getInstance().getUserFromAuthToken(nonExistingSessionToken));
     }
 
     @Test
-    public void testGetAuthTokenFromStartedSession() {
+    public void testGetAuthToken_FromStartedSession_Returns() {
         assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
         assertEquals(testuserAuthtoken, SessionManager.getInstance().getAuthTokenForUser(testuser.getId()));
 
@@ -72,7 +72,7 @@ public class SessionManagerTest {
     }
 
     @Test
-    public void testGetAuthtokenFromNonExistingSessionReturnsNull() {
+    public void testGetAuthToken_FromNonExistingSession_ReturnsNull() {
         ApplicationUser nonExistingSessionUser = new ApplicationUser().setId(-1000L).setNickname("test");
         assertNull(SessionManager.getInstance().getAuthTokenForUser(nonExistingSessionUser.getId()));
     }

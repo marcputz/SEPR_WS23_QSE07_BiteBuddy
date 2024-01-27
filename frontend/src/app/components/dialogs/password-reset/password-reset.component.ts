@@ -7,12 +7,13 @@ import {
   ValidatorFn,
   Validators
 } from "@angular/forms";
-import {AuthService} from "../../../services/auth.service";
+import {UserService} from "../../../services/user.service";
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ResetPasswordDto} from "../../../dtos/resetPasswordDto";
 import {ToastrService} from "ngx-toastr";
 import {split, toNumber} from "lodash";
+import {ErrorHandler} from "../../../services/errorHandler";
 
 @Component({
   selector: 'app-password-reset',
@@ -40,8 +41,9 @@ export class PasswordResetComponent implements OnInit {
   protected expirationDate: Date | null;
 
   constructor(private formBuilder: UntypedFormBuilder,
-              private authService: AuthService,
+              private authService: UserService,
               private passwordEncoder: PasswordEncoder,
+              private errorHandler: ErrorHandler,
               private router: Router,
               private activatedRoute: ActivatedRoute,
               private notifications: ToastrService) {
@@ -103,31 +105,22 @@ export class PasswordResetComponent implements OnInit {
             this.requestSuccess = true;
           },
           error: error => {
-            console.error("Could not reset password", error);
 
-            let errorObject;
-            if (typeof error.error === 'object') {
-              errorObject = error.error;
-            } else {
-              errorObject = error;
-            }
+            let errorObj = this.errorHandler.getErrorObject(error);
 
-            let status = errorObject.status;
-            let message = errorObject.error;
-
-            switch (status) {
+            switch (errorObj.status) {
               case 400:
-                // bad request, validation error
-                this.notifications.error("New password does not match requirements");
+                // validation error
+                this.notifications.error("New Password does not match the requirements");
                 break;
               case 401:
-                // unauthorized, invalid request id
-                this.notifications.error("This request is invalid. Please try again!");
+                this.notifications.error("This Request ID is invalid, please try again!");
                 break;
               default:
-                this.notifications.error("Something went wrong on our side, sorry! Please try again later.");
+                this.errorHandler.handleApiError(errorObj);
                 break;
             }
+
             this.requestSent = false;
           }
         });

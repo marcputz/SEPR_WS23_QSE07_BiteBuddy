@@ -122,6 +122,17 @@ public class ProfileEndpoint {
         return profileService.editProfile(profileDto);
     }
 
+    @PostMapping("/setActive/{profileId}")
+    public void setActiveProfile(@PathVariable Long profileId, @RequestHeader HttpHeaders headers)
+        throws AuthenticationException, ConflictException {
+        LOGGER.info("Received POST request to set active profile with ID {}", profileId);
+        this.authenticationService.verifyAuthenticated(headers);
+        String authToken = this.authenticationService.getAuthToken(headers);
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+
+        profileService.setActiveProfile(profileId, currentUserId);
+    }
+
     @PutMapping("/rating/{RecipeId}")
     public void postRating(@Valid @RequestBody RecipeRatingDto recipeRatingDto, @RequestHeader HttpHeaders headers)
         throws ValidationException, NotFoundException, AuthenticationException {

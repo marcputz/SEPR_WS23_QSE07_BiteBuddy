@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService} from "../../services/auth.service";
+import {UserService} from "../../services/user.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
@@ -28,7 +28,7 @@ export class NavbarLayoutComponent implements OnInit {
   error = false;
   errorMessage = '';
 
-  constructor(private authService: AuthService,
+  constructor(private authService: UserService,
               private router: Router,
               private route: ActivatedRoute,
               private notification: ToastrService,

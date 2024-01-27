@@ -4,7 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.auth.SessionManager;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;

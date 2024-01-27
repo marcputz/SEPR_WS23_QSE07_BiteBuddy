@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot} from '@angular/router';
-import {AuthService} from '../services/auth.service';
+import {UserService} from '../services/user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard  {
 
-  constructor(private userService: AuthService,
+  constructor(private userService: UserService,
               private router: Router,
               private activatedRoute: ActivatedRoute) {}
 

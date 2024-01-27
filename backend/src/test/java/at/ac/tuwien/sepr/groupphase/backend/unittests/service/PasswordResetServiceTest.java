@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;

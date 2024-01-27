@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -20,16 +20,18 @@ public class LoginDto {
         return email;
     }
 
-    public void setEmail(String email) {
+    public LoginDto setEmail(String email) {
         this.email = email;
+        return this;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public LoginDto setPassword(String password) {
         this.password = password;
+        return this;
     }
 
     @Override
@@ -55,35 +57,5 @@ public class LoginDto {
             + "email='" + email + '\''
             + ", password='" + password + '\''
             + '}';
-    }
-
-
-    public static final class LoginDtobuilder {
-        private String email;
-        private String password;
-
-        private LoginDtobuilder() {
-        }
-
-        public static LoginDtobuilder anLoginDto() {
-            return new LoginDtobuilder();
-        }
-
-        public LoginDtobuilder withEmail(String email) {
-            this.email = email;
-            return this;
-        }
-
-        public LoginDtobuilder withPassword(String password) {
-            this.password = password;
-            return this;
-        }
-
-        public LoginDto build() {
-            LoginDto userLoginDto = new LoginDto();
-            userLoginDto.setEmail(email);
-            userLoginDto.setPassword(password);
-            return userLoginDto;
-        }
     }
 }
