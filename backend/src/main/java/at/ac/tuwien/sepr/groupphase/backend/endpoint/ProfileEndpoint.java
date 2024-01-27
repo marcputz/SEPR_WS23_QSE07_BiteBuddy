@@ -13,13 +13,9 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,11 +58,6 @@ public class ProfileEndpoint {
         return profileService.searchProfiles(searchParams, currentUserId);
     }
 
-    @Operation(summary = "Create profile", description = "Profile fields should be valid")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Created"),
-        @ApiResponse(responseCode = "422", description = "Unable to process the data, because contains invalid data"),
-        @ApiResponse(responseCode = "400", description = "Illegal arguments in the request body")})
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProfileDto createProfile(@Valid @RequestBody ProfileDto toCreateProfile, @RequestHeader HttpHeaders headers) throws ValidationException, AuthenticationException {
