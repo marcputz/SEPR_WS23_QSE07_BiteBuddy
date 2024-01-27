@@ -18,9 +18,9 @@
           </label>
           <div class="col-md-10 col-lg-8"
           >
-            <ng-container *ngFor="let allergeneName of profileDetails.allergens">
+            <ng-container *ngFor="let allergene of profileDetails.allergens">
               <div class="model">
-                {{allergeneName}}
+                {{allergene.name}}
               </div>
             </ng-container>
           </div>
@@ -38,9 +38,9 @@
           </label>
           <div class="col-md-10 col-lg-8"
           >
-            <ng-container *ngFor="let ingredientName of profileDetails.ingredients">
+            <ng-container *ngFor="let ingredient of profileDetails.ingredients">
               <div class="model" >
-                {{ingredientName}}
+                {{ingredient.name}}
               </div>
             </ng-container>
           </div>
@@ -93,7 +93,7 @@
     <div class="mb-2 col-lg-10">
       <div class="row">
         <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-          Instructions:
+          Creator:
         </label>
         <div class="col-md-10 col-lg-8"
         >

@@ -89,7 +89,7 @@ public class ProfileDto {
         private List<IngredientDto> ingredient;
         private Long userId;
 
-        private ProfileDtoBuilder() {
+        public ProfileDtoBuilder() {
         }
 
         public static ProfileDtoBuilder aProfileDto() {

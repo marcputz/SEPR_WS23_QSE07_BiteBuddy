@@ -106,11 +106,11 @@ export class ProfileEditComponent {
           this.service.editProfile(this.profile)
             .subscribe({
               next: data => {
-                this.notification.success(`Profile ${this.profile?.name} successfully.`);
-                this.router.navigate(['/dashboard']);
+                this.notification.success(`Profile ${this.profile?.name} successfully edited.`);
+                this.router.navigate(['/profiles']);
               },
               error: error => {
-                console.error('Error creating profile', error);
+                console.error('Error editing profile', error);
                 const errorMessage = error?.message || 'Unknown error occured';
                 this.notification.error(`Error creating profile: ${errorMessage}`);
               }

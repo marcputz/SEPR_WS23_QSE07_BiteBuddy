@@ -70,11 +70,11 @@
               <div class="card-body">
                 <p class="card-text"><strong>Restricted Allergens:</strong></p>
                 <ul>
-                  <li *ngFor="let allergen of profile.allergens">{{ allergen }}</li>
+                  <li *ngFor="let allergen of profile.allergens">{{ allergen.name }}</li>
                 </ul>
                 <p class="card-text"><strong>Liked Ingredients:</strong></p>
                 <ul>
-                  <li *ngFor="let ingredient of profile.ingredients">{{ ingredient }}</li>
+                  <li *ngFor="let ingredient of profile.ingredients">{{ ingredient.name }}</li>
                 </ul>
                 <p class="card-text"><strong>Liked Recipes:</strong></p>
                 <ul>
@@ -90,7 +90,15 @@
                   </ng-container>
                   <li *ngIf="profile.disliked.length > 3">...</li>
                 </ul>
-                <button class="btn btn-primary btn-edit">Edit</button>
+                <div class = "buttons-flex">
+                  <button class="btn btn-primary btn-edit edit-button d-flex"
+                          [routerLink]="['/profiles/edit', profile.id]">
+                    Edit
+                  </button>
+                  <button class="btn btn-primary bi-trash delete-button d-flex"
+                          (click)="deleteProfile(profile.id, profile.name)"
+                  ></button>
+                </div>
               </div>
             </div>
           </div>
@@ -171,11 +179,11 @@
               <div class="card-body">
                 <p class="card-text"><strong>Restricted Allergens:</strong></p>
                 <ul>
-                  <li *ngFor="let allergen of profile.allergens">{{ allergen }}</li>
+                  <li *ngFor="let allergen of profile.allergens">{{ allergen.name }}</li>
                 </ul>
                 <p class="card-text"><strong>Liked Ingredients:</strong></p>
                 <ul>
-                  <li *ngFor="let ingredient of profile.ingredients">{{ ingredient }}</li>
+                  <li *ngFor="let ingredient of profile.ingredients">{{ ingredient.name }}</li>
                 </ul>
                 <p class="card-text"><strong>Liked Recipes:</strong></p>
                 <ul>

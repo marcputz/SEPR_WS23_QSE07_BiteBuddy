@@ -1,8 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
@@ -38,23 +36,15 @@ public interface ProfileMapper {
     @Named("profileDtoToProfile")
     Profile profileDtoToProfile(ProfileUserDto profileDto);
 
-    @Mapping(target = "allergens", source = "allergens", qualifiedByName = "allergeneSetToStringList")
-    @Mapping(target = "ingredients", source = "ingredient", qualifiedByName = "ingredientSetToStringList")
+    @Mapping(target = "allergens", source = "allergens", qualifiedByName = "allergeneSetToAllergeneDtoList")
+    @Mapping(target = "ingredients", source = "ingredient", qualifiedByName = "ingredientSetToIngredientDtoList")
     @Mapping(source = "user.nickname", target = "user")
     @Mapping(source = "user.id", target = "userId")
     ProfileDetailDto profileToProfileDetailDto(Profile profile);
 
-    @Named("allergeneSetToStringList")
-    default ArrayList<String> allergeneSetToStringList(Set<Allergene> allergens) {
-        return allergens != null ? new ArrayList<>(allergens.stream()
-            .map(Allergene::getName)
-            .toList()) : new ArrayList<>();
-    }
+    @Named("allergeneSetToAllergeneDtoList")
+    ArrayList<AllergeneDto> allergeneSetToAllergeneDtoList(Set<Allergene> allergens);
 
-    @Named("ingredientSetToStringList")
-    default ArrayList<String> ingredientSetToStringList(Set<Ingredient> ingredients) {
-        return ingredients != null ? new ArrayList<>(ingredients.stream()
-            .map(Ingredient::getName)
-            .toList()) : new ArrayList<>();
-    }
+    @Named("ingredientSetToIngredientDtoList")
+    ArrayList<IngredientDto> ingredientSetToIngredientDtoList(Set<Ingredient> ingredients);
 }

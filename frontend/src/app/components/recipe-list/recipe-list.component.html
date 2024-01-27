@@ -41,18 +41,19 @@
                 <!-- <button class="btn btn-primary btn-add-to-list">+ Add to List</button> -->
               </div>
               </div>
+              <div></div>
               <div class="btn-group d-flex align-items-">
                 <a
                   (click)="rateRecipe(recipe.id, 1)"
                   aria-label="Like Recipe">
-                  <i *ngIf= "likes.includes(recipe.id); else elseBlock" class="bi bi-hand-thumbs-up-fill"></i>
-                  <ng-template #elseBlock><i class="bi bi-hand-thumbs-up"></i></ng-template>
+                  <i *ngIf= "likes.includes(recipe.id); else notFilledUp" class="bi bi-hand-thumbs-up-fill"></i>
+                  <ng-template #notFilledUp><i class="bi bi-hand-thumbs-up"></i></ng-template>
                 </a>
                 <a
                   (click)="rateRecipe(recipe.id, 0)"
                   aria-label="Dislike Recipe">
-                  <i *ngIf= "dislikes.includes(recipe.id); else elseBlock" class="bi bi-hand-thumbs-down-fill"></i>
-                  <ng-template #elseBlock><i class="bi bi-hand-thumbs-down"></i></ng-template>
+                  <i *ngIf= "dislikes.includes(recipe.id); else notFilledDown" class="bi bi-hand-thumbs-down-fill"></i>
+                  <ng-template #notFilledDown><i class="bi bi-hand-thumbs-down"></i></ng-template>
                 </a>
               </div>
               <div></div>
@@ -205,15 +206,15 @@
             <a class="btn btn-sm btn-success"
                (click)="rateRecipe(recipe.id, 1)"
                aria-label="Like Recipe">
-              <i *ngIf="likes.includes(recipe.id); else elseBlock" class="bi bi-hand-thumbs-up-fill"></i>
-              <ng-template #elseBlock><i class="bi bi-hand-thumbs-up"></i></ng-template>
+              <i *ngIf="likes.includes(recipe.id); else notFilledUp" class="bi bi-hand-thumbs-up-fill"></i>
+              <ng-template #notFilledUp><i class="bi bi-hand-thumbs-up"></i></ng-template>
 
             </a>
             <a class="btn btn-sm btn-danger"
                (click)="rateRecipe(recipe.id, 0)"
                aria-label="Dislike Recipe">
-              <i *ngIf="dislikes.includes(recipe.id); else elseBlock" class="bi bi-hand-thumbs-down-fill"></i>
-              <ng-template #elseBlock><i class="bi bi-hand-thumbs-down"></i></ng-template>
+              <i *ngIf="dislikes.includes(recipe.id); else notFilledDown" class="bi bi-hand-thumbs-down-fill"></i>
+              <ng-template #notFilledDown><i class="bi bi-hand-thumbs-down"></i></ng-template>
             </a>
           </div>
         </div>

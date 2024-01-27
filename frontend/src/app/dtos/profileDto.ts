@@ -42,8 +42,8 @@ export interface CheckRatingDto {
 export interface ProfileDetailDto {
     id: number,
     name: string,
-    allergens: string[],
-    ingredients: string[],
+    allergens: AllergeneDto[],
+    ingredients: IngredientDto[],
     liked: RecipeProfileViewDto[],
     disliked: RecipeProfileViewDto[],
     user: string,

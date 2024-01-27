@@ -37,3 +37,16 @@
   color: var(--bs-card-title-color);
   text-decoration: none;
 }
+
+.delete-button {
+  align-self: end;
+}
+
+.edit-button {
+  align-self: start;
+}
+
+.buttons-flex {
+  display: flex;
+  justify-content: space-between;
+}

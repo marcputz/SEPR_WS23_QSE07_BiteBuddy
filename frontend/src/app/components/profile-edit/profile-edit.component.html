@@ -12,7 +12,7 @@
                class="bb-input-textfield form-control"
                id="name"
                aria-describedby="nameHelp"
-               placeholder="Enter name"
+               value ={{previousProfileDetails.name}}
                required
         >
       </div>
@@ -26,7 +26,8 @@
         <select multiple class="form-select"
                 id = "allergens"
                 formControlName="allergens"
-                required>
+                required
+                [(ngModel)]="previousProfileDetails.allergens">
           <option *ngFor="let allergene of allergens"
                   [value]="allergene">
           {{allergene.name}}

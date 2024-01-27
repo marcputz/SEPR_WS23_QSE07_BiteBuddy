@@ -116,4 +116,18 @@ export class ProfileListComponent {
                 this.ownProfiles.push(newProfile);
             });
     }
+
+    deleteProfile(profileId: number, profileName: string){
+      this.profileService.deleteProfile(profileId).subscribe({
+        next: data => {
+          this.notification.success(`Profile ${profileName} successfully deleted.`);
+          this.reloadProfiles(this.ownSearchParams, true);
+        },
+        error: error => {
+          console.error('Error deleting profile', error);
+          const errorMessage = error?.error || 'Unknown error occured';
+          this.notification.error(`Error deleting profile: ${errorMessage}`);
+        }
+      });
+    }
 }

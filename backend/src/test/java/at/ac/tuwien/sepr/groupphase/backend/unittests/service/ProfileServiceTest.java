@@ -20,6 +20,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
@@ -220,8 +221,8 @@ public class ProfileServiceTest {
             () -> assertEquals("Asian", resultProfile.name(), "Profile name should be 'Asian'"),
             () -> assertEquals(profileId, resultProfile.id(), "Profile ID should match the expected profileId"),
             () -> assertEquals(testUserId, resultProfile.userId(), "Profile ID should match the expected profileId"),
-            () -> assertEquals("Gluten", resultProfile.allergens().get(0), "First allergen should be 'Gluten'"),
-            () -> assertEquals("Rice", resultProfile.ingredients().get(0), "First ingredient should be 'Rice'")
+            () -> assertEquals("Gluten", resultProfile.allergens().get(0).getName(), "First allergen should be 'Gluten'"),
+            () -> assertEquals("Rice", resultProfile.ingredients().get(0).getName(), "First ingredient should be 'Rice'")
         );
     }
 
@@ -432,6 +433,23 @@ public class ProfileServiceTest {
 
         assertThrows(NotFoundException.class,
             () -> profileService.editProfile(testProfileDto));
+    }
+
+    @Test
+    public void deleteExistingProfile() throws ConflictException {
+
+        ProfileDto deletedProfile = this.profileService.deleteProfile(profileId, testUserId);
+
+        assertAll(
+            () -> assertEquals(deletedProfile.getId(), profileId),
+            () -> assertTrue(profileRepository.findById(profileId).isEmpty())
+        );
+    }
+
+    @Test
+    public void deleteProfileNotExistingProfile(){
+        assertThrows(NotFoundException.class,
+            () -> this.profileService.deleteProfile(-1L, testUserId));
     }
 
 }

@@ -75,4 +75,9 @@ export class ProfileService {
         return this.http.post<ProfileDetailDto>(`${this.baseUri}/copyToOwn/${profileId}`, null)
     }
 
+    deleteProfile(profileId: number): Observable<ProfileDto>{
+      console.log(`${this.baseUri}/deleteProfile/${profileId}`)
+      return this.http.delete<ProfileDto>(`${this.baseUri}/deleteProfile/${profileId}`);
+    }
+
 }
