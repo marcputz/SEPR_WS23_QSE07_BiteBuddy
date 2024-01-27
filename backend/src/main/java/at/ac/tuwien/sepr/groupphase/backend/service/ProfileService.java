@@ -104,5 +104,18 @@ public interface ProfileService {
      */
     ProfileDto deleteProfile(Long profileId, Long userId) throws NotFoundException, ConflictException;
 
-    void setActiveProfile(Long profileId, Long currentUserId) throws ConflictException;
+    /**
+     * Sets the active profile for a user.
+     *
+     * <p>Ensures the profile and user exist and that the profile belongs to the user. If the profile
+     * is already active for the user, no changes are made. Throws {@link NotFoundException} if the
+     * profile or user is not found, and {@link ConflictException} if the profile does not belong to
+     * the user.
+     *
+     * @param profileId The ID of the profile to be activated.
+     * @param userId    The ID of the user.
+     * @throws NotFoundException If the profile or user is not found.
+     * @throws ConflictException If the profile does not belong to the user.
+     */
+    void setActiveProfile(Long profileId, Long userId) throws ConflictException;
 }
