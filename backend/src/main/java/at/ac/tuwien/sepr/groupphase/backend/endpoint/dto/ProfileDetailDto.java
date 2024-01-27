@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public record ProfileDetailDto(
     Long id,
     String name,
-    ArrayList<String> allergens,
-    ArrayList<String> ingredients,
+    ArrayList<AllergeneDto> allergens,
+    ArrayList<IngredientDto> ingredients,
     ArrayList<RecipeGetByIdDto> liked,
     ArrayList<RecipeGetByIdDto> disliked,
     String user,

@@ -1,12 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapperImpl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapperImpl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapperImpl;
@@ -37,6 +32,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -175,8 +171,8 @@ public class ProfileEndpointTest {
             () -> assertEquals("Asian", resultProfile.name(), "Profile name should be 'Asian'"),
             () -> assertEquals(profileId, resultProfile.id(), "Profile ID should match the expected profileId"),
             () -> assertEquals(testUserId, resultProfile.userId(), "Profile ID should match the expected profileId"),
-            () -> assertEquals("Gluten", resultProfile.allergens().get(0), "First allergen should be 'Gluten'"),
-            () -> assertEquals("Rice", resultProfile.ingredients().get(0), "First ingredient should be 'Rice'")
+            () -> assertEquals("Gluten", resultProfile.allergens().get(0).getName(), "First allergen should be 'Gluten'"),
+            () -> assertEquals("Rice", resultProfile.ingredients().get(0).getName(), "First ingredient should be 'Rice'")
         );
     }
 
@@ -203,4 +199,8 @@ public class ProfileEndpointTest {
         assertEquals(testUserId, resultProfileDto.userId(), "User Id should be same as testUserId");
         profileRepository.deleteById(resultProfileDto.id());
     }
+
+
+
+
 }
