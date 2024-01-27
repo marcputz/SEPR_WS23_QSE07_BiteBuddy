@@ -92,18 +92,6 @@ public class RecipeServiceTest {
     private long rd2Id;
     private ApplicationUser user;
 
-
-    @BeforeEach
-    public void setupUsers() {
-        ApplicationUser user = new ApplicationUser();
-        user.setId(1L);
-        user.setNickname("testuser");
-        user.setEmail("test@test");
-        user.setPasswordEncoded(PasswordEncoder.encode("password", "test@test"));
-
-        this.user = this.userRepository.save(user);
-    }
-
     public String authenticate() throws Exception {
         LoginDto dto = new LoginDto();
         dto.setEmail("test@test");
@@ -113,6 +101,14 @@ public class RecipeServiceTest {
 
     @BeforeEach
     public void setup() {
+        ApplicationUser user = new ApplicationUser();
+        user.setNickname("testuser");
+        user.setEmail("test@test");
+        user.setPasswordEncoded(PasswordEncoder.encode("password", "test@test"));
+
+        this.userRepository.save(user);
+
+        this.user = this.userRepository.findByNickname("testuser").get();
 
         // creating ingredients
         // adding apple
@@ -138,7 +134,7 @@ public class RecipeServiceTest {
         recipe1Id = recipeRepository.save(recipe1).getId();
 
         Recipe recipe2 = new Recipe();
-        recipe2.setCreatorId(1L);
+        recipe2.setCreatorId(this.user.getId());
         recipe2.setInstructions("Instructions2");
         recipe2.setName("recipe 2");
         recipe2Id = recipeRepository.save(recipe2).getId();
@@ -221,7 +217,7 @@ public class RecipeServiceTest {
             .extracting(Recipe::getId, Recipe::getName, Recipe::getCreatorId)
             .contains(
                 tuple(recipe1Id, "recipe 1", -1L),
-                tuple(recipe2Id, "recipe 2", 1L)
+                tuple(recipe2Id, "recipe 2", this.user.getId())
             );
     }
 
