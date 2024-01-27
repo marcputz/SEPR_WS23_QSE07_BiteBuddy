@@ -5,20 +5,17 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredient
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
@@ -46,25 +43,19 @@ public class RecipeServiceImpl implements RecipeService {
     private RecipeRepository recipeRepository;
     private RecipeIngredientRepository recipeIngredientRepository;
     private RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
-    private IngredientRepository ingredientRepository;
     private AllergeneIngredientRepository allergeneIngredientRepository;
-    private AllergeneRepository allergeneRepository;
     private RecipeValidator validator;
     private IngredientServiceImpl ingredientService;
     private JpaUserService userService;
 
     @Autowired
     public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeIngredientRepository recipeIngredientRepository,
-                             RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
-                             AllergeneIngredientRepository allergeneIngredientRepository,
-                             AllergeneRepository allergeneRepository, RecipeValidator validator, IngredientServiceImpl ingredientService) {
-                             IngredientRepository ingredientRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                             AllergeneRepository allergeneRepository, RecipeValidator validator, JpaUserService userService) {
+                             RecipeIngredientDetailsRepository recipeIngredientDetailsRepository, AllergeneIngredientRepository allergeneIngredientRepository,
+                             RecipeValidator validator, IngredientServiceImpl ingredientService, JpaUserService userService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
-        this.allergeneRepository = allergeneRepository;
         this.validator = validator;
         this.ingredientService = ingredientService;
         this.userService = userService;
@@ -248,7 +239,7 @@ public class RecipeServiceImpl implements RecipeService {
         List<RecipeIngredientDetails> rids = this.recipeIngredientDetailsRepository.findByIngredientContainingIgnoreCase(name);
         List<RecipeIngredient> results = new ArrayList<>();
 
-        for (RecipeIngredientDetails details: rids) {
+        for (RecipeIngredientDetails details : rids) {
             List<RecipeIngredient> queryResult = this.recipeIngredientRepository.findByAmountEquals(details);
 
             if (!queryResult.isEmpty()) {
@@ -305,14 +296,12 @@ public class RecipeServiceImpl implements RecipeService {
 
                 String creatorName = "BiteBuddy";
                 if (recipe.get().getCreatorId() >= 0) {
-                    var creator = this.userService.getUserById(recipe.get().getCreatorId());
+                    ApplicationUser creator = this.userService.getUserById(recipe.get().getCreatorId());
                     creatorName = creator.getNickname();
                 }
 
                 RecipeDetailsDto detailsDto =
                     new RecipeDetailsDto(id, recipe.get().getName(), creatorName, recipe.get().getInstructions(), newIngredients, allergens,
-                        recipe.get().getPicture());
-                    new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions(), newIngredients, allergens,
                         recipe.get().getPictureId());
                 return detailsDto;
             }
