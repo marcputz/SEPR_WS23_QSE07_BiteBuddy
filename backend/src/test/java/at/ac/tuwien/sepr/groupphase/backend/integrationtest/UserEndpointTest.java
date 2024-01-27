@@ -142,6 +142,47 @@ public class UserEndpointTest {
     }
 
     @Test
+    public void testLogin_WithTwoUsersSimultaneously_isOK() throws Exception {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/login")
+                .content((new ObjectMapper()).writeValueAsString(new LoginDto()
+                    .setEmail(testuser.getEmail())
+                    .setPassword("password")))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        String authToken = response.getContentAsString();
+
+        assertAll(
+            () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
+            () -> assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType()),
+            () -> assertNotNull(authToken),
+            () -> assertEquals("Bearer ", authToken.substring(0, 7))
+        );
+
+        MvcResult mvcResult2 = this.mockMvc.perform(post("/api/v1/user/login")
+                .content((new ObjectMapper()).writeValueAsString(new LoginDto()
+                    .setEmail(testuser2.getEmail())
+                    .setPassword("password2")))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response2 = mvcResult2.getResponse();
+        String authToken2 = response2.getContentAsString();
+
+        assertAll(
+            () -> assertEquals(HttpStatus.OK.value(), response2.getStatus()),
+            () -> assertEquals(MediaType.APPLICATION_JSON_VALUE, response2.getContentType()),
+            () -> assertNotNull(authToken2),
+            () -> assertEquals("Bearer ", authToken2.substring(0, 7))
+        );
+    }
+
+    @Test
     public void testLogoutApi_withValidToken_isOk() throws Exception {
         // given
         HttpHeaders requestHeaders = new HttpHeaders();
