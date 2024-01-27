@@ -52,6 +52,13 @@
   cursor: pointer;
 }
 
+@media (max-width: 1440px) {
+  .card-body {
+    min-height: 11rem;
+    max-height: fit-content;
+  }
+}
+
 .col-recipe {
   margin-right: -3rem !important;
 }

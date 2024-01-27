@@ -8,7 +8,7 @@ import {LoginComponent} from './components/dialogs/login/login.component';
 import {RecipeListComponent} from './components/recipe-list/recipe-list.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
-import {RegisterComponent} from './components/dialogs/register/register.component';
+import {RegisterComponent} from './components/register/register.component';
 import { RequestPasswordResetComponent } from './components/dialogs/request-password-reset/request-password-reset.component';
 import {PasswordResetComponent} from './components/dialogs/password-reset/password-reset.component';
 import {RecipeDetailComponent} from './components/recipe-detail/recipe-detail.component';

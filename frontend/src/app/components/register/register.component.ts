@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
-import {UserService} from "../../../services/user.service";
+import {UserService} from '../../services/user.service';
 import {Router} from "@angular/router";
-import {RegisterDto} from "../../../dtos/registerDto";
-import {PasswordEncoder} from "../../../utils/passwordEncoder";
+import {RegisterDto} from "../../dtos/registerDto";
+import {PasswordEncoder} from "../../utils/passwordEncoder";
 import {ToastrService} from "ngx-toastr";
 
 

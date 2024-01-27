@@ -21,7 +21,6 @@ import {RecipeDetailsDto} from "../../../dtos/recipe";
 export class ProfileComponent {
 
   title: string = "Set up your Profile"
-  subtitle1: string = "Before we start we need a few informations about you."
 
   submitted = false;
   isInputFocused: {[key: string]: boolean } = {};
@@ -47,8 +46,8 @@ export class ProfileComponent {
       // Initialize the form in the constructor
       this.form = this.fb.group({
           name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(255)]],
-          allergens: [[], Validators.required],
-          ingredient: [[], Validators.required],
+          allergens: [[]],
+          ingredient: [[]],
       });
   }
 
