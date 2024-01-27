@@ -10,7 +10,7 @@ import {UserSettingsDto} from '../dtos/userSettingsDto';
 import {UpdateAuthenticationSettingsDto} from '../dtos/updateAuthenticationSettingsDto';
 import {ResetPasswordDto} from "../dtos/resetPasswordDto";
 import {UpdateUserSettingsDto} from '../dtos/updateUserSettingsDto';
-import {ApiErrorHandler} from "./apiErrorHandler";
+import {ErrorHandler} from "./errorHandler";
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,7 @@ export class UserService {
 
   private authBaseUri: string = this.globals.backendUri + '/user';
 
-  constructor(private httpClient: HttpClient, private globals: Globals, private apiErrorHandler: ApiErrorHandler) {
+  constructor(private httpClient: HttpClient, private globals: Globals, private apiErrorHandler: ErrorHandler) {
   }
 
   /**

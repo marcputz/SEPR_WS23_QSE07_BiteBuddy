@@ -5,7 +5,7 @@ import {UserService} from '../../../services/user.service';
 import {LoginDto} from '../../../dtos/loginDto';
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {ToastrService} from "ngx-toastr";
-import {ApiErrorHandler} from "../../../services/apiErrorHandler";
+import {ErrorHandler} from "../../../services/errorHandler";
 import {ErrorDto} from "../../../dtos/errorDto";
 
 @Component({
@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: UserService,
-              private apiErrorHandler: ApiErrorHandler,
+              private apiErrorHandler: ErrorHandler,
               private passwordEncoder: PasswordEncoder,
               private router: Router,
               private notification: ToastrService) {
