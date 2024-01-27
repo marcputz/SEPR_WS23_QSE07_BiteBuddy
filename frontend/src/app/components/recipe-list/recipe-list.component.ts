@@ -59,7 +59,7 @@ export class RecipeListComponent implements OnInit {
     this.searchChangedObservable
       .pipe(debounceTime(300))
       .subscribe({next: () => this.reloadRecipes()});
-    
+
       this.authService.getUser().subscribe(
           (settings: UserSettingsDto) => {
               this.profileService.getRatingLists(settings.id)
@@ -73,9 +73,8 @@ export class RecipeListComponent implements OnInit {
                           const errorMessage = error?.error || 'Unknown error occured';
                           if(error.message.includes("404")){
                             this.router.navigate(["/profile"])
-                            this.notification.error("You need to create a profile before using the Website")
-                          }
-                          else{
+                            this.notification.error("You need to create a profile before using the Website");
+                          }else{
                             this.notification.error(`Error getting rating lists: ${errorMessage}`);
                           }
                       }
