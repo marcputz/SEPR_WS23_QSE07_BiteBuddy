@@ -19,6 +19,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
@@ -35,9 +36,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -52,6 +55,8 @@ public class ProfileServiceImpl implements ProfileService {
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
     private final RecipeMapper recipeMapper;
+    private final AllergeneMapper allergeneMapper;
+    private final IngredientMapper ingredientMapper;
 
     public ProfileServiceImpl(ProfileRepository profileRepository, AllergeneRepository allergeneRepository,
                               ProfileMapper profileMapper, IngredientRepository ingredientRepository,
@@ -66,6 +71,8 @@ public class ProfileServiceImpl implements ProfileService {
         this.profileValidator = profileValidator;
         this.userRepository = userRepository;
         this.recipeMapper = recipeMapper;
+        this.allergeneMapper = allergeneMapper;
+        this.ingredientMapper = ingredientMapper;
     }
 
     @Override
@@ -219,32 +226,9 @@ public class ProfileServiceImpl implements ProfileService {
         } else {
             profile = profileOptional.get();
         }
-        ArrayList<String> allergens = new ArrayList<>();
-        if (profile.getAllergens() != null) {
-            for (Allergene allergene : profile.getAllergens()) {
-                allergens.add(allergene.getName());
-            }
-        }
 
-        ArrayList<String> ingredients = new ArrayList<>();
-        if (profile.getIngredient() != null) {
-            for (Ingredient ingredient : profile.getIngredient()) {
-                ingredients.add(ingredient.getName());
-            }
-        }
+        ProfileDetailDto profileDetails = profileMapper.profileToProfileDetailDto(profile);
 
-        ArrayList<RecipeGetByIdDto> liked = new ArrayList<>();
-        for (Recipe recipe : profile.getLiked()) {
-            liked.add(new RecipeGetByIdDto(recipe.getId(), recipe.getName()));
-        }
-
-        ArrayList<RecipeGetByIdDto> disliked = new ArrayList<>();
-        for (Recipe recipe : profile.getDisliked()) {
-            disliked.add(new RecipeGetByIdDto(recipe.getId(), recipe.getName()));
-        }
-
-        ProfileDetailDto profileDetails = new ProfileDetailDto(profile.getId(), profile.getName(),
-            allergens, ingredients, liked, disliked, profile.getUser().getNickname(), profile.getUser().getId());
 
         return profileDetails;
     }
@@ -303,13 +287,30 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void deleteProfile(Long profileId) throws NotFoundException {
+    public ProfileDto deleteProfile(Long profileId, Long userId) throws NotFoundException, ConflictException {
+        LOGGER.trace("deleteProfile({})", profileId);
         Optional<Profile> profileToDelete = profileRepository.findById(profileId);
 
         if (profileToDelete.isEmpty()) {
             throw new NotFoundException("Profile does not exist");
         }
+        Optional<ApplicationUser> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new NotFoundException("User does not exist");
+        }
+
+        Profile profile = profileToDelete.get();
+
+        ApplicationUser currentUser = user.get();
+
+        if (Objects.equals(currentUser.getActiveProfile().getId(), profile.getId())) {
+            ArrayList<String> conflictErrors = new ArrayList<>();
+            conflictErrors.add("can not delete " + profile.getName());
+            throw new ConflictException("The active profile can not be deleted", conflictErrors);
+        }
 
         profileRepository.delete(profileToDelete.get());
+
+        return profileMapper.profileToProfileDto(profile);
     }
 }

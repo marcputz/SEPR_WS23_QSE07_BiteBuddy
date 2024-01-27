@@ -6,6 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
@@ -89,7 +90,8 @@ public interface ProfileService {
      *
      * @param profileId to edit
      * @throws NotFoundException if the profile does not exist in the database
+     * @throws ConflictException if the user tries to delete the active profile
      */
-    void deleteProfile(Long profileId) throws NotFoundException;
+    ProfileDto deleteProfile(Long profileId, Long userId) throws NotFoundException, ConflictException;
 
 }
