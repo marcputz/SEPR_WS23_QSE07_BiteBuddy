@@ -49,7 +49,7 @@ const routes: Routes = [
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
   ]},
   {
-    path: 'profiles', children: [
+    path: 'profiles', canActivate: mapToCanActivate([AuthGuard]), component: NavbarLayoutComponent, children: [
       {path: '', component: ProfileListComponent},
       {path: ':id', component: ProfileDetailsComponent},
       {path: '', component: DialogLayoutComponent, children: [
