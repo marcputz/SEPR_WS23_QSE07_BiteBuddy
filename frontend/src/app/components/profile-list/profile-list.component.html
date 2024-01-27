@@ -27,7 +27,7 @@
             <form class="d-flex" (submit)="reloadOwnProfiles()">
               <input type="text" id="searchProfile" name="searchProfile" class="form-control"
                      placeholder="Search your Profiles" [(ngModel)]="ownSearchParams.name"
-                     (ngModelChange)="searchChanged()" aria-label="Search Profiles">
+                     (ngModelChange)="searchOwnChanged()" aria-label="Search Profiles">
             </form>
           </div>
 
@@ -64,11 +64,17 @@
               <div class="card-body">
                 <p class="card-text"><strong>Restricted Allergens:</strong></p>
                 <ul>
-                  <li *ngFor="let allergen of profile.allergens">{{ allergen.name }}</li>
+                  <ng-container *ngFor="let allergen of profile.allergens; let i = index">
+                    <li *ngIf="i < 3">{{ allergen.name }}</li>
+                  </ng-container>
+                  <li *ngIf="profile.allergens.length > 3">...</li>
                 </ul>
                 <p class="card-text"><strong>Liked Ingredients:</strong></p>
                 <ul>
-                  <li *ngFor="let ingredient of profile.ingredients">{{ ingredient.name }}</li>
+                  <ng-container *ngFor="let ingredient of profile.ingredients; let i = index">
+                    <li *ngIf="i < 3">{{ ingredient.name }}</li>
+                  </ng-container>
+                  <li *ngIf="profile.ingredients.length > 3">...</li>
                 </ul>
                 <p class="card-text"><strong>Liked Recipes:</strong></p>
                 <ul>
@@ -141,10 +147,10 @@
           <div class="col">
             <form class="d-flex flex-row w-auto" (submit)="reloadDiscoverProfiles()">
               <div class="input-group">
-                <input type="text" id="searchProfile2" name="searchProfile" class="form-control"
-                       placeholder="Search for profiles or @creators. "
-                       aria-label="Search for profiles or @creators"
-                       [(ngModel)]="ownSearchParams.name" (ngModelChange)="searchChanged()">
+                <input type="text" id="searchProfile2" name="searchProfile2" class="form-control"
+                       placeholder="Search for profiles"
+                       aria-label="Search for profiles"
+                       [(ngModel)]="discoverSearchParams.name" (ngModelChange)="searchDiscoverChanged()">
               </div>
             </form>
           </div>
@@ -173,11 +179,17 @@
               <div class="card-body">
                 <p class="card-text"><strong>Restricted Allergens:</strong></p>
                 <ul>
-                  <li *ngFor="let allergen of profile.allergens">{{ allergen.name }}</li>
+                  <ng-container *ngFor="let allergen of profile.allergens; let i = index">
+                    <li *ngIf="i < 3">{{ allergen.name }}</li>
+                  </ng-container>
+                  <li *ngIf="profile.allergens.length > 3">...</li>
                 </ul>
                 <p class="card-text"><strong>Liked Ingredients:</strong></p>
                 <ul>
-                  <li *ngFor="let ingredient of profile.ingredients">{{ ingredient.name }}</li>
+                  <ng-container *ngFor="let ingredient of profile.ingredients; let i = index">
+                    <li *ngIf="i < 3">{{ ingredient.name }}</li>
+                  </ng-container>
+                  <li *ngIf="profile.ingredients.length > 3">...</li>
                 </ul>
                 <p class="card-text"><strong>Liked Recipes:</strong></p>
                 <ul>
