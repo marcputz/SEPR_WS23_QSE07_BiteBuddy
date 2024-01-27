@@ -3,7 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
@@ -106,10 +106,9 @@ public class ProfileEndpointTest {
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
-                .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
-                    .withEmail(testUser.getEmail())
-                    .withPassword(testUserPassword)
-                    .build()))
+                .content((new ObjectMapper()).writeValueAsString(new LoginDto()
+                    .setEmail(testUser.getEmail())
+                    .setPassword(testUserPassword)))
                 .headers(requestHeaders)).andExpect(status().isOk())
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();

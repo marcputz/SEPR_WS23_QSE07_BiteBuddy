@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
@@ -50,10 +50,9 @@ public class AuthenticationServiceTest {
 
     @Test
     void testLogin_WithValidData_Returns() throws Exception {
-        LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(testuser.getEmail())
-            .withPassword("password")
-            .build();
+        LoginDto dto = new LoginDto()
+            .setEmail(testuser.getEmail())
+            .setPassword("password");
 
         assertDoesNotThrow(() -> service.loginUser(dto));
 
@@ -63,20 +62,19 @@ public class AuthenticationServiceTest {
 
     @Test
     void testLogin_WithInvalidData_ThrowsAuthenticationError() {
-        LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail("thisEmailDoesNotExist@authenticationtest.test")
-            .withPassword("password")
-            .build();
+        LoginDto dto = new LoginDto()
+            .setEmail("thisEmailDoesNotExist@authenticationtest.test")
+            .setPassword("password");
 
         assertThrows(AuthenticationException.class, () -> service.loginUser(dto));
     }
 
     @Test
     void testLogout_WithValidSession_Returns() throws Exception {
-        LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(testuser.getEmail())
-            .withPassword("password")
-            .build();
+        LoginDto dto = new LoginDto()
+            .setEmail(testuser.getEmail())
+            .setPassword("password");
+
         String authToken = service.loginUser(dto);
 
         // logout
@@ -90,10 +88,9 @@ public class AuthenticationServiceTest {
 
     @Test
     void testLogout_WithLoggedInUser_Returns() throws Exception {
-        LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(testuser.getEmail())
-            .withPassword("password")
-            .build();
+        LoginDto dto = new LoginDto()
+            .setEmail(testuser.getEmail())
+            .setPassword("password");
         service.loginUser(dto);
 
         // logout
@@ -113,10 +110,9 @@ public class AuthenticationServiceTest {
 
     @Test
     void testVerifyAuthenticated_WithValidToken_Returns() throws Exception {
-        LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(testuser.getEmail())
-            .withPassword("password")
-            .build();
+        LoginDto dto = new LoginDto()
+            .setEmail(testuser.getEmail())
+            .setPassword("password");
         service.loginUser(dto);
         String authToken = service.loginUser(dto);
 
@@ -130,10 +126,9 @@ public class AuthenticationServiceTest {
 
     @Test
     void testVerifyAuthenticated_WithValidHeaders_Returns() throws Exception {
-        LoginDto dto = LoginDto.LoginDtobuilder.anLoginDto()
-            .withEmail(testuser.getEmail())
-            .withPassword("password")
-            .build();
+        LoginDto dto = new LoginDto()
+            .setEmail(testuser.getEmail())
+            .setPassword("password");
         service.loginUser(dto);
         String authToken = service.loginUser(dto);
 
