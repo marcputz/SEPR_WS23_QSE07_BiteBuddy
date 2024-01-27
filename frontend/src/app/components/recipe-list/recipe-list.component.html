@@ -23,32 +23,33 @@
     <div class="row row-form">
       <div class="col-md-3 mb-5" *ngFor="let recipe of recipes">
         <div class="card recipe-card">
-          <img *ngIf="getImageFor(recipe) !== null" [src]="sanitizeImage(getImageFor(recipe))" class="card-img-top rounded-top img-zoom" alt="Recipe Image">
+          <img *ngIf="getImageFor(recipe) !== null" [src]="sanitizeImage(getImageFor(recipe))"
+               class="card-img-top rounded-top img-zoom" alt="Recipe Image">
           <div class="card-body">
             <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
               <h5 class="card-title">{{ recipe.name }}</h5>
             </a><br>
             <p class="card-text">Number of Persons: 4 persons | </p>
-            <div class = "userinfo-buttons-space">
+            <div class="userinfo-buttons-space">
               <div class="user-info d-flex align-items-center">
                 <img src="assets/icons/user_default.png" class="rounded-circle user-icon" alt="User Icon">
                 <div class="user-details ms-3">
-                <p class="user-name">user name</p>
-                <!-- <button class="btn btn-primary btn-add-to-list">+ Add to List</button> -->
-              </div>
+                  <p class="user-name">user name</p>
+                  <!-- <button class="btn btn-primary btn-add-to-list">+ Add to List</button> -->
+                </div>
               </div>
               <div></div>
               <div class="btn-group d-flex align-items-">
                 <a
                   (click)="rateRecipe(recipe.id, 1)"
                   aria-label="Like Recipe">
-                  <i *ngIf= "likes.includes(recipe.id); else notFilledUp" class="bi bi-hand-thumbs-up-fill"></i>
+                  <i *ngIf="likes.includes(recipe.id); else notFilledUp" class="bi bi-hand-thumbs-up-fill"></i>
                   <ng-template #notFilledUp><i class="bi bi-hand-thumbs-up"></i></ng-template>
                 </a>
                 <a
                   (click)="rateRecipe(recipe.id, 0)"
                   aria-label="Dislike Recipe">
-                  <i *ngIf= "dislikes.includes(recipe.id); else notFilledDown" class="bi bi-hand-thumbs-down-fill"></i>
+                  <i *ngIf="dislikes.includes(recipe.id); else notFilledDown" class="bi bi-hand-thumbs-down-fill"></i>
                   <ng-template #notFilledDown><i class="bi bi-hand-thumbs-down"></i></ng-template>
                 </a>
               </div>
@@ -189,10 +190,9 @@
   <div class="row">
     <div class="col-md-auto p-3" *ngFor="let recipe of recipes">
       <div class="card border-primary">
-        <img *ngIf="getImageFor(recipe) !== null" [src]="sanitizeImage(getImageFor(recipe))" class="card-img-top rounded-top img-zoom" alt="Recipe Image">
-
-        <img class="card-img-top img-thumbnail" *ngIf="getImageFor(recipe) !== null" [src]="sanitizeImage(getImageFor(recipe))" alt="Image of recipe">
-          <h5 class="card-title m-1">{{recipe.name}}</h5>
+        <img class="card-img-top img-thumbnail" *ngIf="getImageFor(recipe) !== null"
+             [src]="sanitizeImage(getImageFor(recipe))" alt="Image of recipe">
+        <h5 class="card-title m-1">{{recipe.name}}</h5>
         <p class="card-text m-1">Preview of the recipe, but currently not implemented</p>
         <div class="row-cols-3">
           <div class="btn-group">
