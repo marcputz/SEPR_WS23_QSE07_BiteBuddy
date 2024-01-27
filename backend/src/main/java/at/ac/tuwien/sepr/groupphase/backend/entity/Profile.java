@@ -1,6 +1,16 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -97,4 +107,15 @@ public class Profile {
         return user;
     }
 
+    public Profile copyForAnotherUser(ApplicationUser newUser) {
+        Profile newProfile = new Profile();
+        newProfile.setId(0L);
+        newProfile.setName(this.name); // Copy the name
+        newProfile.setAllergens(new HashSet<>(this.allergens)); // Deep copy of allergens
+        newProfile.setIngredient(new HashSet<>(this.ingredient)); // Deep copy of ingredients
+        newProfile.setLiked(new HashSet<>(this.liked)); // Deep copy of liked recipes
+        newProfile.setDisliked(new HashSet<>(this.disliked)); // Deep copy of disliked recipes
+        newProfile.setUser(newUser); // Set to the new user
+        return newProfile;
+    }
 }

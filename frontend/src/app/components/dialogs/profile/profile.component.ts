@@ -94,8 +94,8 @@ export class ProfileComponent {
               this.service.create(this.profile)
                 .subscribe({
                   next: data => {
-                    this.notification.success(`Profile ${this.profile?.name} successfully.`);
-                    this.router.navigate(['/dashboard']);
+                    this.notification.success(`Profile ${this.profile?.name} successfully created.`);
+                    this.router.navigate(['/profiles']);
                   },
                   error: error => {
                     console.error('Error creating profile', error);

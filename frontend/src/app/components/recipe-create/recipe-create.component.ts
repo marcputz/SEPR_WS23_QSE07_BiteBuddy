@@ -8,6 +8,8 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
+import {PictureService} from "../../services/picture.service";
+import {IngredientService} from "../../services/ingredient.service";
 
 @Component({
   selector: 'app-recipe-create',
@@ -18,17 +20,20 @@ export class RecipeCreateComponent {
   ingredient: string = '';
   recipe: RecipeDetailsDto = {
     name: '',
-    picture: null,
+    pictureId: null,
     description: '',
     id: null,
     ingredients: [],
     allergens: [],
   }
+  recipePicture: number[] = null;
   pictureSelected: File = null;
   submitButtonClicked = false;
 
   constructor(
     private service: RecipeService,
+    private pictureService: PictureService,
+    private ingredientService: IngredientService,
     private sanitizer: DomSanitizer,
     private router: Router,
     private notification: ToastrService,
@@ -52,7 +57,7 @@ export class RecipeCreateComponent {
       // Convert the ArrayBuffer to an array of numbers (uint8)
       const byteArray = Array.from(new Uint8Array(arrayBuffer));
 
-      this.recipe.picture = byteArray;
+      this.recipePicture = byteArray;
     }
     reader.readAsDataURL(this.pictureSelected);
   }
@@ -75,22 +80,35 @@ export class RecipeCreateComponent {
       console.log(this.pictureSelected);
 
       console.log(this.recipe);
-      this.service.createRecipe(this.recipe).subscribe({
-          next: data => {
-            this.notification.success("Successfully created new recipe!")
-            this.router.navigate(['/recipes']);
-          },
-          error: error => {
-            console.log(error)
-            console.error(error.message, error);
-            let title = "Could not create recipe!";
-            this.notification.error(this.errorFormatter.format(error), title, {
-              enableHtml: true,
-              timeOut: 5000,
-            });
-          }
+
+      this.pictureService.uploadPicture(this.recipePicture).subscribe({
+        next: data => {
+
+          this.recipe.id = data.id;
+
+          this.service.createRecipe(this.recipe).subscribe({
+              next: data => {
+                this.notification.success("Successfully created new recipe!")
+
+                this.router.navigate(['/recipes']);
+              },
+              error: error => {
+                console.log(error)
+                console.error(error.message, error);
+                let title = "Could not create recipe!";
+                this.notification.error(this.errorFormatter.format(error), title, {
+                  enableHtml: true,
+                  timeOut: 5000,
+                });
+              }
+            }
+          );
+
+        },
+        error: error => {
+          console.error(error);
         }
-      );
+      })
     }
   }
 
@@ -138,5 +156,5 @@ export class RecipeCreateComponent {
 
   ingredientSuggestions = (input: string) => (input === '')
     ? of([])
-    : this.service.searchRecipeIngredientsMatching(input);
+    : this.ingredientService.searchRecipeIngredientsMatching(input);
 }

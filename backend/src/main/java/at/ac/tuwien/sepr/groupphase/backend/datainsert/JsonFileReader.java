@@ -1,34 +1,31 @@
 package at.ac.tuwien.sepr.groupphase.backend.datainsert;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
-
-
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PictureRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
-import java.io.IOException;
-
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.invoke.MethodHandles;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -52,16 +49,19 @@ public class JsonFileReader {
     private final AllergeneIngredientRepository allergeneIngredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
+    private final PictureRepository pictureRepository;
 
     public JsonFileReader(RecipeRepository recipeRepository, IngredientRepository ingredientRepository,
                           AllergeneRepository allergeneRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                          RecipeIngredientRepository recipeIngredientRepository, RecipeIngredientDetailsRepository recipeIngredientDetailsRepository) {
+                          RecipeIngredientRepository recipeIngredientRepository, RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
+                          PictureRepository pictureRepository) {
         this.recipeRepository = recipeRepository;
         this.ingredientRepository = ingredientRepository;
         this.allergeneRepository = allergeneRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
+        this.pictureRepository = pictureRepository;
     }
 
     @PostConstruct
@@ -95,7 +95,11 @@ public class JsonFileReader {
             if (recipeRepository.count() == 0) {
                 for (Recipe recipe : recipes) {
                     Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".png");
-                    recipe.setPicture(Files.readAllBytes(path));
+                    byte[] imgData = Files.readAllBytes(path);
+                    Picture picture = new Picture()
+                        .setData(imgData);
+                    long picId = this.pictureRepository.save(picture).getId();
+                    recipe.setPictureId(picId);
                     recipeRepository.save(recipe);
                     pictureCount++;
                 }

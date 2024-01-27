@@ -1,26 +1,25 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeDetailsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeIngredientDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeListDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
+import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
-import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.RecipeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,23 +42,23 @@ public class RecipeServiceImpl implements RecipeService {
     private RecipeRepository recipeRepository;
     private RecipeIngredientRepository recipeIngredientRepository;
     private RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
-    private IngredientRepository ingredientRepository;
     private AllergeneIngredientRepository allergeneIngredientRepository;
     private AllergeneRepository allergeneRepository;
     private RecipeValidator validator;
+    private IngredientServiceImpl ingredientService;
 
     @Autowired
     public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeIngredientRepository recipeIngredientRepository,
                              RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
-                             IngredientRepository ingredientRepository, AllergeneIngredientRepository allergeneIngredientRepository,
-                             AllergeneRepository allergeneRepository, RecipeValidator validator) {
+                             AllergeneIngredientRepository allergeneIngredientRepository,
+                             AllergeneRepository allergeneRepository, RecipeValidator validator, IngredientServiceImpl ingredientService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
-        this.ingredientRepository = ingredientRepository;
         this.allergeneIngredientRepository = allergeneIngredientRepository;
         this.allergeneRepository = allergeneRepository;
         this.validator = validator;
+        this.ingredientService = ingredientService;
     }
 
     @Override
@@ -88,11 +87,48 @@ public class RecipeServiceImpl implements RecipeService {
 
         ArrayList<RecipeListDto> recipeDtos = new ArrayList<>();
         for (Recipe recipe : recipes) {
-            recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId(), recipe.getPicture()));
+            recipeDtos.add(new RecipeListDto(null, recipe.getName(), recipe.getId(), recipe.getPictureId()));
         }
 
         return new RecipeSearchResultDto(pageSelector, entriesPerPage, recipes.getTotalPages(), recipeDtos);
     }
+
+    @Override
+    public List<Recipe> getAll() {
+        return this.recipeRepository.findAll();
+    }
+
+    @Override
+    public List<Recipe> getAllWithoutAllergens(Set<Allergene> allergens) {
+        Set<Long> allergeneIds = new HashSet<>();
+        for (Allergene a : allergens) {
+            allergeneIds.add(a.getId());
+        }
+        // fix a problem with SQL where empty lists will always return empty result set
+        if (allergeneIds.isEmpty()) {
+            allergeneIds.add(Long.MAX_VALUE); // there should never be any allergen with this ID
+        }
+        return this.recipeRepository.getAllWithoutAllergens(allergeneIds);
+    }
+
+    @Override
+    public List<Recipe> getAllWithIngredientsWithoutAllergens(Set<String> ingredientNames, Set<Allergene> allergens) {
+        Set<Long> allergeneIds = new HashSet<>();
+        for (Allergene a : allergens) {
+            allergeneIds.add(a.getId());
+        }
+        // fix a problem with SQL where empty lists will always return empty result set
+        if (allergeneIds.isEmpty()) {
+            allergeneIds.add(Long.MAX_VALUE); // there should never be any allergen with this ID
+        }
+
+        if (ingredientNames.isEmpty()) {
+            ingredientNames.add("-");
+        }
+
+        return this.recipeRepository.getAllWithIngredientsWithoutAllergens(ingredientNames, allergeneIds);
+    }
+
 
     @Override
     public void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException {
@@ -106,7 +142,7 @@ public class RecipeServiceImpl implements RecipeService {
 
         // creating database entry
         Recipe newRecipe = new Recipe();
-        newRecipe.setPicture(recipe.picture());
+        newRecipe.setPictureId(recipe.pictureId());
         newRecipe.setName(recipe.name());
         newRecipe.setInstructions(recipe.description());
         newRecipe.setIngredients(ingredients);
@@ -118,7 +154,7 @@ public class RecipeServiceImpl implements RecipeService {
         // update recipe with the correct ingredients
         ingredients = new HashSet<>();
         for (RecipeIngredientDto ingredient : recipe.ingredients()) {
-            List<Ingredient> queriedResults = this.ingredientRepository.findByNameContainingIgnoreCase(ingredient.name());
+            List<Ingredient> queriedResults = this.ingredientService.getByNameMatching(ingredient.name());
 
             if (!queriedResults.isEmpty()) {
                 RecipeIngredientDetails r = new RecipeIngredientDetails();
@@ -150,18 +186,67 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public long getHighestRecipeId() {
+        LOGGER.trace("getHighestRecipeId()");
+
+        Recipe r = this.recipeRepository.findFirstByOrderByIdDesc();
+        return r.getId();
+    }
+
+    @Override
+    public long getLowestRecipeId() {
+        LOGGER.trace("getLowestRecipeId()");
+
+        Recipe r = this.recipeRepository.findFirstByOrderByIdAsc();
+        return r.getId();
+    }
+
+    @Override
+    public Recipe getRecipeById(long id) throws NotFoundException {
+        LOGGER.trace("getRecipeById({})", id);
+
+        Optional<Recipe> recipe = this.recipeRepository.findById(id);
+        if (recipe.isEmpty()) {
+            throw new NotFoundException("The searched for recipe does not exist in the database.");
+        } else {
+            return recipe.get();
+        }
+    }
+
+    @Override
     public List<String> findMatchingIngredients(String name) {
-        // TODO when we have ingredients with working amount and units we should return a dto of ingredients
+        LOGGER.trace("findMatchingIngredients({})", name);
 
         ArrayList<String> matchingIngredients = new ArrayList<>();
-        List<Ingredient> ingredients = this.ingredientRepository.findByNameContainingIgnoreCase(name);
+        List<Ingredient> ingredients = this.ingredientService.getByNameMatching(name);
+        List<RecipeIngredientDetails> detailedIngredients = this.recipeIngredientDetailsRepository.findByIngredientContainingIgnoreCase(name);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             if (ingredients.size() > i) {
                 matchingIngredients.add(ingredients.get(i).getName());
             }
+
+            if (detailedIngredients.size() > i) {
+                matchingIngredients.add(detailedIngredients.get(i).getIngredient());
+            }
         }
-        return matchingIngredients;
+        return matchingIngredients.stream().sorted().toList();
+    }
+
+    @Override
+    public List<RecipeIngredient> findMatchingRecipeIngredients(String name) {
+        List<RecipeIngredientDetails> rids = this.recipeIngredientDetailsRepository.findByIngredientContainingIgnoreCase(name);
+        List<RecipeIngredient> results = new ArrayList<>();
+
+        for (RecipeIngredientDetails details : rids) {
+            List<RecipeIngredient> queryResult = this.recipeIngredientRepository.findByAmountEquals(details);
+
+            if (!queryResult.isEmpty()) {
+                results.add(queryResult.get(0));
+            }
+        }
+
+        return results;
     }
 
     @Override
@@ -186,7 +271,7 @@ public class RecipeServiceImpl implements RecipeService {
                 ingredientsAndAmount.add(currentIngredient.getName() + ": " + ingredient.getAmount());
 
                 newIngredients.add(new RecipeIngredientDto(
-                    currentIngredient.getName(),
+                    ingredient.getAmount().getIngredient(),
                     ingredient.getAmount().getAmount(),
                     ingredient.getAmount().getUnit()));
             }
@@ -209,7 +294,7 @@ public class RecipeServiceImpl implements RecipeService {
                 }
                 RecipeDetailsDto detailsDto =
                     new RecipeDetailsDto(id, recipe.get().getName(), recipe.get().getInstructions(), newIngredients, allergens,
-                        recipe.get().getPicture());
+                        recipe.get().getPictureId());
                 return detailsDto;
             }
         }

@@ -15,7 +15,8 @@
         <li class="nav-item">
           <a class="nav-link bb-link" (click)="toggleSecondaryNavbar('recipes')">
             Recipes
-            <i [ngClass]="{'bi bi-chevron-down': !showSecondaryNavbar['recipes'], 'bi bi-chevron-up': showSecondaryNavbar['recipes']}"></i>
+            <i
+              [ngClass]="{'bi bi-chevron-down': !showSecondaryNavbar['recipes'], 'bi bi-chevron-up': showSecondaryNavbar['recipes']}"></i>
           </a>
           <!-- Secondary Navbar (Initially Hidden) -->
           <div *ngIf="showSecondaryNavbar['recipes']" class="secondary-navbar glassy-background">
@@ -23,16 +24,24 @@
             <a class="nav-link bb-link" href="#">History</a>
           </div>
         </li>
+        <!-- Other Main Navbar Items -->
+        <li class="nav-item">
+          <a [routerLink]="['./menuplan']" class="nav-link bb-link">Create Menu Plan</a>
+        </li>
+        <li class="nav-item">
+          <a [routerLink]="['./menuplanLookup']" class="nav-link bb-link">Menu Plan</a>
+        </li>
         <!-- Main Navbar Item with Down Icon (Profiles) -->
         <li class="nav-item">
           <a class="nav-link bb-link" (click)="toggleSecondaryNavbar('profiles')">
             Profiles
-            <i [ngClass]="{'bi bi-chevron-down': !showSecondaryNavbar['profiles'], 'bi bi-chevron-up': showSecondaryNavbar['profiles']}"></i>
+            <i
+              [ngClass]="{'bi bi-chevron-down': !showSecondaryNavbar['profiles'], 'bi bi-chevron-up': showSecondaryNavbar['profiles']}"></i>
           </a>
           <!-- Secondary Navbar for Profiles (Initially Hidden) -->
           <div *ngIf="showSecondaryNavbar['profiles']" class="secondary-navbar glassy-background">
-            <a class="nav-link bb-link first-item" href="#">My Profile</a>
-            <a class="nav-link bb-link" href="#">Discover profiles</a>
+            <a class="nav-link bb-link first-item" [routerLink]="['/profiles']">My Profile</a>
+            <a class="nav-link bb-link" [routerLink]="['/profiles']" fragment="discover-profiles">Discover profiles</a>
           </div>
         </li>
         <!-- Other Main Navbar Items -->

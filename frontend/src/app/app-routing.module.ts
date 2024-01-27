@@ -17,13 +17,20 @@ import {ChangePasswordComponent} from './components/user-settings/change-passwor
 import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout.component";
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
+import {MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
+import {InventoryComponent} from "./components/inventory/inventory.component";
+import {MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
 import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
+import {ProfileListComponent} from './components/profile-list/profile-list.component';
+import {ProfileEditComponent} from "./components/profile-edit/profile-edit.component";
+import {ProfileDetailsComponent} from "./components/profile-details/profile-details.component";
 
 const routes: Routes = [
   {path: '*', redirectTo: ''}, // Redirection for unknown paths
 
   {path: '', canActivate: mapToCanActivate([AuthGuard]), component: LandingLayoutComponent}, // Landing Page
-  {path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
+  {
+    path: '', component: DialogLayoutComponent, children: [ // Pages using Dialog Box Layout
       {path: 'login', component: LoginComponent}, // Login Page
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
       {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
@@ -44,10 +51,26 @@ const routes: Routes = [
       {path: 'email', canActivate: mapToCanActivate([AuthGuard]), component: ChangeEmailComponent},
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
   ]},
+  {
+    path: 'profiles', canActivate: mapToCanActivate([AuthGuard]), component: NavbarLayoutComponent, children: [
+      {path: '', component: ProfileListComponent},
+      {path: ':id', component: ProfileDetailsComponent},
+      {path: '', component: DialogLayoutComponent, children: [
+      {path: 'edit/:id', component: ProfileEditComponent}]}
+    ]
+  },
+  {path: 'menuplan', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent},
+  {path: 'menuplanLookup', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanLookupComponent},
+  {path: 'inventory', canActivate: mapToCanActivate([AuthGuard]), component: InventoryComponent},
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {useHash: false})],
+  imports: [RouterModule.forRoot(routes, {
+    useHash: false,
+    scrollPositionRestoration: 'enabled',
+    anchorScrolling: 'enabled',
+    scrollOffset: [0, 64] // [x, y]
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule {

@@ -3,7 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -80,8 +80,8 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserByEmail_NotFound_ThrowsUserNotFoundException() {
-        assertThrows(UserNotFoundException.class, () -> {
+    public void testGetUserByEmail_NotFound_ThrowsNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
             userService.getUserByEmail("test@shouldnotexist.at");
         });
     }
@@ -101,8 +101,8 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserByNickname_NotFound_ThrowsUserNotFoundException() {
-        assertThrows(UserNotFoundException.class, () -> {
+    public void testGetUserByNickname_NotFound_ThrowsNotFoundException() {
+        assertThrows(NotFoundException.class, () -> {
             userService.getUserByNickname("shouldNotExist");
         });
     }
@@ -113,7 +113,7 @@ public class UserServiceTest {
         userToBeUpdated.setEmail("updated.email@test.at");
         userToBeUpdated.setNickname("updatedNickname");
 
-        ApplicationUser result = userService.updateApplicationUser(userToBeUpdated);
+        ApplicationUser result = userService.updateUser(userToBeUpdated);
 
         assertAll(
             () -> assertEquals("updated.email@test.at", result.getEmail(), "Email not updated correctly"),
@@ -124,14 +124,15 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateUser_NonExistentUser_ThrowsUserNotFoundException() {
+    public void testUpdateUser_NonExistentUser_ThrowsNotFoundException() {
         ApplicationUser nonExistentUser = new ApplicationUser()
             .setId(Long.MIN_VALUE) // An ID that does not exist in the database
             .setEmail("nonexistent.email@test.at")
+            .setPasswordEncoded("test1234")
             .setNickname("nonexistentNickname");
 
-        assertThrows(UserNotFoundException.class, () -> {
-            userService.updateApplicationUser(nonExistentUser);
+        assertThrows(NotFoundException.class, () -> {
+            userService.updateUser(nonExistentUser);
         });
     }
 
@@ -142,7 +143,7 @@ public class UserServiceTest {
             .setEmail(null) // Null Email
             .setPasswordEncoded(null) // Null Password
             .setNickname(null); // Null Nickname
-        ValidationException validationException = assertThrows(ValidationException.class, () -> userService.updateApplicationUser(invalidUser));
+        ValidationException validationException = assertThrows(ValidationException.class, () -> userService.updateUser(invalidUser));
         List<String> expectedErrors = List.of(
             "Email is required",
             "Password is required",
@@ -154,7 +155,7 @@ public class UserServiceTest {
     @Test
     public void testUpdateUser_InvalidEmailFormat_ThrowsValidationException() {
         ApplicationUser userWithInvalidEmail = testUser.setEmail("invalidEmailFormat"); // Invalid email format
-        ValidationException validationException = assertThrows(ValidationException.class, () -> userService.updateApplicationUser(userWithInvalidEmail));
+        ValidationException validationException = assertThrows(ValidationException.class, () -> userService.updateUser(userWithInvalidEmail));
         assertTrue(validationException.errors().contains("Invalid email format"), "Validation error should contain invalid email format message");
     }
 
@@ -165,7 +166,7 @@ public class UserServiceTest {
         ApplicationUser userWithLongEmailAndNickname = testUser.setEmail(longEmail)
             .setNickname(longNickname);
         ValidationException validationException = assertThrows(ValidationException.class,
-            () -> userService.updateApplicationUser(userWithLongEmailAndNickname));
+            () -> userService.updateUser(userWithLongEmailAndNickname));
         List<String> expectedErrors = List.of(
             "Email cannot be longer than 255 characters",
             "Nickname cannot be longer than 255 characters");
@@ -174,19 +175,28 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateUser_DuplicateNicknameAndEmail_ThrowsConflictException() {
+    public void testUpdateUser_DuplicateNickname_ThrowsConflictException() {
         generateSecondTestUser();
         try {
-            testUser.setEmail(secondTestUser.getEmail());
-            testUser.setNickname(secondTestUser.getNickname());
-            ConflictException conflictException = assertThrows(ConflictException.class, () -> userService.updateApplicationUser(testUser),
-                "Expected ConflictException for duplicate email");
-            List<String> expectedErrors = List.of(
-                "Email '" + testUser.getEmail() + "' is already in use",
-                "Nickname '" + testUser.getNickname() + "' is already in use");
-            assertTrue(conflictException.errors().containsAll(expectedErrors), "Conflict errors should contain messages for duplicate email and nickname");
+            ApplicationUser user = testUser;
+            user.setNickname(secondTestUser.getNickname());
+            assertThrows(ConflictException.class, () -> userService.updateUser(user));
         } finally {
             userRepository.deleteById(testUserId);
+            userRepository.deleteById(secondTestUserId);
+        }
+    }
+
+    @Test
+    public void testUpdateUser_DuplicateEmail_ThrowsConflictException() {
+        generateSecondTestUser();
+        try {
+            ApplicationUser user = testUser;
+            user.setEmail(secondTestUser.getEmail());
+            assertThrows(ConflictException.class, () -> userService.updateUser(user));
+        } finally {
+            userRepository.deleteById(testUserId);
+            userRepository.deleteById(secondTestUserId);
         }
     }
 

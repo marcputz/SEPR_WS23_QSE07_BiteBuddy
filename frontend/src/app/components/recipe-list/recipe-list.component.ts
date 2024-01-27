@@ -10,6 +10,8 @@ import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {ProfileService} from "../../services/profile.service";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
 import {Router} from "@angular/router";
+import {PictureService} from "../../services/picture.service";
+import {PictureDto} from "../../dtos/pictureDto";
 
 @Component({
   selector: 'app-recipe-list',
@@ -18,6 +20,7 @@ import {Router} from "@angular/router";
 })
 export class RecipeListComponent implements OnInit {
   recipes: RecipeListDto[] = [];
+  recipeImages: Map<RecipeListDto, number[]> = null;
   maxPages: number = 5;
   searchChangedObservable = new Subject<void>();
   searchParams: RecipeSearch = {
@@ -35,10 +38,14 @@ export class RecipeListComponent implements OnInit {
     rating: -1
   };
 
+  likes: number[] = [];
+  dislikes: number[] = [];
+
   constructor(
     private service: RecipeService,
     private authService: AuthService,
     private profileService: ProfileService,
+    private pictureService: PictureService,
     private sanitizer: DomSanitizer,
     private notification: ToastrService,
     private errorFormatter: ErrorFormatterService,
@@ -52,6 +59,30 @@ export class RecipeListComponent implements OnInit {
     this.searchChangedObservable
       .pipe(debounceTime(300))
       .subscribe({next: () => this.reloadRecipes()});
+    
+      this.authService.getUser().subscribe(
+          (settings: UserSettingsDto) => {
+              this.profileService.getRatingLists(settings.id)
+                  .subscribe({
+                      next: data => {
+                          this.likes = data.likes;
+                          this.dislikes = data.dislikes
+                      },
+                      error: error => {
+                          console.error('Error getting rating list', error);
+                          const errorMessage = error?.error || 'Unknown error occured';
+                          if(error.message.includes("404")){
+                            this.router.navigate(["/profile"])
+                            this.notification.error("You need to create a profile before using the Website")
+                          }
+                          else{
+                            this.notification.error(`Error getting rating lists: ${errorMessage}`);
+                          }
+                      }
+                  });
+          },
+      );
+
   }
 
   searchChanged(): void {
@@ -67,11 +98,32 @@ export class RecipeListComponent implements OnInit {
         this.searchParams.page = data.page;
         console.log("number of pages: " + data.numberOfPages);
         console.log("recipes available: " + data.recipes.length);
+
+        // load recipe images
+        this.recipeImages = new Map<RecipeListDto, number[]>();
+        for (let dto of this.recipes) {
+          this.pictureService.getPicture(dto.pictureId).subscribe({
+            next: (pictureDto) => {
+              this.recipeImages.set(dto, pictureDto.data);
+            },
+            error: error => {
+              console.error(error);
+            }
+          });
+        }
       },
       error: err => {
         this.notification.error('Error fetching recipes', err)
       }
     })
+  }
+
+  getImageFor(recipe: RecipeListDto) {
+    if (this.recipeImages.has(recipe)) {
+      return this.recipeImages.get(recipe);
+    } else {
+      return null;
+    }
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {
@@ -105,8 +157,23 @@ export class RecipeListComponent implements OnInit {
         this.profileService.createRating(this.recipeRating)
           .subscribe({
               next: data => {
-                this.notification.success("Successfully rated new recipe!")
-                this.router.navigate(['/recipes']);
+                this.notification.success("Successfully rated new recipe!");
+                this.authService.getUser().subscribe(
+                  (settings: UserSettingsDto) => {
+                    this.profileService.getRatingLists(settings.id)
+                      .subscribe({
+                        next: data => {
+                          this.likes = data.likes;
+                          this.dislikes = data.dislikes
+                        },
+                        error: error => {
+                          console.error('Error getting rating list', error);
+                          const errorMessage = error?.message || 'Unknown error occured';
+                          this.notification.error(`Error getting rating lists: ${errorMessage}`);
+                        }
+                      });
+                  },
+                );
               },
               error: error => {
                 console.log(error)

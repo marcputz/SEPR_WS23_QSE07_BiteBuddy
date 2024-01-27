@@ -8,7 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,17 +73,15 @@ public class AuthenticationEndpointTest {
 
     private long testUserId;
 
-    private long testUserId2;
-
     @BeforeEach
-    public void beforeEach() throws UserNotFoundException, MessagingException {
+    public void beforeEach() throws NotFoundException, MessagingException {
         testUserId = userRepository.save(testuser).getId();
-        testUserId2 = userRepository.save(testuser2).getId();
+        userRepository.save(testuser2);
     }
 
     @AfterEach
     public void afterEach() {
-        passwordResetRequestRepository.deleteByUser(testuser.setId(testUserId));
+        passwordResetRequestRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -177,7 +175,6 @@ public class AuthenticationEndpointTest {
         response = mvcResult.getResponse();
 
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
     }
 
     @Test
@@ -364,7 +361,7 @@ public class AuthenticationEndpointTest {
         MvcResult registerResult = this.mockMvc.perform(post("/api/v1/authentication/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto))
                 .headers(registerHeaders))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn();
 
         String authToken = registerResult.getResponse().getContentAsString();
@@ -385,7 +382,7 @@ public class AuthenticationEndpointTest {
         MvcResult registerResult = this.mockMvc.perform(post("/api/v1/authentication/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto))
                 .headers(registerHeaders))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn();
 
         String authToken = registerResult.getResponse().getContentAsString();
@@ -400,12 +397,12 @@ public class AuthenticationEndpointTest {
         MvcResult registerResult2 = this.mockMvc.perform(post("/api/v1/authentication/register")
                 .content(new ObjectMapper().writeValueAsString(registerDto2))
                 .headers(registerHeaders))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isConflict())
             .andReturn();
     }
 
     @Test
-    void testRequestPasswordReset_WithValidEmail_IsOk() throws Exception {
+    void testRequestPasswordReset_WithValidEmail_IsAccepted() throws Exception {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -417,7 +414,7 @@ public class AuthenticationEndpointTest {
             .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
 
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(HttpStatus.ACCEPTED.value(), response.getStatus());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
+package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe;
 
 import java.util.ArrayList;
 
@@ -8,6 +8,6 @@ public record RecipeDetailsViewDto(
     String description,
     ArrayList<RecipeIngredientDto> ingredients,
     ArrayList<String> allergens,
-    byte[] picture,
+    Long pictureId,
     int rating
 ){}
