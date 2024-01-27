@@ -3,15 +3,14 @@ h5 {
 }
 
 .setting-layout {
-  margin-top: 15%;
-  margin-left: 20%;
-  margin-bottom: 15%;
+  margin-top: 8%;
+  margin-left: 25%;
   position: fixed; /* Responsive */
   width: 20%;
   background-color: white;
   box-shadow: rgba(0,0,0, 0.15) 1px 1px 10px;
   border-radius: 35px;
-
+  max-width: 15%;
   word-wrap: break-word;
 }
 
@@ -22,7 +21,7 @@ h5 {
 }
 
 .profile-img {
-  width: 35%;
+  width: 28%;
   transform: translateY(-50%);
 }
 
@@ -32,6 +31,7 @@ h5 {
 
 .link-sidebar {
   margin-top: 15%;
+  margin-block-end: 30%;
 }
 
 .link-sidebar ul {
@@ -92,15 +92,19 @@ i {
 }
 
 .bb-settings-layout-box {
-  margin-top: 15%;
+  margin-top: 8%;
   margin-left: 42%;
-  margin-bottom: 10%;
   position: fixed; /* Responsive */
   width: 50%;
   background-color: white;
   box-shadow: rgba(0,0,0, 0.15) 1px 1px 10px;
   border-radius: 35px;
-  height: 70vh;
-
+  max-width: 30%;
+  height: inherit;
   word-wrap: break-word;
+}
+
+.button-transparent {
+  width: 62%;
+  margin: 8% 19%;
 }

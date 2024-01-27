@@ -9,12 +9,20 @@
   backdrop-filter: blur(10px);
 }
 
-.header .left {
-  display: inline-flex;
+.left {
+  //display: flex;
   align-items: baseline;
   gap: 38px;
   position: relative;
   flex: 0 0 auto;
+  font-size: 18px;
+  color: var(--app-header-text-color) !important;
+  margin: 0 0.4rem;
+}
+
+.title {
+  font-size: 36px;
+  margin-left: 2.5%;
 }
 
 .header .text-wrapper {
@@ -28,7 +36,7 @@
 }
 
 .header .buttons-group {
-  display: inline-flex;
+  display: flex;
   align-items: flex-start;
   gap: 16px;
   position: relative;
@@ -44,7 +52,7 @@
 }
 
 .header .menu-item {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 8px;
@@ -64,10 +72,9 @@
 }
 
 .header .buttons-group-2 {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 22px;
-  margin-left: auto; /* Pushes buttons-group-2 to the right */
 }
 
 .header .text-container {

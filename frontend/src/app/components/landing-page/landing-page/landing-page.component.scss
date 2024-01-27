@@ -2,18 +2,47 @@
   display: flex;
   align-items: center;
   gap: 80px;
-  padding: 80px 80px 0px;
+  padding: 151px 78px 0px;
   position: relative;
+  flex-direction: row;
+  align-content: center;
+  justify-content: flex-start;
 }
 
 .section .vector {
   position: absolute;
-  width: 793px;
-  height: 814px;
+  height: 130%;
   top: 0;
   right: 0;
   margin-top: -8%;
   z-index: -1;
+}
+
+@media (max-width: 1977px) {
+  .section .vector {
+    height: 100%;
+  }
+  .section .div {
+    display: none;
+  }
+}
+
+@media (max-width: 1379px) {
+  .section .vector {
+    height: 80%;
+  }
+  .section .div {
+    display: none;
+  }
+}
+
+@media (max-width: 1270px) {
+  .section .vector {
+    display: none;
+  }
+  .section .div {
+    display: none;
+  }
 }
 
 .section .col {
@@ -38,6 +67,7 @@
 
 .button-longtext {
   width: 180px;
+  margin-top: 15%;
 }
 
 .section .top {
@@ -97,22 +127,6 @@
   all: unset;
   box-sizing: border-box;
 }
-/*
-.section .button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 24px;
-  position: relative;
-  flex: 0 0 auto;
-  background-color: #584238;
-  border-radius: 8px;
-  border: 2px solid;
-  box-shadow: var(--shadow-dark-s);
-  all: unset;
-  box-sizing: border-box;
-}
- */
 
 .section .text-container {
   display: inline-flex;
@@ -131,6 +145,7 @@
   position: relative;
   flex: 0 0 auto;
   color: white;
+  margin-top: 10%
 }
 
 .section .right {
@@ -157,6 +172,7 @@
   left: 1250px;
   background-color: #fbbf24;
   border-radius: 79px;
+  margin-left: 8%;
 }
 
 /* New section */
@@ -358,7 +374,9 @@
   flex-grow: 1;
   padding-top: 50px;
   flex-direction: column;
+  gap: 24px;
 }
+
 @media (max-width: 991px) {
   .div-community-3 {
     max-width: 100%;
@@ -410,7 +428,6 @@
   position: relative;
   width: fit-content;
   margin-top: -1px;
-  //font-family: "Jost-Medium", Helvetica;
   font-weight: 500;
   color: #584238;
   font-size: 16px;
@@ -485,4 +502,12 @@
 
 .community-circle {
   margin: 75px 130px;
+}
+
+.button-login, .button-signup {
+  margin-bottom: 0 !important;
+}
+
+.button-signup {
+  width: 180px;
 }
