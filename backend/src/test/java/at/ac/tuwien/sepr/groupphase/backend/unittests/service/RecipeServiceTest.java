@@ -1,28 +1,39 @@
-package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
+package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
+import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
+import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -31,29 +42,31 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@EnableWebMvc
-@WebAppConfiguration
-@ActiveProfiles("generateData")
-public class RecipesTest {
-    @Autowired
-    private WebApplicationContext webAppContext;
-    private MockMvc mockMvc;
-
+@ActiveProfiles("test")
+public class RecipeServiceTest {
     @Autowired
     ObjectMapper objectMapper;
 
     @Autowired
     private RecipeRepository recipeRepository;
+
+    @Autowired
+    private RecipeService recipeService;
 
     @Autowired
     private RecipeIngredientRepository recipeIngredientRepository;
@@ -70,6 +83,12 @@ public class RecipesTest {
     @Autowired
     private IngredientRepository ingredientRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationService authenticationService;
+
     private long recipe1Id;
     private long recipeIngredient1Id;
     private long allergene1Id;
@@ -82,11 +101,29 @@ public class RecipesTest {
     private long ingredient3Id;
     private long rd1Id;
     private long rd2Id;
+    private ApplicationUser user;
 
 
     @BeforeEach
+    public void setupUsers() {
+        ApplicationUser user = new ApplicationUser();
+        user.setId(1L);
+        user.setNickname("testuser");
+        user.setEmail("test@test");
+        user.setPasswordEncoded(PasswordEncoder.encode("password", "test@test"));
+
+        this.user = this.userRepository.save(user);
+    }
+
+    public String authenticate() throws Exception {
+        LoginDto dto = new LoginDto();
+        dto.setEmail("test@test");
+        dto.setPassword("password");
+        return this.authenticationService.loginUser(dto);
+    }
+
+    @BeforeEach
     public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webAppContext).build();
 
         // creating ingredients
         // adding apple
@@ -106,11 +143,13 @@ public class RecipesTest {
 
         // creating recipes without ingredients
         Recipe recipe1 = new Recipe();
+        recipe1.setCreatorId(-1L);
         recipe1.setInstructions("Instructions 1");
         recipe1.setName("recipe 1");
         recipe1Id = recipeRepository.save(recipe1).getId();
 
         Recipe recipe2 = new Recipe();
+        recipe2.setCreatorId(1L);
         recipe2.setInstructions("Instructions2");
         recipe2.setName("recipe 2");
         recipe2Id = recipeRepository.save(recipe2).getId();
@@ -172,119 +211,86 @@ public class RecipesTest {
 
     @AfterEach
     public void afterEach() {
-        recipeIngredientRepository.deleteById(recipeIngredient1Id);
-        recipeIngredientRepository.deleteById(recipeIngredient2Id);
-
-        recipeIngredientDetailsRepository.deleteById(rd1Id);
-        recipeIngredientDetailsRepository.deleteById(rd2Id);
-
-        allergeneIngredientRepository.deleteById(allergeneIngredient1Id);
-        allergeneRepository.deleteById(allergene1Id);
-
-        ingredientRepository.deleteById(ingredient1Id);
-        ingredientRepository.deleteById(ingredient2Id);
-        ingredientRepository.deleteById(ingredient3Id);
-
-        recipeRepository.deleteById(recipe1Id);
-        recipeRepository.deleteById(recipe2Id);
+        recipeIngredientRepository.deleteAll();
+        recipeIngredientDetailsRepository.deleteAll();
+        allergeneIngredientRepository.deleteAll();
+        ingredientRepository.deleteAll();
+        recipeRepository.deleteAll();
     }
 
     @Test
     public void getAllAddedRecipes() throws Exception {
         // creating request
-        var body = mockMvc
-            .perform(MockMvcRequestBuilders
-                .post("/api/v1/recipes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "name": "recipe",
-                    "creator": "",
-                    "page": 0,
-                    "entriesPerPage": 21
-                    }
-                    """)
-                .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsByteArray();
+        List<Recipe> allRecipes = this.recipeService.getAll();
 
-        // mapping
-        RecipeSearchResultDto recipeResult = objectMapper.readerFor(RecipeSearchResultDto.class).readValue(body);
 
         // asserting test
-        assertNotNull(recipeResult);
+        assertNotNull(allRecipes);
 
-        assertThat(recipeResult.recipes())
-            .extracting(RecipeListDto::id, RecipeListDto::name, RecipeListDto::creator)
+        assertThat(allRecipes)
+            .extracting(Recipe::getId, Recipe::getName, Recipe::getCreatorId)
             .contains(
-                tuple(recipe1Id, "recipe 1", null),
-                tuple(recipe2Id, "recipe 2", null)
+                tuple(recipe1Id, "recipe 1", -1L),
+                tuple(recipe2Id, "recipe 2", 1L)
             );
     }
 
     @Test
     public void getFilteredRecipe() throws Exception {
         // creating request
-        var body = mockMvc
-            .perform(MockMvcRequestBuilders
-                .post("/api/v1/recipes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "name": "1",
-                    "creator": "",
-                    "page": 0,
-                    "entriesPerPage": 1000
-                    }
-                    """)
-                .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsByteArray();
-
-        // mapping
-        RecipeSearchResultDto recipeResult = objectMapper.readerFor(RecipeSearchResultDto.class).readValue(body);
+        RecipeSearchResultDto searchedRecipes = this.recipeService.searchRecipes(new RecipeSearchDto(
+            "", "1", 0, 21
+        ));
 
         // asserting test
-        assertNotNull(recipeResult);
+        assertNotNull(searchedRecipes);
 
-        assertThat(recipeResult.recipes())
+        assertThat(searchedRecipes.recipes())
             .extracting(RecipeListDto::id, RecipeListDto::name, RecipeListDto::creator)
             .contains(
-                tuple(recipe1Id, "recipe 1", null)
+                tuple(recipe1Id, "recipe 1", "BiteBuddy")
+            );
+    }
+
+    @Test
+    public void getCustomCreator() throws Exception {
+        // creating request
+        RecipeSearchResultDto searchedRecipes = this.recipeService.searchRecipes(new RecipeSearchDto(
+            "", "2", 0, 21
+        ));
+
+        // asserting test
+        assertNotNull(searchedRecipes);
+
+        assertThat(searchedRecipes.recipes())
+            .extracting(RecipeListDto::id, RecipeListDto::name, RecipeListDto::creator)
+            .contains(
+                tuple(recipe2Id, "recipe 2", "testuser")
             );
     }
 
     @Test
     public void getRecipeDetails() throws Exception {
-        // creating request
-        var body = mockMvc
-            .perform(MockMvcRequestBuilders
-                .get("/api/v1/recipes/" + recipe1Id)
-                .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsByteArray();
-
-        // mapping
-        RecipeDetailsDto recipeDetails = objectMapper.readerFor(RecipeDetailsDto.class).<RecipeDetailsDto>readValue(body);
+        RecipeDetailsDto details = this.recipeService.getDetailedRecipe(recipe1Id);
 
         // asserting test
-        assertNotNull(recipeDetails);
+        assertNotNull(details);
 
         assertAll(
-            () -> assertThat(recipeDetails.name())
+            () -> assertThat(details.name())
                 .contains(
                     "recipe 1"
                 ),
-            () -> assertThat(recipeDetails.description())
+            () -> assertThat(details.description())
                 .contains(
                     "Instructions 1"
                 ),
-            () -> assertThat(recipeDetails.ingredients())
+            () -> assertThat(details.ingredients())
                 .hasSize(1)
                 .contains(
-                    new RecipeIngredientDto("Apple", 1.0f, FoodUnit.tablespoon)
+                    new RecipeIngredientDto("sugar", 1.0f, FoodUnit.tablespoon)
                 ),
-            () -> assertThat(recipeDetails.allergens())
+            () -> assertThat(details.allergens())
                 .hasSize(1)
                 .contains("Fructose")
         );
@@ -292,50 +298,15 @@ public class RecipesTest {
 
     @Test
     public void createValidRecipe() throws Exception {
-        // creating request
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post("/api/v1/recipes/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "id": -1,
-                    "name": "Eine Prise Test",
-                    "description": "Man nehme einen Test",
-                    "ingredients": [
-                        {
-                            "name": "Apple",
-                            "amount": 1,
-                            "unit": "pound"
-                        }
-                    ],
-                    "allergens": [],
-                    "picture": ""
-                    }
-                    """)
-                .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isOk());
+        ArrayList<RecipeIngredientDto> ingredients = new ArrayList<>();
+        ingredients.add(new RecipeIngredientDto("Apple", 1f, null));
 
-        // now requesting the recipe
-        // creating request
-        var body = mockMvc
-            .perform(MockMvcRequestBuilders
-                .post("/api/v1/recipes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "name": "Eine Prise Test",
-                    "creator": "",
-                    "page": 0,
-                    "entriesPerPage": 1000
-                    }
-                    """)
-                .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isOk())
-            .andReturn().getResponse().getContentAsByteArray();
+        RecipeDetailsDto newRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
+            ingredients, new ArrayList<>(), -1L);
 
-        // mapping
-        RecipeSearchResultDto recipeResult = objectMapper.readerFor(RecipeSearchResultDto.class).readValue(body);
+        this.recipeService.createRecipe(newRecipe, user.getId());
+
+        RecipeSearchResultDto recipeResult = this.recipeService.searchRecipes(new RecipeSearchDto("", "Eine Prise Test", 0, 21));
 
         // asserting test
         assertNotNull(recipeResult);
@@ -354,59 +325,22 @@ public class RecipesTest {
 
     @Test
     public void createInvalidRecipe() throws Exception {
-        // creating request with invalid ingredient
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post("/api/v1/recipes/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "name": "Eine Prise falscher Test",
-                    "description": "Man nehme einen Test 1313üaääw",
-                    "ingredients": [
-                        {
-                            "name": "Apppppppppppple",
-                            "amount": 1,
-                            "unit": "pound"
-                        }
-                    ],
-                    "picture": ""
-                    }
-                    """)
-                .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isConflict());
+        ArrayList<RecipeIngredientDto> ingredients = new ArrayList<>();
+        ingredients.add(new RecipeIngredientDto("Chhhhhhhhhh", 1f, null));
 
-        // creating request with no ingredient
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post("/api/v1/recipes/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "name": "Eine Prise falscher Test",
-                    "description": "Man nehme einen Test 1313üaääw",
-                    "ingredients": [],
-                    "picture": ""
-                    }
-                    """)
-                .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().is4xxClientError());
+        RecipeDetailsDto newRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
+            ingredients, new ArrayList<>(), -1L);
 
-        // creating request with too long name
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post("/api/v1/recipes/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "name": "Eine Prise Testwefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                    "description": "Man nehme einen Test 1313üaääw",
-                    "ingredients": [],
-                    "picture": ""
-                    }
-                    """)
-                .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().is4xxClientError());
+        assertThatExceptionOfType(ConflictException.class).isThrownBy(
+            () -> this.recipeService.createRecipe(newRecipe, 1L)
+        );
+
+        RecipeDetailsDto finalNewRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
+            new ArrayList<>(), new ArrayList<>(), -1L);
+
+        assertThatExceptionOfType(ValidationException.class).isThrownBy(
+            () -> this.recipeService.createRecipe(finalNewRecipe, 1L)
+        );
     }
 }
 
