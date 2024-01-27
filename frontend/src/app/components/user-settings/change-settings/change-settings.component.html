@@ -26,7 +26,7 @@
         <label for="inputNickname" class="bb-transition-label"
                *ngIf="isInputFocused['nickname'] || settingsForm.get('nickname').value">Username</label>
         <input type="text" name="nickname" formControlName="nickname"
-               class="bb-input-textfield bb-input"
+               class="bb-input-textfield bb-input input-nickname"
                [class.bb-input-textfield-error]="submitted && settingsForm.controls.nickname.errors"
                id="inputNickname"
                aria-describedby="nicknameHelp"
@@ -40,7 +40,7 @@
           <small class="form-text text-danger" *ngIf="settingsForm.controls.nickname.errors.required">
             Username is required.
           </small>
-          <!-- TODO: Add username to long or made out of whitespaces -->
+          <!-- TODO: Add username to long or made out of whitespaces or just get fully deleted-->
         </div>
       </div>
       <!-- TODO: add cancel button? -->

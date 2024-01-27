@@ -78,7 +78,7 @@ export class ChangeSettingsComponent implements OnInit {
       next: (settings: UserSettingsDto) => {
         this.originalUserSettings = settings;
         this.settingsForm.controls['nickname'].setValue(settings.nickname);
-        this.loadPreviewPicture();
+        this.loadUserPicture(settings.userPicture);
         this.newUserSettings = new UpdateUserSettingsDto("", null);
       },
       error: error => {
@@ -86,14 +86,23 @@ export class ChangeSettingsComponent implements OnInit {
         this.notifications.error('Error loading user settings');
 
         this.error = true;
-
-        if( (error.error).errorMessage != undefined || (error.error.error).errorMessage != undefined) {
-          this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
-        }
+        this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
       },
       complete: () => {
       }
     });
+  }
+
+  loadUserPicture(userPictureArray: number[]) {
+    console.info('load user picture');
+    if (userPictureArray === undefined) {
+      console.info('user picture is empty');
+      this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.safePictureUrl);
+    } else {
+      console.info('user picture loaded');
+      //this.loadPreviewPicture();
+      this.safePictureUrl = this.imageHandler.sanitizeUserImage(userPictureArray);
+    }
   }
 
   loadPreviewPicture() {
