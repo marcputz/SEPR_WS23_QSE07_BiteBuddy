@@ -23,13 +23,13 @@ public class AuthTokenUtilsTest {
         .setEmail("max.mustermann@test.at");
 
     @Test
-    public void testCreateTokenIsValid() throws Exception {
+    public void testCreateToken_WithValidData_Returns() throws Exception {
         String authToken = AuthTokenUtils.createToken(testuser.getId(), testuser.getNickname(), testuser.getEmail());
         assertTrue(AuthTokenUtils.isValid(authToken));
     }
 
     @Test
-    public void testExpiredTokenIsInvalid() throws Exception {
+    public void testIsValid_WithExpiredToken_ReturnsFalse() throws Exception {
         String expiredToken = "Token eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJCaXRlQnVkZHktU2VydmVyIiwic3ViIjoidGVzdHVzZXIiLCJhdWQiOiJCaXRlQnVkZHktQXBwI"
             + "iwiZXhwIjoxNzAxNjYxNjQ1LCJpYXQiOjE3MDE2NTQ0NDUsImp0aSI6IjEifQ.Kp7iQXqSdLlxNVTiZuf2sZz_0QhUDT_EAV7olUCQDc_CkR8BjZgK71tBosG9Nl6FSKx3ezY7NUDLN8c0dw"
             + "q28-cY0u7LwcEydacGq46-5ys6zbsU0CnLza9gHprl-uLH5oyTALRRqSXpx_o4HkvXDpTrBQghqsDiw9qLKseDAWjnba68n57GLwtBub9zyiwSP737DqklYfCdI5tmQ1C84tnLv2LMJ0oxvo"
@@ -38,12 +38,12 @@ public class AuthTokenUtilsTest {
     }
 
     @Test
-    public void testInvalidFormatTokenIsInvalid() throws Exception {
+    public void testIsValid_InvalidFormatToken_ReturnsFalse() throws Exception {
         assertFalse(AuthTokenUtils.isValid("notAToken"));
     }
 
     @Test
-    public void testGetExpirationDate() {
+    public void testGetExpirationDate_WithValidToken_Returns() {
         String authToken = AuthTokenUtils.createToken(testuser.getId(), testuser.getNickname(), testuser.getEmail());
         Assertions.assertNotNull(AuthTokenUtils.getExpirationDate(authToken));
     }
