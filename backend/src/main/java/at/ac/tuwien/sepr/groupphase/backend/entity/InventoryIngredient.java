@@ -110,7 +110,7 @@ public class InventoryIngredient {
     /**
      * This is needed since we want a custom way to index ingredients with just name and FoodUnit.
      *
-     * @return
+     * @return String which identifiers the ingredient.
      */
     public String getFridgeStringIdentifier() {
         return detailedIngredientName + " " + (getUnit() != null ? getUnit().toString() : "");

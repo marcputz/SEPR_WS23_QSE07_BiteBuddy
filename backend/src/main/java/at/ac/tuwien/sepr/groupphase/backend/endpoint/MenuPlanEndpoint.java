@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.List;
@@ -180,7 +179,7 @@ public class MenuPlanEndpoint {
     @PutMapping("/inventory/update")
     @ResponseStatus(HttpStatus.OK)
     public void updateInventoryIngredient(@RequestHeader HttpHeaders headers, @RequestBody InventoryIngredientDto updatedIngredient)
-        throws AuthenticationException, NotFoundException, ConflictException {
+        throws AuthenticationException, NotFoundException, ConflictException, ValidationException {
         LOGGER.trace("update({},{})", headers, updatedIngredient);
 
         this.authService.verifyAuthenticated(headers);

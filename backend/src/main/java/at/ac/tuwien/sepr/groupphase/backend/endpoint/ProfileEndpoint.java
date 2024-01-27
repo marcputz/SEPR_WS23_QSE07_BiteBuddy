@@ -76,6 +76,7 @@ public class ProfileEndpoint {
         return profileService.saveProfile(toCreateProfile);
     }
 
+
     @PostMapping("/copyToOwn/{profileId}")
     public ProfileDetailDto post(@PathVariable Long profileId, @RequestHeader HttpHeaders headers) throws AuthenticationException {
         LOGGER.info("Received POST request on {}", BASE_PATH + "/copyToOwn");
@@ -84,6 +85,14 @@ public class ProfileEndpoint {
         String authToken = this.authenticationService.getAuthToken(headers);
         Long currentUserId = AuthTokenUtils.getUserId(authToken);
         return profileService.copyToUser(profileId, currentUserId);
+    }
+
+    @PutMapping("/rating/{RecipeId}")
+    public void post(@Valid @RequestBody RecipeRatingDto recipeRatingDto) throws ValidationException, NotFoundException {
+        LOGGER.info("Received POST request on {}", BASE_PATH);
+        LOGGER.debug("Request body for POST:\n{}", recipeRatingDto);
+
+        profileService.rateRecipe(recipeRatingDto);
     }
 
     @GetMapping
@@ -102,7 +111,6 @@ public class ProfileEndpoint {
             throw new AuthenticationException("Error retrieving user data", ex);
         }
     }
-
 
     @GetMapping("/{profileId}")
     public ProfileDetailDto getProfileDetails(@PathVariable long profileId, @RequestHeader HttpHeaders headers)

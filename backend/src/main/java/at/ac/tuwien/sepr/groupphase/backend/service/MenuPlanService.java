@@ -307,7 +307,8 @@ public interface MenuPlanService {
      * @throws NotFoundException if ingredient did not exist before
      * @throws ConflictException if ingredient was updated incorrectly
      */
-    void updateInventoryIngredient(ApplicationUser user, InventoryIngredientDto updatedIngredientDto) throws NotFoundException, ConflictException;
+    void updateInventoryIngredient(ApplicationUser user, InventoryIngredientDto updatedIngredientDto)
+        throws NotFoundException, ConflictException, ValidationException;
 
     /**
      * Updates a single inventory ingredient. This should never be used in the endpoint for security reasons,

@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.validation;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
@@ -10,10 +12,13 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
+import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -29,6 +34,10 @@ public class MenuPlanValidator {
     private IngredientRepository ingredientRepository;
     @Autowired
     private RecipeIngredientRepository recipeIngredientRepository;
+    @Autowired
+    private IngredientService ingredientService;
+    @Autowired
+    private RecipeService recipeService;
 
     public void validateForUpdate(MenuPlan menuplan) throws ValidationException {
         LOGGER.trace("validateForUpdate({})", menuplan);
@@ -137,7 +146,68 @@ public class MenuPlanValidator {
 
     public void validateFridge(List<String> fridge) throws ValidationException, ConflictException {
         LOGGER.trace("validateFridge({})", fridge);
+        List<String> validationErrors = new ArrayList<>();
 
-        // TODO: validate
+        if (fridge != null && !fridge.isEmpty()) {
+            // check that every String exists in either Ingredients or RID.ingredients
+            for (String ingredient : fridge) {
+                List<String> allIngredients = this.recipeService.findMatchingIngredients(ingredient);
+
+                if (allIngredients.isEmpty()) {
+                    validationErrors.add("Ingredient " + ingredient + " does not exist");
+                }
+            }
+        }
+
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Validation of menu plan for create failed", validationErrors);
+        }
+    }
+
+    public void validateInventoryIngredientForUpdate(InventoryIngredientDto ingredientDto, InventoryListDto currentInventory) throws ValidationException {
+        LOGGER.trace("validateInventoryIngredientForUpdate({}, {})", ingredientDto, currentInventory);
+        List<String> validationErrors = new ArrayList<>();
+
+        if (ingredientDto != null) {
+            InventoryIngredientDto inverseIngredientDto = new InventoryIngredientDto(
+                ingredientDto.getId(), ingredientDto.getName(), ingredientDto.getMenuPlanId(), ingredientDto.getIngredientId(),
+                ingredientDto.getDetailedName(), ingredientDto.getAmount(), ingredientDto.getUnit(), !ingredientDto.isInventoryStatus()
+            );
+            boolean foundIngredient = false;
+
+            if (!currentInventory.missing().isEmpty()) {
+                // find if we find matching one but status is irrelevant
+                for (InventoryIngredientDto existing : currentInventory.missing()) {
+                    if (existing.equals(inverseIngredientDto)) {
+                        foundIngredient = true;
+                    }
+                }
+            }
+
+            if (!currentInventory.available().isEmpty() && !foundIngredient) {
+                // find if we find matching one but status is irrelevant
+                for (InventoryIngredientDto existing : currentInventory.available()) {
+                    if (existing.equals(inverseIngredientDto)) {
+                        foundIngredient = true;
+                    }
+                }
+            }
+
+            if (!foundIngredient) {
+                validationErrors.add("Cannot add new ingredients to the inventory");
+            }
+
+            if (currentInventory.missing().isEmpty() && currentInventory.available().isEmpty()) {
+                validationErrors.add("Cannot update an empty inventory");
+            }
+
+
+        } else {
+            validationErrors.add("Ingredient to update has to exist");
+        }
+
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Validation of menu plan for create failed", validationErrors);
+        }
     }
 }

@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -45,6 +44,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -385,16 +385,28 @@ public class JpaMenuPlanService implements MenuPlanService {
         MenuPlan oldPlan = this.getById(updateDto.getMenuPlanId());
         for (MenuPlanContent content : oldPlan.getContent()) {
             if (content.getDayIdx() == updateDto.getDay() && content.getTimeslot() == updateDto.getTimeslot()) {
-                long oldId = content.getRecipe().getId();
-                Random rand = new Random();
-                int i = 1;
-                do {
-                    i = rand.nextInt(99) + 1;
-                } while (i == oldId);
-                Recipe recipe = recipeService.getRecipeById(i);
-                content.setRecipe(recipe);
+                Set<Allergene> allergenes = user.getActiveProfile().getAllergens();
+                List<Recipe> recipes = recipeService.getAllWithoutAllergens(allergenes);
+                Random random = new Random();
+                LOGGER.trace("before randomIndex size of recepys: " + recipes.size());
+                Set<Recipe> oldDisliked = user.getActiveProfile().getDisliked();
+
+                int randomIndex = random.nextInt(recipes.size());
+                Recipe randomRecipe = recipes.get(randomIndex);
+                while (Objects.equals(content.getRecipe().getId(), randomRecipe.getId()) || oldDisliked.contains(randomRecipe)) {
+                    randomIndex = random.nextInt(recipes.size());
+                    randomRecipe = recipes.get(randomIndex);
+                }
+                content.setRecipe(randomRecipe);
+                LOGGER.trace("before dislike");
+                if (updateDto.isDislike()) {
+                    Set<Recipe> disliked = user.getActiveProfile().getDisliked();
+                    disliked.add(content.getRecipe());
+                    user.getActiveProfile().setDisliked(disliked);
+                }
             }
         }
+
         menuPlanRepository.save(oldPlan);
         return oldPlan;
     }
@@ -573,7 +585,7 @@ public class JpaMenuPlanService implements MenuPlanService {
     @Override
     public void createFridge(MenuPlan menuPlan, List<String> fridge) throws ValidationException, ConflictException {
         LOGGER.trace("createFridge({}, {})", menuPlan, fridge);
-        // this.validator.validateFridge(fridge);
+        this.validator.validateFridge(fridge);
 
         ArrayList<InventoryIngredient> newInventory = new ArrayList<>();
 
@@ -670,7 +682,7 @@ public class JpaMenuPlanService implements MenuPlanService {
                     } else {
                         InventoryIngredient existingIngredient = detailedInventory.get(recipeIngredient.getAmount().getFridgeStringIdentifier());
                         // detailed same unit and ingredient --> combining them
-                        if (detailedInventory.containsKey(recipeIngredient.getAmount().getIngredient())) {
+                        if (detailedInventory.containsKey(recipeIngredient.getAmount().getFridgeStringIdentifier())) {
                             float combinedAmount = existingIngredient.getAmount();
                             float newAmount = nullFixer(recipeIngredient.getAmount().getAmount());
                             if (newAmount > 0) {
@@ -752,8 +764,11 @@ public class JpaMenuPlanService implements MenuPlanService {
     }
 
     @Override
-    public void updateInventoryIngredient(ApplicationUser user, InventoryIngredientDto updatedIngredientDto) throws NotFoundException, ConflictException {
-        // TODO Validation
+    public void updateInventoryIngredient(ApplicationUser user, InventoryIngredientDto updatedIngredientDto)
+        throws NotFoundException, ConflictException, ValidationException {
+        LOGGER.trace("updateInventoryIngredient({}, {})", user, updatedIngredientDto);
+        this.validator.validateInventoryIngredientForUpdate(updatedIngredientDto, searchInventory(updatedIngredientDto.getMenuPlanId()));
+
         InventoryIngredient toSave = this.inventoryIngredientRepository.findById(updatedIngredientDto.getId()).get();
         toSave.setInventoryStatus(updatedIngredientDto.isInventoryStatus());
         this.inventoryIngredientRepository.save(toSave);

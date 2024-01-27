@@ -17,14 +17,13 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRe
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
