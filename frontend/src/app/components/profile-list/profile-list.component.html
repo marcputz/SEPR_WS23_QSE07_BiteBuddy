@@ -116,27 +116,27 @@
               <li class="page-item">
                 <a class="page-link" aria-label="First" (click)="pageChanger(0)">&laquo;</a>
               </li>
-              <li class="page-item" *ngIf="this.ownSearchParams.page - 1 > 0">
+              <li class="page-item" *ngIf="this.discoverSearchParams.page - 1 > 0">
                 <a class="page-link"
-                   (click)="pageChanger(this.ownSearchParams.page - 2)">{{ this.ownSearchParams.page - 1 }}</a>
+                   (click)="pageChanger(this.discoverSearchParams.page - 2)">{{ this.discoverSearchParams.page - 1 }}</a>
               </li>
-              <li class="page-item" *ngIf="this.ownSearchParams.page > 0">
+              <li class="page-item" *ngIf="this.discoverSearchParams.page > 0">
                 <a class="page-link"
-                   (click)="pageChanger(this.ownSearchParams.page - 1)">{{ this.ownSearchParams.page }}</a>
+                   (click)="pageChanger(this.discoverSearchParams.page - 1)">{{ this.discoverSearchParams.page }}</a>
               </li>
               <li class="page-item active">
-                <span class="page-link">{{ this.ownSearchParams.page + 1 }}</span>
+                <span class="page-link">{{ this.discoverSearchParams.page + 1 }}</span>
               </li>
-              <li class="page-item" *ngIf="ownMaxPages > this.ownSearchParams.page + 1">
+              <li class="page-item" *ngIf="discoverMaxPages > this.discoverSearchParams.page + 1">
                 <a class="page-link"
-                   (click)="pageChanger(this.ownSearchParams.page + 1)">{{ this.ownSearchParams.page + 2 }}</a>
+                   (click)="pageChanger(this.discoverSearchParams.page + 1)">{{ this.discoverSearchParams.page + 2 }}</a>
               </li>
-              <li class="page-item" *ngIf="ownMaxPages > this.ownSearchParams.page + 2">
+              <li class="page-item" *ngIf="discoverMaxPages > this.discoverSearchParams.page + 2">
                 <a class="page-link"
-                   (click)="pageChanger(this.ownSearchParams.page + 2)">{{ this.ownSearchParams.page + 3 }}</a>
+                   (click)="pageChanger(this.discoverSearchParams.page + 2)">{{ this.discoverSearchParams.page + 3 }}</a>
               </li>
               <li class="page-item">
-                <a class="page-link" aria-label="Last" (click)="pageChanger(ownMaxPages - 1)">&raquo;</a>
+                <a class="page-link" aria-label="Last" (click)="pageChanger(discoverMaxPages - 1)">&raquo;</a>
               </li>
             </ul>
           </nav>

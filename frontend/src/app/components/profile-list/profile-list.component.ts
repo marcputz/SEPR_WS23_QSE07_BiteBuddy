@@ -63,7 +63,7 @@ export class ProfileListComponent {
       name: '', // default value or empty string
       creator: '', // default value or empty string
       page: 0, // default starting page
-      entriesPerPage: 12, // default number of entries per page
+      entriesPerPage: 6, // default number of entries per page
       ownProfiles: false
     };
     this.authService.getUser().subscribe(
@@ -134,13 +134,8 @@ export class ProfileListComponent {
   }
 
   pageChanger(newPageNumber: number) {
-    this.ownSearchParams.page = newPageNumber;
-    this.reloadOwnProfiles()
-  }
-
-  pageCounter(change: number) {
-    this.ownSearchParams.page += change;
-    this.reloadOwnProfiles()
+    this.discoverSearchParams.page = newPageNumber;
+    this.reloadDiscoverProfiles()
   }
 
   onImageLoad(event: any, userId: number): void {
@@ -156,17 +151,17 @@ export class ProfileListComponent {
       });
   }
 
-    deleteProfile(profileId: number, profileName: string){
-      this.profileService.deleteProfile(profileId).subscribe({
-        next: data => {
-          this.notification.success(`Profile ${profileName} successfully deleted.`);
-          this.reloadProfiles(this.ownSearchParams, true);
-        },
-        error: error => {
-          console.error('Error deleting profile', error);
-          const errorMessage = error?.error || 'Unknown error occured';
-          this.notification.error(`Error deleting profile: ${errorMessage}`);
-        }
-      });
-    }
+  deleteProfile(profileId: number, profileName: string) {
+    this.profileService.deleteProfile(profileId).subscribe({
+      next: data => {
+        this.notification.success(`Profile ${profileName} successfully deleted.`);
+        this.reloadProfiles(this.ownSearchParams, true);
+      },
+      error: error => {
+        console.error('Error deleting profile', error);
+        const errorMessage = error?.error || 'Unknown error occured';
+        this.notification.error(`Error deleting profile: ${errorMessage}`);
+      }
+    });
+  }
 }

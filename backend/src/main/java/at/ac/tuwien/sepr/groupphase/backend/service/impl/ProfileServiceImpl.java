@@ -7,7 +7,6 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeGetByIdDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
@@ -36,7 +35,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +83,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         int pageSelector = Math.max(searchParams.page(), 0);
 
-        int entriesPerPage = Math.max(searchParams.entriesPerPage(), 21);
+        int entriesPerPage = Math.min(searchParams.entriesPerPage(), 100);
 
         Pageable page = PageRequest.of(pageSelector, entriesPerPage);
         Page<Profile> profilesPage = searchParams.ownProfiles()
