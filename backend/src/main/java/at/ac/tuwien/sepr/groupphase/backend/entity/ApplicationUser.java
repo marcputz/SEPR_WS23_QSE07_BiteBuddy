@@ -1,14 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -17,8 +14,8 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
@@ -27,24 +24,28 @@ public class ApplicationUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false, unique = true, length = 255)
     private String email;
+
     @Column(nullable = false)
     private String passwordEncoded;
+
     @Column(nullable = false, unique = true, length = 255)
     private String nickname;
+
     @Lob
     @Column
-    private byte[] userPicture;  // The image data represented as a byte array
+    private byte[] userPicture;
+
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "profile_id")
-    private List<Profile> profiles = new ArrayList<>();
+
     @OneToOne
     private Profile activeProfile;
 
@@ -104,14 +105,6 @@ public class ApplicationUser {
         return this;
     }
 
-    public List<Profile> getProfiles() {
-        return profiles;
-    }
-
-    public void setProfiles(List<Profile> profiles) {
-        this.profiles = profiles;
-    }
-
     public Profile getActiveProfile() {
         return activeProfile;
     }
@@ -130,25 +123,48 @@ public class ApplicationUser {
         return this;
     }
 
-    /**
-     * checks if a specified password matches the user's password.
-     *
-     * @param passwordEncoded the password to check against.
-     * @return {@code true} if specified password matches user password.
-     * @author Marc Putz
-     */
-    public boolean checkPasswordMatch(String passwordEncoded) {
-        if (passwordEncoded == null) {
-            return false;
-        }
-        return passwordEncoded.equals(this.passwordEncoded);
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    /* EQUALS, HASHCODE, TOSTRING */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ApplicationUser that = (ApplicationUser) o;
+        return id.equals(that.id) && email.equals(that.email) && passwordEncoded.equals(that.passwordEncoded) && nickname.equals(that.nickname)
+            && Arrays.equals(userPicture, that.userPicture) && createdAt.equals(that.createdAt) && updatedAt.equals(that.updatedAt) && Objects.equals(
+            activeProfile, that.activeProfile);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(id, email, passwordEncoded, nickname, createdAt, updatedAt, activeProfile);
+        result = 31 * result + Arrays.hashCode(userPicture);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationUser{"
+            + "id=" + id
+            + ", email='" + email + '\''
+            + ", passwordEncoded='" + passwordEncoded + '\''
+            + ", nickname='" + nickname + '\''
+            + ", userPicture=" + Arrays.toString(userPicture)
+            + ", createdAt=" + createdAt
+            + ", updatedAt=" + updatedAt
+            + ", activeProfile=" + activeProfile
+            + '}';
     }
 }

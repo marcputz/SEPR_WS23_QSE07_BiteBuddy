@@ -27,7 +27,7 @@ public class Recipe {
     private String instructions;
     @Lob
     @Column
-    private byte[] picture;  // The image data represented as a byte array
+    private Long pictureId;
 
     @OneToMany(mappedBy = "recipe")
     private Set<RecipeIngredient> recipeIngredients;
@@ -57,12 +57,12 @@ public class Recipe {
         return instructions;
     }
 
-    public byte[] getPicture() {
-        return picture;
+    public Long getPictureId() {
+        return pictureId;
     }
 
-    public void setPicture(byte[] picture) {
-        this.picture = picture;
+    public void setPictureId(Long pictureId) {
+        this.pictureId = pictureId;
     }
 
     public void setIngredients(Set<RecipeIngredient> ingredients) {

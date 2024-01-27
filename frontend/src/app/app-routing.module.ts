@@ -17,6 +17,9 @@ import {ChangePasswordComponent} from './components/user-settings/change-passwor
 import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout.component";
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
+import {MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
+import {InventoryComponent} from "./components/inventory/inventory.component";
+import {MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
 import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
 import {ProfileListComponent} from './components/profile-list/profile-list.component';
 import {ProfileEditComponent} from "./components/profile-edit/profile-edit.component";
@@ -56,6 +59,9 @@ const routes: Routes = [
       {path: 'edit/:id', component: ProfileEditComponent}]}
     ]
   },
+  {path: 'menuplan', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent},
+  {path: 'menuplanLookup', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanLookupComponent},
+  {path: 'inventory', canActivate: mapToCanActivate([AuthGuard]), component: InventoryComponent},
 ];
 
 @NgModule({

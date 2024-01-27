@@ -4,11 +4,17 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+
+import java.util.List;
+
 
 public interface ProfileService {
     /**
@@ -37,6 +43,10 @@ public interface ProfileService {
      * @throws NotFoundException   if the given user id, at least one of the allergens or at least one of the ingredients can not be found in the database
      */
     ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException, NotFoundException;
+
+    List<ProfileListDto> getAllByUser(ApplicationUser user);
+
+    Profile getById(long profileId) throws NotFoundException;
 
     /**
      * Creates a copy of an existing profile for a specified user.

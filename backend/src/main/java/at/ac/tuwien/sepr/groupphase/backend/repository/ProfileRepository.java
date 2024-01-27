@@ -1,12 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.repository;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Repository for managing {@link Profile} entities.
@@ -27,4 +30,6 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     Page<Profile> findByNameContainingIgnoreCaseAndUserId(String name, Long userId, Pageable pageable);
 
     Profile findByName(String name);
+
+    List<Profile> getAllByUser(ApplicationUser user);
 }

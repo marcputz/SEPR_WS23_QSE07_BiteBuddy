@@ -4,15 +4,13 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.RecipeMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
@@ -52,15 +50,11 @@ public class ProfileServiceImpl implements ProfileService {
     private final IngredientRepository ingredientRepository;
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
-    private final RecipeMapper recipeMapper;
-    private final AllergeneMapper allergeneMapper;
-    private final IngredientMapper ingredientMapper;
 
     public ProfileServiceImpl(ProfileRepository profileRepository, AllergeneRepository allergeneRepository,
                               ProfileMapper profileMapper, IngredientRepository ingredientRepository,
                               RecipeRepository recipeRepository, UserRepository userRepository,
-                              ProfileValidator profileValidator, AllergeneMapper allergeneMapper, IngredientMapper ingredientMapper,
-                              RecipeMapper recipeMapper) {
+                              ProfileValidator profileValidator) {
         this.profileRepository = profileRepository;
         this.allergeneRepository = allergeneRepository;
         this.ingredientRepository = ingredientRepository;
@@ -68,9 +62,6 @@ public class ProfileServiceImpl implements ProfileService {
         this.profileMapper = profileMapper;
         this.profileValidator = profileValidator;
         this.userRepository = userRepository;
-        this.recipeMapper = recipeMapper;
-        this.allergeneMapper = allergeneMapper;
-        this.ingredientMapper = ingredientMapper;
     }
 
     @Override
@@ -156,6 +147,35 @@ public class ProfileServiceImpl implements ProfileService {
         }
         Profile copy = profileRepository.save(profile.copyForAnotherUser(user.get()));
         return profileMapper.profileToProfileDetailDto(copy);
+    }
+
+    @Override
+    public List<ProfileListDto> getAllByUser(ApplicationUser user) {
+        LOGGER.trace("getAllByUser({})", user);
+
+        List<Profile> profiles = this.profileRepository.getAllByUser(user);
+        List<ProfileListDto> profileDtos = new ArrayList<>();
+
+        for (Profile p : profiles) {
+            profileDtos.add(new ProfileListDto()
+                .setId(p.getId())
+                .setName(p.getName())
+                .setUserId(p.getUser().getId())
+            );
+        }
+
+        return profileDtos;
+    }
+
+    @Override
+    public Profile getById(long profileId) throws NotFoundException {
+        LOGGER.trace("getById({})", profileId);
+
+        Optional<Profile> profileOptional = this.profileRepository.findById(profileId);
+        if (profileOptional.isEmpty()) {
+            throw new NotFoundException("Profile ID " + profileId + " could not be found in the data store.");
+        }
+        return profileOptional.get();
     }
 
     public void rateRecipe(RecipeRatingDto recipeRatingDto) throws NotFoundException, ValidationException {

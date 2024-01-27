@@ -1,13 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-
+import jakarta.persistence.Id;
 
 import java.util.Objects;
 
@@ -79,6 +78,15 @@ public class RecipeIngredientDetails {
             && Objects.equals(unit, recipeIngredientDetails.unit)
             && Objects.equals(ingredient, recipeIngredientDetails.ingredient)
             && Objects.equals(describer, recipeIngredientDetails.describer);
+    }
+
+    /**
+     * This is needed since we want a custom way to index ingredients with just name and FoodUnit.
+     *
+     * @return
+     */
+    public String getFridgeStringIdentifier() {
+        return ingredient + " " + (getUnit() != null ? getUnit().toString() : "");
     }
 
     @Override

@@ -1,7 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapperImpl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapperImpl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapperImpl;
@@ -32,7 +37,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -130,7 +134,7 @@ public class ProfileEndpointTest {
         // Clear data in users
         userRepository.findAll().forEach(user -> {
             user.setActiveProfile(null);
-            user.getProfiles().clear();
+            //user.getProfiles().clear();
             userRepository.save(user);
         });
 
@@ -199,8 +203,6 @@ public class ProfileEndpointTest {
         assertEquals(testUserId, resultProfileDto.userId(), "User Id should be same as testUserId");
         profileRepository.deleteById(resultProfileDto.id());
     }
-
-
 
 
 }

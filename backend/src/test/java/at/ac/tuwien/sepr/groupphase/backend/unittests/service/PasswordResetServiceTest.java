@@ -6,7 +6,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.PasswordResetRequest;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRequestRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.PasswordResetService;
@@ -63,7 +62,7 @@ public class PasswordResetServiceTest {
 
     @Test
     void testRequestPasswordReset_WithInvalidEmail_DoesThrow() {
-        assertThrows(UserNotFoundException.class, () -> service.requestPasswordReset("doesNotExist@asdf.com"));
+        assertThrows(NotFoundException.class, () -> service.requestPasswordReset("doesNotExist@asdf.com"));
     }
 
     @Test

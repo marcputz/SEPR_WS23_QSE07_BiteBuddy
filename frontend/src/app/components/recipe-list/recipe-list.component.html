@@ -23,14 +23,10 @@
     <div class="row row-form">
       <div class="col-md-3 mb-5" *ngFor="let recipe of recipes">
         <div class="card recipe-card">
-          <img [src]="sanitizeImage(recipe.picture)" class="card-img-top rounded-top img-zoom"
-               alt="Recipe Image">
-
+          <img *ngIf="getImageFor(recipe) !== null" [src]="sanitizeImage(getImageFor(recipe))" class="card-img-top rounded-top img-zoom" alt="Recipe Image">
           <div class="card-body">
             <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
-              <h5 class="card-title">
-                {{ recipe.name }}
-              </h5>
+              <h5 class="card-title">{{ recipe.name }}</h5>
             </a><br>
             <p class="card-text">Number of Persons: 4 persons | </p>
             <div class = "userinfo-buttons-space">
@@ -193,7 +189,9 @@
   <div class="row">
     <div class="col-md-auto p-3" *ngFor="let recipe of recipes">
       <div class="card border-primary">
-        <img class="card-img-top img-thumbnail" [src]="sanitizeImage(recipe.picture)" alt="Image of recipe">
+        <img *ngIf="getImageFor(recipe) !== null" [src]="sanitizeImage(getImageFor(recipe))" class="card-img-top rounded-top img-zoom" alt="Recipe Image">
+
+        <img class="card-img-top img-thumbnail" *ngIf="getImageFor(recipe) !== null" [src]="sanitizeImage(getImageFor(recipe))" alt="Image of recipe">
           <h5 class="card-title m-1">{{recipe.name}}</h5>
         <p class="card-text m-1">Preview of the recipe, but currently not implemented</p>
         <div class="row-cols-3">

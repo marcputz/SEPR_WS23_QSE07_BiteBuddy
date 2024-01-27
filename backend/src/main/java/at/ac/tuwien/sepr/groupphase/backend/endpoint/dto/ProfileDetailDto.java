@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeGetByIdDto;
+
 import java.util.ArrayList;
 
 public record ProfileDetailDto(

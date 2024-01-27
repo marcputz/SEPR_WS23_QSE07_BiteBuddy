@@ -196,7 +196,7 @@ public class ProfileServiceTest {
         // Clearing user profiles and active profiles
         userRepository.findAll().forEach(user -> {
             user.setActiveProfile(null);
-            user.getProfiles().clear();
+            //user.getProfiles().clear();
             userRepository.save(user);
         });
 
@@ -447,7 +447,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    public void deleteProfileNotExistingProfile(){
+    public void deleteProfileNotExistingProfile() {
         assertThrows(NotFoundException.class,
             () -> this.profileService.deleteProfile(-1L, testUserId));
     }

@@ -2,16 +2,19 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = ProfileEndpoint.BASE_PATH)
@@ -40,9 +44,12 @@ public class ProfileEndpoint {
     private final ProfileService profileService;
     private AuthenticationService authenticationService;
 
-    public ProfileEndpoint(ProfileService profileService, AuthenticationService authenticationService) {
+    private final UserService userService;
+
+    public ProfileEndpoint(ProfileService profileService, UserService userService, AuthenticationService authenticationService) {
         this.profileService = profileService;
         this.authenticationService = authenticationService;
+        this.userService = userService;
     }
 
 
@@ -79,13 +86,21 @@ public class ProfileEndpoint {
         return profileService.copyToUser(profileId, currentUserId);
     }
 
-    @PutMapping("/rating/{RecipeId}")
-    public void post(@Valid @RequestBody RecipeRatingDto recipeRatingDto, @RequestHeader HttpHeaders headers)
-        throws ValidationException, NotFoundException, AuthenticationException {
-        LOGGER.info("Received PUT request on {}", BASE_PATH);
-        LOGGER.debug("Request body for PUT:\n{}", recipeRatingDto);
+    @GetMapping
+    public List<ProfileListDto> getAllForUser(@RequestHeader HttpHeaders headers) throws AuthenticationException {
+        LOGGER.trace("getAllForUser({})", headers);
+
         this.authenticationService.verifyAuthenticated(headers);
-        profileService.rateRecipe(recipeRatingDto);
+
+        try {
+            Long userId = AuthTokenUtils.getUserId(this.authenticationService.getAuthToken(headers));
+            ApplicationUser thisUser = this.userService.getUserById(userId);
+
+            return this.profileService.getAllByUser(thisUser);
+
+        } catch (NotFoundException ex) {
+            throw new AuthenticationException("Error retrieving user data", ex);
+        }
     }
 
 
@@ -107,6 +122,24 @@ public class ProfileEndpoint {
         return profileService.editProfile(profileDto);
     }
 
+    @PutMapping("/rating/{RecipeId}")
+    public void postRating(@Valid @RequestBody RecipeRatingDto recipeRatingDto, @RequestHeader HttpHeaders headers)
+        throws ValidationException, NotFoundException, AuthenticationException {
+        LOGGER.info("Received PUT request on {}", BASE_PATH);
+        LOGGER.debug("Request body for PUT:\n{}", recipeRatingDto);
+        this.authenticationService.verifyAuthenticated(headers);
+        profileService.rateRecipe(recipeRatingDto);
+    }
+
+    @GetMapping("/rating/{userId}")
+    public RecipeRatingListsDto getRatingLists(@PathVariable long userId, @RequestHeader HttpHeaders headers)
+        throws NotFoundException, AuthenticationException {
+        LOGGER.info("Received Get request on {}", BASE_PATH);
+        LOGGER.debug("Request body for Get:\n{}", userId);
+        this.authenticationService.verifyAuthenticated(headers);
+        return profileService.getRatingLists(userId);
+    }
+
     @DeleteMapping("/deleteProfile/{profileId}")
     public ProfileDto delete(@PathVariable long profileId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException, ConflictException {
@@ -116,14 +149,5 @@ public class ProfileEndpoint {
         String authToken = this.authenticationService.getAuthToken(headers);
         Long currentUserId = AuthTokenUtils.getUserId(authToken);
         return profileService.deleteProfile(profileId, currentUserId);
-    }
-
-    @GetMapping("/userRating/{userId}")
-    public RecipeRatingListsDto getRatingLists(@PathVariable long userId, @RequestHeader HttpHeaders headers)
-        throws NotFoundException, AuthenticationException {
-        LOGGER.info("Received Get request on {}", BASE_PATH);
-        LOGGER.debug("Request body for Get:\n{}", userId);
-        this.authenticationService.verifyAuthenticated(headers);
-        return profileService.getRatingLists(userId);
     }
 }
