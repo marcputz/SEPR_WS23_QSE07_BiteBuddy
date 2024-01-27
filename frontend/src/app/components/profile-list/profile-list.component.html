@@ -90,15 +90,15 @@
                   </ng-container>
                   <li *ngIf="profile.disliked.length > 3">...</li>
                 </ul>
-                <div class = "buttons-flex">
-                  <button class="btn btn-primary btn-edit edit-button d-flex"
-                          [routerLink]="['/profiles/edit', profile.id]">
-                    Edit
-                  </button>
-                  <button class="btn btn-primary bi-trash delete-button d-flex"
-                          (click)="deleteProfile(profile.id, profile.name)"
-                  ></button>
-                </div>
+              </div>
+              <div class="buttons-flex mt-auto m-3">
+                <button class="btn btn-primary btn-edit edit-button d-flex"
+                        [routerLink]="['/profiles/edit', profile.id]">
+                  Edit
+                </button>
+                <button class="btn btn-danger bi-trash delete-button d-flex"
+                        (click)="deleteProfile(profile.id, profile.name)"
+                ></button>
               </div>
             </div>
           </div>
@@ -205,6 +205,8 @@
                   </ng-container>
                   <li *ngIf="profile.disliked.length > 3">...</li>
                 </ul>
+              </div>
+              <div class="buttons-flex mt-auto m-3">
                 <button class="btn btn-primary btn-add-to-own" (click)="addToOwn(profile.id)">+ Add to Own</button>
               </div>
             </div>
