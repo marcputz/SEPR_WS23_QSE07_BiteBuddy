@@ -296,7 +296,7 @@ public class RecipesEndpointTest {
     }
 
     @Test
-    public void getRecipeDetails() throws Exception {
+    public void getRecipeDetailsOfExistingRecipe() throws Exception {
         // creating request
         var body = mockMvc
             .perform(MockMvcRequestBuilders
@@ -329,6 +329,18 @@ public class RecipesEndpointTest {
                 .hasSize(1)
                 .contains("Fructose")
         );
+    }
+
+    @Test
+    public void getRecipeDetailsOfNonExistingRecipeRespondsNotFound() throws Exception {
+        // creating request
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .get("/api/v1/recipes/" + -100)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsByteArray();
+
     }
 
     @Test
