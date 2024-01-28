@@ -75,14 +75,19 @@ export class RecipeListComponent implements OnInit {
               this.createPagination();
             },
             error: error => {
-              console.error('Error getting rating list', error);
-              const errorMessage = error?.error || 'Unknown error occured';
-              if (error.message.includes("404")) {
-                this.router.navigate(["/profile"])
-                this.notification.warning("You need to create a profile before using the Website");
-              } else {
-                this.notification.error(`Error getting rating lists: ${errorMessage}`);
+
+              let errorObj = this.errorHandler.getErrorObject(error);
+
+              switch (errorObj.status) {
+                case 404:
+                  this.notification.warning("You need to create a profile before using the Website");
+                  this.router.navigate(["/profile"])
+                  break;
+                default:
+                  this.errorHandler.handleApiError(errorObj);
+                  break;
               }
+
             }
           });
       },
@@ -163,7 +168,6 @@ export class RecipeListComponent implements OnInit {
         const dataUrl = `data:image/jpg;base64,${imageBytes}`;
         return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
       } catch (error) {
-        // console.error('Error sanitizing image:', error);
         return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
       }
     }
@@ -194,21 +198,27 @@ export class RecipeListComponent implements OnInit {
                           this.dislikes = data.dislikes
                         },
                         error: error => {
-                          console.error('Error getting rating list', error);
-                          const errorMessage = error?.message || 'Unknown error occured';
-                          this.notification.error(this.errorFormatter.format(error));
+
+                          let errorObj = this.errorHandler.getErrorObject(error);
+                          this.errorHandler.handleApiError(errorObj);
+
                         }
                       });
                   },
                 );
               },
               error: error => {
-                console.error(error.message, error);
-                let title = "Could not rate recipe!";
-                this.notification.error(this.errorFormatter.format(error), title, {
-                  enableHtml: true,
-                  timeOut: 5000,
-                });
+
+                let errorObj = this.errorHandler.getErrorObject(error);
+
+                switch (errorObj.status) {
+                  case 500:
+                    this.notification.warning("Can not rate recipe, please try again later");
+                    break;
+                  default:
+                    this.errorHandler.handleApiError(errorObj);
+                    break;
+                }
               }
             }
           );
