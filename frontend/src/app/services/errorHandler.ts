@@ -11,8 +11,7 @@ import {UserService} from "./user.service";
 export class ErrorHandler {
 
   constructor(protected router: Router,
-              protected notifications: ToastrService,
-              private authService: UserService) {}
+              protected notifications: ToastrService) {}
 
   getErrorObject(error: any): ErrorDto {
 
@@ -61,7 +60,7 @@ export class ErrorHandler {
         break;
       case 401: // Unauthorized: logout at first then login again
         this.notifications.info("You were forcefully logged-out by the server, please log in again");
-        this.authService.logoutUser();
+        //Cannot make logout because of circular dependencies in the classes with userservice
         this.router.navigate(['login']);
         break;
       case 404: // not found
