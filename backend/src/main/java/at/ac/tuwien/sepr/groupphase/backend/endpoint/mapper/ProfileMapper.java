@@ -44,6 +44,7 @@ public interface ProfileMapper {
     @Mapping(target = "ingredients", source = "ingredient", qualifiedByName = "ingredientSetToIngredientDtoList")
     @Mapping(source = "user.nickname", target = "user")
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.userPicture", target = "userPicture")
     ProfileDetailDto profileToProfileDetailDto(Profile profile);
 
     @Named("allergeneSetToAllergeneDtoList")

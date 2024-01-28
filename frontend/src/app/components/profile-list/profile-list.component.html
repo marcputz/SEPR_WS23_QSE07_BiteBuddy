@@ -48,21 +48,12 @@
           <div class="col-md-4 d-flex flex-column" *ngFor="let profile of ownProfiles; let i = index">
             <!-- Card for each profile -->
             <div class="card h-100"> <!-- h-100 Cards expand to size of longest Card in line -->
-              <div class="card-header">
-                <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
-                  <h5 class="card-title"
-                      [ngStyle]="{'color': profile.id === activeprofileId ? 'green' : 'inherit'}">{{ profile.name }}</h5>
-                </a><br>
-                <div class="card-subtitle text-muted">
-                  <span>From Me:
-                    <!-- TODO: Add dynamic loading for user profile images -->
-                    <!-- TODO: Example: (load)="onImageLoad($event, profile.userId)"-->
-                    <img [ngSrc]="'/assets/icons/user_default.png'" width="35" height="35" style="margin-right: 5px;"
-                         alt="Profile Image">
-                    {{ profile.user }}</span>
-                </div>
-              </div>
               <div class="card-body">
+
+                <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
+                  <h2 *ngIf="profile.id === activeprofileId" class="card-title">{{ profile.name }}</h2>
+                  <h5 *ngIf="profile.id !== activeprofileId" class="card-title">{{ profile.name }}</h5>
+                </a>
                 <p class="card-text"><strong>Restricted Allergens:</strong></p>
                 <ul>
                   <ng-container *ngFor="let allergen of profile.allergens; let i = index">
@@ -177,7 +168,7 @@
                   <span>Created by:
                     <!-- TODO: Add dynamic loading for user profile images -->
                     <!-- TODO: (load)="onImageLoad($event, profile.userId)"-->
-                    <img [ngSrc]="'/assets/icons/user_default.png'" width="35" height="35" style="margin-right: 5px;"
+                    <img [ngSrc]="getPictureUrl(profile.userPicture)" width="35" height="35" style="margin-right: 5px;"
                          alt="Profile Image">
                     {{ profile.user }}</span>
                 </div>
