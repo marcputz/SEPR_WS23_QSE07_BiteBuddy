@@ -78,6 +78,7 @@ public class PictureEndpointTest {
     @AfterEach
     void cleanup() {
         repository.deleteAll();
+        userRepository.deleteAll();
     }
 
     public String authenticate() throws Exception {
