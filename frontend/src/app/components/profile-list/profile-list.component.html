@@ -2,10 +2,8 @@
 <div class="container-fluid">
   <div class="row flex-nowrap">
     <div class="col py-3">
-
       <div class="container">
         <h1 id="my-profiles" class="header mb-4">My Profiles</h1>
-
         <div class="row mb-5 align-items-center">
           <!-- Search Form Own-->
           <div class="col">
@@ -15,7 +13,6 @@
                      (ngModelChange)="searchOwnChanged()" aria-label="Search Profiles">
             </form>
           </div>
-
           <!-- Create Profile Button -->
           <div class="col-auto">
             <button class="btn btn-success rounded-pill" [routerLink]="['/profile']" aria-label="Create Profile">
@@ -24,8 +21,6 @@
           </div>
         </div>
       </div>
-
-
       <!-- Container for user profiles -->
       <div class="container">
         <div class="row">
@@ -88,11 +83,8 @@
           </div>
         </div>
       </div>
-
-
       <div class="container">
         <h1 id="discover-profiles" class="bb-dialog-box-header mb-4">Discover Profiles</h1>
-
         <!-- Pagination Section -->
         <div class="row justify-content-center mb-3">
           <nav aria-label="Page navigation">
@@ -126,6 +118,7 @@
           </nav>
         </div>
 
+        
         <!-- Search Form Discover -->
         <div class="row align-items-center mb-3">
           <div class="col">
@@ -140,8 +133,6 @@
           </div>
         </div>
       </div>
-
-
       <div class="container">
         <div class="row">
           <!-- Iterate through profiles -->
@@ -195,9 +186,6 @@
           </div>
         </div>
       </div>
-
-
     </div>
-
   </div>
 </div>
