@@ -196,7 +196,8 @@ export class MenuPlanLookupComponent implements OnInit {
     }
   }
 
-  formatDateLocally(inputDate: string, plusDay: number): string {
+  formatDateLocally(inputDate: string, plusDays: number): string {
+    console.log("inputdate: "  + inputDate);
     const months = [
       'January', 'February', 'March', 'April',
       'May', 'June', 'July', 'August',
@@ -204,11 +205,28 @@ export class MenuPlanLookupComponent implements OnInit {
     ];
 
     let [year, month, day] = inputDate.split('-').map(Number);
-    const monthName = months[month - 1];
-    day = day + plusDay;
-    const dayOrdinal = this.getDayOrdinal(day);
+    // Adjust the date by adding plusDays
+    day = day + plusDays;
 
+    // Check if there's an overflow to the next month
+    while (day > this.getDaysInMonth(year, month)) {
+      day -= this.getDaysInMonth(year, month);
+      month++;
+
+      // Check if there's an overflow to the next year
+      if (month > 12) {
+        month = 1;
+        year++;
+      }
+    }
+    let monthName = months[month - 1];
+    let dayOrdinal = this.getDayOrdinal(day);
     return `${monthName} ${day}${dayOrdinal}`;
+  }
+
+  getDaysInMonth(year: number, month: number): number {
+    // Function to get the number of days in a given month
+    return new Date(year, month, 0).getDate();
   }
 
   getDayOrdinal(day: number): string {
