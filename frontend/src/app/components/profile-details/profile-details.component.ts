@@ -1,7 +1,4 @@
 import { Component } from '@angular/core';
-import {RecipeDetailsDto, RecipeProfileViewDto} from "../../dtos/recipe";
-import {RecipeService} from "../../services/recipe.service";
-import {UserService} from "../../services/user.service";
 import {ProfileService} from "../../services/profile.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {DomSanitizer} from "@angular/platform-browser";

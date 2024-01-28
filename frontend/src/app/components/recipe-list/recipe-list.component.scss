@@ -102,19 +102,26 @@ img {
 
 .page-link {
   color: var(--button-background-color);
+  cursor: pointer;
 }
 
-.page-link:hover {
-  background-color: rgba(224, 219, 213, 21%);
+.page-link:hover,
+.pagination > li > span:hover,
+.pagination > li > a:hover {
+  background-color: rgba(224, 219, 213, 0.21);
   backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 
-/* Change color pagination full square from bootstrap 5 */
-.pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span {
+.pagination > li > a:focus,
+.pagination > li > span:focus,
+.page-link.active, .active > .page-link{
   background-color: var(--button-background-color);
   border-color: var(--button-background-color);
   backdrop-filter: blur(10px);
   color: white;
+
+  cursor: pointer;
 }
 
 .card-title-link-disa {

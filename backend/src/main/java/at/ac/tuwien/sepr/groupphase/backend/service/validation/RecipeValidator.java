@@ -43,6 +43,10 @@ public class RecipeValidator {
                 validationErrors.add("Recipe Name is too long");
             }
 
+            if (recipe.description() == null || recipe.description().trim().isEmpty()) {
+                validationErrors.add("Description of Recipe cannot be empty");
+            }
+
             // check that every recipe ingredient actually exists in the database
             if (!recipe.ingredients().isEmpty()) {
                 for (RecipeIngredientDto ingredient : recipe.ingredients()) {

@@ -38,11 +38,9 @@ const routes: Routes = [
     ]
   },
   {path: 'register', component: RegisterComponent}, // Register Page
-  {
-    path: '', component: NavbarLayoutComponent, children: [ // Pages using Navbar Layout
-      {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent}, // TODO: add dashboard component
-      {
-        path: 'recipes', canActivate: mapToCanActivate([AuthGuard]), children: [
+  {path: '', component: NavbarLayoutComponent, children: [ // Pages using Navbar Layout
+      {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent},
+      {path: 'recipes', canActivate: mapToCanActivate([AuthGuard]), children: [
           {path: '', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent},
           {path: 'create', canActivate: mapToCanActivate([AuthGuard]), component: RecipeCreateComponent},
           {path: ':id', canActivate: mapToCanActivate([AuthGuard]), component: RecipeDetailComponent},

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RecipeService} from "../../services/recipe.service";
 import {RecipeDetailsDto, RecipeDto, RecipeIngredientDto} from "../../dtos/recipe";
 import {Observable, of} from "rxjs";
@@ -10,12 +10,15 @@ import {ToastrService} from "ngx-toastr";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
 import {IngredientService} from "../../services/ingredient.service";
 
+import {UserService} from "../../services/user.service";
+import {ErrorHandler} from "../../services/errorHandler";
+
 @Component({
   selector: 'app-recipe-create',
   templateUrl: './recipe-create.component.html',
   styleUrls: ['./recipe-create.component.scss']
 })
-export class RecipeCreateComponent {
+export class RecipeCreateComponent implements OnInit {
   ingredient: string = '';
   recipe: RecipeDetailsDto = {
     name: '',
@@ -36,13 +39,24 @@ export class RecipeCreateComponent {
     private sanitizer: DomSanitizer,
     private router: Router,
     private notification: ToastrService,
-    private errorFormatter: ErrorFormatterService,
+    private errorHandler: ErrorHandler,
+    private userService: UserService
   ) {
   }
 
   ngOnInit(): void {
-
+    this.userService.isLoggedInForCreationComponent().subscribe({
+      next: value => {
+        console.log("user is logged in");
+      },
+      error: err => {
+        console.log("user is not logged in");
+        this.notification.error("Please login to create a recipe");
+        this.router.navigate(["/login"])
+      }
+    })
   }
+
 
   onPictureChange(event) {
     this.pictureSelected = event.target.files[0];
@@ -76,24 +90,16 @@ export class RecipeCreateComponent {
 
   onSubmit(form): void {
     if (form.valid && this.submitButtonClicked) {
-      // formatting image
-      console.log(this.pictureSelected);
-
-      console.log(this.recipe);
-
       this.service.createRecipe(this.recipe).subscribe({
         next: data => {
           this.notification.success("Successfully created new recipe!")
           this.router.navigate(['/recipes']);
         },
         error: error => {
-          console.log(error)
-          console.error(error.message, error);
-          let title = "Could not create recipe!";
-          this.notification.error(this.errorFormatter.format(error), title, {
-            enableHtml: true,
-            timeOut: 5000,
-          });
+          console.log("real error:")
+          console.warn(error)
+
+          this.errorHandler.handleApiError(error);
         }
       });
     }
@@ -127,7 +133,6 @@ export class RecipeCreateComponent {
 
     imageBytes = String.fromCharCode.apply(null, new Uint8Array(imageBytes));
     imageBytes = btoa(imageBytes);
-    console.log(imageBytes);
 
     try {
       if (!imageBytes || imageBytes.length === 0) {
@@ -139,6 +144,11 @@ export class RecipeCreateComponent {
       console.error('Error sanitizing image:', error);
       return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
     }
+  }
+
+  removeIngredient(ingredient) {
+    const indexToRemove = this.recipe.ingredients.indexOf(ingredient);
+    this.recipe.ingredients.splice(indexToRemove, 1);
   }
 
   ingredientSuggestions = (input: string) => (input === '')

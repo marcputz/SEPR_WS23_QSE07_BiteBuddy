@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.AllergeneService;
-import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +23,6 @@ public class AllergeneEndpoint {
         this.allergeneService = allergeneService;
     }
 
-    @Operation(summary = "Get allergens", description = "Get all allergens from database")
     @GetMapping
     public List<AllergeneDto> getAllAllergens() {
         LOGGER.info("Received GET request on {}", BASE_PATH);

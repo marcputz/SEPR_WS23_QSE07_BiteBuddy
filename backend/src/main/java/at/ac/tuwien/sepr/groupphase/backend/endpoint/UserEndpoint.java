@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -227,5 +228,18 @@ public class UserEndpoint {
         LOGGER.trace("resetPassword({})", dto);
 
         passwordResetService.resetPassword(dto);
+    }
+
+    @GetMapping("/request_login_status")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean loginStatus(@RequestHeader HttpHeaders headers) {
+        LOGGER.trace("loginStatus()");
+
+        try {
+            this.authenticationService.verifyAuthenticated(headers);
+        } catch (AuthenticationException e) {
+            return false;
+        }
+        return true;
     }
 }

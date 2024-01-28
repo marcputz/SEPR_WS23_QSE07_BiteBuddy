@@ -10,6 +10,9 @@ import {IngredientService} from "../../services/ingredient.service";
 import {AllergensService} from "../../services/allergens.service";
 import {UserService} from "../../services/user.service";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
+import {Observable} from "rxjs";
+import {RecipeDetailsDto} from "../../dtos/recipe";
+import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
   selector: 'app-profile-edit',
@@ -46,7 +49,8 @@ export class ProfileEditComponent {
     private router: Router,
     private route: ActivatedRoute,
     private notification: ToastrService,
-    private authService: UserService
+    private authService: UserService,
+    private errorHandler: ErrorHandler
   ) {
     // Initialize the form in the constructor
     this.form = this.fb.group({
@@ -126,6 +130,17 @@ export class ProfileEditComponent {
               }
             });
         },
+        error => {
+          console.error('Error getting user settings', error);
+          const errorMessage = error?.error || 'Unknown error occurred';
+
+          let errorObj = this.errorHandler.getErrorObject(error);
+
+          if (error.status === 401) {
+            // Handle logout logic, e.g., redirect to login page
+            this.errorHandler.handleApiError(errorObj);
+          }
+        }
       );
 
     }

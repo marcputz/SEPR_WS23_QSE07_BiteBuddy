@@ -9,6 +9,7 @@ import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {CheckRatingDto} from "../../dtos/profileDto";
 import {PictureService} from "../../services/picture.service";
 import {PictureDto} from "../../dtos/pictureDto";
+import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
   selector: 'app-recipe-detail',
@@ -43,7 +44,8 @@ export class RecipeDetailComponent implements OnInit {
     private pictureService: PictureService,
     private router: Router,
     private route: ActivatedRoute,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private errorHandler: ErrorHandler
   ) {
 
   }
@@ -87,7 +89,19 @@ export class RecipeDetailComponent implements OnInit {
               }
             }
           );
-      });
+      },
+      error => {
+        console.error('Error getting user settings', error);
+        const errorMessage = error?.error || 'Unknown error occurred';
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+
+        if (error.status === 401) {
+          // Handle logout logic, e.g., redirect to login page
+          this.errorHandler.handleApiError(errorObj);
+        }
+      }
+    );
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {

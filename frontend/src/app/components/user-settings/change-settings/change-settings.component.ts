@@ -91,7 +91,9 @@ export class ChangeSettingsComponent implements OnInit {
       },
       complete: () => {
       }
-    });
+    },
+
+    );
   }
 
   loadUserPicture(userPictureArray: number[]) {

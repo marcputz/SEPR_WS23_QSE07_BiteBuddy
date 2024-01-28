@@ -1,7 +1,4 @@
-
-
-
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {debounceTime, Subject} from "rxjs";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ToastrService} from "ngx-toastr";
@@ -24,7 +21,7 @@ import {UserService} from "../../services/user.service";
   templateUrl: './menu-plan-lookup.component.html',
   styleUrls: ['./menu-plan-lookup.component.scss']
 })
-export class MenuPlanLookupComponent {
+export class MenuPlanLookupComponent implements OnInit {
 
   menuplan: MenuPlanDetailDto;
   searchday: string = new Date().toString();
