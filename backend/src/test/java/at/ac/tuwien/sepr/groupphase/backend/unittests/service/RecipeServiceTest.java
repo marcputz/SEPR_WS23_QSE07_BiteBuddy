@@ -16,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
@@ -27,6 +28,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,8 +44,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -256,7 +257,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    public void getRecipeDetails() throws Exception {
+    public void getRecipeDetailsOfExistingRecipe() throws Exception {
         RecipeDetailsDto details = this.recipeService.getDetailedRecipe(recipe1Id);
 
         // asserting test
@@ -280,6 +281,13 @@ public class RecipeServiceTest {
                 .hasSize(1)
                 .contains("Fructose")
         );
+    }
+
+    @Test
+    public void getRecipeDetailsOfNotExistingRecipe() throws Exception {
+
+        assertThrows(NotFoundException.class,
+            () -> this.recipeService.getDetailedRecipe(-100L));
     }
 
     @Test

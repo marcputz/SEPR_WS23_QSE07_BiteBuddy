@@ -135,7 +135,7 @@ public class ProfileValidator {
         List<String> conflictErrors = new ArrayList<>();
 
         if (Objects.equals(currentUser.getActiveProfile().getId(), profile.getId())) {
-            conflictErrors.add("The active profile " + profile.getName() + " can not be deleted.");
+            conflictErrors.add("The active profile can not be deleted.");
         }
 
         if (!Objects.equals(profile.getUser().getId(), currentUser.getId())) {
@@ -143,7 +143,7 @@ public class ProfileValidator {
         }
 
         if (!conflictErrors.isEmpty()) {
-            throw new ConflictException("Conflict during deletion of a profile, profile deletion failed: ", conflictErrors);
+            throw new ConflictException("Deletion of Profile has conflict errors", conflictErrors);
         }
     }
 
