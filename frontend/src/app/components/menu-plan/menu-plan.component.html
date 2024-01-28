@@ -1,0 +1,53 @@
+<div class="container-fluid" style="width: 100%;align-content: center">
+  <div class="justify-content-center align-items-center" style="display: flex; flex-direction: row; margin-bottom: 1rem;">
+    <form style="margin-right: 1rem;">
+      <label for="profileDropdown"><b>Select a Profile:</b></label>
+      <select name="profileDropdown" [(ngModel)]="selectedProfile" id="profileDropdown" class="bb-dropdown"
+              style="margin-bottom: 10px; width: 100%;">
+        <option *ngFor="let profile of userProfiles" [value]="profile.id">{{ profile.name }}</option>
+      </select>
+    </form>
+    <button (click)="onClickGenerate()" class="bb-button"><i class="bi-database-fill-add"
+                                                             style="margin-right: 0.6rem;margin-left: 0.6rem;"></i>Generate
+    </button>
+  </div>
+
+  <div class="" style="display: flex; flex-direction: row;">
+    <div class="card" style="width: 100%">
+      <div class="card-header" style="text-align: center"><b>Fridge</b></div>
+      <table class="table" style="text-align: start; padding-left: 5px">
+        <thead>
+        <tr>
+          <td><b style="margin-left: 2rem;">Ingredient Name</b></td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let ingredient of createDto.fridge">
+          <td><p style="margin-left: 2rem;">{{ ingredient }}</p></td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div class="justify-content-center align-items-center" style="display: flex; flex-direction: row">
+        <div style="width: 50%;">
+          <app-autocomplete
+            #ingredientInput
+            id="ingredients"
+            name="ingredients"
+            class="rounded-pill"
+            textInputClass="input"
+            valueNeedsToMatchSuggestion="true"
+            [(ngModel)]="ingredient"
+            [formatModel]="formatIngredient"
+            [suggestions]="ingredientSuggestions"
+          ></app-autocomplete>
+        </div>
+        <div>
+          <button (click)="addIngredientToFridge(ingredientInput)" class="btn btn-success rounded-pill">
+            <i class="bi-plus-square"></i> Add
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
