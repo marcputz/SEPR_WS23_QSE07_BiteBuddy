@@ -79,7 +79,7 @@ export class RecipeListComponent implements OnInit {
               const errorMessage = error?.error || 'Unknown error occured';
               if (error.message.includes("404")) {
                 this.router.navigate(["/profile"])
-                this.notification.error("You need to create a profile before using the Website");
+                this.notification.warning("You need to create a profile before using the Website");
               } else {
                 this.notification.error(`Error getting rating lists: ${errorMessage}`);
               }
@@ -112,8 +112,6 @@ export class RecipeListComponent implements OnInit {
         this.recipes = data.recipes;
         this.maxPages = data.numberOfPages;
         this.searchParams.page = data.page;
-        console.log("number of pages: " + data.numberOfPages);
-        console.log("recipes available: " + data.recipes.length);
 
         this.createPagination()
 
@@ -183,8 +181,6 @@ export class RecipeListComponent implements OnInit {
     this.authService.getUser().subscribe(
       (settings: UserSettingsDto) => {
         this.recipeRating.userId = settings.id;
-        console.log(settings);
-        console.log(this.recipeRating)
         this.profileService.createRating(this.recipeRating)
           .subscribe({
               next: data => {
@@ -200,14 +196,13 @@ export class RecipeListComponent implements OnInit {
                         error: error => {
                           console.error('Error getting rating list', error);
                           const errorMessage = error?.message || 'Unknown error occured';
-                          this.notification.error(`Error getting rating lists: ${errorMessage}`);
+                          this.notification.error(this.errorFormatter.format(error));
                         }
                       });
                   },
                 );
               },
               error: error => {
-                console.log(error)
                 console.error(error.message, error);
                 let title = "Could not rate recipe!";
                 this.notification.error(this.errorFormatter.format(error), title, {
