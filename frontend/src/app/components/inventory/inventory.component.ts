@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {InventoryListDto} from "../../dtos/InventoryListDto";
 import {InventoryIngredientDto} from "../../dtos/InventoryIngredientDto";
 import {ToastrService} from "ngx-toastr";
@@ -10,7 +10,9 @@ import {Router} from "@angular/router";
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.scss']
 })
-export class InventoryComponent {
+export class InventoryComponent implements OnInit {
+  maxRows = 20;
+  maxRowsAvailable = 20;
   inventory: InventoryListDto = {
     missing: [],
     available: []
@@ -32,13 +34,20 @@ export class InventoryComponent {
     });
   }
 
-
-
   public getInventory() {
     this.service.getInventory().subscribe({
       next: value => {
         console.log(value);
         this.inventory = value;
+
+        if (this.inventory.missing.length > 20) {
+          this.maxRows = this.inventory.missing.length / 2;
+        }
+
+        if (this.inventory.available.length > 20) {
+          this.maxRowsAvailable = this.inventory.available.length / 2;
+        }
+
         this.notification.success("Loaded inventory successfully");
       },
       error: error => {
@@ -103,7 +112,8 @@ export class InventoryComponent {
       } else if (ingred.unit == null || ingred.amount == -1) {
         return ingred.name;
       } else {
-        return ingred.name + ", " + ingred.amount.toFixed(1) + " " + ingred.unit;
+        return (ingred.amount % 1 !== 0 ? ingred.amount.toFixed(1) : ingred.amount.toString()) + " "
+          + ingred.unit + ", " + ingred.name;
       }
     }
     return "";
@@ -116,4 +126,6 @@ export class InventoryComponent {
   public ngOnInit() {
     this.reload();
   }
+
+  protected readonly Math = Math;
 }

@@ -72,7 +72,7 @@ export class MenuPlanComponent implements OnInit {
         let status = errorObject.status;
         let message = errorObject.error;
 
-        switch(status) {
+        switch (status) {
           case 401:
             this.notifications.error("Please log in again", "Login Timeout");
             this.router.navigate(['/login']);
@@ -87,6 +87,11 @@ export class MenuPlanComponent implements OnInit {
 
   formatIngredient(ingredient: String | null) {
     return ingredient ?? '';
+  }
+
+  removeIngredient(ingredient) {
+    const indexToRemove = this.createDto.fridge.indexOf(ingredient);
+    this.createDto.fridge.splice(indexToRemove, 1);
   }
 
   ingredientSuggestions = (input: string) => (input === '')
