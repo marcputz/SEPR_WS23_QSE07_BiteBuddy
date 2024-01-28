@@ -46,9 +46,15 @@ export class RecipeCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.isLoggedInForCreationComponent().subscribe({
+      next: value => {
+        if (!value) {
+          this.notification.error("You need to be logged in to create a recipe");
+          this.router.navigate(["/login"]);
+        }
+      },
       error: err => {
-        this.notification.info("You have been forcefully logged-out by the server, please log in again!");
-        this.router.navigate(["/login"])
+        let errorDto = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorDto);
       }
     })
   }

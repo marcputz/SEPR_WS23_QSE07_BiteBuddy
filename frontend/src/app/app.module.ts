@@ -27,7 +27,7 @@ import { DatePipe, NgOptimizedImage} from "@angular/common";
 import { RecipeCreateComponent } from './components/recipe-create/recipe-create.component';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
 import { ProfileComponent } from './components/dialogs/profile/profile.component';
-import { MenuPlanComponent } from './components/menu-plan/menu-plan.component';
+import { MenuPlanCreateComponent } from './components/menu-plan-create/menu-plan-create-component';
 import { InventoryComponent } from './components/inventory/inventory.component';
 import { MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
 import { NavbarLayoutComponent } from './layouts/navbar-layout/navbar-layout.component';
@@ -56,7 +56,7 @@ import { ProfileDetailsComponent } from './components/profile-details/profile-de
     RecipeCreateComponent,
     AutocompleteComponent,
     ProfileComponent,
-    MenuPlanComponent,
+    MenuPlanCreateComponent,
     InventoryComponent,
     MenuPlanLookupComponent,
     NavbarLayoutComponent,

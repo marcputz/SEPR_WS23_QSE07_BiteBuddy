@@ -17,7 +17,6 @@ import {ChangePasswordComponent} from './components/user-settings/change-passwor
 import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout.component";
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
-import {MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
 import {InventoryComponent} from "./components/inventory/inventory.component";
 import {MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
 import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
@@ -64,14 +63,6 @@ const routes: Routes = [
         path: '', canActivate: mapToCanActivate([AuthGuard]), component: DialogLayoutComponent, children: [
           {path: 'edit/:id', canActivate: mapToCanActivate([AuthGuard]), component: ProfileEditComponent}]
       }
-    ]
-  },
-  {
-    path: 'menuplan',
-    canActivate: mapToCanActivate([AuthGuard]),
-    component: NavbarLayoutComponent, // Use the same NavbarLayoutComponent for the layout
-    children: [
-      {path: '', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent}
     ]
   },
   {

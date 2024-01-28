@@ -1,7 +1,7 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ProfileService} from "../../services/profile.service";
 import {MenuPlanCreateDto} from "../../dtos/menuplan/menuPlanCreateDto";
-import {DatePipe, formatDate} from "@angular/common";
+import {formatDate} from "@angular/common";
 import {MenuPlanService} from "../../services/menuplan.service";
 import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
@@ -11,11 +11,11 @@ import {ProfileListDto} from "../../dtos/profileDto";
 import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
-  selector: 'app-menu-plan',
-  templateUrl: './menu-plan.component.html',
-  styleUrls: ['./menu-plan.component.scss']
+  selector: 'app-menu-plan-create',
+  templateUrl: './menu-plan-create-component.html',
+  styleUrls: ['./menu-plan-create-component.scss']
 })
-export class MenuPlanComponent implements OnInit {
+export class MenuPlanCreateComponent implements OnInit {
 
   @Output() submitClicked: EventEmitter<any> = new EventEmitter();
   protected generateRequest: string | null = null;
@@ -37,7 +37,6 @@ export class MenuPlanComponent implements OnInit {
 
   constructor(private service: MenuPlanService,
               private profileService: ProfileService,
-              private datePipe: DatePipe,
               protected router: Router,
               protected notification: ToastrService,
               private recipeService: RecipeService,
@@ -85,7 +84,6 @@ export class MenuPlanComponent implements OnInit {
             this.errorHandler.handleApiError(errorObj);
             break;
         }
-
       }
     )
   }

@@ -230,6 +230,13 @@ public class UserEndpoint {
         passwordResetService.resetPassword(dto);
     }
 
+    /**
+     * Returns true if the user is logged in and false if the user is not logged in.
+     *
+     * @param headers {@link HttpHeaders} with auth token.
+     * @return boolean of true or false depending on the user status.
+     * @author Frederik Skiera
+     */
     @GetMapping("/request_login_status")
     @ResponseStatus(HttpStatus.OK)
     public Boolean loginStatus(@RequestHeader HttpHeaders headers) {

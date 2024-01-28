@@ -137,7 +137,9 @@ export class RecipeListComponent implements OnInit {
         }
       },
       error: err => {
-        this.notification.error('Error fetching recipes', err)
+        // this.notification.error('Error fetching recipes', err)
+        let errorObj = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorObj);
       }
     })
   }

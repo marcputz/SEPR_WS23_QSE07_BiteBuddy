@@ -12,9 +12,30 @@ import java.util.List;
 
 @Repository
 public interface RecipeIngredientRepository extends JpaRepository<RecipeIngredient, Long> {
+    /**
+     * Finds all recipe ingredients which are used in a specific recipe.
+     *
+     * @param recipe for which want the recipe ingredients.
+     * @return List of {@link RecipeIngredient} which are used in given recipe.
+     * @author Thomas Hellweger
+     */
     List<RecipeIngredient> findByRecipe(Recipe recipe);
 
+    /**
+     * Finds all recipe ingredients for a given (basic) ingredient.
+     *
+     * @param id of basic ingredient.
+     * @return List of {@link RecipeIngredient} which use the basic ingredient.
+     * @author Frederik Skiera
+     */
     List<RecipeIngredient> findByIngredient_Id(Long id);
 
+    /**
+     * Finds all the recipes which use a specific {@link RecipeIngredientDetails}.
+     *
+     * @param details we want to find in the recipe ingredients.
+     * @return List of {@link RecipeIngredient} which use the given recipe ingredient details.
+     * @author Frederik Skiera
+     */
     List<RecipeIngredient> findByAmountEquals(RecipeIngredientDetails details);
 }

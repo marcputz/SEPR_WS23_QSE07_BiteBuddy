@@ -637,7 +637,7 @@ public class JpaMenuPlanService implements MenuPlanService {
             HashMap<Long, InventoryIngredient> basicInventory = new HashMap<>();
 
             // getting possible existing fridge
-            List<InventoryIngredient> existingFridge = this.inventoryIngredientRepository.findAllyByMenuPlanId(menuPlan.getId());
+            List<InventoryIngredient> existingFridge = this.inventoryIngredientRepository.findAllByMenuPlanId(menuPlan.getId());
             if (!existingFridge.isEmpty()) {
                 for (InventoryIngredient inv : existingFridge) {
                     // basic ingredients do not have a detailed ingredient Name
@@ -745,7 +745,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         List<InventoryIngredientDto> missing = new ArrayList<>();
         List<InventoryIngredientDto> available = new ArrayList<>();
         if (menuPlanId != null) {
-            List<InventoryIngredient> inventory = this.inventoryIngredientRepository.findAllyByMenuPlanId(menuPlanId);
+            List<InventoryIngredient> inventory = this.inventoryIngredientRepository.findAllByMenuPlanId(menuPlanId);
 
             for (InventoryIngredient ingred : inventory) {
                 InventoryIngredientDto newDto =

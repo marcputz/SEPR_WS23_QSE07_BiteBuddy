@@ -56,7 +56,6 @@ export class RecipeDetailComponent implements OnInit {
     this.service.getById(this.recipeDetails.id).subscribe(
       (recipeDetails: RecipeDetailsDto) => {
         this.recipeDetails = recipeDetails;
-        console.log(recipeDetails);
 
         // load image
         this.pictureService.getPicture(this.recipeDetails.pictureId).subscribe({
@@ -73,7 +72,6 @@ export class RecipeDetailComponent implements OnInit {
     this.authService.getUser().subscribe(
       (settings: UserSettingsDto) => {
         this.userId = settings.id;
-        console.log(settings);
         this.profileService.getRatingLists(this.userId)
           .subscribe(
             (recipeRatingListsDto: RecipeRatingListsDto) => {
