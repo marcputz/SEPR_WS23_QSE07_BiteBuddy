@@ -1,45 +1,38 @@
 <div *ngIf="this.showCreateDialog" class="bb-modal" tabindex="-1">
-  <div class="bb-modal-dialog">
-    <a style="text-align: start; width: 100%;" class="bb-link" (click)="this.showCreateDialog = false;"><i class="bi-x"></i>Close</a>
-    <h2 style="margin-bottom: 1.5rem; text-align: start; width: 100%;">New Menu Plan</h2>
-    <form style="display: flex; flex-direction: row; width: 100%;">
-      <div style="display: flex; flex-direction: column; margin-right: 1.5rem; width: 100%; text-align: start;">
-        <label for="profileDropdown"><b>Select a Profile:</b></label>
-        <select name="profileDropdown" id="profileDropdown" style="width: 90%;" class="bb-dropdown" style="margin-bottom: 10px;" [(ngModel)]="createSelectedProfile">
-          <option *ngFor="let profile of createUserProfiles" [value]="profile.id">{{profile.name}}</option>
-        </select>
-      </div>
-      <button (click)="onClickGenerate()" class="bb-button"><i class="bi-database-fill-add" style="margin-right: 0.6rem;"></i>Generate</button>
-    </form>
+  <div class="bb-modal-dialog" style="width: 100%;height: 100%">
+    <a style="text-align: start; width: 100%;" class="bb-link" (click)="this.showCreateDialog = false;"><i
+      class="bi-x"></i>Close</a>
+    <h2 style="margin-bottom: 1.5rem; text-align: center; width: 100%;">New Menu Plan</h2>
+    <app-menu-plan style="width: 100%">
+    </app-menu-plan>
   </div>
 </div>
 
 <div class="container">
-  <div class="row justify-content-center">
-    <h1 class="text-center">My Menuplans</h1>
-  </div>
+  <h1 style="text-align: center">My Menuplans</h1>
 </div>
 
 <!-- Check if menuplans has a size greater than or equal to 1 -->
 <div *ngIf="menuplans.length >= 1">
-  <div class="row">
-    <label for="menuplans" class="col-form-label text-md-start text-muted">
-      <span style="font-weight: bold;">Which menuplan do you want to see?</span>
-      <span class="required-asterisk">*</span>
-    </label>
+  <label for="menuplans" style="text-align: center; width: 100%">
+    <span style="font-weight: bold;text-align: center;width: 100%">Which menuplan do you want to see?</span>
+    <span class="required-asterisk">*</span>
+  </label>
+  <div class="row justify-content-center align-items-center">
     <select multiple class="form-select custom-select"
             id="menuplans"
-            style="font-weight: bold;"
+            style="font-weight: bold;width: 20%; text-align: center;"
             formControlName="menuplans"
             (change)="onMenuPlanSelected($event)"
             required>
       <option *ngFor="let m of menuplans" [value]="m.fromTime">
-        {{m.fromTime}} to {{m.untilTime}}
+        {{ m.fromTime }} to {{ m.untilTime }}
       </option>
     </select>
   </div>
-
-  <button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
+  <div class="row justify-content-center align-items-center">
+    <button (click)="this.showCreateDialog = true;" style="width: 20%" class="rounded-pill">Add Menu Plan</button>
+  </div>
 </div>
 
 <!-- If menuplans has a size less than 1, show the message -->
@@ -47,8 +40,6 @@
   <p>You have to add a Menuplan!
     <button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
 </div>
-
-
 
 
 <!--
@@ -86,12 +77,12 @@
 -->
 
 
-
-
 <div class="row">
-  <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6" *ngFor="let content of contents; let i = index">
+  <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6"
+       *ngFor="let content of contents; let i = index">
     <div class="card recipe-card h-100">
-      <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail w-100" [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
+      <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail w-100"
+           [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
       <div class="card-body">
         <a class="card-title-link-disa" [routerLink]="['/recipes', content.recipe.id]">
           <h5 class="card-title">{{ content.recipe.name }}</h5>

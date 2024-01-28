@@ -299,17 +299,13 @@ public class RecipeServiceImpl implements RecipeService {
                     ingredient.getAmount().getUnit()));
             }
 
-
             if (newIngredients.isEmpty()) {
                 throw new NotFoundException("The searched for recipe does not have any ingredients");
             } else {
                 ArrayList<String> allergens = new ArrayList<>();
                 for (RecipeIngredient recipeIngredient : ingredients) {
-                    System.out.println(recipeIngredient.getIngredient());
                     List<AllergeneIngredient> allergensIngredient = this.allergeneIngredientRepository.findByIngredient(recipeIngredient.getIngredient());
-                    System.out.println(allergensIngredient);
                     for (AllergeneIngredient allergene : allergensIngredient) {
-                        System.out.println(allergene.getAllergene().getName());
                         if (!allergens.contains(allergene.getAllergene().getName())) {
                             allergens.add(allergene.getAllergene().getName());
                         }

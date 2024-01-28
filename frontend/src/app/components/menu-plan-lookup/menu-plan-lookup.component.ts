@@ -22,7 +22,7 @@ import {UserService} from "../../services/user.service";
   styleUrls: ['./menu-plan-lookup.component.scss']
 })
 export class MenuPlanLookupComponent implements OnInit {
-
+  fridge: string[];
   menuplan: MenuPlanDetailDto;
   searchday: string = new Date().toString();
   menuplans: MenuPlanDetailDto[];
@@ -34,8 +34,6 @@ export class MenuPlanLookupComponent implements OnInit {
   recipeImages: Map<RecipeListDto, number[]> = null;
 
 
-
-
   constructor(
     private service: MenuPlanService,
     private profileService: ProfileService,
@@ -44,9 +42,9 @@ export class MenuPlanLookupComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private notification: ToastrService,
     private pictureService: PictureService,
-
   ) {
   }
+
   ngOnInit() {
     this.updateValue = null;
     this.searchday = new Date().toString();
@@ -72,7 +70,7 @@ export class MenuPlanLookupComponent implements OnInit {
     });
   }
 
-  getMenuPlans(){
+  getMenuPlans() {
     this.service.getMenuPlans().subscribe({
       next: data => {
         this.menuplans = data;
@@ -91,6 +89,7 @@ export class MenuPlanLookupComponent implements OnInit {
       return "Recipe Image";
     }
   }
+
   getMenuPlan() {
     console.log("before sending getMenuPlan date: " + this.searchday);
     this.service.getMenuPlanForDay(this.searchday).subscribe({
@@ -123,16 +122,18 @@ export class MenuPlanLookupComponent implements OnInit {
       }
     })
   }
+
   onMenuPlanSelected(event: Event): void {
     const selectedMenuPlanValue = (event.target as HTMLSelectElement).value;
     this.searchday = selectedMenuPlanValue.replace(/^\d+/, '').replace(':', '').replace(/'/g, '');
     this.searchChanged();
   }
+
   searchChanged(): void {
     this.searchChangedObservable.next();
   }
 
-  likeRecipe( c: MenuPlanContentDetailDto) {
+  likeRecipe(c: MenuPlanContentDetailDto) {
     // Call your like function logic here
 
     console.log('Recipe liked!');
@@ -250,51 +251,6 @@ export class MenuPlanLookupComponent implements OnInit {
 
   protected createUserProfiles: ProfileListDto[];
   protected createSelectedProfile: number | null = null;
-
-  onClickGenerate() {
-
-    if (this.createSelectedProfile == null) {
-      this.notification.warning("Please select a profile");
-      return;
-    }
-
-    let createDto: MenuPlanCreateDto = {
-      profileId: -1,
-      fromTime: Date.now().toString(),
-      untilTime: Date.now().toString(),
-      fridge: []
-    }
-
-    let fromDate = new Date();
-    let untilDate = new Date();
-    untilDate.setDate(untilDate.getDate() + 6);
-
-    createDto.fromTime = formatDate(fromDate, 'yyyy-MM-dd', 'en_US');
-    createDto.untilTime = formatDate(untilDate, 'yyyy-MM-dd', 'en_US');
-    createDto.profileId = this.createSelectedProfile;
-
-    this.service.generateMenuPlan(createDto).subscribe(
-      data => {
-        console.info("Created new Menu Plan");
-        this.showCreateDialog = false;
-        this.ngOnInit();
-      },
-      error => {
-
-        let errorObj = this.errorHandler.getErrorObject(error);
-
-        switch (errorObj.status) {
-          case 409: // conflict
-            this.notification.warning("You already have an active menu plan active for now, please wait for the current plan to end");
-            break;
-          default:
-            this.errorHandler.handleApiError(errorObj);
-            break;
-        }
-
-      }
-    )
-  }
 }
 
 
