@@ -120,4 +120,11 @@ export class RecipeDetailComponent implements OnInit {
   isInteger(value: number): boolean {
     return Number.isInteger(value);
   }
+
+  roundToTwoDecimals(value: number): number {
+    if(value % 1 !== 0){
+      return +(value.toFixed(2));
+    }
+    return value;
+  }
 }
