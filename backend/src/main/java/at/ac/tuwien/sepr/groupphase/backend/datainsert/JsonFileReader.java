@@ -65,7 +65,9 @@ public class JsonFileReader {
 
     @PostConstruct
     public void putFoodDataInDataBase() {
-        LOGGER.info("called putting FoodData into Database from File");
+        LOGGER.trace("putFoodDataInDataBase()");
+
+        LOGGER.info("Populating DB with Food Data");
 
         try {
             File fileIngredients = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_INGREDIENTS);
