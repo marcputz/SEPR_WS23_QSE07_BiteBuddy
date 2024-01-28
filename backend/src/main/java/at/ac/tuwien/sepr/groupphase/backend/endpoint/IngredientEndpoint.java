@@ -25,7 +25,6 @@ public class IngredientEndpoint {
         this.ingredientService = ingredientService;
     }
 
-    @Operation(summary = "Get ingredients", description = "Get all ingredient from database")
     @GetMapping
     public List<IngredientDto> getAllIngredients() {
         LOGGER.info("Received GET request on {}", BASE_PATH);

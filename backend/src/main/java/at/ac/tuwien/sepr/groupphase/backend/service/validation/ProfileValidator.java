@@ -36,7 +36,6 @@ public class ProfileValidator {
         }
     }
 
-    //Validator method used in update and create methods
     /**
      * Validate the given profile's username.
      *

@@ -8,8 +8,9 @@ import {ProfileService} from '../../services/profile.service';
 import {ToastrService} from 'ngx-toastr';
 import {UserSettingsDto} from '../../dtos/userSettingsDto';
 import {UserService} from '../../services/user.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {debounceTime, Subject} from 'rxjs';
+import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
   selector: 'app-profile-list',
@@ -41,6 +42,8 @@ export class ProfileListComponent {
     private notification: ToastrService,
     private authService: UserService,
     private route: ActivatedRoute,
+    private router: Router,
+    private errorHandler: ErrorHandler
   ) {
   }
 
@@ -72,7 +75,19 @@ export class ProfileListComponent {
         console.log('Got UserId: ' + settings.id);
         this.reloadOwnProfiles();
         this.reloadDiscoverProfiles();
-      });
+      },
+      error => {
+        console.error('Error getting user settings', error);
+        const errorMessage = error?.error || 'Unknown error occurred';
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+
+        if (error.status === 401) {
+          // Handle logout logic, e.g., redirect to login page
+          this.errorHandler.handleApiError(errorObj);
+        }
+      }
+    );
     this.route.fragment.subscribe(fragment => {
       this.fragment = fragment;
     });

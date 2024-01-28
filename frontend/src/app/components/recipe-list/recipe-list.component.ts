@@ -12,6 +12,7 @@ import {ErrorFormatterService} from "../../services/error-formatter.service";
 import {Router} from "@angular/router";
 import {PictureService} from "../../services/picture.service";
 import {PictureDto} from "../../dtos/pictureDto";
+import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
   selector: 'app-recipe-list',
@@ -50,6 +51,7 @@ export class RecipeListComponent implements OnInit {
     private notification: ToastrService,
     private errorFormatter: ErrorFormatterService,
     private router: Router,
+    private errorHandler: ErrorHandler
   ) {
   }
 
@@ -80,8 +82,18 @@ export class RecipeListComponent implements OnInit {
                       }
                   });
           },
-      );
+        error => {
+          console.error('Error getting user settings', error);
+          const errorMessage = error?.error || 'Unknown error occurred';
 
+          let errorObj = this.errorHandler.getErrorObject(error);
+
+          if (error.status === 401) {
+            // Handle logout logic, e.g., redirect to login page
+            this.errorHandler.handleApiError(errorObj);
+          }
+        }
+      );
   }
 
   searchChanged(): void {

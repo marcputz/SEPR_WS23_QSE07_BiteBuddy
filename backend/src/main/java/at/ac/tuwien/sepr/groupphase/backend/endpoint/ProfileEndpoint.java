@@ -52,7 +52,6 @@ public class ProfileEndpoint {
         this.userService = userService;
     }
 
-
     @PostMapping("/search")
     public ProfileSearchResultDto searchProfiles(@Valid @RequestBody ProfileSearchDto searchParams, @RequestHeader HttpHeaders headers)
         throws AuthenticationException {

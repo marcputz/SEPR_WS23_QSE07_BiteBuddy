@@ -1,8 +1,8 @@
 import {Injectable} from "@angular/core";
 import {ToastrService} from "ngx-toastr";
 import {ErrorDto} from "../dtos/errorDto";
-import {toNumber} from "lodash";
 import {Router} from "@angular/router";
+import {UserService} from "./user.service";
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,9 @@ import {Router} from "@angular/router";
 
 export class ErrorHandler {
 
-  constructor(protected router: Router, protected notifications: ToastrService) {}
+  constructor(protected router: Router,
+              protected notifications: ToastrService,
+              private authService: UserService) {}
 
   getErrorObject(error: any): ErrorDto {
 
@@ -57,8 +59,9 @@ export class ErrorHandler {
       case 400: // bad request
         this.notifications.warning("We couldn't process your request, as its format wasn't known to our servers. Please check your inputs and try again!");
         break;
-      case 401: // Unauthorized
+      case 401: // Unauthorized: logout at first then login again
         this.notifications.info("You were forcefully logged-out by the server, please log in again");
+        this.authService.logoutUser();
         this.router.navigate(['login']);
         break;
       case 404: // not found
