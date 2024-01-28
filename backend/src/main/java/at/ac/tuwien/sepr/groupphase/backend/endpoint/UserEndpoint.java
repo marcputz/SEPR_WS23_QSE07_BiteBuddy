@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LoginDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegisterDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserSettingsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateEmailAndPasswordDto;
@@ -35,24 +35,22 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.invoke.MethodHandles;
 
 /**
- * REST endpoint for user authentication.
+ * REST endpoint for users.
  */
 @RestController
-@RequestMapping(value = "/api/v1/authentication")
-public class AuthenticationEndpoint {
+@RequestMapping(value = "/api/v1/user")
+public class UserEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final UserService userService;
-
     private final AuthenticationService authenticationService;
+    private final PasswordResetService passwordResetService;
 
     private final UserMapper userMapper;
 
-    private final PasswordResetService passwordResetService;
-
-    public AuthenticationEndpoint(UserService userService, AuthenticationService authService, PasswordResetService passwordResetService,
-                                  UserMapper userMapper) {
+    public UserEndpoint(UserService userService, AuthenticationService authService, PasswordResetService passwordResetService,
+                        UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.passwordResetService = passwordResetService;

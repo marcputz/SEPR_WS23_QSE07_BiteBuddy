@@ -2,12 +2,15 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneIngredientMapper;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapperImpl;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapperImpl;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapperImpl;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.*;
+import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
+import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,17 +56,19 @@ public class ProfileEndpointTest {
     @Autowired
     private RecipeRepository recipeRepository;
     @Autowired
-    private AllergeneMapperImpl allergeneMapper;
+    private AllergeneMapper allergeneMapper;
     @Autowired
-    private IngredientMapperImpl ingredientMapper;
+    private IngredientMapper ingredientMapper;
     @Autowired
-    private ProfileMapperImpl profileMapper;
+    private ProfileMapper profileMapper;
     @Autowired
     private AllergeneIngredientMapper allergeneIngredientMapper;
     @Autowired
     private ProfileRepository profileRepository;
     @Autowired
     private AllergeneIngredientRepository allergeneIngredientRepository;
+    @Autowired
+    private AuthenticationService authenticationService;
     private Long testUserId;
     private Long recipeId;
     private Long allergeneId;
@@ -114,19 +119,16 @@ public class ProfileEndpointTest {
         ApplicationUser user = userRepository.getReferenceById(testUserId);
         user.setActiveProfile(profileRepository.getReferenceById(profileId));
         userRepository.save(user);
+
         //Login
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
-        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/authentication/login")
-                .content((new ObjectMapper()).writeValueAsString(LoginDto.LoginDtobuilder.anLoginDto()
-                    .withEmail(testUser.getEmail())
-                    .withPassword(testUserPassword)
-                    .build()))
-                .headers(requestHeaders)).andExpect(status().isOk())
-            .andReturn();
-        MockHttpServletResponse response = mvcResult.getResponse();
-        testUserAuthToken = response.getContentAsString();
+        LoginDto loginDto = new LoginDto()
+            .setEmail(testUser.getEmail())
+            .setPassword(testUserPassword);
+        try {
+            testUserAuthToken = authenticationService.loginUser(loginDto);
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Exception while logging in test user", e);
+        }
     }
 
     @AfterEach
@@ -220,6 +222,7 @@ public class ProfileEndpointTest {
 
     @Test
     public void createProfileWithValidProfileDtoShouldCreateProfile() throws Exception {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -258,6 +261,25 @@ public class ProfileEndpointTest {
             () -> assertEquals(ingredient1.getId(), resultProfileDto.getIngredient().get(0).getId()),
             () -> assertEquals("Hangry", resultProfileDto.getName())
         );
+    }
+
+    @Test
+    public void setActiveProfile_ShouldSetActiveProfileSuccessfully() throws Exception {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        Long profileToSetActiveId = profileId;
+
+        this.mockMvc.perform(post("/api/v1/profiles/setActive/" + profileToSetActiveId)
+                .headers(headers))
+            .andExpect(status().isOk());
+
+        ApplicationUser updatedUser = userRepository.findById(testUserId).orElseThrow();
+        assertNotNull(updatedUser.getActiveProfile(), "Active profile should not be null");
+        assertEquals(profileToSetActiveId, updatedUser.getActiveProfile().getId(), "Active profile ID should match the set profile ID");
     }
 
     @Test

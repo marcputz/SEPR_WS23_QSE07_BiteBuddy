@@ -1,28 +1,45 @@
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid header">
-    <div class="left">
-      <div class="text-wrapper">Bite-Buddy</div>
-      <div class="buttons-group">
-        <div class="menu-item"><div class="div">Products</div></div>
-        <div class="menu-item"><div class="div">Solutions</div></div>
-        <div class="menu-item"><div class="div">Services</div></div>
-        <div class="menu-item"><div class="div">Configure</div></div>
+    <!-- Logo and Toggle Button -->
+    <a class="navbar-brand title" href="#">Bite-Buddy</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Items -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto left">
+        <li class="nav-item">
+          <a class="nav-link" href="#">Products</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Solutions</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Services</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Configure</a>
+        </li>
+      </ul>
+
+      <!-- Login and Sign Up Buttons -->
+      <div class="navbar-nav btn-group buttons-group-2 button-header">
+        <button class="button-transparent glassy-background button-login" [routerLink]="['/login']">
+          <div class="text-container">
+            <span class="button-text">Login</span>
+          </div>
+        </button>
+        <button class="button-full button-signup" [routerLink]="['/register']">
+          <div class="text-container">
+              <span class="text-inside-btn">
+                Sign up
+                <i class="bi bi-arrow-right"></i>
+              </span>
+          </div>
+        </button>
       </div>
-    </div>
-    <div class="buttons-group-2 button-header">
-      <button class="button-transparent glassy-background button-login" routerLink="/login">
-        <div class="text-container">
-          <span class="button-text">Login</span>
-        </div>
-      </button>
-      <button class="button-full button-signup" routerLink="/register">
-        <div class="text-container">
-          <span class="text-inside-btn">
-            Sign up
-            <i class="bi bi-arrow-right"></i>
-          </span>
-        </div>
-      </button>
     </div>
   </div>
 </nav>

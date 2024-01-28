@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
@@ -55,8 +56,9 @@ public interface RecipeService {
      * Before creating, it checks that every ingredient already exists in the database. If one does not an exception is thrown.
      *
      * @param recipe we want to store.
+     * @author Frederik Skiera
      */
-    void createRecipe(RecipeDetailsDto recipe) throws ConflictException, ValidationException;
+    void createRecipe(RecipeDetailsDto recipe, Long userId) throws ConflictException, ValidationException;
 
     /**
      * Gets the highest ID of any recipe in the data store.
@@ -91,7 +93,7 @@ public interface RecipeService {
      * @return the {@link RecipeDto} with the given id
      * @throws NotFoundException if the recipe with the given ID does not exist in the persistent data store
      */
-    RecipeDetailsDto getDetailedRecipe(long id) throws NotFoundException;
+    RecipeDetailsDto getDetailedRecipe(long id) throws NotFoundException, UserNotFoundException;
 
     /**
      * Finds the first 10 ingredients matching a name. It is not positional, upper/lower case-sensitive.

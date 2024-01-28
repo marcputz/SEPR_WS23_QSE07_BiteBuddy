@@ -1,6 +1,5 @@
 <h2 class="bb-dialog-box-header title-margin">{{ title }}</h2>
 <div class="row-cols-1 register-form">
-  <h5>{{ subtitle1 }}</h5>
   <!-- Profile Input Form -->
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="form-group">
@@ -32,42 +31,32 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label for="inputAllergens" class="label-select">
+    <div class="form-group label-select">
+      <label for="inputAllergens">
         What do you cannot or do not want to eat?
-        <span class="required-asterisk">*</span>
       </label>
       <select multiple class="form-select"
               id = "inputAllergens"
-              formControlName="allergens"
-              required>
+              formControlName="allergens">
         <option *ngFor="let allergene of allergens"
                 [value]="allergene">
           {{allergene.name}}
         </option>
       </select>
-      <div class="invalid-feedback">
-        Please select at least one allergene.
-      </div>
     </div>
 
-    <div class="form-group">
-      <label for="inputIngredient" class="label-select">
+    <div class="form-group label-select">
+      <label for="inputIngredient">
         What do you like to eat?
-        <span class="required-asterisk">*</span>
       </label>
       <select multiple class="form-select"
               id ="inputIngredient"
-              formControlName="ingredient"
-              required>
+              formControlName="ingredient">
         <option *ngFor="let ingred of ingredient"
                 [value]="ingred">
           {{ingred.name}}
         </option>
       </select>
-      <div class="invalid-feedback">
-        Please select at least one ingredient.
-      </div>
     </div>
     <button type="submit"
             name="submitButton"

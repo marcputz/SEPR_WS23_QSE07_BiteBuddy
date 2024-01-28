@@ -63,6 +63,9 @@
     <button type="submit" name="loginButton" class="button-full bb-form-button">Login</button>
   </form>
   <div class="bb-text-under-button">
-    <span>Forgot password? </span><a routerLink="/request_password_reset" class="bb-link">Reset password</a>
+    <span>Forgot password? </span><a [routerLink]="['/request_password_reset']" class="bb-link">Reset password</a>
+  </div>
+  <div class=" bb-text-under-button bb-text-under-button-2">
+    <span>Don't have an account yet? </span><a [routerLink]="['/register']" class="bb-link">Sign up</a>
   </div>
 </div>

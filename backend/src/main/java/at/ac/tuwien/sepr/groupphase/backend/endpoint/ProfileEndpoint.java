@@ -146,6 +146,17 @@ public class ProfileEndpoint {
         return profileService.editProfile(profileDto);
     }
 
+    @PostMapping("/setActive/{profileId}")
+    public void setActiveProfile(@PathVariable Long profileId, @RequestHeader HttpHeaders headers)
+        throws AuthenticationException, ConflictException {
+        LOGGER.info("Received POST request to set active profile with ID {}", profileId);
+        this.authenticationService.verifyAuthenticated(headers);
+        String authToken = this.authenticationService.getAuthToken(headers);
+        Long currentUserId = AuthTokenUtils.getUserId(authToken);
+
+        profileService.setActiveProfile(profileId, currentUserId);
+    }
+
     /**
      * Lets a profile rate a recipe
      *
@@ -154,7 +165,6 @@ public class ProfileEndpoint {
      * @throws NotFoundException if the user or the recipe do not exist in the database and if the user does not have an active profile.
      * @throws ValidationException if the rating value is not 0 or 1.
      */
-
     @PutMapping("/rating/{RecipeId}")
     public void putRating(@Valid @RequestBody RecipeRatingDto recipeRatingDto, @RequestHeader HttpHeaders headers)
         throws ValidationException, NotFoundException, AuthenticationException {

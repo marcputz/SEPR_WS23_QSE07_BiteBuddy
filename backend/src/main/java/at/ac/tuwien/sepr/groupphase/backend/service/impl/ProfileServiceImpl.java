@@ -67,7 +67,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public ProfileSearchResultDto searchProfiles(ProfileSearchDto searchParams, Long currentUserId) {
-        LOGGER.debug("search profiles");
+        LOGGER.trace("search profiles({}, [])", searchParams, currentUserId);
 
         String name = (searchParams.name() != null && !searchParams.name().trim().isEmpty()) ? searchParams.name() : "";
 
@@ -343,4 +343,37 @@ public class ProfileServiceImpl implements ProfileService {
 
         return deletedProfile;
     }
+
+    @Override
+    public void setActiveProfile(Long profileId, Long userId) throws NotFoundException, ConflictException {
+        LOGGER.trace("setActiveProfile({}, {})", profileId, userId);
+
+        Optional<Profile> profileOptional = profileRepository.findById(profileId);
+        if (profileOptional.isEmpty()) {
+            throw new NotFoundException("Profile with ID " + profileId + " not found");
+        }
+        Profile profile = profileOptional.get();
+
+        Optional<ApplicationUser> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException("User with ID " + userId + " not found");
+        }
+        ApplicationUser user = userOptional.get();
+
+        if (user.getActiveProfile() != null && profile.getId().equals(user.getActiveProfile().getId())) {
+            LOGGER.trace("User ID {} already has profile ID {} as active profile", userId, profileId);
+            return;
+        }
+
+        if (!profile.getUser().getId().equals(userId)) {
+            throw new ConflictException("Profile does not belong to the user",
+                List.of("The profile with ID " + profileId + " does not belong to the user with ID " + userId));
+        }
+
+        user.setActiveProfile(profile);
+        userRepository.save(user);
+        LOGGER.trace("Active profile for user ID {} set to profile ID {}", userId, profileId);
+    }
+
+
 }

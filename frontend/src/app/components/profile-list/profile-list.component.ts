@@ -7,7 +7,7 @@ import {
 import {ProfileService} from '../../services/profile.service';
 import {ToastrService} from 'ngx-toastr';
 import {UserSettingsDto} from '../../dtos/userSettingsDto';
-import {AuthService} from '../../services/auth.service';
+import {UserService} from '../../services/user.service';
 import {ActivatedRoute} from '@angular/router';
 import {debounceTime, Subject} from 'rxjs';
 
@@ -39,7 +39,7 @@ export class ProfileListComponent {
   constructor(
     private profileService: ProfileService,
     private notification: ToastrService,
-    private authService: AuthService,
+    private authService: UserService,
     private route: ActivatedRoute,
   ) {
   }

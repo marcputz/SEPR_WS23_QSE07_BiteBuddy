@@ -1,9 +1,3 @@
-.background-img {
-  width: 100%;
-  height: fit-content;
-  background: var(--app-background-color) url(/assets/images/background_w_circle.svg) !important;
-}
-
 .input-button {
   position: relative;
   display: flex;
@@ -56,6 +50,13 @@
   border: none;
 
   cursor: pointer;
+}
+
+@media (max-width: 1440px) {
+  .card-body {
+    min-height: 11rem;
+    max-height: fit-content;
+  }
 }
 
 .col-recipe {

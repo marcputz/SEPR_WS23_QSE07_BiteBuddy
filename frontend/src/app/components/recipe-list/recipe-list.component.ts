@@ -5,7 +5,7 @@ import {debounceTime, Subject} from "rxjs";
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {ToastrService} from "ngx-toastr";
 import {RecipeRatingDto} from "../../dtos/profileDto";
-import {AuthService} from "../../services/auth.service";
+import {UserService} from "../../services/user.service";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {ProfileService} from "../../services/profile.service";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
@@ -43,7 +43,7 @@ export class RecipeListComponent implements OnInit {
 
   constructor(
     private service: RecipeService,
-    private authService: AuthService,
+    private authService: UserService,
     private profileService: ProfileService,
     private pictureService: PictureService,
     private sanitizer: DomSanitizer,
@@ -59,7 +59,7 @@ export class RecipeListComponent implements OnInit {
     this.searchChangedObservable
       .pipe(debounceTime(300))
       .subscribe({next: () => this.reloadRecipes()});
-    
+
       this.authService.getUser().subscribe(
           (settings: UserSettingsDto) => {
               this.profileService.getRatingLists(settings.id)
@@ -73,9 +73,8 @@ export class RecipeListComponent implements OnInit {
                           const errorMessage = error?.error || 'Unknown error occured';
                           if(error.message.includes("404")){
                             this.router.navigate(["/profile"])
-                            this.notification.error("You need to create a profile before using the Website")
-                          }
-                          else{
+                            this.notification.error("You need to create a profile before using the Website");
+                          }else{
                             this.notification.error(`Error getting rating lists: ${errorMessage}`);
                           }
                       }

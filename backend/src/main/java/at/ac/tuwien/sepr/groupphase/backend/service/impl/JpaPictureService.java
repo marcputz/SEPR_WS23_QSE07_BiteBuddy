@@ -51,6 +51,10 @@ public class JpaPictureService implements PictureService {
     public Picture createPicture(byte[] imgData, String description) throws DataStoreException {
         LOGGER.trace("createPicture()"); // do NOT show img data in logger!
 
+        if (imgData == null) {
+            throw new IllegalArgumentException("Image Data cannot be NULL value");
+        }
+
         Picture p = new Picture()
             .setData(imgData)
             .setDescription(description);

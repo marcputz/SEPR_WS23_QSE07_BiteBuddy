@@ -1,13 +1,13 @@
 .bb-dialog-layout-container {
   margin-top: 5%;
-  margin-left: 20%;
+  margin-left: 35%;
   margin-bottom: 10%;
   position: fixed; /* Responsive */
   width: 50%;
   background-color: white;
   box-shadow: rgba(0,0,0, 0.15) 1px 1px 10px;
   border-radius: 35px;
-
+  max-width: 30%;
   word-wrap: break-word;
 }
 
@@ -29,4 +29,11 @@
   margin-left: 15%;
   margin-top: 22% !important;
   margin-bottom: 10%;
+}
+
+@media (max-width: 1440px) {
+  .bb-dialog-layout-container {
+    max-width: 40%;
+    margin-left: 30%;
+  }
 }
