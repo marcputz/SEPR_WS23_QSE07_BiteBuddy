@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {LoginDto} from '../dtos/loginDto';
 import {Observable} from 'rxjs';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
@@ -19,7 +19,13 @@ export class UserService {
 
   private authBaseUri: string = this.globals.backendUri + '/user';
 
+  updateEvent: EventEmitter<void> = new EventEmitter<void>();
+
   constructor(private httpClient: HttpClient, private globals: Globals, private apiErrorHandler: ErrorHandler) {
+  }
+
+  triggerUpdate() {
+    this.updateEvent.emit();
   }
 
   /**
