@@ -241,8 +241,6 @@ public class ProfileEndpointTest {
 
         ProfileDto profileToCreate = new ProfileDto.ProfileDtoBuilder().withName("Hangry").withAllergens(allergenes).withIngredient(ingredients).withUserId(testUserId).build();
 
-        LOGGER.info("HEEEEELP" + new ObjectMapper().writeValueAsString(profileToCreate));
-
         MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/profiles")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(profileToCreate))
@@ -261,6 +259,36 @@ public class ProfileEndpointTest {
             () -> assertEquals(ingredient1.getId(), resultProfileDto.getIngredient().get(0).getId()),
             () -> assertEquals("Hangry", resultProfileDto.getName())
         );
+    }
+
+    @Test
+    public void createProfileWithInvalidProfileDtoRespondsValidation() throws Exception {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        Allergene allergene1 = allergeneRepository.getReferenceById(allergeneId);
+        AllergeneDto allergeneDto = allergeneMapper.allergeneToAllergeneDto(allergene1);
+
+        ArrayList<AllergeneDto> allergenes = new ArrayList<>();
+        allergenes.add(allergeneDto);
+
+        Ingredient ingredient1 = ingredientRepository.getReferenceById(ingredientId);
+        IngredientDto ingredientDto = ingredientMapper.ingredientToIngredientDto(ingredient1);
+        ArrayList<IngredientDto> ingredients = new ArrayList<>();
+        ingredients.add(ingredientDto);
+
+        ProfileDto profileToCreate = new ProfileDto.ProfileDtoBuilder().withName("    ").withAllergens(allergenes).withIngredient(ingredients).withUserId(testUserId).build();
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/profiles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(profileToCreate))
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnprocessableEntity())
+            .andReturn();
     }
 
     @Test
@@ -299,11 +327,75 @@ public class ProfileEndpointTest {
             .andExpect(status().isOk())
             .andReturn().getResponse().getContentAsByteArray();
 
+        Profile activeProfile = this.profileRepository.getReferenceById(userRepository.getReferenceById(testUserId).getActiveProfile().getId());
+
+        assertAll(
+            () -> assertNotNull(activeProfile.getLiked()),
+            () -> assertEquals(1, activeProfile.getLiked().size()),
+            () -> assertTrue(activeProfile.getLiked().contains(recipeRepository.getReferenceById(recipeId)))
+        );
 
     }
 
     @Test
-    public void editProfileWithValidProfileDtoShouldEditProfile() throws Exception {
+    public void rateRecipeWithExistingProfileAndInvalidRatingRespondsUnprocessableEntity() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        RecipeRatingDto ratingDto = new RecipeRatingDto(recipeId, testUserId, 2);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/profiles/rating/" + ratingDto.recipeId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(ratingDto))
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnprocessableEntity())
+            .andReturn().getResponse().getContentAsByteArray();
+
+    }
+
+    @Test
+    public void rateRecipeWithInvalidUserIdRespondsNotFound() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        RecipeRatingDto ratingDto = new RecipeRatingDto(recipeId, -100L, 1);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/profiles/rating/" + ratingDto.recipeId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(ratingDto))
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsByteArray();
+
+    }
+
+    @Test
+    public void rateRecipeWithInvalidRecipeIdRespondsNotFound() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        RecipeRatingDto ratingDto = new RecipeRatingDto(-100L, testUserId, 1);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/profiles/rating/" + ratingDto.recipeId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(ratingDto))
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsByteArray();
+
+    }
+
+    @Test
+    public void editProfileWithInvalidProfileDtoIdRespondsNotFound() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -323,27 +415,15 @@ public class ProfileEndpointTest {
         Profile oldProfile = profileRepository.getReferenceById(profileId);
 
         ProfileDto profileToCreate = new ProfileDto.ProfileDtoBuilder().withName("Love Food a lot").withAllergens(allergenes).withIngredient(ingredients).withUserId(testUserId).build();
-        profileToCreate.setId(profileId);
+        profileToCreate.setId(-100L);
 
-        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/profiles")
+        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/profiles/editProfile/" + -100L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(profileToCreate))
                 .headers(headers)
                 .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isCreated())
+            .andExpect(status().isNotFound())
             .andReturn();
-
-        MockHttpServletResponse response = mvcResult.getResponse();
-        ProfileDto resultProfileDto = objectMapper.readValue(response.getContentAsString(), ProfileDto.class);
-
-        assertAll(
-            () -> assertNotNull(resultProfileDto, "edited profile should not be null"),
-            () -> assertEquals(testUserId, resultProfileDto.getUserId(), "User Id should be same as testUserId"),
-            () -> assertEquals(allergene1.getId(), resultProfileDto.getAllergens().get(0).getId()),
-            () -> assertEquals(ingredient1.getId(), resultProfileDto.getIngredient().get(0).getId()),
-            () -> assertEquals("Love Food a lot", resultProfileDto.getName()),
-            () -> assertNotEquals(oldProfile.getName(), resultProfileDto.getName())
-        );
 
     }
 
@@ -381,7 +461,24 @@ public class ProfileEndpointTest {
     }
 
     @Test
-    public void deleteExistingProfileThrowsConflictErrorIfItIsActiveProfile() throws Exception {
+    public void getProfileDetailsOfNonExistingProfile() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        Profile profile = profileRepository.getReferenceById(profileId);
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/v1/profiles/" + -100L)
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andReturn();
+
+    }
+
+    @Test
+    public void deleteExistingProfileRespondsConflictIfItIsActiveProfile() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -394,9 +491,21 @@ public class ProfileEndpointTest {
             .andExpect(status().isConflict())
             .andReturn();
 
-        MockHttpServletResponse response = mvcResult.getResponse();
-        ProfileDto resultProfileDto = objectMapper.readValue(response.getContentAsString(), ProfileDto.class);
+    }
 
+    @Test
+    public void deleteNonExistingProfileRespondsNotFound() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+
+        MvcResult mvcResult = this.mockMvc.perform(delete("/api/v1/profiles/deleteProfile/" + -100)
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andReturn();
     }
 
     @Test
@@ -468,5 +577,27 @@ public class ProfileEndpointTest {
             () -> assertTrue(resultRecipeRatingListsDto.likes().contains(recipeId), "User Id should be same as testUserId"),
             () -> assertTrue(resultRecipeRatingListsDto.dislikes().isEmpty())
         );
+    }
+
+    @Test
+    public void getRatingListWithInValidUserIdRespondsNotFound() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        Set<Recipe> liked = new HashSet<>();
+        liked.add(recipeRepository.getReferenceById(recipeId));
+        Profile profile = profileRepository.getReferenceById(profileId);
+        profile.setLiked(liked);
+        profileRepository.save(profile);
+
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/v1/profiles/rating/" + -100L)
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andReturn();
+
     }
 }
