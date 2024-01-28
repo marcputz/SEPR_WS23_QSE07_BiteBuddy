@@ -130,7 +130,8 @@ export class RecipeListComponent implements OnInit {
               this.recipeImageAlts.set(dto, pictureDto.description);
             },
             error: error => {
-              console.error(error);
+              let errorObj = this.errorHandler.getErrorObject(error);
+              this.errorHandler.handleApiError(errorObj);
             }
           });
         }
