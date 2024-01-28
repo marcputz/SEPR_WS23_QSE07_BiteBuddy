@@ -5,7 +5,11 @@ import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -22,6 +26,12 @@ public class IngredientEndpoint {
         this.ingredientService = ingredientService;
     }
 
+    /**
+     * Gets all ingredients.
+     *
+     * @return {@link IngredientDto} of all ingredients.
+     * @author Giulia Gallico
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<IngredientDto> getAllIngredients() {
@@ -29,6 +39,13 @@ public class IngredientEndpoint {
         return ingredientService.getAllIngredients();
     }
 
+    /**
+     * Returns a list of all ingredients matching the given name. The search is not case-sensitive.
+     *
+     * @param name for which we to search ingredients.
+     * @return List of ingredients names matching searched name.
+     * @author Frederik Skiera
+     */
     @GetMapping("/{name}")
     @ResponseStatus(HttpStatus.OK)
     public List<String> getAllMatchingIngredients(@PathVariable String name) {

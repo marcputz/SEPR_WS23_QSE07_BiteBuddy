@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -772,10 +773,5 @@ public class JpaMenuPlanService implements MenuPlanService {
         InventoryIngredient toSave = this.inventoryIngredientRepository.findById(updatedIngredientDto.getId()).get();
         toSave.setInventoryStatus(updatedIngredientDto.isInventoryStatus());
         this.inventoryIngredientRepository.save(toSave);
-    }
-
-    @Override
-    public void updateInventoryIngredient(InventoryIngredientDto updatedIngredientDto) throws NotFoundException, ConflictException {
-        throw new NotImplementedException();
     }
 }

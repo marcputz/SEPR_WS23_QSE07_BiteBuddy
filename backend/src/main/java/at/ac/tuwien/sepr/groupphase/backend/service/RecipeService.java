@@ -21,6 +21,7 @@ public interface RecipeService {
      *
      * @param searchParams {@link RecipeSearchDto} with all parameters.
      * @return {@link RecipeSearchResultDto} with all the recipe entries that match the given search parameters and page information
+     * @author Frederik Skiera
      */
     RecipeSearchResultDto searchRecipes(RecipeSearchDto searchParams);
 
@@ -92,6 +93,7 @@ public interface RecipeService {
      * @param id is the id of the searched for recipe.
      * @return the {@link RecipeDto} with the given id
      * @throws NotFoundException if the recipe with the given ID does not exist in the persistent data store
+     * @author Frederik Skiera
      */
     RecipeDetailsDto getDetailedRecipe(long id) throws NotFoundException, UserNotFoundException;
 
@@ -101,6 +103,7 @@ public interface RecipeService {
      *
      * @param name which needs to be a substring of the ingredient.
      * @return list of matching ingredients.
+     * @author Frederik Skiera
      */
     List<String> findMatchingIngredients(String name);
 
@@ -109,6 +112,7 @@ public interface RecipeService {
      *
      * @param name detailed ingredients name
      * @return List of RecipeIngredients
+     * @author Frederik Skiera
      */
     List<RecipeIngredient> findMatchingRecipeIngredients(String name);
 

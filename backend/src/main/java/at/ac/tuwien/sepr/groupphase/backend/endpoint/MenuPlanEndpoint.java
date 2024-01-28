@@ -149,21 +149,15 @@ public class MenuPlanEndpoint {
         this.service.updateMenuPlanByChangingOneRecipe(thisUser, menuPlan);
     }
 
-    @GetMapping("/inventory/create/")
-    @ResponseStatus(HttpStatus.CREATED)
-    public InventoryListDto createInventory(@RequestHeader HttpHeaders headers) throws NotFoundException, AuthenticationException {
-        // TODO this will be removed soon
-        LOGGER.trace("createInventory({})", headers);
-
-        this.authService.verifyAuthenticated(headers);
-
-        Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
-        ApplicationUser thisUser = this.userService.getUserById(thisUserId);
-
-        this.service.createInventory(thisUser);
-        return this.service.searchInventory(thisUser, true);
-    }
-
+    /**
+     * Gets the inventory of the current menu plan of the logged-in user.
+     *
+     * @param headers {@link HttpHeaders} with auth token.
+     * @return {@link InventoryListDto} with all the missing and available inventory ingredients.
+     * @throws AuthenticationException if the user cannot be authenticated.
+     * @throws NotFoundException       if the user is not found.
+     * @author Frederik Skiera
+     */
     @GetMapping("/inventory/")
     @ResponseStatus(HttpStatus.OK)
     public InventoryListDto getInventory(@RequestHeader HttpHeaders headers) throws AuthenticationException, NotFoundException {
@@ -177,6 +171,18 @@ public class MenuPlanEndpoint {
         return this.service.searchInventory(thisUser, true);
     }
 
+    /**
+     * Updates an ingredient in the inventory.
+     * This only works with valid ingredients and when logged in.
+     *
+     * @param headers           {@link HttpHeaders} with auth token.
+     * @param updatedIngredient {@link InventoryIngredientDto} with updated inventory status.
+     * @throws AuthenticationException if the user cannot be authenticated.
+     * @throws ConflictException       if the data given by the user is in conflict with the current state of the system.
+     * @throws ValidationException     if the data given by the user is invalid.
+     * @throws NotFoundException       if the user is not found.
+     * @author Frederik Skiera
+     */
     @PutMapping("/inventory/update")
     @ResponseStatus(HttpStatus.OK)
     public void updateInventoryIngredient(@RequestHeader HttpHeaders headers, @RequestBody InventoryIngredientDto updatedIngredient)
