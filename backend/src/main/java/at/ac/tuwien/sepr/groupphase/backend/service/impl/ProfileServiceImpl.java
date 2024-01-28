@@ -10,6 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
@@ -46,6 +47,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
     private final ProfileMapper profileMapper;
+    private final IngredientMapper ingredientMapper;
     private final ProfileValidator profileValidator;
     private final AllergeneRepository allergeneRepository;
     private final IngredientRepository ingredientRepository;
@@ -55,7 +57,7 @@ public class ProfileServiceImpl implements ProfileService {
     public ProfileServiceImpl(ProfileRepository profileRepository, AllergeneRepository allergeneRepository,
                               ProfileMapper profileMapper, IngredientRepository ingredientRepository,
                               RecipeRepository recipeRepository, UserRepository userRepository,
-                              ProfileValidator profileValidator) {
+                              ProfileValidator profileValidator, IngredientMapper ingredientMapper) {
         this.profileRepository = profileRepository;
         this.allergeneRepository = allergeneRepository;
         this.ingredientRepository = ingredientRepository;
@@ -63,6 +65,7 @@ public class ProfileServiceImpl implements ProfileService {
         this.profileMapper = profileMapper;
         this.profileValidator = profileValidator;
         this.userRepository = userRepository;
+        this.ingredientMapper = ingredientMapper;
     }
 
     @Override
@@ -107,7 +110,7 @@ public class ProfileServiceImpl implements ProfileService {
         //check if the ingredients correspond to the ones in the database
         List<Ingredient> ingredients = ingredientRepository.findAll();
         for (IngredientDto ingredientDto : profileDto.getIngredient()) {
-            if (ingredients.stream().noneMatch(ingredient -> ingredient.getId() == ingredientDto.getId())) {
+            if (!ingredients.contains(ingredientMapper.ingredientDtoToIngredient(ingredientDto))) {
                 throw new NotFoundException("Ingredient with id " + ingredientDto.getId() + " does not exist");
             }
         }
@@ -287,7 +290,7 @@ public class ProfileServiceImpl implements ProfileService {
         //check if the ingredients correspond to the ones in the database
         List<Ingredient> ingredients = ingredientRepository.findAll();
         for (IngredientDto ingredientDto : profileDto.getIngredient()) {
-            if (ingredients.stream().noneMatch(ingredient -> ingredient.getId() == ingredientDto.getId())) {
+            if (!ingredients.contains(ingredientMapper.ingredientDtoToIngredient(ingredientDto))) {
                 throw new NotFoundException("Ingredient with id " + ingredientDto.getId() + " does not exist");
             }
         }
