@@ -3,6 +3,9 @@ package at.ac.tuwien.sepr.groupphase.backend.service.validation;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.AllergeneDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.IngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import org.slf4j.Logger;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class ProfileValidator {
@@ -117,6 +121,29 @@ public class ProfileValidator {
 
         if (!validationErrors.isEmpty()) {
             throw new ValidationException("Validation of rating for rating for recipe rating failed", validationErrors);
+        }
+    }
+
+    /**
+     * Validate the profile to delete.
+     *
+     * @param currentUser the current User of the application
+     * @param profile the currently used profile
+     */
+    public void validateDelete(ApplicationUser currentUser, Profile profile) throws ConflictException {
+        LOGGER.trace("validateDelete({}),({})", currentUser, profile);
+        List<String> conflictErrors = new ArrayList<>();
+
+        if (Objects.equals(currentUser.getActiveProfile().getId(), profile.getId())) {
+            conflictErrors.add("The active profile " + profile.getName() + " can not be deleted.");
+        }
+
+        if (!Objects.equals(profile.getUser().getId(), currentUser.getId())) {
+            conflictErrors.add("The active profile does not belong to the active user");
+        }
+
+        if (!conflictErrors.isEmpty()) {
+            throw new ConflictException("Conflict during deletion of a profile, profile deletion failed: ", conflictErrors);
         }
     }
 
