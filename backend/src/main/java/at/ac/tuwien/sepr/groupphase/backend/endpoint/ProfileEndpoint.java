@@ -42,7 +42,7 @@ public class ProfileEndpoint {
     static final String BASE_PATH = "/api/v1/profiles";
 
     private final ProfileService profileService;
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
     private final UserService userService;
 
@@ -65,6 +65,14 @@ public class ProfileEndpoint {
         return profileService.searchProfiles(searchParams, currentUserId);
     }
 
+    /**
+     * Creates a profile
+     *
+     * @param toCreateProfile contains the id and the create information of the profile
+     * @throws AuthenticationException if no user is logged in.
+     * @throws NotFoundException if the profile, it's user, one of its allergens or one of its liked ingredients do not exist in the database.
+     * @throws ValidationException if the edited data is not valid for editing.
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProfileDto createProfile(@Valid @RequestBody ProfileDto toCreateProfile, @RequestHeader HttpHeaders headers)
@@ -105,6 +113,13 @@ public class ProfileEndpoint {
         }
     }
 
+    /**
+     * Gets the details of an existing profile
+     *
+     * @param profileId the id of the requested profile
+     * @throws AuthenticationException if no user is logged in.
+     * @throws NotFoundException if the profile does not exist in the database.
+     */
     @GetMapping("/{profileId}")
     public ProfileDetailDto getProfileDetails(@PathVariable long profileId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException {
@@ -114,6 +129,14 @@ public class ProfileEndpoint {
         return profileService.getProfileDetails(profileId);
     }
 
+    /**
+     * Edits an existing profile
+     *
+     * @param profileDto contains the id and the edited information of the profile
+     * @throws AuthenticationException if no user is logged in.
+     * @throws NotFoundException if the profile or it's user do not exist in the database.
+     * @throws ValidationException if the edited data is not valid for editing.
+     */
     @PutMapping("/edit/{id}")
     public ProfileDto editProfile(@RequestBody ProfileDto profileDto, @RequestHeader HttpHeaders headers)
         throws ValidationException, NotFoundException, AuthenticationException {
@@ -130,7 +153,6 @@ public class ProfileEndpoint {
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException if the user or the recipe do not exist in the database and if the user does not have an active profile.
      * @throws ValidationException if the rating value is not 0 or 1.
-     * @author Thomas Hellweger
      */
 
     @PutMapping("/rating/{RecipeId}")
@@ -150,7 +172,6 @@ public class ProfileEndpoint {
      * @return returns a list of the liked- and a list of the disliked recipes.
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException if the profile containing the lists does not exist.
-     * @author Thomas Hellweger
      */
     @GetMapping("/rating/{userId}")
     public RecipeRatingListsDto getRatingLists(@PathVariable long userId, @RequestHeader HttpHeaders headers)
@@ -169,7 +190,6 @@ public class ProfileEndpoint {
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException if the profile to delete does not exist in the database.
      * @throws ConflictException if the user wants to delete the active profile or the current profile does not belong to the current user.
-     * @author Thomas Hellweger
      */
     @DeleteMapping("/deleteProfile/{profileId}")
     public ProfileDto delete(@PathVariable long profileId, @RequestHeader HttpHeaders headers)
