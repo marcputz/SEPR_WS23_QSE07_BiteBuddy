@@ -1,11 +1,13 @@
 <div *ngIf="this.showCreateDialog" class="bb-modal" tabindex="-1">
   <div class="bb-modal-dialog">
-    <h2>New Menu Plan</h2>
-    <form>
-      <label for="profileDropdown">Select a profile</label>
-      <select name="profileDropdown" id="profileDropdown" class="bb-dropdown" style="margin-bottom: 10px;" [(ngModel)]="createSelectedProfile">
-        <option *ngFor="let profile of createUserProfiles" [value]="profile.id">{{profile.name}}</option>
-      </select>
+    <h2 style="margin-bottom: 1.5rem;">New Menu Plan</h2>
+    <form style="display: flex; flex-direction: row; width: 90%;">
+      <div style="display: flex; flex-direction: column; margin-right: 1.5rem; width: 100%; text-align: start;">
+        <label for="profileDropdown">Select a profile</label>
+        <select name="profileDropdown" id="profileDropdown" style="width: 90%;" class="bb-dropdown" style="margin-bottom: 10px;" [(ngModel)]="createSelectedProfile">
+          <option *ngFor="let profile of createUserProfiles" [value]="profile.id">{{profile.name}}</option>
+        </select>
+      </div>
       <button (click)="onClickGenerate()" class="bb-button"><i class="bi-database-fill-add" style="margin-right: 0.6rem;"></i>Generate</button>
     </form>
   </div>

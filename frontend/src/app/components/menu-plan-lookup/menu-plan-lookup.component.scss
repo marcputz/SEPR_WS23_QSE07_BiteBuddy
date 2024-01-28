@@ -9,7 +9,7 @@
   height: 100vh;
 
   z-index: 99;
-  background-color: rgba(0,0,0, 0.5);
+  background-color: rgba(0,0,0, 0.7);
 }
 
 .bb-modal > .bb-modal-dialog {
@@ -37,6 +37,8 @@
   text-align: center;
   align-content: center;
   align-items: center;
+
+  box-shadow: rgba(0,0,0, 0.15) 0px 0px 6px 6px;
 }
 
 .bb-modal > .bb-modal-dialog > form {
