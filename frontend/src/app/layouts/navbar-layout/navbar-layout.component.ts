@@ -5,6 +5,7 @@ import {ToastrService} from "ngx-toastr";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {ImageHandler} from "../../utils/imageHandler";
 import { SafeUrl } from '@angular/platform-browser';
+import {ErrorHandler} from "../../services/errorHandler";
 
 
 @Component({
@@ -29,6 +30,7 @@ export class NavbarLayoutComponent implements OnInit {
   errorMessage = '';
 
   constructor(private authService: UserService,
+              private errorHandler: ErrorHandler,
               private router: Router,
               private route: ActivatedRoute,
               private notification: ToastrService,
@@ -58,11 +60,10 @@ export class NavbarLayoutComponent implements OnInit {
         this.loadUserPicture(userSettingsDto.userPicture);
       },
       error: error => {
-        console.error('Error loading user infos');
-        this.notification.error('Error loading user infos');
 
-        this.error = true;
-        this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(error);
+
       },
       complete: () => {
       }
@@ -71,10 +72,8 @@ export class NavbarLayoutComponent implements OnInit {
 
   loadUserPicture(userPictureArray: number[]) {
     if (userPictureArray === undefined) {
-      console.info('user picture is empty');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.userSettings.userPicture);
     } else {
-      console.info('user picture loaded');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(userPictureArray);
     }
   }
