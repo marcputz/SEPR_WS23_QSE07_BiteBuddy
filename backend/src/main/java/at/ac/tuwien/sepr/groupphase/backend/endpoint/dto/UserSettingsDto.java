@@ -7,6 +7,7 @@ public class UserSettingsDto {
     private String email;
     private String nickname;
     private byte[] userPicture;
+    private Long activeProfileId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -42,6 +43,14 @@ public class UserSettingsDto {
         this.userPicture = userPicture;
     }
 
+    public Long getActiveProfileId() {
+        return activeProfileId;
+    }
+
+    public void setActiveProfileId(Long activeProfileId) {
+        this.activeProfileId = activeProfileId;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -66,15 +75,18 @@ public class UserSettingsDto {
             + ", email='" + email + '\''
             + ", nickname='" + nickname + '\''
             + ", userPicture.length=" + userPictureLength
+            + ", activeProfileId=" + activeProfileId
             + ", createdAt=" + createdAt
             + ", updatedAt=" + updatedAt
             + '}';
     }
 
+
     public static final class UserSettingsDtoBuilder {
         private Long id;
         private String email;
         private String nickname;
+        private Long activeProfileId;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -100,6 +112,11 @@ public class UserSettingsDto {
             return this;
         }
 
+        public UserSettingsDtoBuilder withActiveProfileId(Long activeProfileId) {
+            this.activeProfileId = activeProfileId;
+            return this;
+        }
+
         public UserSettingsDtoBuilder withCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -115,6 +132,7 @@ public class UserSettingsDto {
             userSettingsDto.id = this.id;
             userSettingsDto.email = this.email;
             userSettingsDto.nickname = this.nickname;
+            userSettingsDto.activeProfileId = this.activeProfileId;
             userSettingsDto.createdAt = this.createdAt;
             userSettingsDto.updatedAt = this.updatedAt;
             return userSettingsDto;

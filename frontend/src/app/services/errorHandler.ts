@@ -21,14 +21,11 @@ export class ErrorHandler {
     let reason: string;
 
     // set error status code
-    errorStatus = error.statusCode;
-    if (errorStatus == undefined) {
-      errorStatus = error.status;
-    }
+    errorStatus = error.status;
 
     // set error text
     errorText = error.statusText;
-    if (errorText == undefined) {
+    if (errorText == undefined || errorText == "OK") {
       errorText = this.statusCodeToStatusText(errorStatus);
     }
 
@@ -36,14 +33,14 @@ export class ErrorHandler {
       // error has a body
       let errorBody = error.error;
 
-      let errorJson = JSON.parse(errorBody);
-      if (errorJson["statusCode"] != undefined && errorJson["statusText"] != undefined) {
-        // this is a errorDto object
+      if (errorBody.statusCode != undefined && errorBody.statusText != undefined) {
+        // error dto was parsed correctly
 
-        errorStatus = errorJson["statusCode"];
-        errorText = errorJson["statusText"];
-        errorMessage = errorJson["statusDescription"];
-        reason = errorJson["reason"];
+        errorStatus = errorBody.statusCode;
+        errorText = errorBody.statusText;
+        errorMessage = errorBody.statusDescription;
+        reason = errorBody.reason;
+
       }
     }
 

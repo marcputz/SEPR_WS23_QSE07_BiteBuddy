@@ -1,8 +1,8 @@
-import {Component, numberAttribute} from '@angular/core';
+import {Component} from '@angular/core';
 import {ToastrService} from "ngx-toastr";
 import {ActivatedRoute, ParamMap, Router} from "@angular/router";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {ProfileDetailDto, ProfileDto, ProfileEditDto} from "../../dtos/profileDto";
+import {ProfileDetailDto, ProfileDto} from "../../dtos/profileDto";
 import {ProfileService} from "../../services/profile.service";
 import {AllergeneDto} from "../../dtos/allergeneDto";
 import {IngredientDto} from "../../dtos/ingredientDto";
@@ -22,6 +22,13 @@ import {ErrorHandler} from "../../services/errorHandler";
 export class ProfileEditComponent {
 
   title: string = "Edit Profile"
+
+  isInputFocused: {[key: string]: boolean } = {};
+  submitted = false;
+
+  changedAllergenes: boolean = false;
+  changedIngredients: boolean = false;
+
 
   profile: ProfileDto = {} as ProfileDto;
   previousProfileDetails: ProfileDetailDto = {} as ProfileDetailDto;
@@ -55,10 +62,15 @@ export class ProfileEditComponent {
 
   ngOnInit(): void {
     const routeParams: ParamMap = this.route.snapshot.paramMap;
+    this.changedAllergenes = false;
+    this.changedIngredients = false;
     this.service.getProfileDetails(Number(routeParams.get('id'))).subscribe({
       next: profileDetails => {
         this.previousProfileDetails = profileDetails;
         console.log(this.previousProfileDetails)
+        this.form.controls['name'].setValue(this.previousProfileDetails.name);
+        this.form.controls['allergens'].setValue(this.previousProfileDetails.allergens);
+        this.form.controls['ingredient'].setValue(this.previousProfileDetails.ingredients);
       },
       error: error => {
         console.error('Error retrieving profile information', error);
@@ -133,5 +145,22 @@ export class ProfileEditComponent {
 
     }
   }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.form.get(attribute).value !== '';
+  }
+
+  onChangeAllergenes(){
+    this.changedAllergenes = true;
+  }
+
+  onChangeIngredients(){
+    this.changedIngredients = true;
+  }
+
+
 
 }

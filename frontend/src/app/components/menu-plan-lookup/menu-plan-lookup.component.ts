@@ -8,6 +8,12 @@ import {MenuPlanContentDetailDto} from "../../dtos/menuplan/menuPlanContentDetai
 import {RecipeListDto} from "../../dtos/recipe";
 import {MenuPlanUpdateRecipeDto} from "../../dtos/menuplan/menuPlanUpdateRecipeDto";
 import {PictureService} from "../../services/picture.service"
+import {ProfileListDto} from "../../dtos/profileDto";
+import {ProfileService} from "../../services/profile.service";
+import {MenuPlanCreateDto} from "../../dtos/menuplan/menuPlanCreateDto";
+import {formatDate} from "@angular/common";
+import {ErrorHandler} from "../../services/errorHandler";
+import {UserService} from "../../services/user.service";
 
 
 @Component({
@@ -32,6 +38,9 @@ export class MenuPlanLookupComponent implements OnInit {
 
   constructor(
     private service: MenuPlanService,
+    private profileService: ProfileService,
+    private errorHandler: ErrorHandler,
+    private userService: UserService,
     private sanitizer: DomSanitizer,
     private notification: ToastrService,
     private pictureService: PictureService,
@@ -46,6 +55,21 @@ export class MenuPlanLookupComponent implements OnInit {
     this.searchChangedObservable
       .pipe(debounceTime(300))
       .subscribe({next: () => this.getMenuPlan()});
+
+    this.profileService.getAllProfilesOfUser().subscribe(response => {
+      this.createUserProfiles = response;
+    });
+
+    // get active profile and pre-select
+    this.userService.getUser().subscribe({
+      next: data => {
+        this.createSelectedProfile = data.activeProfileId;
+      },
+      error: error => {
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+      }
+    });
   }
 
   getMenuPlans(){
@@ -64,7 +88,7 @@ export class MenuPlanLookupComponent implements OnInit {
     if (this.recipeImages.has(recipe)) {
       return this.recipeImages.get(recipe);
     } else {
-      return null;
+      return "Recipe Image";
     }
   }
   getMenuPlan() {
@@ -172,7 +196,7 @@ export class MenuPlanLookupComponent implements OnInit {
     }
   }
 
-  formatDate(inputDate: string, plusDay: number): string {
+  formatDateLocally(inputDate: string, plusDay: number): string {
     const months = [
       'January', 'February', 'March', 'April',
       'May', 'June', 'July', 'August',
@@ -187,7 +211,7 @@ export class MenuPlanLookupComponent implements OnInit {
     return `${monthName} ${day}${dayOrdinal}`;
   }
 
-   getDayOrdinal(day: number): string {
+  getDayOrdinal(day: number): string {
     if (day >= 11 && day <= 13) {
       return 'th';
     }
@@ -204,4 +228,56 @@ export class MenuPlanLookupComponent implements OnInit {
     }
   }
 
+  protected showCreateDialog: boolean = false;
+
+  protected createUserProfiles: ProfileListDto[];
+  protected createSelectedProfile: number | null = null;
+
+  onClickGenerate() {
+
+    if (this.createSelectedProfile == null) {
+      this.notification.warning("Please select a profile");
+      return;
+    }
+
+    let createDto: MenuPlanCreateDto = {
+      profileId: -1,
+      fromTime: Date.now().toString(),
+      untilTime: Date.now().toString(),
+      fridge: []
+    }
+
+    let fromDate = new Date();
+    let untilDate = new Date();
+    untilDate.setDate(untilDate.getDate() + 6);
+
+    createDto.fromTime = formatDate(fromDate, 'yyyy-MM-dd', 'en_US');
+    createDto.untilTime = formatDate(untilDate, 'yyyy-MM-dd', 'en_US');
+    createDto.profileId = this.createSelectedProfile;
+
+    this.service.generateMenuPlan(createDto).subscribe(
+      data => {
+        console.info("Created new Menu Plan");
+        this.showCreateDialog = false;
+        this.ngOnInit();
+      },
+      error => {
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+
+        switch (errorObj.status) {
+          case 409: // conflict
+            this.notification.warning("You already have an active menu plan active for now, please wait for the current plan to end");
+            break;
+          default:
+            this.errorHandler.handleApiError(errorObj);
+            break;
+        }
+
+      }
+    )
+  }
 }
+
+
+

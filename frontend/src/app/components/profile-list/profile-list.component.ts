@@ -22,6 +22,7 @@ export class ProfileListComponent {
   fragment: string;
   scrolledToAnchor: boolean;
   currentUserName = "";
+  activeprofileId: number;
   ownMaxPages: number = 5;
 
   ownSearchParams: ProfileSearch;
@@ -36,6 +37,7 @@ export class ProfileListComponent {
 
   searchOwnChangedObservable = new Subject<void>();
   searchDiscoverChangedObservable = new Subject<void>();
+
 
   constructor(
     private profileService: ProfileService,
@@ -72,6 +74,7 @@ export class ProfileListComponent {
     this.authService.getUser().subscribe(
       (settings: UserSettingsDto) => {
         this.currentUserName = settings.nickname;
+        this.activeprofileId = settings.activeProfileId;
         console.log('Got UserId: ' + settings.id);
         this.reloadOwnProfiles();
         this.reloadDiscoverProfiles();
@@ -125,14 +128,14 @@ export class ProfileListComponent {
           this.ownMaxPages = data.numberOfPages;
           this.ownSearchParams.page = data.page;
           this.scrollToAnchor();
+          console.log("ownProfiles: number of pages: " + data.numberOfPages + ", profiles available: " + data.profiles.length);
         } else {
           this.discoverSearchResult = data;
           this.discoverProfiles = data.profiles;
           this.discoverMaxPages = data.numberOfPages;
           this.discoverSearchParams.page = data.page;
+          console.log("discoverProfiles: number of pages: " + data.numberOfPages + ", profiles available: " + data.profiles.length);
         }
-        console.log("number of pages: " + data.numberOfPages);
-        console.log("profiles available: " + data.profiles.length);
       },
       error: err => {
         this.notification.error('Error fetching profiles', err)
@@ -171,6 +174,20 @@ export class ProfileListComponent {
       next: data => {
         this.notification.success(`Profile ${profileName} successfully deleted.`);
         this.reloadProfiles(this.ownSearchParams, true);
+      },
+      error: error => {
+        console.error('Error deleting profile', error);
+        const errorMessage = error?.error.reason || 'Unknown error occured';
+        this.notification.error(`Error deleting profile: ${errorMessage}`);
+      }
+    });
+  }
+
+  setActiveProfile(profileId: number, profileName: string) {
+    this.profileService.setActiveProfile(profileId).subscribe({
+      next: data => {
+        this.notification.success(`Profile ${profileName} successfully activated.`);
+        this.activeprofileId = profileId;
       },
       error: error => {
         console.error('Error deleting profile', error);
