@@ -11,6 +11,8 @@ import {UserService} from '../../services/user.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {debounceTime, Subject} from 'rxjs';
 import {ErrorHandler} from "../../services/errorHandler";
+import {ImageHandler} from '../../utils/imageHandler';
+import {SafeUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-profile-list',
@@ -45,7 +47,8 @@ export class ProfileListComponent {
     private authService: UserService,
     private route: ActivatedRoute,
     private router: Router,
-    private errorHandler: ErrorHandler
+    private errorHandler: ErrorHandler,
+    private imageHandler: ImageHandler,
   ) {
   }
 
@@ -195,5 +198,17 @@ export class ProfileListComponent {
         this.notification.error(`Error deleting profile: ${errorMessage}`);
       }
     });
+  }
+
+  getPictureUrl(userPictureArray: number[]): SafeUrl {
+    console.info('load user picture');
+    if (userPictureArray === undefined) {
+      console.info('user picture is empty');
+      return this.imageHandler.sanitizeUserImage('/assets/icons/user_default.png');
+    } else {
+      console.info('user picture loaded');
+      //this.loadPreviewPicture();
+      return this.imageHandler.sanitizeUserImage(userPictureArray);
+    }
   }
 }

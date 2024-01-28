@@ -19,7 +19,8 @@ export class ProfileDetailsComponent {
     liked: [],
     disliked: [],
     user: "",
-    userId: -1
+    userId: -1,
+    userPicture: []
   }
 
   userId: number = -1;

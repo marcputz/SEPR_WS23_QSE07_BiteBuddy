@@ -1,5 +1,12 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {UserService} from '../../../services/user.service';
 import {Router} from '@angular/router';
@@ -21,7 +28,7 @@ export class ChangeSettingsComponent implements OnInit {
   error = false;
   errorMessage = 'Something went wrong, no user settings found. Check if your backend is connected';
 
-  isInputFocused: {[key: string]: boolean } = {};
+  isInputFocused: { [key: string]: boolean } = {};
 
   originalUserSettings: UserSettingsDto;
   newUserSettings: UpdateUserSettingsDto = new UpdateUserSettingsDto("", null);
@@ -38,9 +45,24 @@ export class ChangeSettingsComponent implements OnInit {
     private imageHandler: ImageHandler
   ) {
     this.settingsForm = this.formBuilder.group({
-      nickname: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]]
+      nickname: ['', [Validators.required, this.trimmedMinLength(3), Validators.maxLength(255)]]
     });
   }
+
+
+  trimmedMinLength(minLength: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value || '';
+      const trimmedValue = value.trim();
+      return trimmedValue.length < minLength ? {
+        'trimmedMinLength': {
+          requiredLength: minLength,
+          actualLength: trimmedValue.length
+        }
+      } : null;
+    };
+  }
+
 
   vanishError() {
     this.error = false;
@@ -59,7 +81,7 @@ export class ChangeSettingsComponent implements OnInit {
         })
         .catch(error => {
           console.error('Error processing image: ', error);
-          // Handle the error appropriately
+          this.notifications.error(error, 'Unsupported Format use png or Jpg');
         });
     } else {
       this.newUserSettings.userPicture = null;
@@ -76,22 +98,21 @@ export class ChangeSettingsComponent implements OnInit {
 
   private getUser() {
     this.authService.getUser().subscribe({
-      next: (settings: UserSettingsDto) => {
-        this.originalUserSettings = settings;
-        this.settingsForm.controls['nickname'].setValue(settings.nickname);
-        this.loadUserPicture(settings.userPicture);
-        this.newUserSettings = new UpdateUserSettingsDto("", null);
+        next: (settings: UserSettingsDto) => {
+          this.originalUserSettings = settings;
+          this.settingsForm.controls['nickname'].setValue(settings.nickname);
+          this.loadUserPicture(settings.userPicture);
+          this.newUserSettings = new UpdateUserSettingsDto("", null);
+        },
+        error: error => {
+
+          let errorObj = this.errorHandler.getErrorObject(error);
+          this.errorHandler.handleApiError(errorObj);
+
+        },
+        complete: () => {
+        }
       },
-      error: error => {
-
-        let errorObj = this.errorHandler.getErrorObject(error);
-        this.errorHandler.handleApiError(errorObj);
-
-      },
-      complete: () => {
-      }
-    },
-
     );
   }
 
@@ -121,8 +142,7 @@ export class ChangeSettingsComponent implements OnInit {
     let somethingChanged = false;
     if (this.settingsForm.valid) {
       if (this.settingsForm.controls.nickname.value !== this.originalUserSettings.nickname) {
-        const nickname: string = this.settingsForm.controls.nickname.value;
-        this.newUserSettings.nickname = nickname;
+        this.newUserSettings.nickname = this.settingsForm.controls.nickname.value;
         somethingChanged = true;
       }
       if (this.newUserSettings.userPicture !== null) {
