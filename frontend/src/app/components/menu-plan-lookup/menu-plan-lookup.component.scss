@@ -149,6 +149,9 @@ img {
   transform: scale(1.1);
 }
 
+.userinfo-buttons-space {
+  margin-left: auto;
+}
 @each $color in (info, warning, danger) {
   $value: map.get($theme-colors, $color);
   tr:hover .responsive-#{$color}-button {

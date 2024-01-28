@@ -99,7 +99,6 @@
             </ng-template>
           </ng-template>
         </p>
-        <p class="card-text">Number of Persons: 4 persons | </p>
         <div class="user-info d-flex align-items-center">
           <!-- user name add here -->
           <img src="assets/icons/user_default.png" class="rounded-circle user-icon" alt="User Icon">
@@ -107,10 +106,10 @@
             <p class="user-name">user name</p>
           </div>
           <div></div>
-          <div class="btn-group d-flex align-items-">
+          <div class="btn-group d-flex align-items userinfo-buttons-space">
             <a
-              (click)="likeRecipe(content)"
-              aria-label="Like Recipe">
+              (click)="rerollRecipe(content)"
+              aria-label="Reroll Recipe">
               <i class="bi bi-arrow-clockwise"></i>
             </a>
             <a

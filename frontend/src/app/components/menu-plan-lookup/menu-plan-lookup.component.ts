@@ -137,7 +137,7 @@ export class MenuPlanLookupComponent implements OnInit {
     this.searchChangedObservable.next();
   }
 
-  likeRecipe(c: MenuPlanContentDetailDto) {
+  rerollRecipe(c: MenuPlanContentDetailDto) {
     // Call your like function logic here
 
     console.log('Recipe liked!');
