@@ -22,6 +22,7 @@ export class RecipeListComponent implements OnInit {
   recipes: RecipeListDto[] = [];
   recipeImages: Map<RecipeListDto, number[]> = null;
   maxPages: number = 5;
+  pagesForPagination: number[];
   searchChangedObservable = new Subject<void>();
   searchParams: RecipeSearch = {
     creator: "",
@@ -67,6 +68,8 @@ export class RecipeListComponent implements OnInit {
             next: data => {
               this.likes = data.likes;
               this.dislikes = data.dislikes
+
+              this.createPagination();
             },
             error: error => {
               console.error('Error getting rating list', error);
@@ -97,6 +100,8 @@ export class RecipeListComponent implements OnInit {
         this.searchParams.page = data.page;
         console.log("number of pages: " + data.numberOfPages);
         console.log("recipes available: " + data.recipes.length);
+
+        this.createPagination()
 
         // load recipe images
         this.recipeImages = new Map<RecipeListDto, number[]>();
@@ -190,5 +195,20 @@ export class RecipeListComponent implements OnInit {
 
   redirectToRecipe(recipeId: number) {
     this.router.navigate(['/recipes', recipeId]);
+  }
+
+  createPagination() {
+    function arange(size: number, start: number = 0): number[] {
+      return Array.from({ length: size }, (_, index) => start + index);
+    }
+
+    // when having less than 5 pages we only show available pages
+    if (this.maxPages < 5) {
+      this.pagesForPagination = arange(this.maxPages, 0);
+    } else if (this.searchParams.page >= (this.maxPages - 3)) {
+      this.pagesForPagination = arange(5, (this.maxPages - 5))
+    } else {
+      this.pagesForPagination = arange(5, Math.max(this.searchParams.page - 2, 0));
+    }
   }
 }
