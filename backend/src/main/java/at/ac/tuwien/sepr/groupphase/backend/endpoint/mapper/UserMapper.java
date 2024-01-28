@@ -9,6 +9,14 @@ import org.mapstruct.Mapping;
  */
 @Mapper
 public interface UserMapper {
+
+    /**
+     * Maps a {@link ApplicationUser} entity to an {@link UserSettingsDto} DTO.
+     *
+     * @param user the ApplicationUser to map
+     * @return the mapped UserSettingsDto
+     */
+
     @Mapping(source = "activeProfile.id", target = "activeProfileId")
     UserSettingsDto toUserSettingsDto(ApplicationUser user);
 }

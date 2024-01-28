@@ -53,6 +53,7 @@ public class ProfileEndpoint {
     }
 
     @PostMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
     public ProfileSearchResultDto searchProfiles(@Valid @RequestBody ProfileSearchDto searchParams, @RequestHeader HttpHeaders headers)
         throws AuthenticationException {
         LOGGER.info("Received POST request on {}", BASE_PATH + "/search");
@@ -86,6 +87,7 @@ public class ProfileEndpoint {
 
 
     @PostMapping("/copyToOwn/{profileId}")
+    @ResponseStatus(HttpStatus.OK)
     public ProfileDetailDto post(@PathVariable Long profileId, @RequestHeader HttpHeaders headers) throws AuthenticationException {
         LOGGER.info("Received POST request on {}", BASE_PATH + "/copyToOwn");
         LOGGER.debug("Request body for POST:\n{}", profileId);
@@ -96,6 +98,7 @@ public class ProfileEndpoint {
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<ProfileListDto> getAllForUser(@RequestHeader HttpHeaders headers) throws AuthenticationException {
         LOGGER.trace("getAllForUser({})", headers);
 
@@ -120,6 +123,7 @@ public class ProfileEndpoint {
      * @throws NotFoundException if the profile does not exist in the database.
      */
     @GetMapping("/{profileId}")
+    @ResponseStatus(HttpStatus.OK)
     public ProfileDetailDto getProfileDetails(@PathVariable long profileId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException {
         LOGGER.info("Received Get request on {}", BASE_PATH);
@@ -137,6 +141,7 @@ public class ProfileEndpoint {
      * @throws ValidationException if the edited data is not valid for editing.
      */
     @PutMapping("/edit/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ProfileDto editProfile(@RequestBody ProfileDto profileDto, @RequestHeader HttpHeaders headers)
         throws ValidationException, NotFoundException, AuthenticationException {
         LOGGER.info("Received PUT request on {}", BASE_PATH);
@@ -146,6 +151,7 @@ public class ProfileEndpoint {
     }
 
     @PostMapping("/setActive/{profileId}")
+    @ResponseStatus(HttpStatus.OK)
     public void setActiveProfile(@PathVariable Long profileId, @RequestHeader HttpHeaders headers)
         throws AuthenticationException, ConflictException {
         LOGGER.info("Received POST request to set active profile with ID {}", profileId);
@@ -165,6 +171,7 @@ public class ProfileEndpoint {
      * @throws ValidationException if the rating value is not 0 or 1.
      */
     @PutMapping("/rating/{RecipeId}")
+    @ResponseStatus(HttpStatus.CREATED)
     public void putRating(@Valid @RequestBody RecipeRatingDto recipeRatingDto, @RequestHeader HttpHeaders headers)
         throws ValidationException, NotFoundException, AuthenticationException {
         LOGGER.info("Received PUT request on {}", BASE_PATH);
@@ -183,6 +190,7 @@ public class ProfileEndpoint {
      * @throws NotFoundException if the profile containing the lists does not exist.
      */
     @GetMapping("/rating/{userId}")
+    @ResponseStatus(HttpStatus.OK)
     public RecipeRatingListsDto getRatingLists(@PathVariable long userId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException {
         LOGGER.info("Received Get request on {}", BASE_PATH);
@@ -201,6 +209,7 @@ public class ProfileEndpoint {
      * @throws ConflictException if the user wants to delete the active profile or the current profile does not belong to the current user.
      */
     @DeleteMapping("/deleteProfile/{profileId}")
+    @ResponseStatus(HttpStatus.OK)
     public ProfileDto delete(@PathVariable long profileId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException, ConflictException {
         LOGGER.info("Received Delete request on {}", BASE_PATH);

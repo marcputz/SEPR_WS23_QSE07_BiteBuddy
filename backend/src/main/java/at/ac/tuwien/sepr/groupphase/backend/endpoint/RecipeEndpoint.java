@@ -28,7 +28,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping(value = RecipeEndpoint.BASE_PATH)
@@ -45,6 +44,7 @@ public class RecipeEndpoint {
     }
 
     @PostMapping()
+    @ResponseStatus(HttpStatus.OK)
     public RecipeSearchResultDto searchRecipes(@RequestBody RecipeSearchDto searchParams) {
         LOGGER.info("POST " + BASE_PATH);
         LOGGER.debug("request body: {}", searchParams);
@@ -52,18 +52,21 @@ public class RecipeEndpoint {
     }
 
     @GetMapping("/ingredient/{name}")
+    @ResponseStatus(HttpStatus.OK)
     public List<String> findMatchingIngredients(@PathVariable String name) {
         LOGGER.info("GET " + BASE_PATH + "/ingredient/" + name);
         return this.recipeService.findMatchingIngredients(name);
     }
 
     @GetMapping("/ingredient/basic/{name}")
+    @ResponseStatus(HttpStatus.OK)
     public List<String> findOnlyBasicMatchingIngredients(@PathVariable String name) {
         LOGGER.info("GET " + BASE_PATH + "/ingredient/" + name);
         return this.recipeService.findMatchingIngredients(name);
     }
 
     @PostMapping("/create")
+    @ResponseStatus(HttpStatus.CREATED)
     public void createRecipe(@RequestBody RecipeDetailsDto recipe, @RequestHeader HttpHeaders headers) {
         LOGGER.info("POST " + BASE_PATH + "/create");
         LOGGER.debug("request body: {}", recipe);
@@ -90,6 +93,7 @@ public class RecipeEndpoint {
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public RecipeDetailsDto getDetailedRecipe(@PathVariable long id) {
         LOGGER.info("GET " + BASE_PATH + "/" + id);
         try {
