@@ -159,7 +159,7 @@ export class ProfileListComponent {
       },
       error: error => {
         console.error('Error deleting profile', error);
-        const errorMessage = error?.error || 'Unknown error occured';
+        const errorMessage = error?.error.reason || 'Unknown error occured';
         this.notification.error(`Error deleting profile: ${errorMessage}`);
       }
     });
