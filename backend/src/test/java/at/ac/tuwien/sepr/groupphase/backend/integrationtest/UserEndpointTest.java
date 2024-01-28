@@ -478,6 +478,21 @@ public class UserEndpointTest {
     }
 
     @Test
+    void testRequestPasswordReset_WithNoData_IsBadRequest() throws Exception {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/request_password_reset")
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+    }
+
+    @Test
     void testPasswordReset_WithValidRequest_IsOk() throws Exception {
         // given
         final String requestId = "abcdefghijklmnop";
@@ -569,5 +584,21 @@ public class UserEndpointTest {
 
         // then
         assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
+    }
+
+    @Test
+    void testPasswordReset_WithNoData_IsBadRequest() throws Exception {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/password_reset")
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        // then
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
     }
 }
