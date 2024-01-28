@@ -373,7 +373,7 @@ public class RecipesEndpointTest {
                     """)
                 .headers(requestHeaders)
                 .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isOk());
+            ).andExpect(status().isCreated());
 
         // now requesting the recipe
         // creating request

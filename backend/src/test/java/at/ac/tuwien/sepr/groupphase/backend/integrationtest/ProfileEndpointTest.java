@@ -34,7 +34,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -324,7 +323,7 @@ public class ProfileEndpointTest {
                 .content(new ObjectMapper().writeValueAsString(ratingDto))
                 .headers(headers)
                 .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andReturn().getResponse().getContentAsByteArray();
 
         Profile activeProfile = this.profileRepository.getReferenceById(userRepository.getReferenceById(testUserId).getActiveProfile().getId());
