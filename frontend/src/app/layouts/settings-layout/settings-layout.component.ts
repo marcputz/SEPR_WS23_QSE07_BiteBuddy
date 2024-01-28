@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from "../../services/user.service";
 import {ActivatedRoute, NavigationEnd, Router, RouterState} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
@@ -6,13 +6,14 @@ import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
 import {SafeUrl} from "@angular/platform-browser";
 import {ImageHandler} from "../../utils/imageHandler";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-settings-layout',
   templateUrl: './settings-layout.component.html',
   styleUrls: ['./settings-layout.component.scss']
 })
-export class SettingsLayoutComponent implements OnInit {
+export class SettingsLayoutComponent implements OnInit, OnDestroy {
 
   accountEmail: string | null;
   accountUsername: string | null;
@@ -28,6 +29,8 @@ export class SettingsLayoutComponent implements OnInit {
   errorMessage = '';
 
   userSettings: UserSettingsDto;
+
+  private updateSubscription: Subscription;
 
   constructor(private authService: UserService,
               private router: Router,
@@ -76,6 +79,15 @@ export class SettingsLayoutComponent implements OnInit {
 
     //retrieve then the user image
     this.getUser();
+
+    this.updateSubscription = this.authService.updateEvent.subscribe(() => {
+      // Reload logic for the parent component here
+      this.getUser();
+    });
+  }
+
+  ngOnDestroy() {
+    this.updateSubscription.unsubscribe();
   }
 
   setActiveNavItem(itemLabel: string) {
