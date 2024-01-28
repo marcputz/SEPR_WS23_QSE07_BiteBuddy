@@ -22,6 +22,9 @@ export class ProfileEditComponent {
 
   title: string = "Edit Profile"
 
+  isInputFocused: {[key: string]: boolean } = {};
+  submitted = false;
+
   profile: ProfileDto = {} as ProfileDto;
   previousProfileDetails: ProfileDetailDto = {} as ProfileDetailDto;
   allergens: AllergeneDto[] = [];
@@ -120,5 +123,13 @@ export class ProfileEditComponent {
 
     }
   }
+
+  /**
+   * Update the input focus flag in order to show/hide the label on the input field
+   */
+  updateInputFocus(attribute: string) {
+    this.isInputFocused[attribute] = this.form.get(attribute).value !== '';
+  }
+
 
 }

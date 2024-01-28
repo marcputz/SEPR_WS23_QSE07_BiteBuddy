@@ -26,6 +26,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.ProfileValidator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -181,9 +182,23 @@ public class ProfileServiceImpl implements ProfileService {
     public void rateRecipe(RecipeRatingDto recipeRatingDto) throws NotFoundException, ValidationException {
         LOGGER.trace("createRating({})", recipeRatingDto);
 
-        Recipe recipeToRate = recipeRepository.getReferenceById(recipeRatingDto.recipeId());
-        ApplicationUser user = userRepository.getReferenceById(recipeRatingDto.userId());
+        Optional<Recipe> recipeToRateOpt = recipeRepository.findById(recipeRatingDto.recipeId());
+        if (recipeToRateOpt.isEmpty()) {
+            throw new NotFoundException("recipe does not exist in the database");
+        }
+        Recipe recipeToRate = recipeToRateOpt.get();
+
+        Optional<ApplicationUser> userOpt = userRepository.findById(recipeRatingDto.userId());
+        if (userOpt.isEmpty()) {
+            throw new NotFoundException("user does not exist in the database");
+        }
+        ApplicationUser user = userOpt.get();
+
         Profile ratingProfile = user.getActiveProfile();
+        if (ratingProfile == null) {
+            throw new NotFoundException("the user does not have an active profile which is needed to rate");
+        }
+
         profileValidator.validateRating(recipeRatingDto.rating());
 
 
@@ -227,11 +242,9 @@ public class ProfileServiceImpl implements ProfileService {
             disliked.add(recipe.getId());
         }
 
-        RecipeRatingListsDto ratingLists = new RecipeRatingListsDto(
+        return new RecipeRatingListsDto(
             liked,
             disliked);
-
-        return ratingLists;
     }
 
     @Override
@@ -306,7 +319,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public ProfileDto deleteProfile(Long profileId, Long userId) throws NotFoundException, ConflictException {
-        LOGGER.trace("deleteProfile({})", profileId);
+        LOGGER.trace("deleteProfile({}),({})", profileId, userId);
         Optional<Profile> profileToDelete = profileRepository.findById(profileId);
 
         if (profileToDelete.isEmpty()) {
@@ -319,17 +332,16 @@ public class ProfileServiceImpl implements ProfileService {
 
         Profile profile = profileToDelete.get();
 
+        ProfileDto deletedProfile = profileMapper.profileToProfileDto(profile);
+
+
         ApplicationUser currentUser = user.get();
 
-        if (Objects.equals(currentUser.getActiveProfile().getId(), profile.getId())) {
-            ArrayList<String> conflictErrors = new ArrayList<>();
-            conflictErrors.add("can not delete " + profile.getName());
-            throw new ConflictException("The active profile can not be deleted", conflictErrors);
-        }
+        profileValidator.validateDelete(currentUser, profile);
 
         profileRepository.delete(profileToDelete.get());
 
-        return profileMapper.profileToProfileDto(profile);
+        return deletedProfile;
     }
 
     @Override
