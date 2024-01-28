@@ -2,14 +2,11 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
  * Data object transfer for Profile entity to send information through the network and between layers.
- * To create java boilerplate code use lombok.
  */
 
 public class ProfileListDto {
