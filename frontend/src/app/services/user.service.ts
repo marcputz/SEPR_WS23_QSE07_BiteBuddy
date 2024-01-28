@@ -35,6 +35,7 @@ export class UserService {
    */
   loginUser(authRequest: LoginDto): Observable<string> {
     console.trace("Logging in as '" + authRequest.email + "'");
+
     return this.httpClient.post(this.authBaseUri + "/login", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
@@ -43,6 +44,7 @@ export class UserService {
 
   registerUser(authRequest: RegisterDto): Observable<string> {
     console.trace("Registering as '" + authRequest.email + "'");
+
     return this.httpClient.post(this.authBaseUri + "/register", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
@@ -50,8 +52,6 @@ export class UserService {
   }
 
   getUser(): Observable<UserSettingsDto> {
-    console.debug("Retrieving current user settings");
-
     return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`);
   }
 
@@ -70,7 +70,7 @@ export class UserService {
   }
 
   logoutUser() {
-    console.debug("Logging out");
+    console.log("Logging out");
 
     this.httpClient.post(this.authBaseUri + "/logout", this.getToken())
       .subscribe({
@@ -86,7 +86,8 @@ export class UserService {
   }
 
   requestPasswordReset(userEmail: string): Observable<any> {
-    console.debug("Requesting password reset for '" + userEmail + "' from server");
+    console.log("Requesting password reset for '" + userEmail + "' from server");
+
     return this.httpClient.post(this.authBaseUri + "/request_password_reset", "{\"email\":\"" + userEmail + "\"}", {responseType: 'text'})
   }
 
