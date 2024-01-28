@@ -28,6 +28,9 @@
     </div>
     <!-- Card layout -->
     <div class="row">
+      <div *ngIf="this.recipes === null || this.recipes.length <= 0" style="text-align: center; width: 100%;">
+        <p style="color: rgba(0,0,0, 0.8);">No Recipes found</p>
+      </div>
       <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6" *ngFor="let recipe of recipes">
         <div class="card recipe-card">
           <img [src]="getImageFor(recipe)" class="card-img-top rounded-top img-zoom" [alt]="getImageAltFor(recipe)">
@@ -65,7 +68,7 @@
       </div>
     </div>
 
-    <div class="row justify-content-center">
+    <div class="row justify-content-center" *ngIf="this.recipes !== null && this.recipes.length > 1">
       <div class="col-md-auto">
         <div class="container">
           <ul class="pagination mb-4 mt-4">
