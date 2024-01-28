@@ -35,34 +35,63 @@ const routes: Routes = [
       {path: 'request_password_reset', component: RequestPasswordResetComponent}, // Forgot password page
       {path: 'password_reset', component: PasswordResetComponent}, // Password reset page
       {path: 'profile', canActivate: mapToCanActivate([AuthGuard]), component: ProfileComponent}
-    ]},
+    ]
+  },
   {path: 'register', component: RegisterComponent}, // Register Page
-  {path: '', component: NavbarLayoutComponent, children: [ // Pages using Navbar Layout
+  {
+    path: '', component: NavbarLayoutComponent, children: [ // Pages using Navbar Layout
       {path: 'dashboard', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent}, // TODO: add dashboard component
-      {path: 'recipes', canActivate: mapToCanActivate([AuthGuard]), children: [
+      {
+        path: 'recipes', canActivate: mapToCanActivate([AuthGuard]), children: [
           {path: '', canActivate: mapToCanActivate([AuthGuard]), component: RecipeListComponent},
           {path: 'create', canActivate: mapToCanActivate([AuthGuard]), component: RecipeCreateComponent},
           {path: ':id', canActivate: mapToCanActivate([AuthGuard]), component: RecipeDetailComponent},
-        ]},
-    ]},
-  {path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
+        ]
+      },
+    ]
+  },
+  {
+    path: 'settings', canActivate: mapToCanActivate([AuthGuard]), component: SettingsLayoutComponent, children: [
       {path: '', pathMatch: 'full', redirectTo: 'user'},
       {path: 'user', canActivate: mapToCanActivate([AuthGuard]), component: ChangeSettingsComponent},
       {path: 'email', canActivate: mapToCanActivate([AuthGuard]), component: ChangeEmailComponent},
       {path: 'password', canActivate: mapToCanActivate([AuthGuard]), component: ChangePasswordComponent},
-  ]},
+    ]
+  },
   {
     path: 'profiles', canActivate: mapToCanActivate([AuthGuard]), component: NavbarLayoutComponent, children: [
       {path: '', canActivate: mapToCanActivate([AuthGuard]), component: ProfileListComponent},
       {path: ':id', canActivate: mapToCanActivate([AuthGuard]), component: ProfileDetailsComponent},
-      {path: '', canActivate: mapToCanActivate([AuthGuard]), component: DialogLayoutComponent, children: [
-      {path: 'edit/:id', canActivate: mapToCanActivate([AuthGuard]), component: ProfileEditComponent}]}
+      {
+        path: '', canActivate: mapToCanActivate([AuthGuard]), component: DialogLayoutComponent, children: [
+          {path: 'edit/:id', canActivate: mapToCanActivate([AuthGuard]), component: ProfileEditComponent}]
+      }
     ]
   },
-  {path: 'menuplan', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent},
-  {path: 'menuplanLookup', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanLookupComponent},
-  {path: 'inventory', canActivate: mapToCanActivate([AuthGuard]), component: InventoryComponent},
-];
+  {
+    path: 'menuplan',
+    canActivate: mapToCanActivate([AuthGuard]),
+    component: NavbarLayoutComponent, // Use the same NavbarLayoutComponent for the layout
+    children: [
+      {path: '', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent}
+    ]
+  },
+  {
+    path: 'menuplanLookup',
+    canActivate: mapToCanActivate([AuthGuard]),
+    component: NavbarLayoutComponent, // Use the same NavbarLayoutComponent for the layout
+    children: [
+      {path: '', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanLookupComponent}
+    ]
+  },
+  {
+    path: 'inventory',
+    canActivate: mapToCanActivate([AuthGuard]),
+    component: NavbarLayoutComponent, // Use the same NavbarLayoutComponent for the layout
+    children: [
+      {path: '', canActivate: mapToCanActivate([AuthGuard]), component: InventoryComponent}
+    ]
+  }];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, {

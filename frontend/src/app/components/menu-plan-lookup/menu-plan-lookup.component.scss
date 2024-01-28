@@ -74,7 +74,7 @@
 }
 
 .row-form {
-  margin: 5% 10%;
+  margin: 5% 8%;
 }
 
 .button-create {
@@ -94,10 +94,9 @@
 }
 
 img {
-  width: 270px;
-  height: 11rem;
+  height: 15rem;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
 .recipe-card:hover {
@@ -141,11 +140,6 @@ img {
   @include button-variant($light, $light);
 }
 
-.img-thumbnail {
-  width: auto;
-  height: 200px;
-  object-fit: contain;
-}
 
 .card {
   transition: all 0.3s;

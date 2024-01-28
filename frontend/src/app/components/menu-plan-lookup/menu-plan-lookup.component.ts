@@ -261,6 +261,8 @@ export class MenuPlanLookupComponent {
     this.service.generateMenuPlan(createDto).subscribe(
       data => {
         console.info("Created new Menu Plan");
+        this.showCreateDialog = false;
+        this.ngOnInit();
       },
       error => {
 
@@ -278,7 +280,6 @@ export class MenuPlanLookupComponent {
       }
     )
   }
-
 }
 
 

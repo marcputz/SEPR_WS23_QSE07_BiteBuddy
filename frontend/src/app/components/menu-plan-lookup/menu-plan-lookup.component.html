@@ -20,24 +20,35 @@
   </div>
 </div>
 
-<button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
+<!-- Check if menuplans has a size greater than or equal to 1 -->
+<div *ngIf="menuplans.length >= 1">
+  <div class="row">
+    <label for="menuplans" class="col-form-label text-md-start text-muted">
+      <span style="font-weight: bold;">Which menuplan do you want to see?</span>
+      <span class="required-asterisk">*</span>
+    </label>
+    <select multiple class="form-select custom-select"
+            id="menuplans"
+            style="font-weight: bold;"
+            formControlName="menuplans"
+            (change)="onMenuPlanSelected($event)"
+            required>
+      <option *ngFor="let m of menuplans" [value]="m.fromTime">
+        {{m.fromTime}} to {{m.untilTime}}
+      </option>
+    </select>
+  </div>
 
-<div class="row">
-  <label for="menuplans" class="col-form-label text-md-start text-muted">
-    <span style="font-weight: bold;">Which menuplan do you want to see?</span>
-    <span class="required-asterisk">*</span>
-  </label>
-  <select multiple class="form-select custom-select"
-          id="menuplans"
-          style="font-weight: bold;"
-          formControlName="menuplans"
-          (change)="onMenuPlanSelected($event)"
-          required>
-    <option *ngFor="let m of menuplans" [value]="m.fromTime">
-      {{m.fromTime}} to {{m.untilTime}}
-    </option>
-  </select>
+  <button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
 </div>
+
+<!-- If menuplans has a size less than 1, show the message -->
+<div *ngIf="menuplans.length < 1" style="text-align: center; font-size: 18px; font-weight: bold; margin-top: 50 px;">
+  <p>You have to add a Menuplan!
+    <button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
+</div>
+
+
 
 
 <!--
