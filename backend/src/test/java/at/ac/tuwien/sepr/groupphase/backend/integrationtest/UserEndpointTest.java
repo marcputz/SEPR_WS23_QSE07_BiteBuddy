@@ -142,6 +142,21 @@ public class UserEndpointTest {
     }
 
     @Test
+    public void testLogin_withNoData_IsBadRequest() throws Exception {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/user/login")
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+    }
+
+    @Test
     public void testLogin_WithTwoUsersSimultaneously_isOK() throws Exception {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
