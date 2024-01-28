@@ -78,20 +78,14 @@ export class ProfileListComponent {
       (settings: UserSettingsDto) => {
         this.currentUserName = settings.nickname;
         this.activeprofileId = settings.activeProfileId;
-        console.log('Got UserId: ' + settings.id);
         this.reloadOwnProfiles();
         this.reloadDiscoverProfiles();
       },
       error => {
-        console.error('Error getting user settings', error);
-        const errorMessage = error?.error || 'Unknown error occurred';
 
         let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
 
-        if (error.status === 401) {
-          // Handle logout logic, e.g., redirect to login page
-          this.errorHandler.handleApiError(errorObj);
-        }
       }
     );
     this.route.fragment.subscribe(fragment => {
@@ -131,17 +125,18 @@ export class ProfileListComponent {
           this.ownMaxPages = data.numberOfPages;
           this.ownSearchParams.page = data.page;
           this.scrollToAnchor();
-          console.log("ownProfiles: number of pages: " + data.numberOfPages + ", profiles available: " + data.profiles.length);
         } else {
           this.discoverSearchResult = data;
           this.discoverProfiles = data.profiles;
           this.discoverMaxPages = data.numberOfPages;
           this.discoverSearchParams.page = data.page;
-          console.log("discoverProfiles: number of pages: " + data.numberOfPages + ", profiles available: " + data.profiles.length);
         }
       },
       error: err => {
-        this.notification.error('Error fetching profiles', err)
+
+        let errorObj = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorObj);
+
       }
     })
   }
@@ -175,13 +170,14 @@ export class ProfileListComponent {
   deleteProfile(profileId: number, profileName: string) {
     this.profileService.deleteProfile(profileId).subscribe({
       next: data => {
-        this.notification.success(`Profile ${profileName} successfully deleted.`);
+        this.notification.success(`Profile ${profileName} deleted.`);
         this.reloadProfiles(this.ownSearchParams, true);
       },
       error: error => {
-        console.error('Error deleting profile', error);
-        const errorMessage = error?.error.reason || 'Unknown error occured';
-        this.notification.error(`Error deleting profile: ${errorMessage}`);
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+
       }
     });
   }
@@ -193,20 +189,18 @@ export class ProfileListComponent {
         this.activeprofileId = profileId;
       },
       error: error => {
-        console.error('Error deleting profile', error);
-        const errorMessage = error?.error || 'Unknown error occured';
-        this.notification.error(`Error deleting profile: ${errorMessage}`);
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+
       }
     });
   }
 
   getPictureUrl(userPictureArray: number[]): SafeUrl {
-    console.info('load user picture');
     if (userPictureArray === undefined) {
-      console.info('user picture is empty');
       return this.imageHandler.sanitizeUserImage('/assets/icons/user_default.png');
     } else {
-      console.info('user picture loaded');
       //this.loadPreviewPicture();
       return this.imageHandler.sanitizeUserImage(userPictureArray);
     }
