@@ -148,9 +148,6 @@ public class RecipeServiceImpl implements RecipeService {
         // validate recipe
         this.validator.validateForCreate(recipe);
 
-        ArrayList<String> conflictList = new ArrayList<>();
-        Set<RecipeIngredient> ingredients = new HashSet<>();
-
         // creating picture
         Long pictureId = null;
         if (recipe.picture() != null) {
@@ -161,6 +158,9 @@ public class RecipeServiceImpl implements RecipeService {
                 LOGGER.warn("Image sent was not valid");
             }
         }
+
+        ArrayList<String> conflictList = new ArrayList<>();
+        Set<RecipeIngredient> ingredients = new HashSet<>();
 
         // creating database entry
         Recipe newRecipe = new Recipe();
