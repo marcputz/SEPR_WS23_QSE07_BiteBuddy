@@ -131,18 +131,21 @@ export class RecipeListComponent implements OnInit {
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {
-    try {
-      if (!imageBytes || imageBytes.length === 0) {
-        // throw new Error('Empty or undefined imageBytes');
-      }
+    if (imageBytes != null) {
+      try {
+        if (!imageBytes || imageBytes.length === 0) {
+          // throw new Error('Empty or undefined imageBytes');
+        }
 
-      const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
-      const dataUrl = `data:image/png;base64,${imageBytes}`;
-      return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
-    } catch (error) {
-      // console.error('Error sanitizing image:', error);
-      return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
+        const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
+        const dataUrl = `data:image/jpg;base64,${imageBytes}`;
+        return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+      } catch (error) {
+        // console.error('Error sanitizing image:', error);
+        return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
+      }
     }
+    return "";
   }
 
   pageChanger(newPageNumber: number) {

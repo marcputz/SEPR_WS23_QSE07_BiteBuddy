@@ -95,7 +95,7 @@ export class RecipeDetailComponent implements OnInit {
       if (!imageBytes || imageBytes.length === 0) {
         throw new Error('Empty or undefined imageBytes');
       }
-      const dataUrl = `data:image/png;base64,${imageBytes}`;
+      const dataUrl = `data:image/jpg;base64,${imageBytes}`;
       return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
     } catch (error) {
       console.error('Error sanitizing image:', error);
