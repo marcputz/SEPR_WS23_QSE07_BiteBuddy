@@ -1,5 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from "@angular/forms";
 import {UserService} from '../../services/user.service';
 import {Router} from "@angular/router";
 import {RegisterDto} from "../../dtos/registerDto";
@@ -23,7 +30,7 @@ export class RegisterComponent implements OnInit {
   errorMailAlreadyExists: boolean = false;
   errorPasswordsNotSame: boolean = false;
 
-  isInputFocused: {[key: string]: boolean } = {};
+  isInputFocused: { [key: string]: boolean } = {};
 
   showPasswords: boolean = false;
   showPassword1: boolean = false;
@@ -34,13 +41,25 @@ export class RegisterComponent implements OnInit {
               private router: Router,
               private notification: ToastrService) {
     this.registerForm = this.formBuilder.group({
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
+      username: ['', [Validators.required, this.trimmedMinLength(3), Validators.maxLength(255)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       password2: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
+  trimmedMinLength(minLength: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value || '';
+      const trimmedValue = value.trim();
+      return trimmedValue.length < minLength ? {
+        'trimmedMinLength': {
+          requiredLength: minLength,
+          actualLength: trimmedValue.length
+        }
+      } : null;
+    };
+  }
 
   /**
    * Form validation will start after the method is called, additionally an LoginDto will be sent
@@ -138,6 +157,7 @@ export class RegisterComponent implements OnInit {
   togglePasswordVisibility() {
     this.showPasswords = !this.showPasswords;
   }
+
   //TODO: refactor this
   togglePasswordVisibility1() {
     this.showPassword1 = !this.showPassword1;
