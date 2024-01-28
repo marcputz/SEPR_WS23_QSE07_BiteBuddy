@@ -1,26 +1,9 @@
 <!-- profile-list.component.html -->
 <div class="container-fluid">
   <div class="row flex-nowrap">
-    <!-- Side Nav Bar -->
-    <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-light">
-      <nav id="navbar-example3" class="navbar navbar-light bg-light flex-column align-items-stretch p-3"
-           aria-label="On Site Navigation">
-        <a class="navbar-brand">Menu</a>
-        <nav class="nav nav-pills flex-column" aria-label="Main navigation">
-          <a class="nav-link" routerLink="." fragment="my-profiles" aria-label="Scroll to My Profiles section">My
-            Profiles</a>
-          <a class="nav-link" routerLink="." fragment="discover-profiles"
-             aria-label="Scroll to Discover Profiles section">Discover Profiles</a>
-        </nav>
-      </nav>
-    </div>
-
-
     <div class="col py-3">
-
       <div class="container">
         <h1 id="my-profiles" class="header mb-4">My Profiles</h1>
-
         <div class="row mb-5 align-items-center">
           <!-- Search Form Own-->
           <div class="col">
@@ -30,7 +13,6 @@
                      (ngModelChange)="searchOwnChanged()" aria-label="Search Profiles">
             </form>
           </div>
-
           <!-- Create Profile Button -->
           <div class="col-auto">
             <button class="btn btn-success rounded-pill" [routerLink]="['/profile']" aria-label="Create Profile">
@@ -39,19 +21,17 @@
           </div>
         </div>
       </div>
-
-
       <!-- Container for user profiles -->
       <div class="container">
         <div class="row">
           <!-- Loop through each profile in ownProfiles array -->
-          <div class="col-md-4 d-flex flex-column" *ngFor="let profile of ownProfiles; let i = index">
+          <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-3 mb-4 row-gap-6"
+               *ngFor="let profile of ownProfiles; let i = index">
             <!-- Card for each profile -->
             <div class="card h-100"> <!-- h-100 Cards expand to size of longest Card in line -->
               <div class="card-body">
-
                 <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
-                  <h2 *ngIf="profile.id === activeprofileId" class="card-title">{{ profile.name }}</h2>
+                  <h5 *ngIf="profile.id === activeprofileId" class="card-title">Active: {{ profile.name }}</h5>
                   <h5 *ngIf="profile.id !== activeprofileId" class="card-title">{{ profile.name }}</h5>
                 </a>
                 <p class="card-text"><strong>Restricted Allergens:</strong></p>
@@ -84,15 +64,17 @@
                 </ul>
               </div>
               <div class="buttons-flex mt-auto m-3">
-                <button class="btn btn-primary btn-edit edit-button d-flex"
+                <button class="button-transparent"
                         [routerLink]="['/profiles/edit', profile.id]">
-                  Edit
+                  <span class="bb-text-inside-btn-transp">
+                Edit
+              </span>
                 </button>
-                <button *ngIf="profile.id !== activeprofileId" class="btn btn-success delete-button d-flex"
+                <button *ngIf="profile.id !== activeprofileId" class="button-transparent d-flex"
                         (click)="setActiveProfile(profile.id, profile.name)">
                   Activate
                 </button>
-                <button class="btn btn-danger bi-trash delete-button d-flex"
+                <button class="button-transparent bi-trash  d-flex"
                         *ngIf="profile.id !== activeprofileId"
                         (click)="deleteProfile(profile.id, profile.name)"
                 ></button>
@@ -101,11 +83,8 @@
           </div>
         </div>
       </div>
-
-
       <div class="container">
         <h1 id="discover-profiles" class="bb-dialog-box-header mb-4">Discover Profiles</h1>
-
         <!-- Pagination Section -->
         <div class="row justify-content-center mb-3">
           <nav aria-label="Page navigation">
@@ -139,6 +118,7 @@
           </nav>
         </div>
 
+        
         <!-- Search Form Discover -->
         <div class="row align-items-center mb-3">
           <div class="col">
@@ -153,27 +133,23 @@
           </div>
         </div>
       </div>
-
-
       <div class="container">
         <div class="row">
           <!-- Iterate through profiles -->
-          <div class="col-md-4 d-flex flex-column" *ngFor="let profile of discoverProfiles; let i = index">
+          <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-3 mb-4 row-gap-6"
+               *ngFor="let profile of discoverProfiles; let i = index">
             <div class="card h-100"> <!-- Cards expand to size of longest Card in line -->
-              <div class="card-header">
+              <div class="card-body">
                 <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
                   <h5 class="card-title">{{ profile.name }}</h5>
-                </a><br>
+                </a>
                 <div class="card-subtitle text-muted">
                   <span>Created by:
-                    <!-- TODO: Add dynamic loading for user profile images -->
-                    <!-- TODO: (load)="onImageLoad($event, profile.userId)"-->
                     <img [ngSrc]="getPictureUrl(profile.userPicture)" width="35" height="35" style="margin-right: 5px;"
                          alt="Profile Image">
                     {{ profile.user }}</span>
                 </div>
-              </div>
-              <div class="card-body">
+                <br>
                 <p class="card-text"><strong>Restricted Allergens:</strong></p>
                 <ul>
                   <ng-container *ngFor="let allergen of profile.allergens; let i = index">
@@ -204,15 +180,12 @@
                 </ul>
               </div>
               <div class="buttons-flex mt-auto m-3">
-                <button class="btn btn-primary btn-add-to-own" (click)="addToOwn(profile.id)">+ Add to Own</button>
+                <button class="button-transparent" (click)="addToOwn(profile.id)">+ Add to Own</button>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-
     </div>
-
   </div>
 </div>
