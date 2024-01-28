@@ -161,10 +161,17 @@ export class ProfileListComponent {
   }
 
   addToOwn(profileId: number) {
-    this.profileService.copyToOwn(profileId).subscribe(
-      (newProfile: ProfileDetailDto) => {
-        this.ownProfiles.push(newProfile);
-      });
+    this.profileService.copyToOwn(profileId).subscribe({
+      next:
+        (newProfile: ProfileDetailDto) => {
+          this.ownProfiles.push(newProfile);
+          this.notification.success(`Profile ${newProfile.name} successfully added.`);
+        },
+      error: error => {
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+      }
+    });
   }
 
   deleteProfile(profileId: number, profileName: string) {
