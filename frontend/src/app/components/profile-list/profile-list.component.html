@@ -50,7 +50,8 @@
             <div class="card h-100"> <!-- h-100 Cards expand to size of longest Card in line -->
               <div class="card-header">
                 <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
-                  <h5 class="card-title">{{ profile.name }}</h5>
+                  <h5 class="card-title"
+                      [ngStyle]="{'color': profile.id === activeprofileId ? 'green' : 'inherit'}">{{ profile.name }}</h5>
                 </a><br>
                 <div class="card-subtitle text-muted">
                   <span>From Me:
@@ -95,6 +96,10 @@
                 <button class="btn btn-primary btn-edit edit-button d-flex"
                         [routerLink]="['/profiles/edit', profile.id]">
                   Edit
+                </button>
+                <button *ngIf="profile.id !== activeprofileId" class="btn btn-success delete-button d-flex"
+                        (click)="setActiveProfile(profile.id, profile.name)">
+                  Activate
                 </button>
                 <button class="btn btn-danger bi-trash delete-button d-flex"
                         (click)="deleteProfile(profile.id, profile.name)"
