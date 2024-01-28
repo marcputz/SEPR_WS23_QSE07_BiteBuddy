@@ -1,12 +1,11 @@
-import {ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {UserService} from '../../../services/user.service';
-import {PasswordEncoder} from '../../../utils/passwordEncoder';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
 import {UpdateUserSettingsDto} from '../../../dtos/updateUserSettingsDto';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {SafeUrl} from '@angular/platform-browser';
 import {ImageHandler} from '../../../utils/imageHandler';
 import {ErrorHandler} from "../../../services/errorHandler";
 
@@ -97,7 +96,6 @@ export class ChangeSettingsComponent implements OnInit {
   }
 
   loadUserPicture(userPictureArray: number[]) {
-    console.info('load user picture');
     if (userPictureArray === undefined) {
       console.info('user picture is empty');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.safePictureUrl);
@@ -109,7 +107,6 @@ export class ChangeSettingsComponent implements OnInit {
   }
 
   loadPreviewPicture() {
-    console.info('loadProfilePicture');
     if (this.newUserSettings.userPicture === null) {
       console.info('loadProfilePicture originalUserSettings');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.originalUserSettings.userPicture);
@@ -134,10 +131,9 @@ export class ChangeSettingsComponent implements OnInit {
       if (somethingChanged) {
         this.authService.updateUserSettings(this.newUserSettings).subscribe({
           next: () => {
-            console.log('User settings updated successfully');
             this.notifications.success('User settings updated successfully');
             this.getUser();
-            //TODO: add notifier for all the pictures
+            this.authService.triggerUpdate();
           },
           error: error => {
             console.error('Error updating user settings', error);
