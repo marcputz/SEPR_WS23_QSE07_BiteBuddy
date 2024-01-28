@@ -74,7 +74,7 @@ export class RecipeListComponent implements OnInit {
                           const errorMessage = error?.error || 'Unknown error occured';
                           if(error.message.includes("404")){
                             this.router.navigate(["/profile"])
-                            this.notification.error("You need to create a profile before using the Website");
+                            this.notification.warning("You need to create a profile before using the Website");
                           }else{
                             this.notification.error(`Error getting rating lists: ${errorMessage}`);
                           }
