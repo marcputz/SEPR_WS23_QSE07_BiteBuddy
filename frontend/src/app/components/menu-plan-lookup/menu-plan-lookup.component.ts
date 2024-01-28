@@ -13,6 +13,7 @@ import {ProfileService} from "../../services/profile.service";
 import {MenuPlanCreateDto} from "../../dtos/menuplan/menuPlanCreateDto";
 import {formatDate} from "@angular/common";
 import {ErrorHandler} from "../../services/errorHandler";
+import {UserService} from "../../services/user.service";
 
 
 @Component({
@@ -39,6 +40,7 @@ export class MenuPlanLookupComponent {
     private service: MenuPlanService,
     private profileService: ProfileService,
     private errorHandler: ErrorHandler,
+    private userService: UserService,
     private sanitizer: DomSanitizer,
     private notification: ToastrService,
     private pictureService: PictureService,
@@ -56,6 +58,17 @@ export class MenuPlanLookupComponent {
 
     this.profileService.getAllProfilesOfUser().subscribe(response => {
       this.createUserProfiles = response;
+    });
+
+    // get active profile and pre-select
+    this.userService.getUser().subscribe({
+      next: data => {
+        this.createSelectedProfile = data.activeProfileId;
+      },
+      error: error => {
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+      }
     });
   }
 

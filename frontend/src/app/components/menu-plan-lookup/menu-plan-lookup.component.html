@@ -6,7 +6,7 @@
       <select name="profileDropdown" id="profileDropdown" class="bb-dropdown" style="margin-bottom: 10px;" [(ngModel)]="createSelectedProfile">
         <option *ngFor="let profile of createUserProfiles" [value]="profile.id">{{profile.name}}</option>
       </select>
-      <button (click)="onClickGenerate()">Generate</button>
+      <button (click)="onClickGenerate()" class="bb-button"><i class="bi-database-fill-add" style="margin-right: 0.6rem;"></i>Generate</button>
     </form>
   </div>
 </div>
