@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
@@ -40,6 +42,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -49,9 +52,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -340,5 +350,312 @@ public class MenuPlanEndpointTest {
 
         assertEquals(HttpStatus.CONFLICT.value(), response.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+    }
+
+    @Test
+    void generateMenuPlanWhenLoggedInWithValidFridge() throws Exception {
+        // creating menuPlan
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .content(this.objectMapper.writeValueAsString(
+                    new MenuPlanCreateDto()
+                        .setFromTime(LocalDate.now().minusDays(6))
+                        .setUntilTime(LocalDate.now())
+                        .setProfileId(this.profile.getId())
+                        .setFridge(List.of("thing", "Apple"))
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+    }
+
+    @Test
+    void generateMenuPlanWhenLoggedInWithInValidFridgeThrowsException() throws Exception {
+        // creating menuPlan
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .content(this.objectMapper.writeValueAsString(
+                    new MenuPlanCreateDto()
+                        .setFromTime(LocalDate.now().minusDays(6))
+                        .setUntilTime(LocalDate.now())
+                        .setProfileId(this.profile.getId())
+                        .setFridge(List.of("thing", "Apppppple"))
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+    }
+
+    @Test
+    void testGettingNormalInventory() throws Exception {
+        // creating menuPlan
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .content(this.objectMapper.writeValueAsString(
+                    new MenuPlanCreateDto()
+                        .setFromTime(LocalDate.now().minusDays(6))
+                        .setUntilTime(LocalDate.now())
+                        .setProfileId(this.profile.getId())
+                        .setFridge(List.of("thing", "Apple"))
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+
+        // getting inventory
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .get("/api/v1/menuplan/inventory/")
+                .headers(requestHeaders)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsByteArray();
+
+        InventoryListDto inventory = objectMapper.readerFor(InventoryListDto.class).readValue(body);
+
+        // asserting test
+        assertNotNull(inventory);
+
+        assertThat(inventory.available())
+            .extracting(InventoryIngredientDto::getName, InventoryIngredientDto::isInventoryStatus)
+            .contains(
+                tuple("Apple", true),
+                tuple("thing", true)
+            );
+    }
+
+    @Test
+    void testGettingEmptyAvailableInventory() throws Exception {
+        // creating menuPlan
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .content(this.objectMapper.writeValueAsString(
+                    new MenuPlanCreateDto()
+                        .setFromTime(LocalDate.now().minusDays(6))
+                        .setUntilTime(LocalDate.now())
+                        .setProfileId(this.profile.getId())
+                        .setFridge(List.of())
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+
+        // getting inventory
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .get("/api/v1/menuplan/inventory/")
+                .headers(requestHeaders)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsByteArray();
+
+        InventoryListDto inventory = objectMapper.readerFor(InventoryListDto.class).readValue(body);
+
+        // asserting test
+        assertNotNull(inventory);
+        assertEquals(0, inventory.available().size());
+        assertFalse(inventory.missing().isEmpty());
+    }
+
+    @Test
+    void testGetInventoryWithoutAuthenticationThrowsException() throws Exception {
+        // creating menuPlan
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .content(this.objectMapper.writeValueAsString(
+                    new MenuPlanCreateDto()
+                        .setFromTime(LocalDate.now().minusDays(6))
+                        .setUntilTime(LocalDate.now())
+                        .setProfileId(this.profile.getId())
+                        .setFridge(List.of())
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+
+        // getting inventory
+        mvcResult = this.mockMvc.perform(get("/api/v1/menuplan/inventory/"))
+            .andDo(print())
+            .andReturn();
+
+        response = mvcResult.getResponse();
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
+    }
+
+    @Test
+    void testUpdateInventoryIngredientValid() throws Exception {
+        // creating menuPlan
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .content(this.objectMapper.writeValueAsString(
+                    new MenuPlanCreateDto()
+                        .setFromTime(LocalDate.now().minusDays(6))
+                        .setUntilTime(LocalDate.now())
+                        .setProfileId(this.profile.getId())
+                        .setFridge(List.of())
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+
+        // getting inventory
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .get("/api/v1/menuplan/inventory/")
+                .headers(requestHeaders)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsByteArray();
+
+        InventoryListDto inventory = objectMapper.readerFor(InventoryListDto.class).readValue(body);
+
+        // updating inventory
+        mvcResult = this.mockMvc.perform(put("/api/v1/menuplan/inventory/update")
+            .content(this.objectMapper.writeValueAsString(
+                    inventory.missing().get(0).setInventoryStatus(true)
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+    }
+
+    @Test
+    void testUpdateInventoryIngredientInValid() throws Exception {
+        // creating menuPlan
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .content(this.objectMapper.writeValueAsString(
+                    new MenuPlanCreateDto()
+                        .setFromTime(LocalDate.now().minusDays(6))
+                        .setUntilTime(LocalDate.now())
+                        .setProfileId(this.profile.getId())
+                        .setFridge(List.of())
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+
+        // getting inventory
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .get("/api/v1/menuplan/inventory/")
+                .headers(requestHeaders)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsByteArray();
+
+        InventoryListDto inventory = objectMapper.readerFor(InventoryListDto.class).readValue(body);
+
+        // updating inventory
+        mvcResult = this.mockMvc.perform(put("/api/v1/menuplan/inventory/update")
+                .content(this.objectMapper.writeValueAsString(
+                    inventory.missing().get(0).setIngredientId(55).setDetailedName("Test")
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        response = mvcResult.getResponse();
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
+    }
+
+    @Test
+    void testUpdateInventoryIngredientNotAuthenticated() throws Exception {
+        // creating menuPlan
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .content(this.objectMapper.writeValueAsString(
+                    new MenuPlanCreateDto()
+                        .setFromTime(LocalDate.now().minusDays(6))
+                        .setUntilTime(LocalDate.now())
+                        .setProfileId(this.profile.getId())
+                        .setFridge(List.of())
+                ))
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+
+        // getting inventory
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .get("/api/v1/menuplan/inventory/")
+                .headers(requestHeaders)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsByteArray();
+
+        InventoryListDto inventory = objectMapper.readerFor(InventoryListDto.class).readValue(body);
+
+        requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        // updating inventory
+        mvcResult = this.mockMvc.perform(put("/api/v1/menuplan/inventory/update")
+                .content(this.objectMapper.writeValueAsString(
+                    inventory.missing().get(0).setInventoryStatus(true)
+                )).headers(requestHeaders)
+                )
+            .andDo(print())
+            .andReturn();
+        response = mvcResult.getResponse();
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
     }
 }
