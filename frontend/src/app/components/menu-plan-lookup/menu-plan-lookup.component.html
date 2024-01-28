@@ -40,7 +40,7 @@
 </div>
 
 
-
+<!--
 <div class="container">
   <div class="row">
     <div class="col-md-auto p-3" *ngFor="let content of contents; let i = index">
@@ -50,8 +50,8 @@
       <div class="card border-primary">
         <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail" [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
         <h5 class="card-title m-1">{{content.recipe.name}}</h5>
-        <!-- <h5 class="card-title m-1">{{content.day + 1}}</h5>
-        <h5 class="card-title m-1">{{content.timeslot + 1}}</h5> -->
+        <h5 class="card-title m-1">{{content.day + 1}}</h5>
+        <h5 class="card-title m-1">{{content.timeslot + 1}}</h5>
         <p class="card-text m-1">Preview of the recipe, but currently not implemented</p>
         <div class="row-cols-3">
           <div class="btn-group">
@@ -67,6 +67,58 @@
               <i class="bi bi-hand-thumbs-down"></i>
             </a>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+
+
+
+
+<div class="row">
+  <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6" *ngFor="let content of contents; let i = index">
+    <div class="card recipe-card h-100">
+      <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail w-100" [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
+      <div class="card-body">
+        <a class="card-title-link-disa" [routerLink]="['/recipes', content.recipe.id]">
+          <h5 class="card-title">{{ content.recipe.name }}</h5>
+        </a><br>
+        <p class="card-text">
+          <ng-container *ngIf="(i+2) % maxTimeslots === 0; else dinnerBlock">
+            {{ formatDateLocally(menuplan.fromTime, content.day) }} - lunch
+          </ng-container>
+          <ng-template #dinnerBlock>
+            <ng-container *ngIf="(i+2) % maxTimeslots === 1; else breakfastBlock">
+              {{ formatDateLocally(menuplan.fromTime, content.day) }} - dinner
+            </ng-container>
+            <ng-template #breakfastBlock>
+              {{ formatDateLocally(menuplan.fromTime, content.day) }} - breakfast
+            </ng-template>
+          </ng-template>
+        </p>
+        <p class="card-text">Number of Persons: 4 persons | </p>
+        <div class="user-info d-flex align-items-center">
+          <!-- user name add here -->
+          <img src="assets/icons/user_default.png" class="rounded-circle user-icon" alt="User Icon">
+          <div class="user-details ms-3">
+            <p class="user-name">user name</p>
+          </div>
+          <div></div>
+          <div class="btn-group d-flex align-items-">
+            <a
+              (click)="likeRecipe(content)"
+              aria-label="Like Recipe">
+              <i class="bi bi-arrow-clockwise"></i>
+            </a>
+            <a
+              (click)="dislikeRecipe(content)"
+              aria-label="Dislike Recipe">
+              <i class="bi bi-hand-thumbs-down"></i>
+            </a>
+          </div>
+          <div></div>
         </div>
       </div>
     </div>

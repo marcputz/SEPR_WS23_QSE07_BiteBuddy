@@ -1,3 +1,6 @@
+
+
+
 import { Component } from '@angular/core';
 import {debounceTime, Subject} from "rxjs";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
@@ -88,7 +91,7 @@ export class MenuPlanLookupComponent {
     if (this.recipeImages.has(recipe)) {
       return this.recipeImages.get(recipe);
     } else {
-      return null;
+      return "Recipe Image";
     }
   }
   getMenuPlan() {
@@ -211,7 +214,7 @@ export class MenuPlanLookupComponent {
     return `${monthName} ${day}${dayOrdinal}`;
   }
 
-   getDayOrdinal(day: number): string {
+  getDayOrdinal(day: number): string {
     if (day >= 11 && day <= 13) {
       return 'th';
     }
@@ -277,3 +280,6 @@ export class MenuPlanLookupComponent {
   }
 
 }
+
+
+
