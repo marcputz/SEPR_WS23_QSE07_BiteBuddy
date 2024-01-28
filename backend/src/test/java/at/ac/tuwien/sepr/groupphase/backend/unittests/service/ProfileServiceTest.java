@@ -93,6 +93,7 @@ public class ProfileServiceTest {
     private Long ingredientId;
     private Long profileId;
     private Long profileId2;
+    private Long profileId3;
     private Long testUserId;
     private Long testUserId2;
     private long recipe1Id;
@@ -184,10 +185,12 @@ public class ProfileServiceTest {
         try {
             profileId = profileRepository.save(profileMapper.profileDtoToProfile(profileDto)).getId();
             profileId2 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto2)).getId();
-            profileRepository.save(profileMapper.profileDtoToProfile(profileDto3));
+            profileId3 = profileRepository.save(profileMapper.profileDtoToProfile(profileDto3)).getId();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        userRepository.save(userRepository.getReferenceById(testUserId).setActiveProfile(profileRepository.getReferenceById(profileId)));
     }
 
 
@@ -369,6 +372,20 @@ public class ProfileServiceTest {
     }
 
     @Test
+    public void rateRecipeWithExistingProfileRatesRecipe() throws ValidationException {
+        RecipeRatingDto recipeRatingDto = new RecipeRatingDto(recipe1Id, testUserId, 1);
+        profileService.rateRecipe(recipeRatingDto);
+
+        Profile profile = profileRepository.getReferenceById(profileId);
+
+        assertAll(
+            () -> assertNotNull(profile.getLiked()),
+            () -> assertEquals(1, profile.getLiked().size()),
+            () -> assertTrue(profile.getLiked().contains(recipeRepository.getReferenceById(recipe1Id)))
+        );
+    }
+
+    @Test
     public void getRatingListsOfExistingProfileReturnsRatingListsOfProfile() {
         RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId2);
 
@@ -438,12 +455,19 @@ public class ProfileServiceTest {
     @Test
     public void deleteExistingProfile() throws ConflictException {
 
-        ProfileDto deletedProfile = this.profileService.deleteProfile(profileId, testUserId);
+        ProfileDto deletedProfile = this.profileService.deleteProfile(profileId3, testUserId2);
 
         assertAll(
-            () -> assertEquals(deletedProfile.getId(), profileId),
-            () -> assertTrue(profileRepository.findById(profileId).isEmpty())
+            () -> assertEquals(deletedProfile.getId(), profileId3),
+            () -> assertTrue(profileRepository.findById(profileId3).isEmpty())
         );
+    }
+
+    @Test
+    public void deleteActiveProfileThrowsConflictException() throws ConflictException {
+
+        assertThrows(ConflictException.class,
+            () -> this.profileService.deleteProfile(profileId, testUserId));
     }
 
     @Test
