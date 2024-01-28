@@ -46,12 +46,8 @@ export class RecipeCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.isLoggedInForCreationComponent().subscribe({
-      next: value => {
-        console.log("user is logged in");
-      },
       error: err => {
-        console.log("user is not logged in");
-        this.notification.error("Please login to create a recipe");
+        this.notification.info("You have been forcefully logged-out by the server, please log in again!");
         this.router.navigate(["/login"])
       }
     })
@@ -92,14 +88,12 @@ export class RecipeCreateComponent implements OnInit {
     if (form.valid && this.submitButtonClicked) {
       this.service.createRecipe(this.recipe).subscribe({
         next: data => {
-          this.notification.success("Successfully created new recipe!")
+          this.notification.success("Recipe created!");
           this.router.navigate(['/recipes']);
         },
         error: error => {
-          console.log("real error:")
-          console.warn(error)
-
-          this.errorHandler.handleApiError(error);
+          let errorObj = this.errorHandler.getErrorObject(error);
+          this.errorHandler.handleApiError(errorObj);
         }
       });
     }
@@ -122,9 +116,8 @@ export class RecipeCreateComponent implements OnInit {
 
     if (ingredient.name.trim() !== '') {
       this.recipe.ingredients.push(ingredient);
-      console.log('Valid input, added: ', ingredient);
     } else {
-      console.log("Ingredient not valid!", ingredient?.name);
+      console.warn("Invalid Ingredient: ", ingredient?.name);
     }
   }
 
