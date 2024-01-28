@@ -69,7 +69,7 @@ export class UserService {
     this.httpClient.post(this.authBaseUri + "/logout", this.getToken())
       .subscribe({
         next: success => {
-            console.log("Logged out from backend");
+          console.log("Logged out from backend");
         },
         error: error => {
           this.apiErrorHandler.handleApiError(error);
@@ -86,6 +86,14 @@ export class UserService {
 
   resetPassword(dto: ResetPasswordDto): Observable<any> {
     return this.httpClient.post(this.authBaseUri + "/password_reset", dto, {responseType: 'text'});
+  }
+
+  /**
+   * Checks if the user is really logged in via backend response.
+   * Not using isLoggedIn, since this is used elsewhere and checks if the frontend user is valid.
+   */
+  isLoggedInForCreationComponent() {
+    return this.httpClient.get(this.authBaseUri + "/request_login_status");
   }
 
   /**

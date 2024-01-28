@@ -70,7 +70,6 @@ export class NavbarLayoutComponent implements OnInit {
   }
 
   loadUserPicture(userPictureArray: number[]) {
-    console.info('load user picture');
     if (userPictureArray === undefined) {
       console.info('user picture is empty');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.userSettings.userPicture);
