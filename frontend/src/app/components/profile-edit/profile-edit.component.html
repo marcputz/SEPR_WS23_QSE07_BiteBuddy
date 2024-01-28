@@ -33,14 +33,18 @@
     </div>
 
         <div class="form-group">
-          <label for="inputAllergens" class="label-select">
+          <label for="inputAllergens" class="label-select" *ngIf="changedAllergenes; else unchangedAllergens">
             What do you cannot or do not want to eat?
             <span class="required-asterisk">*</span>
           </label>
+          <ng-template #unchangedAllergens><label for="inputAllergens" class="label-select">
+            Select new Allergens if change is needed!
+          </label></ng-template>
           <select multiple class="form-select"
                   id = "inputAllergens"
                   formControlName="allergens"
-                  required>
+                  required
+                  (change) = "onChangeAllergenes()">
             <option *ngFor="let allergene of allergens"
                     [value]="allergene">
               {{allergene.name}}
@@ -53,14 +57,18 @@
 
 
         <div class="form-group">
-          <label for="inputIngredient" class="label-select">
+          <label for="inputIngredient" class="label-select" *ngIf="changedIngredients; else unchangedIngredients">
             What do you like to eat?
             <span class="required-asterisk">*</span>
           </label>
+          <ng-template #unchangedIngredients><label for="inputAllergens" class="label-select">
+            Select new Ingredients if change is needed!
+          </label></ng-template>
           <select multiple class="form-select"
                   id ="inputIngredient"
                   formControlName="ingredient"
-                  required>
+                  required
+                  (change) = "onChangeIngredients()">
             <option *ngFor="let ingred of ingredient"
                     [value]="ingred">
               {{ingred.name}}
