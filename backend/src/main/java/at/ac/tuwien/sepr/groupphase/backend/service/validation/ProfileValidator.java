@@ -143,7 +143,7 @@ public class ProfileValidator {
         }
 
         if (!conflictErrors.isEmpty()) {
-            throw new ConflictException("Conflict during deletion of a profile, profile deletion failed: ", conflictErrors);
+            throw new ConflictException("Deletion of Profile has conflict errors", conflictErrors);
         }
     }
 
