@@ -7,6 +7,7 @@ import {ToastrService} from 'ngx-toastr';
 import {UpdateUserSettingsDto} from '../../../dtos/updateUserSettingsDto';
 import {SafeUrl} from '@angular/platform-browser';
 import {ImageHandler} from '../../../utils/imageHandler';
+import {ErrorHandler} from "../../../services/errorHandler";
 
 @Component({
   selector: 'app-change-settings',
@@ -31,6 +32,7 @@ export class ChangeSettingsComponent implements OnInit {
   constructor(
     private formBuilder: UntypedFormBuilder,
     private authService: UserService,
+    private errorHandler: ErrorHandler,
     private router: Router,
     private notifications: ToastrService,
     private imageHandler: ImageHandler
@@ -81,11 +83,10 @@ export class ChangeSettingsComponent implements OnInit {
         this.newUserSettings = new UpdateUserSettingsDto("", null);
       },
       error: error => {
-        console.error('Error loading user settings');
-        this.notifications.error('Error loading user settings');
 
-        this.error = true;
-        this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+
       },
       complete: () => {
       }

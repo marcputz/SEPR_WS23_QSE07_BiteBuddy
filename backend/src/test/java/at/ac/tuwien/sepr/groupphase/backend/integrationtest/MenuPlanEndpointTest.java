@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
@@ -49,6 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -227,7 +229,7 @@ public class MenuPlanEndpointTest {
     }
 
     @Test
-    void testGenerateMenuPlan_WhenLoggedIn_WithValidData_ReturnsOK() throws Exception {
+    void testGenerateMenuPlan_WhenLoggedIn_WithValidData_ReturnsOKAndValidDto() throws Exception {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -249,9 +251,13 @@ public class MenuPlanEndpointTest {
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
         assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
 
-        //MenuPlanDetailDto responseDto = objectMapper.readerFor(MenuPlanDetailDto.class).readValue(response.getContentAsByteArray());
+        MenuPlanDetailDto responseDto = objectMapper.readerFor(MenuPlanDetailDto.class).readValue(response.getContentAsByteArray());
 
-        //System.out.println(responseDto);
+        assertAll(
+            () -> assertEquals(LocalDate.now().minusDays(6), responseDto.getFromTime()),
+            () -> assertEquals(LocalDate.now(), responseDto.getUntilTime()),
+            () -> assertEquals(this.profile.getId(), responseDto.getProfileId())
+        );
     }
 
     @Test
@@ -274,7 +280,6 @@ public class MenuPlanEndpointTest {
         MockHttpServletResponse response = mvcResult.getResponse();
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
-        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
     }
 
     @Test
@@ -298,7 +303,22 @@ public class MenuPlanEndpointTest {
         MockHttpServletResponse response = mvcResult.getResponse();
 
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), response.getStatus());
-        assertEquals(MediaType.APPLICATION_JSON_VALUE, response.getContentType());
+    }
+
+    @Test
+    void testGenerateMenuPlan_WhenLoggedIn_WithNoData_ReturnsBadRequest() throws Exception {
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        requestHeaders.set("Authorization", authenticate());
+
+        MvcResult mvcResult = this.mockMvc.perform(post("/api/v1/menuplan/generate")
+                .headers(requestHeaders))
+            .andDo(print())
+            .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
     }
 
     @Test

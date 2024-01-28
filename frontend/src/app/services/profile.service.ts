@@ -47,6 +47,7 @@ export class ProfileService {
   }
 
   public search(searchParams: ProfileSearch): Observable<ProfileSearchResultDto> {
+    console.log(`${this.baseUri}/search/${JSON.stringify(searchParams)}`)
     return this.http.post<ProfileSearchResultDto>(`${this.baseUri}/search`, searchParams);
   }
 
@@ -82,4 +83,8 @@ export class ProfileService {
     return this.http.delete<ProfileDto>(`${this.baseUri}/deleteProfile/${profileId}`);
   }
 
+  setActiveProfile(profileId: number) {
+    console.log(`${this.baseUri}/setActive/${profileId}`)
+    return this.http.post(`${this.baseUri}/setActive/${profileId}`, null);
+  }
 }
