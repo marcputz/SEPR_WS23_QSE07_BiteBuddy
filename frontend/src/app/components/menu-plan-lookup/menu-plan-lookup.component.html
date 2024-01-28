@@ -3,8 +3,7 @@
     <a style="text-align: start; width: 100%;" class="bb-link" (click)="this.showCreateDialog = false;"><i
       class="bi-x"></i>Close</a>
     <h2 style="margin-bottom: 1.5rem; text-align: center; width: 100%;">New Menu Plan</h2>
-    <app-menu-plan style="width: 100%">
-    </app-menu-plan>
+    <app-menu-plan (submitClicked)="onMenuPlanSubmit()" style="width: 100%"></app-menu-plan>
   </div>
 </div>
 

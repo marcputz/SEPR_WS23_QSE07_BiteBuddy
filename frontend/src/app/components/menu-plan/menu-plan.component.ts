@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ProfileService} from "../../services/profile.service";
 import {MenuPlanCreateDto} from "../../dtos/menuplan/menuPlanCreateDto";
 import {DatePipe, formatDate} from "@angular/common";
@@ -7,7 +7,7 @@ import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {RecipeService} from "../../services/recipe.service";
 import {of} from "rxjs";
-import {ProfileDto, ProfileListDto} from "../../dtos/profileDto";
+import {ProfileListDto} from "../../dtos/profileDto";
 import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
@@ -17,6 +17,7 @@ import {ErrorHandler} from "../../services/errorHandler";
 })
 export class MenuPlanComponent implements OnInit {
 
+  @Output() submitClicked: EventEmitter<any> = new EventEmitter();
   protected generateRequest: string | null = null;
   protected generateResponse: string | null = null;
 
@@ -70,6 +71,7 @@ export class MenuPlanComponent implements OnInit {
     this.service.generateMenuPlan(this.createDto).subscribe(
       data => {
         this.notification.success("Created Menu Plan");
+        this.submitClicked.emit();
         this.router.navigate(["/menuplanLookup"])
       },
       error => {

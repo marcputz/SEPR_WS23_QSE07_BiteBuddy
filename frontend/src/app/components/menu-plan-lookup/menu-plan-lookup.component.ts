@@ -10,8 +10,6 @@ import {MenuPlanUpdateRecipeDto} from "../../dtos/menuplan/menuPlanUpdateRecipeD
 import {PictureService} from "../../services/picture.service"
 import {ProfileListDto} from "../../dtos/profileDto";
 import {ProfileService} from "../../services/profile.service";
-import {MenuPlanCreateDto} from "../../dtos/menuplan/menuPlanCreateDto";
-import {formatDate} from "@angular/common";
 import {ErrorHandler} from "../../services/errorHandler";
 import {UserService} from "../../services/user.service";
 
@@ -70,6 +68,12 @@ export class MenuPlanLookupComponent implements OnInit {
     });
   }
 
+  onMenuPlanSubmit(): void {
+    // Your logic here
+    console.log('Submit button clicked in app-menu-plan');
+    this.showCreateDialog = false;
+    this.ngOnInit();
+  }
   getMenuPlans() {
     this.service.getMenuPlans().subscribe({
       next: data => {
