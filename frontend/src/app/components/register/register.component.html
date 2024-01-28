@@ -20,13 +20,17 @@
                    (focus)="isInputFocused['username'] = true"
                    (blur)="this.updateInputFocus('username')"
                    [ngClass]="{'filled-input': registerForm.get('username').value !== ''}"
-                   required >
+                   required>
             <div *ngIf="submitted && registerForm.controls.username.errors" class="bb-input-error">
               <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors?.required">
                 Username is required
               </small>
               <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors?.userAlreadyExists">
                 Username already exists
+              </small>
+              <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors?.trimmedMinLength">
+                Username must be at least {{ registerForm.controls.username.errors.trimmedMinLength.requiredLength }}
+                characters (excluding whitespace)
               </small>
               <small class="form-text text-danger" *ngIf="registerForm.controls.username.errors?.maxLength">
                 Username is too long. Please enter a max of 255 characters
@@ -46,7 +50,7 @@
                    (focus)="isInputFocused['email'] = true"
                    (blur)="this.updateInputFocus('email')"
                    [ngClass]="{'filled-input': registerForm.get('email').value !== ''}"
-                   required >
+                   required>
             <div *ngIf="submitted && registerForm.controls.email.errors" class="bb-input-error">
               <small class="form-text text-danger" *ngIf="registerForm.controls.email.errors?.required">
                 Email is required
@@ -75,7 +79,7 @@
                      (focus)="isInputFocused['password'] = true"
                      (blur)="this.updateInputFocus('password')"
                      [ngClass]="{'filled-input': registerForm.get('password').value !== ''}"
-                     required >
+                     required>
               <button type="button" class="bb-toggle-password" (click)="togglePasswordVisibility()">
                 <i *ngIf="!showPasswords; else showHiddenPassword" class="bi bi-eye"></i>
               </button>
@@ -102,7 +106,7 @@
                      (focus)="isInputFocused['password2'] = true"
                      (blur)="this.updateInputFocus('password2')"
                      [ngClass]="{'filled-input': registerForm.get('password2').value !== ''}"
-                     required >
+                     required>
               <button type="button" class="bb-toggle-password" (click)="togglePasswordVisibility1()">
                 <i *ngIf="!showPassword1; else showHiddenPassword" class="bi bi-eye"></i>
               </button>
