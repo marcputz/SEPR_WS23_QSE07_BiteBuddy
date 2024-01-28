@@ -59,7 +59,7 @@ export class ChangeSettingsComponent implements OnInit {
         })
         .catch(error => {
           console.error('Error processing image: ', error);
-          // Handle the error appropriately
+          this.notifications.error(error, 'Unsupported Format use png or Jpg');
         });
     } else {
       this.newUserSettings.userPicture = null;
