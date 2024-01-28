@@ -182,9 +182,23 @@ public class ProfileServiceImpl implements ProfileService {
     public void rateRecipe(RecipeRatingDto recipeRatingDto) throws NotFoundException, ValidationException {
         LOGGER.trace("createRating({})", recipeRatingDto);
 
-        Recipe recipeToRate = recipeRepository.getReferenceById(recipeRatingDto.recipeId());
-        ApplicationUser user = userRepository.getReferenceById(recipeRatingDto.userId());
+        Optional<Recipe> recipeToRateOpt = recipeRepository.findById(recipeRatingDto.recipeId());
+        if (recipeToRateOpt.isEmpty()) {
+            throw new NotFoundException("recipe does not exist in the database");
+        }
+        Recipe recipeToRate = recipeToRateOpt.get();
+
+        Optional<ApplicationUser> userOpt = userRepository.findById(recipeRatingDto.userId());
+        if (userOpt.isEmpty()) {
+            throw new NotFoundException("user does not exist in the database");
+        }
+        ApplicationUser user = userOpt.get();
+
         Profile ratingProfile = user.getActiveProfile();
+        if (ratingProfile == null) {
+            throw new NotFoundException("the user does not have an active profile which is needed to rate");
+        }
+
         profileValidator.validateRating(recipeRatingDto.rating());
 
 
@@ -228,11 +242,9 @@ public class ProfileServiceImpl implements ProfileService {
             disliked.add(recipe.getId());
         }
 
-        RecipeRatingListsDto ratingLists = new RecipeRatingListsDto(
+        return new RecipeRatingListsDto(
             liked,
             disliked);
-
-        return ratingLists;
     }
 
     @Override

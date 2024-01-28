@@ -74,6 +74,7 @@ public class ProfileEndpoint {
 
         this.authenticationService.verifyAuthenticated(headers);
         return profileService.saveProfile(toCreateProfile);
+
     }
 
 
@@ -122,15 +123,35 @@ public class ProfileEndpoint {
         return profileService.editProfile(profileDto);
     }
 
+    /**
+     * Lets a profile rate a recipe
+     *
+     * @param recipeRatingDto contains the id of the recipe to rate, the current user id (active profile is the one rating) and the rating (0-dislike, 1-like)
+     * @throws AuthenticationException if no user is logged in.
+     * @throws NotFoundException if the user or the recipe do not exist in the database and if the user does not have an active profile.
+     * @throws ValidationException if the rating value is not 0 or 1.
+     * @author Thomas Hellweger
+     */
+
     @PutMapping("/rating/{RecipeId}")
-    public void postRating(@Valid @RequestBody RecipeRatingDto recipeRatingDto, @RequestHeader HttpHeaders headers)
+    public void putRating(@Valid @RequestBody RecipeRatingDto recipeRatingDto, @RequestHeader HttpHeaders headers)
         throws ValidationException, NotFoundException, AuthenticationException {
         LOGGER.info("Received PUT request on {}", BASE_PATH);
         LOGGER.debug("Request body for PUT:\n{}", recipeRatingDto);
+
         this.authenticationService.verifyAuthenticated(headers);
         profileService.rateRecipe(recipeRatingDto);
     }
 
+    /**
+     * Gets a list of the liked and disliked recipes of a profile.
+     *
+     * @param userId the id of the profile which wants the liked and disliked lists
+     * @return returns a list of the liked- and a list of the disliked recipes.
+     * @throws AuthenticationException if no user is logged in.
+     * @throws NotFoundException if the profile containing the lists does not exist.
+     * @author Thomas Hellweger
+     */
     @GetMapping("/rating/{userId}")
     public RecipeRatingListsDto getRatingLists(@PathVariable long userId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException {
@@ -140,10 +161,21 @@ public class ProfileEndpoint {
         return profileService.getRatingLists(userId);
     }
 
+    /**
+     * Deletes an existing profile.
+     *
+     * @param profileId id of profile to delete.
+     * @return returns a ProfileDto which contains the delete profile's data.
+     * @throws AuthenticationException if no user is logged in.
+     * @throws NotFoundException if the profile to delete does not exist in the database.
+     * @throws ConflictException if the user wants to delete the active profile or the current profile does not belong to the current user.
+     * @author Thomas Hellweger
+     */
     @DeleteMapping("/deleteProfile/{profileId}")
     public ProfileDto delete(@PathVariable long profileId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException, ConflictException {
         LOGGER.info("Received Delete request on {}", BASE_PATH);
+        LOGGER.debug("Request body for Delete:\n{}", profileId);
 
         this.authenticationService.verifyAuthenticated(headers);
         String authToken = this.authenticationService.getAuthToken(headers);
