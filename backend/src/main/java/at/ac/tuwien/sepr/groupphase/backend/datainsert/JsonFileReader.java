@@ -93,7 +93,7 @@ public class JsonFileReader {
             int pictureCount = 1;
             if (recipeRepository.count() == 0) {
                 for (Recipe recipe : recipes) {
-                    Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".png");
+                    Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".jpg");
                     byte[] imgData = Files.readAllBytes(path);
                     Picture picture = new Picture()
                         .setData(imgData)
