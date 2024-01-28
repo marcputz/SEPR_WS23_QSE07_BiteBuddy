@@ -26,6 +26,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.ProfileValidator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -306,7 +307,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public ProfileDto deleteProfile(Long profileId, Long userId) throws NotFoundException, ConflictException {
-        LOGGER.trace("deleteProfile({})", profileId);
+        LOGGER.trace("deleteProfile({}),({})", profileId, userId);
         Optional<Profile> profileToDelete = profileRepository.findById(profileId);
 
         if (profileToDelete.isEmpty()) {
@@ -319,16 +320,15 @@ public class ProfileServiceImpl implements ProfileService {
 
         Profile profile = profileToDelete.get();
 
+        ProfileDto deletedProfile = profileMapper.profileToProfileDto(profile);
+
+
         ApplicationUser currentUser = user.get();
 
-        if (Objects.equals(currentUser.getActiveProfile().getId(), profile.getId())) {
-            ArrayList<String> conflictErrors = new ArrayList<>();
-            conflictErrors.add("can not delete " + profile.getName());
-            throw new ConflictException("The active profile can not be deleted", conflictErrors);
-        }
+        profileValidator.validateDelete(currentUser, profile);
 
         profileRepository.delete(profileToDelete.get());
 
-        return profileMapper.profileToProfileDto(profile);
+        return deletedProfile;
     }
 }
