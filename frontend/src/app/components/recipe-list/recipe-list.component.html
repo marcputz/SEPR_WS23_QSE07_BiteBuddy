@@ -29,7 +29,7 @@
     <div class="row">
       <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6" *ngFor="let recipe of recipes">
         <div class="card recipe-card">
-          <img [src]="getImageFor(recipe)" class="card-img-top rounded-top img-zoom" alt="Recipe Image">
+          <img [src]="getImageFor(recipe)" class="card-img-top rounded-top img-zoom" [alt]="getImageAltFor(recipe)">
           <div class="card-body">
             <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
               <h5 class="card-title">{{ recipe.name }}</h5>

@@ -21,6 +21,7 @@ import {PictureDto} from "../../dtos/pictureDto";
 export class RecipeListComponent implements OnInit {
   recipes: RecipeListDto[] = [];
   recipeImages: Map<RecipeListDto, number[]> = null;
+  recipeImageAlts: Map<RecipeListDto, string> = null;
   maxPages: number = 5;
   searchChangedObservable = new Subject<void>();
   searchParams: RecipeSearch = {
@@ -100,10 +101,12 @@ export class RecipeListComponent implements OnInit {
 
         // load recipe images
         this.recipeImages = new Map<RecipeListDto, number[]>();
+        this.recipeImageAlts = new Map<RecipeListDto, string>();
         for (let dto of this.recipes) {
           this.pictureService.getPicture(dto.pictureId).subscribe({
             next: (pictureDto) => {
               this.recipeImages.set(dto, pictureDto.data);
+              this.recipeImageAlts.set(dto, pictureDto.description);
             },
             error: error => {
               console.error(error);
@@ -122,6 +125,14 @@ export class RecipeListComponent implements OnInit {
       return this.sanitizeImage(this.recipeImages.get(recipe));
     } else {
       return this.sanitizer.bypassSecurityTrustUrl("assets/images/recipe_default.png");
+    }
+  }
+
+  getImageAltFor(recipe: RecipeListDto) {
+    if (this.recipeImageAlts.has(recipe)) {
+      return this.recipeImageAlts.get(recipe);
+    } else {
+      return "Recipe Image";
     }
   }
 
