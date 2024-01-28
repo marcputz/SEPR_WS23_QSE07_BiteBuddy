@@ -60,27 +60,27 @@ export class RecipeListComponent implements OnInit {
       .pipe(debounceTime(300))
       .subscribe({next: () => this.reloadRecipes()});
 
-      this.authService.getUser().subscribe(
-          (settings: UserSettingsDto) => {
-              this.profileService.getRatingLists(settings.id)
-                  .subscribe({
-                      next: data => {
-                          this.likes = data.likes;
-                          this.dislikes = data.dislikes
-                      },
-                      error: error => {
-                          console.error('Error getting rating list', error);
-                          const errorMessage = error?.error || 'Unknown error occured';
-                          if(error.message.includes("404")){
-                            this.router.navigate(["/profile"])
-                            this.notification.error("You need to create a profile before using the Website");
-                          }else{
-                            this.notification.error(`Error getting rating lists: ${errorMessage}`);
-                          }
-                      }
-                  });
-          },
-      );
+    this.authService.getUser().subscribe(
+      (settings: UserSettingsDto) => {
+        this.profileService.getRatingLists(settings.id)
+          .subscribe({
+            next: data => {
+              this.likes = data.likes;
+              this.dislikes = data.dislikes
+            },
+            error: error => {
+              console.error('Error getting rating list', error);
+              const errorMessage = error?.error || 'Unknown error occured';
+              if (error.message.includes("404")) {
+                this.router.navigate(["/profile"])
+                this.notification.error("You need to create a profile before using the Website");
+              } else {
+                this.notification.error(`Error getting rating lists: ${errorMessage}`);
+              }
+            }
+          });
+      },
+    );
 
   }
 
@@ -128,14 +128,14 @@ export class RecipeListComponent implements OnInit {
   sanitizeImage(imageBytes: any): SafeUrl {
     try {
       if (!imageBytes || imageBytes.length === 0) {
-        throw new Error('Empty or undefined imageBytes');
+        // throw new Error('Empty or undefined imageBytes');
       }
 
       const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
       const dataUrl = `data:image/png;base64,${imageBytes}`;
       return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
     } catch (error) {
-      console.error('Error sanitizing image:', error);
+      // console.error('Error sanitizing image:', error);
       return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
     }
   }

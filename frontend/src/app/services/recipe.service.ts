@@ -3,6 +3,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {RecipeDetailsDto, RecipeDto, RecipeListDto, RecipeSearch, RecipeSearchResultDto} from "../dtos/recipe";
 import {Observable} from "rxjs";
 import {Globals} from '../global/globals';
+import {tap} from "rxjs/operators";
 
 
 @Injectable({
