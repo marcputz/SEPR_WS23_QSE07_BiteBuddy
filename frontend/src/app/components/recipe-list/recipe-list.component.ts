@@ -119,9 +119,9 @@ export class RecipeListComponent implements OnInit {
 
   getImageFor(recipe: RecipeListDto) {
     if (this.recipeImages.has(recipe)) {
-      return this.recipeImages.get(recipe);
+      return this.sanitizeImage(this.recipeImages.get(recipe));
     } else {
-      return null;
+      return this.sanitizer.bypassSecurityTrustUrl("assets/images/recipe_default.png");
     }
   }
 
