@@ -3,6 +3,51 @@
 @import "node_modules/bootstrap/scss/variables";
 @import "node_modules/bootstrap/scss/mixins";
 
+.bb-modal {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+
+  z-index: 99;
+  background-color: rgba(0,0,0, 0.5);
+}
+
+.bb-modal > .bb-modal-dialog {
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+
+  max-width: 500px;
+  width: 90%;
+  max-height: 300px;
+  height: 90%;
+
+  background-color: whitesmoke;
+  border-radius: 10px;
+
+  padding: 20px;
+
+  text-align: center;
+  align-content: center;
+  align-items: center;
+}
+
+.bb-modal > .bb-modal-dialog > form {
+  display: flex;
+  flex-direction: column;
+}
+
+.bb-dropdown {
+
+}
+
 .background-img {
   width: 100%;
   height: fit-content;

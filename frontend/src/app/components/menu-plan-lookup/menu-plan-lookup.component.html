@@ -1,9 +1,23 @@
+<div *ngIf="this.showCreateDialog" class="bb-modal" tabindex="-1">
+  <div class="bb-modal-dialog">
+    <h2>New Menu Plan</h2>
+    <form>
+      <label for="profileDropdown">Select a profile</label>
+      <select name="profileDropdown" id="profileDropdown" class="bb-dropdown" style="margin-bottom: 10px;" [(ngModel)]="createSelectedProfile">
+        <option *ngFor="let profile of createUserProfiles" [value]="profile.id">{{profile.name}}</option>
+      </select>
+      <button (click)="onClickGenerate()">Generate</button>
+    </form>
+  </div>
+</div>
+
 <div class="container">
   <div class="row justify-content-center">
     <h1 class="text-center">My Menuplans</h1>
   </div>
 </div>
 
+<button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
 
 <div class="row">
   <label for="menuplans" class="col-form-label text-md-start text-muted">
@@ -27,9 +41,9 @@
 <div class="container">
   <div class="row">
     <div class="col-md-auto p-3" *ngFor="let content of contents; let i = index">
-      <h3 *ngIf="(i+2) % maxTimeslots === 0" class="text-center">{{formatDate(menuplan.fromTime, content.day)}} - lunch</h3>
-      <h3 *ngIf="(i+2) % maxTimeslots === 1" class="text-center">{{formatDate(menuplan.fromTime, content.day)}} - dinner</h3>
-      <h3 *ngIf="(i+2) % maxTimeslots === 2" class="text-center">{{formatDate(menuplan.fromTime, content.day)}} - breakfast</h3>
+      <h3 *ngIf="(i+2) % maxTimeslots === 0" class="text-center">{{formatDateLocally(menuplan.fromTime, content.day)}} - lunch</h3>
+      <h3 *ngIf="(i+2) % maxTimeslots === 1" class="text-center">{{formatDateLocally(menuplan.fromTime, content.day)}} - dinner</h3>
+      <h3 *ngIf="(i+2) % maxTimeslots === 2" class="text-center">{{formatDateLocally(menuplan.fromTime, content.day)}} - breakfast</h3>
       <div class="card border-primary">
         <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail" [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
         <h5 class="card-title m-1">{{content.recipe.name}}</h5>
