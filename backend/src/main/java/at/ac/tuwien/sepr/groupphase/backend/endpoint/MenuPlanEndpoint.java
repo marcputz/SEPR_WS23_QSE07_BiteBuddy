@@ -103,6 +103,17 @@ public class MenuPlanEndpoint {
         }
     }
 
+
+    /**
+     * REST endpoint to find a menu plan which start and endDate encompass the given date
+     *
+     * @param headers the HTTP headers from the request.
+     * @param date    a LocalDate to use for finding a menu plan.
+     * @return a detail dto of the found menu plan.
+     * @throws AuthenticationException if the user cannot be authenticated.
+     * @throws NotFoundException       if there is no menu plan which start and endDate encompass the given date
+     * @author Anton Nather
+     */
     @GetMapping("/forDate")
     @ResponseStatus(HttpStatus.OK)
     public MenuPlanDetailDto getMenuPlanOnDate(@RequestHeader HttpHeaders headers,
@@ -120,6 +131,15 @@ public class MenuPlanEndpoint {
         return this.service.getMenuPlanForUserOnDateDetailDto(thisUser, date);
     }
 
+    /**
+     * REST endpoint to return information about all menu plans of the current user
+     *
+     * @param headers the HTTP headers from the request.
+     * @return a List of menu plan detail dtos of this user.
+     * @throws AuthenticationException if the user cannot be authenticated.
+     * @throws NotFoundException       if the current user cannot be found in the DB
+     * @author Anton Nather
+     */
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public List<MenuPlanDetailDto> getMenuPlans(@RequestHeader HttpHeaders headers) throws AuthenticationException, NotFoundException {
@@ -135,10 +155,18 @@ public class MenuPlanEndpoint {
         return this.service.getAllMenuPlansofUserDetailDto(thisUser);
     }
 
+    /**
+     * REST endpoint to update one Recipe in a menuplan of the current user
+     *
+     * @param headers  the HTTP headers from the request.
+     * @param menuPlan a MenuPlanUpdateRecipeDto to use for updating
+     * @throws AuthenticationException if the user cannot be authenticated.
+     * @author Anton Nather
+     */
     @PutMapping("/update")
     @ResponseStatus(HttpStatus.OK)
     public void updateRecipeInMenuPlan(@RequestHeader HttpHeaders headers, @RequestBody MenuPlanUpdateRecipeDto menuPlan)
-        throws AuthenticationException, NotFoundException {
+        throws AuthenticationException {
         LOGGER.info("updateRecipe({},{})", headers, menuPlan);
 
         this.authService.verifyAuthenticated(headers);
