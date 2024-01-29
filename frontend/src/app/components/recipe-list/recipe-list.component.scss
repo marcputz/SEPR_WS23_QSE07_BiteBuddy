@@ -48,8 +48,6 @@
   height: fit-content;
   border-radius: 12px;
   border: none;
-
-  cursor: pointer;
 }
 
 @media (max-width: 1440px) {
@@ -136,5 +134,10 @@ img {
 
 .userinfo-buttons-space {
   margin-left: auto;
+}
+
+.like-dislike {
+  cursor: pointer;
+  font-size: 1.5em;
 }
 

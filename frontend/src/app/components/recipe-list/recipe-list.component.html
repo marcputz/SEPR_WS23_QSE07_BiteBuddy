@@ -33,7 +33,9 @@
       </div>
       <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6" *ngFor="let recipe of recipes">
         <div class="card recipe-card">
-          <img [src]="getImageFor(recipe)" class="card-img-top rounded-top img-zoom" [alt]="getImageAltFor(recipe)">
+          <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
+            <img [src]="getImageFor(recipe)" class="card-img-top rounded-top img-zoom" [alt]="getImageAltFor(recipe)">
+          </a><br>
           <div class="card-body">
             <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
               <h5 class="card-title">{{ recipe.name }}</h5>
@@ -50,14 +52,14 @@
                 <a
                   (click)="rateRecipe(recipe.id, 1)"
                   aria-label="Like Recipe" role="button">
-                  <i *ngIf="likes.includes(recipe.id); else notFilledUp" class="bi bi-hand-thumbs-up-fill"></i>
-                  <ng-template #notFilledUp><i class="bi bi-hand-thumbs-up"></i></ng-template>
+                  <i *ngIf="likes.includes(recipe.id); else notFilledUp" class="bi bi-hand-thumbs-up-fill like-dislike"></i>
+                  <ng-template #notFilledUp><i class="bi bi-hand-thumbs-up like-dislike"></i></ng-template>
                 </a>
                 <a
                   (click)="rateRecipe(recipe.id, 0)"
-                  aria-label="Dislike Recipe" role="button">
-                  <i *ngIf="dislikes.includes(recipe.id); else notFilledDown" class="bi bi-hand-thumbs-down-fill"></i>
-                  <ng-template #notFilledDown><i class="bi bi-hand-thumbs-down"></i></ng-template>
+                  aria-label="Dislike Recipe">
+                  <i *ngIf="dislikes.includes(recipe.id); else notFilledDown" class="bi bi-hand-thumbs-down-fill like-dislike"></i>
+                  <ng-template #notFilledDown><i class="bi bi-hand-thumbs-down like-dislike"></i></ng-template>
                 </a>
               </div>
               <div></div>
