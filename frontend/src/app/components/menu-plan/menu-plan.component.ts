@@ -165,6 +165,7 @@ export class MenuPlanComponent implements OnInit {
     this.service.updateRecipeInMenuPlan(this.updateValue).subscribe({
       next: response => {
         this.getMenuPlan();
+        this.notification.success("Successfully rerolled recipe!");
       },
       error: err => {
         // Handle the error case here
@@ -188,6 +189,7 @@ export class MenuPlanComponent implements OnInit {
     this.service.updateRecipeInMenuPlan(this.updateValue).subscribe({
       next: response => {
         this.getMenuPlan();
+        this.notification.success("Successfully disliked recipe!");
       },
       error: err => {
         // Handle the error case here
