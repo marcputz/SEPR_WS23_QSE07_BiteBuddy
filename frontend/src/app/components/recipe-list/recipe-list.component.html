@@ -49,13 +49,13 @@
               <div class="btn-group d-flex align-items userinfo-buttons-space">
                 <a
                   (click)="rateRecipe(recipe.id, 1)"
-                  aria-label="Like Recipe">
+                  aria-label="Like Recipe" role="button">
                   <i *ngIf="likes.includes(recipe.id); else notFilledUp" class="bi bi-hand-thumbs-up-fill"></i>
                   <ng-template #notFilledUp><i class="bi bi-hand-thumbs-up"></i></ng-template>
                 </a>
                 <a
                   (click)="rateRecipe(recipe.id, 0)"
-                  aria-label="Dislike Recipe">
+                  aria-label="Dislike Recipe" role="button">
                   <i *ngIf="dislikes.includes(recipe.id); else notFilledDown" class="bi bi-hand-thumbs-down-fill"></i>
                   <ng-template #notFilledDown><i class="bi bi-hand-thumbs-down"></i></ng-template>
                 </a>
@@ -73,7 +73,7 @@
         <div class="container">
           <ul class="pagination mb-4 mt-4">
             <li class="page-item" [class.disabled]="this.searchParams.page === 0">
-              <a class="page-link" (click)="pageChanger(0)" aria-label="First">
+              <a class="page-link" (click)="pageChanger(0)" aria-label="First" role="button">
                 <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
@@ -85,7 +85,7 @@
             </li>
 
             <li class="page-item" [class.disabled]="this.searchParams.page === maxPages - 1">
-              <a class="page-link" (click)="pageChanger(maxPages - 1)" aria-label="Last">
+              <a class="page-link" (click)="pageChanger(maxPages - 1)" aria-label="Last" role="button">
                 <span aria-hidden="true">&raquo;</span>
               </a>
             </li>
