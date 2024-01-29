@@ -11,7 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.AllergeneMapper;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.IngredientMapper;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapperImpl;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ProfileMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
@@ -79,7 +79,7 @@ public class ProfileServiceTest {
     @Autowired
     private ProfileRepository profileRepository;
     @Autowired
-    private ProfileMapperImpl profileMapper;
+    private ProfileMapper profileMapper;
     @Autowired
     private RecipeRepository recipeRepository;
 
@@ -190,6 +190,8 @@ public class ProfileServiceTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        userRepository.save(userRepository.getReferenceById(testUserId).setActiveProfile(profileRepository.getReferenceById(profileId)));
     }
 
 
@@ -371,6 +373,20 @@ public class ProfileServiceTest {
     }
 
     @Test
+    public void rateRecipeWithExistingProfileRatesRecipe() throws ValidationException {
+        RecipeRatingDto recipeRatingDto = new RecipeRatingDto(recipe1Id, testUserId, 1);
+        profileService.rateRecipe(recipeRatingDto);
+
+        Profile profile = profileRepository.getReferenceById(profileId2);
+
+        assertAll(
+            () -> assertNotNull(profile.getLiked()),
+            () -> assertEquals(1, profile.getLiked().size()),
+            () -> assertTrue(profile.getLiked().contains(recipeRepository.getReferenceById(recipe1Id)))
+        );
+    }
+
+    @Test
     public void getRatingListsOfExistingProfileReturnsRatingListsOfProfile() {
         RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId);
 
@@ -440,12 +456,19 @@ public class ProfileServiceTest {
     @Test
     public void deleteExistingProfile() throws ConflictException {
 
-        ProfileDto deletedProfile = profileService.deleteProfile(profileId, testUserId);
+        ProfileDto deletedProfile = this.profileService.deleteProfile(profileId, testUserId);
 
         assertAll(
             () -> assertEquals(deletedProfile.getId(), profileId),
             () -> assertTrue(profileRepository.findById(profileId).isEmpty())
         );
+    }
+
+    @Test
+    public void deleteActiveProfileThrowsConflictException() throws ConflictException {
+
+        assertThrows(ConflictException.class,
+            () -> this.profileService.deleteProfile(profileId, testUserId2));
     }
 
     @Test

@@ -9,7 +9,6 @@ import java.util.List;
 
 /**
  * Data object transfer for Profile entity to send information through the network and between layers.
- * To create java boilerplate code use lombok.
  */
 
 public class ProfileUserDto {
@@ -90,9 +89,6 @@ public class ProfileUserDto {
         private List<AllergeneDto> allergens;
         private List<IngredientDto> ingredient;
         private ApplicationUser user;
-
-        private ProfileDtoBuilder() {
-        }
 
         public static ProfileDtoBuilder aProfileDto() {
             return new ProfileDtoBuilder();

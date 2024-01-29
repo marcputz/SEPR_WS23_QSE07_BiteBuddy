@@ -18,8 +18,23 @@ import java.util.Set;
 
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
+    /**
+     * Finds recipes containing given name. This search is not case-sensitive.
+     *
+     * @param name     for which we want to search recipes.
+     * @param pageable {@link Pageable} for pagination.
+     * @return {@link Page} with found recipes and pagination information.
+     * @author Frederik Skiera
+     */
     Page<Recipe> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
+    /**
+     * Finds recipes containing given name. This search is not case-sensitive.
+     *
+     * @param name for which we want to search recipes.
+     * @return List of {@link Recipe} of found recipes.
+     * @author Frederik Skiera
+     */
     List<Recipe> findByNameContainingIgnoreCase(String name);
 
     @Query("select distinct r from Recipe r "
@@ -36,6 +51,13 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
         + "and (ri.ingredient.name in (:ingredientNames) or rid.ingredient in (:ingredientNames))")
     List<Recipe> getAllWithIngredientsWithoutAllergens(@Param("ingredientNames") Set<String> ingredientNames, @Param("allergeneIds") Set<Long> allergeneIds);
 
+    /**
+     * Updates the recipe ingredients which are used.
+     *
+     * @param id          of the recipe we want to update.
+     * @param ingredients Set of {@link RecipeIngredient} we want inside of the recipe.
+     * @author Frederik Skiera
+     */
     @Transactional
     default void updateIngredients(Long id, Set<RecipeIngredient> ingredients) {
         Recipe recipe = findById(id).orElse(null);

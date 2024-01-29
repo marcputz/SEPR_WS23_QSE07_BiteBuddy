@@ -65,7 +65,9 @@ public class JsonFileReader {
 
     @PostConstruct
     public void putFoodDataInDataBase() {
-        LOGGER.info("called putting FoodData into Database from File");
+        LOGGER.trace("putFoodDataInDataBase()");
+
+        LOGGER.info("Populating DB with Food Data");
 
         try {
             File fileIngredients = new File(DEFAULT_KEY_FOLDER, PRIVATE_KEY_FILENAME_INGREDIENTS);
@@ -93,10 +95,11 @@ public class JsonFileReader {
             int pictureCount = 1;
             if (recipeRepository.count() == 0) {
                 for (Recipe recipe : recipes) {
-                    Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".png");
+                    Path path = Path.of(DEFAULT_PICTURE_FOLDER + "/" + pictureCount + ".jpg");
                     byte[] imgData = Files.readAllBytes(path);
                     Picture picture = new Picture()
-                        .setData(imgData);
+                        .setData(imgData)
+                        .setDescription("Picture of '" + recipe.getName() + "'");
                     long picId = this.pictureRepository.save(picture).getId();
                     recipe.setPictureId(picId);
                     recipeRepository.save(recipe);

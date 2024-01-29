@@ -44,8 +44,21 @@ public interface ProfileService {
      */
     ProfileDto saveProfile(ProfileDto profileDto) throws ValidationException, NotFoundException;
 
+    /**
+     * Returns all profiles of a user.
+     *
+     * @param user the user whose profiles are to be returned
+     * @return a list of {@link ProfileListDto} objects representing the user's profiles
+     */
     List<ProfileListDto> getAllByUser(ApplicationUser user);
 
+    /**
+     * Returns a profile by its id.
+     *
+     * @param profileId the id of the profile to be returned
+     * @return a {@link Profile} object representing the profile
+     * @throws NotFoundException if the profile could not be found
+     */
     Profile getById(long profileId) throws NotFoundException;
 
     /**

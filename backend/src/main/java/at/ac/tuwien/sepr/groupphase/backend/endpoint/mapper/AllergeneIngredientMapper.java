@@ -13,12 +13,18 @@ public interface AllergeneIngredientMapper {
     /**
      * Maps a {@link AllergeneIngredient} entity to a {@link AllergeneIngredientDto} DTO.
      *
+     * @param allergeneIngredient the allergeneIngredientDto to map
+     * @return the mapped allergeneIngredientDto
+     */
+    @Named("allergeneIngredientToAllergeneIngredientDto")
+    AllergeneIngredientDto allergeneIngredientToAllergeneIngredientDto(AllergeneIngredient allergeneIngredient);
+
+    /**
+     * Maps a {@link AllergeneIngredientDto} DTO to a {@link AllergeneIngredient} entity.
+     *
      * @param allergeneIngredientDto the allergeneIngredientDto to map
      * @return the mapped allergeneIngredient
      */
-    @Named("allergeneIngredientToAllergeneIngredientDto")
-    AllergeneIngredientDto allergeneIngredientToAllergeneIngredientDto(AllergeneIngredient allergeneIngredientDto);
-
     @Named("allergeneIngredientDtoToAllergeneIngredients")
     AllergeneIngredient allergeneIngredientDtoToAllergeneIngredient(AllergeneIngredientDto allergeneIngredientDto);
 }

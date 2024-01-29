@@ -26,6 +26,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepositor
 import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.JDBCException;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -61,19 +63,21 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     private final RecipeService recipeService;
     private final IngredientService ingredientService;
+    private final UserService userService;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final MenuPlanRepository menuPlanRepository;
     private final InventoryIngredientRepository inventoryIngredientRepository;
 
     @Autowired
     public JpaMenuPlanService(MenuPlanRepository repository, RecipeService recipeService, IngredientService ingredientService, MenuPlanValidator validator,
-                              RecipeIngredientRepository recipeIngredientRepository, InventoryIngredientRepository inventoryIngredientRepository) {
+                              RecipeIngredientRepository recipeIngredientRepository, InventoryIngredientRepository inventoryIngredientRepository, UserService userService) {
         this.validator = validator;
         this.menuPlanRepository = repository;
         this.recipeService = recipeService;
         this.ingredientService = ingredientService;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.inventoryIngredientRepository = inventoryIngredientRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -543,11 +547,18 @@ public class JpaMenuPlanService implements MenuPlanService {
      */
     private MenuPlanContentDetailDto convertContentToDetailDto(MenuPlanContent c) {
         Recipe r = c.getRecipe();
-        RecipeListDto recipeListDto = new RecipeListDto("", r.getName(), r.getId(), r.getPictureId());
+
+        String creatorName = "BiteBuddy";
+        if (r.getCreatorId() >= 0) {
+            ApplicationUser creator = this.userService.getUserById(r.getCreatorId());
+            creatorName = creator.getNickname();
+        }
+        RecipeListDto recipeListDto = new RecipeListDto(creatorName, r.getName(), r.getId(), r.getPictureId());
 
         return new MenuPlanContentDetailDto()
             .setDay(c.getDayIdx())
             .setTimeslot(c.getTimeslot())
+            .setCreator(creatorName)
             .setRecipe(recipeListDto);
 
     }
@@ -636,7 +647,7 @@ public class JpaMenuPlanService implements MenuPlanService {
             HashMap<Long, InventoryIngredient> basicInventory = new HashMap<>();
 
             // getting possible existing fridge
-            List<InventoryIngredient> existingFridge = this.inventoryIngredientRepository.findAllyByMenuPlanId(menuPlan.getId());
+            List<InventoryIngredient> existingFridge = this.inventoryIngredientRepository.findAllByMenuPlanId(menuPlan.getId());
             if (!existingFridge.isEmpty()) {
                 for (InventoryIngredient inv : existingFridge) {
                     // basic ingredients do not have a detailed ingredient Name
@@ -744,7 +755,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         List<InventoryIngredientDto> missing = new ArrayList<>();
         List<InventoryIngredientDto> available = new ArrayList<>();
         if (menuPlanId != null) {
-            List<InventoryIngredient> inventory = this.inventoryIngredientRepository.findAllyByMenuPlanId(menuPlanId);
+            List<InventoryIngredient> inventory = this.inventoryIngredientRepository.findAllByMenuPlanId(menuPlanId);
 
             for (InventoryIngredient ingred : inventory) {
                 InventoryIngredientDto newDto =
@@ -772,10 +783,5 @@ public class JpaMenuPlanService implements MenuPlanService {
         InventoryIngredient toSave = this.inventoryIngredientRepository.findById(updatedIngredientDto.getId()).get();
         toSave.setInventoryStatus(updatedIngredientDto.isInventoryStatus());
         this.inventoryIngredientRepository.save(toSave);
-    }
-
-    @Override
-    public void updateInventoryIngredient(InventoryIngredientDto updatedIngredientDto) throws NotFoundException, ConflictException {
-        throw new NotImplementedException();
     }
 }

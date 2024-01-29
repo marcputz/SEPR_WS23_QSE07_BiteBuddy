@@ -3,6 +3,53 @@
 @import "node_modules/bootstrap/scss/variables";
 @import "node_modules/bootstrap/scss/mixins";
 
+.bb-modal {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+
+  z-index: 99;
+  background-color: rgba(0,0,0, 0.7);
+}
+
+.bb-modal > .bb-modal-dialog {
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+
+  max-width: 500px;
+  width: 90%;
+  max-height: 800px;
+  height: 90%;
+
+  background-color: whitesmoke;
+  border-radius: 10px;
+
+  padding: 2rem;
+
+  text-align: center;
+  align-content: center;
+  align-items: center;
+
+  box-shadow: rgba(0,0,0, 0.15) 0px 0px 6px 6px;
+}
+
+.bb-modal > .bb-modal-dialog > form {
+  display: flex;
+  flex-direction: column;
+}
+
+.bb-dropdown {
+
+}
+
 .background-img {
   width: 100%;
   height: fit-content;
@@ -27,7 +74,7 @@
 }
 
 .row-form {
-  margin: 5% 10%;
+  margin: 5% 8%;
 }
 
 .button-create {
@@ -47,10 +94,9 @@
 }
 
 img {
-  width: 270px;
-  height: 11rem;
+  height: 15rem;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
 .recipe-card:hover {
@@ -94,11 +140,6 @@ img {
   @include button-variant($light, $light);
 }
 
-.img-thumbnail {
-  width: auto;
-  height: 200px;
-  object-fit: contain;
-}
 
 .card {
   transition: all 0.3s;
@@ -108,6 +149,9 @@ img {
   transform: scale(1.1);
 }
 
+.userinfo-buttons-space {
+  margin-left: auto;
+}
 @each $color in (info, warning, danger) {
   $value: map.get($theme-colors, $color);
   tr:hover .responsive-#{$color}-button {

@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {LoginDto} from '../dtos/loginDto';
 import {Observable} from 'rxjs';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
@@ -19,7 +19,13 @@ export class UserService {
 
   private authBaseUri: string = this.globals.backendUri + '/user';
 
+  updateEvent: EventEmitter<void> = new EventEmitter<void>();
+
   constructor(private httpClient: HttpClient, private globals: Globals, private apiErrorHandler: ErrorHandler) {
+  }
+
+  triggerUpdate() {
+    this.updateEvent.emit();
   }
 
   /**
@@ -29,6 +35,7 @@ export class UserService {
    */
   loginUser(authRequest: LoginDto): Observable<string> {
     console.trace("Logging in as '" + authRequest.email + "'");
+
     return this.httpClient.post(this.authBaseUri + "/login", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
@@ -37,6 +44,7 @@ export class UserService {
 
   registerUser(authRequest: RegisterDto): Observable<string> {
     console.trace("Registering as '" + authRequest.email + "'");
+
     return this.httpClient.post(this.authBaseUri + "/register", authRequest, {responseType: 'text'})
       .pipe(
         tap((authResponse: string) => this.setToken(authResponse))
@@ -44,8 +52,6 @@ export class UserService {
   }
 
   getUser(): Observable<UserSettingsDto> {
-    console.debug("Retrieving current user settings");
-
     return this.httpClient.get<UserSettingsDto>(`${this.authBaseUri}/settings`);
   }
 
@@ -64,12 +70,12 @@ export class UserService {
   }
 
   logoutUser() {
-    console.debug("Logging out");
+    console.log("Logging out");
 
     this.httpClient.post(this.authBaseUri + "/logout", this.getToken())
       .subscribe({
         next: success => {
-            console.log("Logged out from backend");
+          console.log("Logged out from backend");
         },
         error: error => {
           this.apiErrorHandler.handleApiError(error);
@@ -80,12 +86,21 @@ export class UserService {
   }
 
   requestPasswordReset(userEmail: string): Observable<any> {
-    console.debug("Requesting password reset for '" + userEmail + "' from server");
+    console.log("Requesting password reset for '" + userEmail + "' from server");
+
     return this.httpClient.post(this.authBaseUri + "/request_password_reset", "{\"email\":\"" + userEmail + "\"}", {responseType: 'text'})
   }
 
   resetPassword(dto: ResetPasswordDto): Observable<any> {
     return this.httpClient.post(this.authBaseUri + "/password_reset", dto, {responseType: 'text'});
+  }
+
+  /**
+   * Checks if the user is really logged in via backend response.
+   * Not using isLoggedIn, since this is used elsewhere and checks if the frontend user is valid.
+   */
+  isLoggedInForCreationComponent() {
+    return this.httpClient.get(this.authBaseUri + "/request_login_status");
   }
 
   /**

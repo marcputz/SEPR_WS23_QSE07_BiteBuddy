@@ -62,9 +62,17 @@ public class PictureEndpointTest {
     final private Path picturePath = Path.of((new File("")).getAbsolutePath() + "/src/test/resources/pictures/test.png");
     private byte[] pictureData;
 
+    private Picture testPicture;
+
     @BeforeEach
     void setup() throws Exception {
         pictureData = Files.readAllBytes(picturePath);
+
+        Picture p = new Picture()
+            .setData(pictureData)
+            .setDescription("Test Description");
+
+        this.testPicture = this.repository.save(p);
 
         ApplicationUser user = new ApplicationUser();
         user.setId(1L);
@@ -78,6 +86,7 @@ public class PictureEndpointTest {
     @AfterEach
     void cleanup() {
         repository.deleteAll();
+        userRepository.deleteAll();
     }
 
     public String authenticate() throws Exception {
@@ -88,7 +97,7 @@ public class PictureEndpointTest {
     }
 
     @Test
-    void testSetPicture_LoggedIn_WithValidData_IsCreated() throws Exception {
+    void testSetPicture_LoggedIn_WithValidData_IsCreatedAndValidDto() throws Exception {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -105,6 +114,14 @@ public class PictureEndpointTest {
         MockHttpServletResponse response = mvcResult.getResponse();
 
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+
+        PictureDto responseDto = objectMapper.readerFor(PictureDto.class).readValue(response.getContentAsByteArray());
+
+        assertAll(
+            () -> assertArrayEquals(pictureData, responseDto.getData()),
+            () -> assertEquals("Image Description", responseDto.getDescription()),
+            () -> assertTrue(responseDto.getId() > 0)
+        );
     }
 
     @Test
@@ -169,9 +186,7 @@ public class PictureEndpointTest {
         requestHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        Picture p = this.repository.save(new Picture().setData(pictureData).setDescription("Test Description"));
-
-        MvcResult mvcResult = this.mockMvc.perform(get("/api/v1/picture?id=" + p.getId())
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/v1/picture?id=" + testPicture.getId())
                 .headers(requestHeaders))
             .andDo(print())
             .andReturn();
@@ -182,9 +197,9 @@ public class PictureEndpointTest {
         PictureDto responseDto = objectMapper.readerFor(PictureDto.class).readValue(response.getContentAsByteArray());
 
         assertAll(
-            () -> assertEquals(p.getId(), responseDto.getId()),
-            () -> assertArrayEquals(pictureData, responseDto.getData()),
-            () -> assertEquals("Test Description", responseDto.getDescription())
+            () -> assertEquals(testPicture.getId(), responseDto.getId()),
+            () -> assertArrayEquals(testPicture.getData(), responseDto.getData()),
+            () -> assertEquals(testPicture.getDescription(), responseDto.getDescription())
         );
     }
 

@@ -44,11 +44,24 @@ public interface ProfileMapper {
     @Mapping(target = "ingredients", source = "ingredient", qualifiedByName = "ingredientSetToIngredientDtoList")
     @Mapping(source = "user.nickname", target = "user")
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.userPicture", target = "userPicture")
     ProfileDetailDto profileToProfileDetailDto(Profile profile);
 
+    /**
+     * Maps a {@link Set<Allergene>} of entities to an {@link ArrayList<AllergeneDto>} of DTOs.
+     *
+     * @param allergens the Set of Allergene to map
+     * @return the mapped Arraylist of AllergeneDto
+     */
     @Named("allergeneSetToAllergeneDtoList")
     ArrayList<AllergeneDto> allergeneSetToAllergeneDtoList(Set<Allergene> allergens);
 
+    /**
+     * Maps a {@link Set<Ingredient>} of entities to an {@link ArrayList<IngredientDto>} of DTOs.
+     *
+     * @param ingredients the Set of Ingredient to map
+     * @return the mapped Arraylist of IngredientDto
+     */
     @Named("ingredientSetToIngredientDtoList")
     ArrayList<IngredientDto> ingredientSetToIngredientDtoList(Set<Ingredient> ingredients);
 }

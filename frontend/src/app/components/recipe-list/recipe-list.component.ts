@@ -12,6 +12,7 @@ import {ErrorFormatterService} from "../../services/error-formatter.service";
 import {Router} from "@angular/router";
 import {PictureService} from "../../services/picture.service";
 import {PictureDto} from "../../dtos/pictureDto";
+import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
   selector: 'app-recipe-list',
@@ -21,7 +22,9 @@ import {PictureDto} from "../../dtos/pictureDto";
 export class RecipeListComponent implements OnInit {
   recipes: RecipeListDto[] = [];
   recipeImages: Map<RecipeListDto, number[]> = null;
+  recipeImageAlts: Map<RecipeListDto, string> = null;
   maxPages: number = 5;
+  pagesForPagination: number[];
   searchChangedObservable = new Subject<void>();
   searchParams: RecipeSearch = {
     creator: "",
@@ -50,6 +53,7 @@ export class RecipeListComponent implements OnInit {
     private notification: ToastrService,
     private errorFormatter: ErrorFormatterService,
     private router: Router,
+    private errorHandler: ErrorHandler
   ) {
   }
 
@@ -60,27 +64,45 @@ export class RecipeListComponent implements OnInit {
       .pipe(debounceTime(300))
       .subscribe({next: () => this.reloadRecipes()});
 
-      this.authService.getUser().subscribe(
-          (settings: UserSettingsDto) => {
-              this.profileService.getRatingLists(settings.id)
-                  .subscribe({
-                      next: data => {
-                          this.likes = data.likes;
-                          this.dislikes = data.dislikes
-                      },
-                      error: error => {
-                          console.error('Error getting rating list', error);
-                          const errorMessage = error?.error || 'Unknown error occured';
-                          if(error.message.includes("404")){
-                            this.router.navigate(["/profile"])
-                            this.notification.error("You need to create a profile before using the Website");
-                          }else{
-                            this.notification.error(`Error getting rating lists: ${errorMessage}`);
-                          }
-                      }
-                  });
-          },
-      );
+    this.authService.getUser().subscribe(
+      (settings: UserSettingsDto) => {
+        this.profileService.getRatingLists(settings.id)
+          .subscribe({
+            next: data => {
+              this.likes = data.likes;
+              this.dislikes = data.dislikes
+
+              this.createPagination();
+            },
+            error: error => {
+
+              let errorObj = this.errorHandler.getErrorObject(error);
+
+              switch (errorObj.status) {
+                case 404:
+                  this.notification.warning("You need to create a profile before using the Website");
+                  this.router.navigate(["/profile"])
+                  break;
+                default:
+                  this.errorHandler.handleApiError(errorObj);
+                  break;
+              }
+
+            }
+          });
+      },
+      error => {
+        console.error('Error getting user settings', error);
+        const errorMessage = error?.error || 'Unknown error occurred';
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+
+        if (error.status === 401) {
+          // Handle logout logic, e.g., redirect to login page
+          this.errorHandler.handleApiError(errorObj);
+        }
+      }
+    );
 
   }
 
@@ -95,49 +117,64 @@ export class RecipeListComponent implements OnInit {
         this.recipes = data.recipes;
         this.maxPages = data.numberOfPages;
         this.searchParams.page = data.page;
-        console.log("number of pages: " + data.numberOfPages);
-        console.log("recipes available: " + data.recipes.length);
+
+        this.createPagination()
 
         // load recipe images
         this.recipeImages = new Map<RecipeListDto, number[]>();
+        this.recipeImageAlts = new Map<RecipeListDto, string>();
         for (let dto of this.recipes) {
           this.pictureService.getPicture(dto.pictureId).subscribe({
             next: (pictureDto) => {
               this.recipeImages.set(dto, pictureDto.data);
+              this.recipeImageAlts.set(dto, pictureDto.description);
             },
             error: error => {
-              console.error(error);
+              let errorObj = this.errorHandler.getErrorObject(error);
+              this.errorHandler.handleApiError(errorObj);
             }
           });
         }
       },
       error: err => {
-        this.notification.error('Error fetching recipes', err)
+        // this.notification.error('Error fetching recipes', err)
+        let errorObj = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorObj);
       }
     })
   }
 
   getImageFor(recipe: RecipeListDto) {
     if (this.recipeImages.has(recipe)) {
-      return this.recipeImages.get(recipe);
+      return this.sanitizeImage(this.recipeImages.get(recipe));
     } else {
-      return null;
+      return this.sanitizer.bypassSecurityTrustUrl("assets/images/recipe_default.png");
+    }
+  }
+
+  getImageAltFor(recipe: RecipeListDto) {
+    if (this.recipeImageAlts.has(recipe)) {
+      return this.recipeImageAlts.get(recipe);
+    } else {
+      return "Recipe Image";
     }
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {
-    try {
-      if (!imageBytes || imageBytes.length === 0) {
-        throw new Error('Empty or undefined imageBytes');
-      }
+    if (imageBytes != null) {
+      try {
+        if (!imageBytes || imageBytes.length === 0) {
+          // throw new Error('Empty or undefined imageBytes');
+        }
 
-      const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
-      const dataUrl = `data:image/png;base64,${imageBytes}`;
-      return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
-    } catch (error) {
-      console.error('Error sanitizing image:', error);
-      return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
+        const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
+        const dataUrl = `data:image/jpg;base64,${imageBytes}`;
+        return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+      } catch (error) {
+        return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
+      }
     }
+    return "";
   }
 
   pageChanger(newPageNumber: number) {
@@ -151,8 +188,6 @@ export class RecipeListComponent implements OnInit {
     this.authService.getUser().subscribe(
       (settings: UserSettingsDto) => {
         this.recipeRating.userId = settings.id;
-        console.log(settings);
-        console.log(this.recipeRating)
         this.profileService.createRating(this.recipeRating)
           .subscribe({
               next: data => {
@@ -166,22 +201,27 @@ export class RecipeListComponent implements OnInit {
                           this.dislikes = data.dislikes
                         },
                         error: error => {
-                          console.error('Error getting rating list', error);
-                          const errorMessage = error?.message || 'Unknown error occured';
-                          this.notification.error(`Error getting rating lists: ${errorMessage}`);
+
+                          let errorObj = this.errorHandler.getErrorObject(error);
+                          this.errorHandler.handleApiError(errorObj);
+
                         }
                       });
                   },
                 );
               },
               error: error => {
-                console.log(error)
-                console.error(error.message, error);
-                let title = "Could not rate recipe!";
-                this.notification.error(this.errorFormatter.format(error), title, {
-                  enableHtml: true,
-                  timeOut: 5000,
-                });
+
+                let errorObj = this.errorHandler.getErrorObject(error);
+
+                switch (errorObj.status) {
+                  case 500:
+                    this.notification.warning("Can not rate recipe, please try again later");
+                    break;
+                  default:
+                    this.errorHandler.handleApiError(errorObj);
+                    break;
+                }
               }
             }
           );
@@ -190,5 +230,20 @@ export class RecipeListComponent implements OnInit {
 
   redirectToRecipe(recipeId: number) {
     this.router.navigate(['/recipes', recipeId]);
+  }
+
+  createPagination() {
+    function arange(size: number, start: number = 0): number[] {
+      return Array.from({ length: size }, (_, index) => start + index);
+    }
+
+    // when having less than 5 pages we only show available pages
+    if (this.maxPages < 5) {
+      this.pagesForPagination = arange(this.maxPages, 0);
+    } else if (this.searchParams.page >= (this.maxPages - 3)) {
+      this.pagesForPagination = arange(5, (this.maxPages - 5))
+    } else {
+      this.pagesForPagination = arange(5, Math.max(this.searchParams.page - 2, 0));
+    }
   }
 }

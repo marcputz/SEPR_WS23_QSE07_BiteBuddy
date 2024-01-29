@@ -33,7 +33,8 @@ export class ProfileService {
    * @return Observable for the created profile
    */
   create(profile: ProfileDto | undefined): Observable<ProfileDto> {
-    console.log('Create profile: ' + profile.name);
+    console.trace('Creating profile: ' + profile.name);
+
     return this.http.post<ProfileDto>(
       this.baseUri,
       profile
@@ -63,23 +64,22 @@ export class ProfileService {
   }
 
   getProfileDetails(profileId: number): Observable<ProfileDetailDto> {
-    console.log(`${this.baseUri}/${profileId}`)
     return this.http.get<ProfileDetailDto>(`${this.baseUri}/${profileId}`)
   }
 
   editProfile(profileDto: ProfileDto): Observable<ProfileDto> {
-    console.log(`${this.baseUri}/edit/${profileDto.id}`);
     return this.http.put<ProfileDto>(`${this.baseUri}/edit/${profileDto.id}`, profileDto)
   }
 
   copyToOwn(profileId: number): Observable<ProfileDetailDto> {
-    console.log(`${this.baseUri}/copyToOwn/${profileId}`)
     return this.http.post<ProfileDetailDto>(`${this.baseUri}/copyToOwn/${profileId}`, null)
   }
 
   deleteProfile(profileId: number): Observable<ProfileDto> {
-    console.log(`${this.baseUri}/deleteProfile/${profileId}`)
     return this.http.delete<ProfileDto>(`${this.baseUri}/deleteProfile/${profileId}`);
   }
 
+  setActiveProfile(profileId: number) {
+    return this.http.post(`${this.baseUri}/setActive/${profileId}`, null);
+  }
 }

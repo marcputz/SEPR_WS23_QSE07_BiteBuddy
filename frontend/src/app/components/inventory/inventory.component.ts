@@ -4,6 +4,7 @@ import {InventoryIngredientDto} from "../../dtos/InventoryIngredientDto";
 import {ToastrService} from "ngx-toastr";
 import {MenuPlanService} from "../../services/menuplan.service";
 import {Router} from "@angular/router";
+import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
   selector: 'app-inventory',
@@ -22,6 +23,7 @@ export class InventoryComponent implements OnInit {
     private service: MenuPlanService,
     private notification: ToastrService,
     private router: Router,
+    private errorHandler: ErrorHandler
   ) {
   }
 
@@ -34,10 +36,10 @@ export class InventoryComponent implements OnInit {
     });
   }
 
+
   public getInventory() {
     this.service.getInventory().subscribe({
       next: value => {
-        console.log(value);
         this.inventory = value;
 
         if (this.inventory.missing.length > 20) {
@@ -51,22 +53,10 @@ export class InventoryComponent implements OnInit {
         this.notification.success("Loaded inventory successfully");
       },
       error: error => {
+        let errorDto = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorDto);
+
         console.error(error);
-
-        let errorObject;
-        if (typeof error.error === 'object') {
-          errorObject = error.error;
-        } else {
-          errorObject = error;
-        }
-
-        let status = errorObject.status;
-
-        switch(status) {
-          case 401:
-            this.notification.error("Please log in again", "Login Timeout");
-            this.router.navigate(['/login']);
-        }
       }
     });
   }
@@ -79,11 +69,11 @@ export class InventoryComponent implements OnInit {
 
     this.service.updateInventoryIngredient(inv).subscribe({
       next: data => {
-        console.log("Update was successful");
+
       },
       error: err => {
-        console.log("Update failed");
-        this.notification.error("Updating Inventory failed");
+        let errorDto = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorDto);
       }
     });
   }
@@ -96,11 +86,10 @@ export class InventoryComponent implements OnInit {
 
     this.service.updateInventoryIngredient(inv).subscribe({
       next: data => {
-        console.log("Update was successful");
       },
       error: err => {
-        console.log("Update failed");
-        this.notification.error("Updating Inventory failed");
+        let errorDto = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorDto);
       }
     });
   }

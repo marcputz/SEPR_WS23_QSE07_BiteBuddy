@@ -9,6 +9,7 @@ import {UserSettingsDto} from "../../dtos/userSettingsDto";
 import {CheckRatingDto} from "../../dtos/profileDto";
 import {PictureService} from "../../services/picture.service";
 import {PictureDto} from "../../dtos/pictureDto";
+import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
   selector: 'app-recipe-detail',
@@ -43,7 +44,8 @@ export class RecipeDetailComponent implements OnInit {
     private pictureService: PictureService,
     private router: Router,
     private route: ActivatedRoute,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private errorHandler: ErrorHandler
   ) {
 
   }
@@ -54,7 +56,6 @@ export class RecipeDetailComponent implements OnInit {
     this.service.getById(this.recipeDetails.id).subscribe(
       (recipeDetails: RecipeDetailsDto) => {
         this.recipeDetails = recipeDetails;
-        console.log(recipeDetails);
 
         // load image
         this.pictureService.getPicture(this.recipeDetails.pictureId).subscribe({
@@ -71,7 +72,6 @@ export class RecipeDetailComponent implements OnInit {
     this.authService.getUser().subscribe(
       (settings: UserSettingsDto) => {
         this.userId = settings.id;
-        console.log(settings);
         this.profileService.getRatingLists(this.userId)
           .subscribe(
             (recipeRatingListsDto: RecipeRatingListsDto) => {
@@ -87,7 +87,19 @@ export class RecipeDetailComponent implements OnInit {
               }
             }
           );
-      });
+      },
+      error => {
+        console.error('Error getting user settings', error);
+        const errorMessage = error?.error || 'Unknown error occurred';
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+
+        if (error.status === 401) {
+          // Handle logout logic, e.g., redirect to login page
+          this.errorHandler.handleApiError(errorObj);
+        }
+      }
+    );
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {
@@ -95,7 +107,7 @@ export class RecipeDetailComponent implements OnInit {
       if (!imageBytes || imageBytes.length === 0) {
         throw new Error('Empty or undefined imageBytes');
       }
-      const dataUrl = `data:image/png;base64,${imageBytes}`;
+      const dataUrl = `data:image/jpg;base64,${imageBytes}`;
       return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
     } catch (error) {
       console.error('Error sanitizing image:', error);
@@ -105,5 +117,12 @@ export class RecipeDetailComponent implements OnInit {
 
   isInteger(value: number): boolean {
     return Number.isInteger(value);
+  }
+
+  roundToTwoDecimals(value: number): number {
+    if(value % 1 !== 0){
+      return +(value.toFixed(2));
+    }
+    return value;
   }
 }

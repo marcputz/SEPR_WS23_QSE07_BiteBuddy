@@ -8,8 +8,11 @@ import {ProfileService} from '../../services/profile.service';
 import {ToastrService} from 'ngx-toastr';
 import {UserSettingsDto} from '../../dtos/userSettingsDto';
 import {UserService} from '../../services/user.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {debounceTime, Subject} from 'rxjs';
+import {ErrorHandler} from "../../services/errorHandler";
+import {ImageHandler} from '../../utils/imageHandler';
+import {SafeUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-profile-list',
@@ -21,6 +24,7 @@ export class ProfileListComponent {
   fragment: string;
   scrolledToAnchor: boolean;
   currentUserName = "";
+  activeprofileId: number;
   ownMaxPages: number = 5;
 
   ownSearchParams: ProfileSearch;
@@ -36,11 +40,15 @@ export class ProfileListComponent {
   searchOwnChangedObservable = new Subject<void>();
   searchDiscoverChangedObservable = new Subject<void>();
 
+
   constructor(
     private profileService: ProfileService,
     private notification: ToastrService,
     private authService: UserService,
     private route: ActivatedRoute,
+    private router: Router,
+    private errorHandler: ErrorHandler,
+    private imageHandler: ImageHandler,
   ) {
   }
 
@@ -69,10 +77,17 @@ export class ProfileListComponent {
     this.authService.getUser().subscribe(
       (settings: UserSettingsDto) => {
         this.currentUserName = settings.nickname;
-        console.log('Got UserId: ' + settings.id);
+        this.activeprofileId = settings.activeProfileId;
         this.reloadOwnProfiles();
         this.reloadDiscoverProfiles();
-      });
+      },
+      error => {
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+
+      }
+    );
     this.route.fragment.subscribe(fragment => {
       this.fragment = fragment;
     });
@@ -116,11 +131,12 @@ export class ProfileListComponent {
           this.discoverMaxPages = data.numberOfPages;
           this.discoverSearchParams.page = data.page;
         }
-        console.log("number of pages: " + data.numberOfPages);
-        console.log("profiles available: " + data.profiles.length);
       },
       error: err => {
-        this.notification.error('Error fetching profiles', err)
+
+        let errorObj = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorObj);
+
       }
     })
   }
@@ -145,23 +161,55 @@ export class ProfileListComponent {
   }
 
   addToOwn(profileId: number) {
-    this.profileService.copyToOwn(profileId).subscribe(
-      (newProfile: ProfileDetailDto) => {
-        this.ownProfiles.push(newProfile);
-      });
+    this.profileService.copyToOwn(profileId).subscribe({
+      next:
+        (newProfile: ProfileDetailDto) => {
+          this.ownProfiles.push(newProfile);
+          this.notification.success(`Profile ${newProfile.name} successfully added.`);
+        },
+      error: error => {
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+      }
+    });
   }
 
   deleteProfile(profileId: number, profileName: string) {
     this.profileService.deleteProfile(profileId).subscribe({
       next: data => {
-        this.notification.success(`Profile ${profileName} successfully deleted.`);
+        this.notification.success(`Profile ${profileName} deleted.`);
         this.reloadProfiles(this.ownSearchParams, true);
       },
       error: error => {
-        console.error('Error deleting profile', error);
-        const errorMessage = error?.error || 'Unknown error occured';
-        this.notification.error(`Error deleting profile: ${errorMessage}`);
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+
       }
     });
+  }
+
+  setActiveProfile(profileId: number, profileName: string) {
+    this.profileService.setActiveProfile(profileId).subscribe({
+      next: data => {
+        this.notification.success(`Profile ${profileName} successfully activated.`);
+        this.activeprofileId = profileId;
+      },
+      error: error => {
+
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
+
+      }
+    });
+  }
+
+  getPictureUrl(userPictureArray: number[]): SafeUrl {
+    if (userPictureArray === undefined) {
+      return this.imageHandler.sanitizeUserImage('/assets/icons/user_default.png');
+    } else {
+      //this.loadPreviewPicture();
+      return this.imageHandler.sanitizeUserImage(userPictureArray);
+    }
   }
 }

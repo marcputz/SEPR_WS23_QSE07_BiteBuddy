@@ -40,11 +40,18 @@
           <small class="form-text text-danger" *ngIf="settingsForm.controls.nickname.errors.required">
             Username is required.
           </small>
-          <!-- TODO: Add username to long or made out of whitespaces or just get fully deleted-->
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.nickname.errors.trimmedMinLength">
+            Username must be at least {{ settingsForm.controls.nickname.errors.trimmedMinLength.requiredLength }}
+            characters (excluding whitespace), currently
+            it's {{ settingsForm.controls.nickname.errors.trimmedMinLength.actualLength }} characters long.
+          </small>
+          <small class="form-text text-danger" *ngIf="settingsForm.controls.nickname.errors.maxlength">
+            Username must be less than 255 characters.
+          </small>
         </div>
       </div>
       <!-- TODO: add cancel button? -->
-      <button type="submit" name="emailUpdateButton" class="button-full bb-form-button" (click)="updateUserSettings()">Save changes</button>
+      <button type="submit" name="emailUpdateButton" class="button-full bb-form-button">Save changes</button>
     </form>
   </div>
 </div>

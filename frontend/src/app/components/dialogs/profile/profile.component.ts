@@ -94,7 +94,7 @@ export class ProfileComponent {
                 .subscribe({
                   next: data => {
                     this.notification.success(`Profile ${this.profile?.name} successfully created.`);
-                    this.router.navigate(['/profiles']);
+                    this.router.navigate(['/recipes']);
                   },
                   error: error => {
                     console.error('Error creating profile', error);

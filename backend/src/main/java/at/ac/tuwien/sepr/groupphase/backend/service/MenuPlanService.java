@@ -271,6 +271,7 @@ public interface MenuPlanService {
      *
      * @param menuPlan needs to have valid id, everything else is irrelevant.
      * @param fridge   List of Ingredients which we add to the fridge.
+     * @author Frederik Skiera
      */
     void createFridge(MenuPlan menuPlan, List<String> fridge) throws ValidationException, ConflictException;
 
@@ -279,6 +280,7 @@ public interface MenuPlanService {
      * Only creates the inventory for running MenuPlans, not outdated ones!
      *
      * @param user for which we want to create the inventory.
+     * @author Frederik Skiera
      */
     void createInventory(ApplicationUser user);
 
@@ -288,6 +290,7 @@ public interface MenuPlanService {
      * @param user      for which we want to get the inventory.
      * @param onlyValid if true we only look at the inventory for the MenuPlan which is still running. If false we return the whole inventory over all MenuPlans.
      * @return list of the inventory split into missing and available ingredients.
+     * @author Frederik Skiera
      */
     InventoryListDto searchInventory(ApplicationUser user, boolean onlyValid);
 
@@ -296,27 +299,18 @@ public interface MenuPlanService {
      *
      * @param menuPlanId id of the MenuPlan which we want to lookup.
      * @return list of the inventory split into missing and available ingredients used in the specific MenuPlan.
+     * @author Frederik Skiera
      */
     InventoryListDto searchInventory(Long menuPlanId);
 
     /**
      * Updates a single inventory ingredient.
      *
-     * @param user                 user of which we want to update an ingredient from
+     * @param user                 user of which we want to update an ingredient from.
      * @param updatedIngredientDto updated inventory ingredient.
      * @throws NotFoundException if ingredient did not exist before
      * @throws ConflictException if ingredient was updated incorrectly
      */
     void updateInventoryIngredient(ApplicationUser user, InventoryIngredientDto updatedIngredientDto)
         throws NotFoundException, ConflictException, ValidationException;
-
-    /**
-     * Updates a single inventory ingredient. This should never be used in the endpoint for security reasons,
-     * since we not validate if the user is authorized to change the inventory.
-     *
-     * @param updatedIngredientDto updated inventory ingredient.
-     * @throws NotFoundException if ingredient did not exist before
-     * @throws ConflictException if ingredient was updated incorrectly
-     */
-    void updateInventoryIngredient(InventoryIngredientDto updatedIngredientDto) throws NotFoundException, ConflictException;
 }

@@ -1,221 +1,189 @@
-<!-- profile-list.component.html -->
 <div class="container-fluid">
-  <div class="row flex-nowrap">
-    <!-- Side Nav Bar -->
-    <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-light">
-      <nav id="navbar-example3" class="navbar navbar-light bg-light flex-column align-items-stretch p-3"
-           aria-label="On Site Navigation">
-        <a class="navbar-brand">Menu</a>
-        <nav class="nav nav-pills flex-column" aria-label="Main navigation">
-          <a class="nav-link" routerLink="." fragment="my-profiles" aria-label="Scroll to My Profiles section">My
-            Profiles</a>
-          <a class="nav-link" routerLink="." fragment="discover-profiles"
-             aria-label="Scroll to Discover Profiles section">Discover Profiles</a>
-        </nav>
+  <div class="row-form">
+    <div class="row row-title">
+      <!-- Title -->
+      <div class="col-md-2 col-lg-5 col-sm-4 col-xl-4 col-xxl-3">
+        <h1 id="my-profiles" class="bb-dialog-box-header title-margin">My Profiles</h1>
+      </div>
+      <div class="col-md-5 col-lg-5 col-sm-4 col-xl-5 col-xxl-6">
+        <!-- Search Form Own-->
+        <form class="d-flex" (submit)="reloadOwnProfiles()">
+          <input type="text" id="searchProfile" name="searchProfile" class="form-control input-field"
+                 placeholder="Search your Profiles" [(ngModel)]="ownSearchParams.name"
+                 (ngModelChange)="searchOwnChanged()" aria-label="Search Profiles">
+        </form>
+      </div>
+      <!-- Create Profile Button -->
+      <div class="col-md-4 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
+        <div class="input-button">
+          <button class="button-create button-transparent" [routerLink]="['/profile']" aria-label="Create Profile">
+            <i class="bi bi-plus">
+              Create Profile
+            </i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Container for user profiles -->
+    <div class="row">
+      <!-- Loop through each profile in ownProfiles array -->
+      <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-3 mb-4 row-gap-6"
+           *ngFor="let profile of ownProfiles; let i = index">
+        <!-- Card for each profile -->
+        <div class="card h-100"> <!-- h-100 Cards expand to size of longest Card in line -->
+          <div class="card-body">
+            <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
+              <h5 *ngIf="profile.id === activeprofileId" class="card-title">Active: {{ profile.name }}</h5>
+              <h5 *ngIf="profile.id !== activeprofileId" class="card-title">{{ profile.name }}</h5>
+            </a>
+            <p class="card-text"><strong>Restricted Allergens:</strong></p>
+            <ul>
+              <ng-container *ngFor="let allergen of profile.allergens; let i = index">
+                <li *ngIf="i < 3">{{ allergen.name }}</li>
+              </ng-container>
+              <li *ngIf="profile.allergens.length > 3">...</li>
+            </ul>
+            <p class="card-text"><strong>Liked Ingredients:</strong></p>
+            <ul>
+              <ng-container *ngFor="let ingredient of profile.ingredients; let i = index">
+                <li *ngIf="i < 3">{{ ingredient.name }}</li>
+              </ng-container>
+              <li *ngIf="profile.ingredients.length > 3">...</li>
+            </ul>
+            <p class="card-text"><strong>Liked Recipes:</strong></p>
+            <ul>
+              <ng-container *ngFor="let recipe of profile.liked; let i = index">
+                <li *ngIf="i < 3">{{ recipe.name }}</li>
+              </ng-container>
+              <li *ngIf="profile.liked.length > 3">...</li>
+            </ul>
+            <p class="card-text"><strong>Disliked Recipes:</strong></p>
+            <ul>
+              <ng-container *ngFor="let recipe of profile.disliked; let i = index">
+                <li *ngIf="i < 3">{{ recipe.name }}</li>
+              </ng-container>
+              <li *ngIf="profile.disliked.length > 3">...</li>
+            </ul>
+          </div>
+          <div class="buttons-flex mt-auto m-3">
+            <button class="button-transparent"
+                    [routerLink]="['/profiles/edit', profile.id]">
+                  <span class="bb-text-inside-btn-transp">
+                Edit
+              </span>
+            </button>
+            <button *ngIf="profile.id !== activeprofileId" class="button-transparent d-flex"
+                    (click)="setActiveProfile(profile.id, profile.name)">
+              Activate
+            </button>
+            <button class="button-transparent bi-trash  d-flex"
+                    *ngIf="profile.id !== activeprofileId"
+                    (click)="deleteProfile(profile.id, profile.name)"
+            ></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row-form">
+    <div class="row row-title">
+      <div class="col-md-2 col-lg-5 col-sm-4 col-xl-4 col-xxl-3">
+        <h1 id="discover-profiles" class="bb-dialog-box-header title-margin">Discover Profiles</h1>
+      </div>
+      <div class="col-md-10 col-lg-7 col-sm-8 col-xl-8 col-xxl-9">
+        <!-- Search Form Discover-->
+        <form class="d-flex" (submit)="reloadDiscoverProfiles()">
+          <input type="text" id="searchProfile2" name="searchProfile2" class="form-control input-field"
+                 placeholder="Search for profiles" aria-label="Search for profiles"
+                 [(ngModel)]="discoverSearchParams.name" (ngModelChange)="searchDiscoverChanged()">
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Pagination Section -->
+    <div class="row justify-content-center mb-3">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <li class="page-item">
+            <a class="page-link" aria-label="First" (click)="pageChanger(0)">&laquo;</a>
+          </li>
+          <li class="page-item" *ngIf="this.discoverSearchParams.page - 1 > 0">
+            <a class="page-link"
+               (click)="pageChanger(this.discoverSearchParams.page - 2)">{{ this.discoverSearchParams.page - 1 }}</a>
+          </li>
+          <li class="page-item" *ngIf="this.discoverSearchParams.page > 0">
+            <a class="page-link"
+               (click)="pageChanger(this.discoverSearchParams.page - 1)">{{ this.discoverSearchParams.page }}</a>
+          </li>
+          <li class="page-item active">
+            <span class="page-link">{{ this.discoverSearchParams.page + 1 }}</span>
+          </li>
+          <li class="page-item" *ngIf="discoverMaxPages > this.discoverSearchParams.page + 1">
+            <a class="page-link"
+               (click)="pageChanger(this.discoverSearchParams.page + 1)">{{ this.discoverSearchParams.page + 2 }}</a>
+          </li>
+          <li class="page-item" *ngIf="discoverMaxPages > this.discoverSearchParams.page + 2">
+            <a class="page-link"
+               (click)="pageChanger(this.discoverSearchParams.page + 2)">{{ this.discoverSearchParams.page + 3 }}</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" aria-label="Last" (click)="pageChanger(discoverMaxPages - 1)">&raquo;</a>
+          </li>
+        </ul>
       </nav>
     </div>
 
-
-    <div class="col py-3">
-
-      <div class="container">
-        <h1 id="my-profiles" class="header mb-4">My Profiles</h1>
-
-        <div class="row mb-5 align-items-center">
-          <!-- Search Form Own-->
-          <div class="col">
-            <form class="d-flex" (submit)="reloadOwnProfiles()">
-              <input type="text" id="searchProfile" name="searchProfile" class="form-control"
-                     placeholder="Search your Profiles" [(ngModel)]="ownSearchParams.name"
-                     (ngModelChange)="searchOwnChanged()" aria-label="Search Profiles">
-            </form>
-          </div>
-
-          <!-- Create Profile Button -->
-          <div class="col-auto">
-            <button class="btn btn-success rounded-pill" [routerLink]="['/profile']" aria-label="Create Profile">
-              <i class="bi-plus-square"></i> Create Profile
-            </button>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- Container for user profiles -->
-      <div class="container">
-        <div class="row">
-          <!-- Loop through each profile in ownProfiles array -->
-          <div class="col-md-4 d-flex flex-column" *ngFor="let profile of ownProfiles; let i = index">
-            <!-- Card for each profile -->
-            <div class="card h-100"> <!-- h-100 Cards expand to size of longest Card in line -->
-              <div class="card-header">
-                <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
-                  <h5 class="card-title">{{ profile.name }}</h5>
-                </a><br>
-                <div class="card-subtitle text-muted">
-                  <span>From Me:
-                    <!-- TODO: Add dynamic loading for user profile images -->
-                    <!-- TODO: Example: (load)="onImageLoad($event, profile.userId)"-->
-                    <img [ngSrc]="'/assets/icons/user_default.png'" width="35" height="35" style="margin-right: 5px;"
-                         alt="Profile Image">
-                    {{ profile.user }}</span>
-                </div>
-              </div>
-              <div class="card-body">
-                <p class="card-text"><strong>Restricted Allergens:</strong></p>
-                <ul>
-                  <ng-container *ngFor="let allergen of profile.allergens; let i = index">
-                    <li *ngIf="i < 3">{{ allergen.name }}</li>
-                  </ng-container>
-                  <li *ngIf="profile.allergens.length > 3">...</li>
-                </ul>
-                <p class="card-text"><strong>Liked Ingredients:</strong></p>
-                <ul>
-                  <ng-container *ngFor="let ingredient of profile.ingredients; let i = index">
-                    <li *ngIf="i < 3">{{ ingredient.name }}</li>
-                  </ng-container>
-                  <li *ngIf="profile.ingredients.length > 3">...</li>
-                </ul>
-                <p class="card-text"><strong>Liked Recipes:</strong></p>
-                <ul>
-                  <ng-container *ngFor="let recipe of profile.liked; let i = index">
-                    <li *ngIf="i < 3">{{ recipe.name }}</li>
-                  </ng-container>
-                  <li *ngIf="profile.liked.length > 3">...</li>
-                </ul>
-                <p class="card-text"><strong>Disliked Recipes:</strong></p>
-                <ul>
-                  <ng-container *ngFor="let recipe of profile.disliked; let i = index">
-                    <li *ngIf="i < 3">{{ recipe.name }}</li>
-                  </ng-container>
-                  <li *ngIf="profile.disliked.length > 3">...</li>
-                </ul>
-              </div>
-              <div class="buttons-flex mt-auto m-3">
-                <button class="btn btn-primary btn-edit edit-button d-flex"
-                        [routerLink]="['/profiles/edit', profile.id]">
-                  Edit
-                </button>
-                <button class="btn btn-danger bi-trash delete-button d-flex"
-                        (click)="deleteProfile(profile.id, profile.name)"
-                ></button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="container">
-        <h1 id="discover-profiles" class="bb-dialog-box-header mb-4">Discover Profiles</h1>
-
-        <!-- Pagination Section -->
-        <div class="row justify-content-center mb-3">
-          <nav aria-label="Page navigation">
-            <ul class="pagination">
-              <li class="page-item">
-                <a class="page-link" aria-label="First" (click)="pageChanger(0)">&laquo;</a>
-              </li>
-              <li class="page-item" *ngIf="this.discoverSearchParams.page - 1 > 0">
-                <a class="page-link"
-                   (click)="pageChanger(this.discoverSearchParams.page - 2)">{{ this.discoverSearchParams.page - 1 }}</a>
-              </li>
-              <li class="page-item" *ngIf="this.discoverSearchParams.page > 0">
-                <a class="page-link"
-                   (click)="pageChanger(this.discoverSearchParams.page - 1)">{{ this.discoverSearchParams.page }}</a>
-              </li>
-              <li class="page-item active">
-                <span class="page-link">{{ this.discoverSearchParams.page + 1 }}</span>
-              </li>
-              <li class="page-item" *ngIf="discoverMaxPages > this.discoverSearchParams.page + 1">
-                <a class="page-link"
-                   (click)="pageChanger(this.discoverSearchParams.page + 1)">{{ this.discoverSearchParams.page + 2 }}</a>
-              </li>
-              <li class="page-item" *ngIf="discoverMaxPages > this.discoverSearchParams.page + 2">
-                <a class="page-link"
-                   (click)="pageChanger(this.discoverSearchParams.page + 2)">{{ this.discoverSearchParams.page + 3 }}</a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" aria-label="Last" (click)="pageChanger(discoverMaxPages - 1)">&raquo;</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-
-        <!-- Search Form Discover -->
-        <div class="row align-items-center mb-3">
-          <div class="col">
-            <form class="d-flex flex-row w-auto" (submit)="reloadDiscoverProfiles()">
-              <div class="input-group">
-                <input type="text" id="searchProfile2" name="searchProfile2" class="form-control"
-                       placeholder="Search for profiles"
-                       aria-label="Search for profiles"
-                       [(ngModel)]="discoverSearchParams.name" (ngModelChange)="searchDiscoverChanged()">
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="container">
-        <div class="row">
-          <!-- Iterate through profiles -->
-          <div class="col-md-4 d-flex flex-column" *ngFor="let profile of discoverProfiles; let i = index">
-            <div class="card h-100"> <!-- Cards expand to size of longest Card in line -->
-              <div class="card-header">
-                <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
-                  <h5 class="card-title">{{ profile.name }}</h5>
-                </a><br>
-                <div class="card-subtitle text-muted">
+    <div class="row">
+      <!-- Iterate through profiles -->
+      <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-3 mb-4 row-gap-6"
+           *ngFor="let profile of discoverProfiles; let i = index">
+        <div class="card h-100"> <!-- Cards expand to size of longest Card in line -->
+          <div class="card-body">
+            <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
+              <h5 class="card-title">{{ profile.name }}</h5>
+            </a>
+            <div class="card-subtitle text-muted">
                   <span>Created by:
-                    <!-- TODO: Add dynamic loading for user profile images -->
-                    <!-- TODO: (load)="onImageLoad($event, profile.userId)"-->
-                    <img [ngSrc]="'/assets/icons/user_default.png'" width="35" height="35" style="margin-right: 5px;"
+                    <img [ngSrc]="getPictureUrl(profile.userPicture)" width="35" height="35" style="margin-right: 5px;"
                          alt="Profile Image">
                     {{ profile.user }}</span>
-                </div>
-              </div>
-              <div class="card-body">
-                <p class="card-text"><strong>Restricted Allergens:</strong></p>
-                <ul>
-                  <ng-container *ngFor="let allergen of profile.allergens; let i = index">
-                    <li *ngIf="i < 3">{{ allergen.name }}</li>
-                  </ng-container>
-                  <li *ngIf="profile.allergens.length > 3">...</li>
-                </ul>
-                <p class="card-text"><strong>Liked Ingredients:</strong></p>
-                <ul>
-                  <ng-container *ngFor="let ingredient of profile.ingredients; let i = index">
-                    <li *ngIf="i < 3">{{ ingredient.name }}</li>
-                  </ng-container>
-                  <li *ngIf="profile.ingredients.length > 3">...</li>
-                </ul>
-                <p class="card-text"><strong>Liked Recipes:</strong></p>
-                <ul>
-                  <ng-container *ngFor="let recipe of profile.liked; let i = index">
-                    <li *ngIf="i < 3">{{ recipe.name }}</li>
-                  </ng-container>
-                  <li *ngIf="profile.liked.length > 3">...</li>
-                </ul>
-                <p class="card-text"><strong>Disliked Recipes:</strong></p>
-                <ul>
-                  <ng-container *ngFor="let recipe of profile.disliked; let i = index">
-                    <li *ngIf="i < 3">{{ recipe.name }}</li>
-                  </ng-container>
-                  <li *ngIf="profile.disliked.length > 3">...</li>
-                </ul>
-              </div>
-              <div class="buttons-flex mt-auto m-3">
-                <button class="btn btn-primary btn-add-to-own" (click)="addToOwn(profile.id)">+ Add to Own</button>
-              </div>
             </div>
+            <br>
+            <p class="card-text"><strong>Restricted Allergens:</strong></p>
+            <ul>
+              <ng-container *ngFor="let allergen of profile.allergens; let i = index">
+                <li *ngIf="i < 3">{{ allergen.name }}</li>
+              </ng-container>
+              <li *ngIf="profile.allergens.length > 3">...</li>
+            </ul>
+            <p class="card-text"><strong>Liked Ingredients:</strong></p>
+            <ul>
+              <ng-container *ngFor="let ingredient of profile.ingredients; let i = index">
+                <li *ngIf="i < 3">{{ ingredient.name }}</li>
+              </ng-container>
+              <li *ngIf="profile.ingredients.length > 3">...</li>
+            </ul>
+            <p class="card-text"><strong>Liked Recipes:</strong></p>
+            <ul>
+              <ng-container *ngFor="let recipe of profile.liked; let i = index">
+                <li *ngIf="i < 3">{{ recipe.name }}</li>
+              </ng-container>
+              <li *ngIf="profile.liked.length > 3">...</li>
+            </ul>
+            <p class="card-text"><strong>Disliked Recipes:</strong></p>
+            <ul>
+              <ng-container *ngFor="let recipe of profile.disliked; let i = index">
+                <li *ngIf="i < 3">{{ recipe.name }}</li>
+              </ng-container>
+              <li *ngIf="profile.disliked.length > 3">...</li>
+            </ul>
+          </div>
+          <div class="buttons-flex mt-auto m-3">
+            <button class="button-transparent" (click)="addToOwn(profile.id)">+ Add to Own</button>
           </div>
         </div>
       </div>
-
-
     </div>
-
   </div>
 </div>

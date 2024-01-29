@@ -6,11 +6,11 @@ import {RecipeProfileViewDto} from "./recipe";
  * DTO for Profile related requests to pass data between frontend and backend
  */
 export interface ProfileDto {
-    id?: number;
-    name: string;
-    allergens: AllergeneDto[];
-    ingredient: IngredientDto[];
-    userId: number;
+  id?: number;
+  name: string;
+  allergens: AllergeneDto[];
+  ingredient: IngredientDto[];
+  userId: number;
 }
 
 export interface ProfileListDto {
@@ -20,40 +20,41 @@ export interface ProfileListDto {
 }
 
 export interface ProfileSearch {
-    name: string;
-    creator: string;
-    ownProfiles: boolean;
-    page: number;
-    entriesPerPage: number;
+  name: string;
+  creator: string;
+  ownProfiles: boolean;
+  page: number;
+  entriesPerPage: number;
 }
 
 export interface ProfileSearchResultDto {
-    page: number,
-    entriesPerPage: number,
-    numberOfPages: number,
-    profiles: ProfileDetailDto[];
+  page: number,
+  entriesPerPage: number,
+  numberOfPages: number,
+  profiles: ProfileDetailDto[];
 }
 
 export interface RecipeRatingDto {
-    recipeId: number;
-    userId: number;
-    rating: number;
+  recipeId: number;
+  userId: number;
+  rating: number;
 }
 
 export interface CheckRatingDto {
-    recipeId: number;
-    userId: number;
+  recipeId: number;
+  userId: number;
 }
 
 export interface ProfileDetailDto {
-    id: number,
-    name: string,
-    allergens: AllergeneDto[],
-    ingredients: IngredientDto[],
-    liked: RecipeProfileViewDto[],
-    disliked: RecipeProfileViewDto[],
-    user: string,
-    userId: number
+  id: number,
+  name: string,
+  allergens: AllergeneDto[],
+  ingredients: IngredientDto[],
+  liked: RecipeProfileViewDto[],
+  disliked: RecipeProfileViewDto[],
+  user: string,
+  userId: number,
+  userPicture: number[],
 }
 
 export interface ProfileEditDto {

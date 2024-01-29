@@ -45,16 +45,16 @@ public class PictureEndpoint {
         this.authService = authService;
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
     public PictureDto getPicture(@RequestParam long id) throws NotFoundException {
         LOGGER.trace("getPicture({})", id);
 
         return this.service.getByIdAsDto(id);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PutMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public PictureDto createPicture(@RequestHeader HttpHeaders headers, @RequestBody PictureDto pictureDto) throws AuthenticationException, DataStoreException {
         LOGGER.trace("createPicture({})", pictureDto);
 

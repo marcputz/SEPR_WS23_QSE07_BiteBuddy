@@ -296,7 +296,7 @@ public class RecipesEndpointTest {
     }
 
     @Test
-    public void getRecipeDetails() throws Exception {
+    public void getRecipeDetailsOfExistingRecipe() throws Exception {
         // creating request
         var body = mockMvc
             .perform(MockMvcRequestBuilders
@@ -332,6 +332,18 @@ public class RecipesEndpointTest {
     }
 
     @Test
+    public void getRecipeDetailsOfNonExistingRecipeRespondsNotFound() throws Exception {
+        // creating request
+        var body = mockMvc
+            .perform(MockMvcRequestBuilders
+                .get("/api/v1/recipes/" + -100)
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isNotFound())
+            .andReturn().getResponse().getContentAsByteArray();
+
+    }
+
+    @Test
     public void createValidRecipe() throws Exception {
         // creating request
         HttpHeaders requestHeaders = new HttpHeaders();
@@ -361,7 +373,7 @@ public class RecipesEndpointTest {
                     """)
                 .headers(requestHeaders)
                 .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isOk());
+            ).andExpect(status().isCreated());
 
         // now requesting the recipe
         // creating request

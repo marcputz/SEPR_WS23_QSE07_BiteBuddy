@@ -8,5 +8,12 @@ import java.util.List;
 
 @Repository
 public interface RecipeIngredientDetailsRepository extends JpaRepository<RecipeIngredientDetails, Long> {
+    /**
+     * Finds all recipe ingredient details where the specific ingredient matches the given name.
+     *
+     * @param name for which we want to filter.
+     * @return List of {@link RecipeIngredientDetails} which include given name.
+     * @author Frederik Skiera
+     */
     List<RecipeIngredientDetails> findByIngredientContainingIgnoreCase(String name);
 }

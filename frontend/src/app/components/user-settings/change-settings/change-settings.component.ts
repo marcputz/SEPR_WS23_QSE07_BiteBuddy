@@ -1,13 +1,20 @@
-import {ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {
+  AbstractControl,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {UserService} from '../../../services/user.service';
-import {PasswordEncoder} from '../../../utils/passwordEncoder';
 import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
 import {UpdateUserSettingsDto} from '../../../dtos/updateUserSettingsDto';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {SafeUrl} from '@angular/platform-browser';
 import {ImageHandler} from '../../../utils/imageHandler';
+import {ErrorHandler} from "../../../services/errorHandler";
 
 @Component({
   selector: 'app-change-settings',
@@ -21,7 +28,7 @@ export class ChangeSettingsComponent implements OnInit {
   error = false;
   errorMessage = 'Something went wrong, no user settings found. Check if your backend is connected';
 
-  isInputFocused: {[key: string]: boolean } = {};
+  isInputFocused: { [key: string]: boolean } = {};
 
   originalUserSettings: UserSettingsDto;
   newUserSettings: UpdateUserSettingsDto = new UpdateUserSettingsDto("", null);
@@ -32,14 +39,30 @@ export class ChangeSettingsComponent implements OnInit {
   constructor(
     private formBuilder: UntypedFormBuilder,
     private authService: UserService,
+    private errorHandler: ErrorHandler,
     private router: Router,
     private notifications: ToastrService,
     private imageHandler: ImageHandler
   ) {
     this.settingsForm = this.formBuilder.group({
-      nickname: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]]
+      nickname: ['', [Validators.required, this.trimmedMinLength(3), Validators.maxLength(255)]]
     });
   }
+
+
+  trimmedMinLength(minLength: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value || '';
+      const trimmedValue = value.trim();
+      return trimmedValue.length < minLength ? {
+        'trimmedMinLength': {
+          requiredLength: minLength,
+          actualLength: trimmedValue.length
+        }
+      } : null;
+    };
+  }
+
 
   vanishError() {
     this.error = false;
@@ -58,7 +81,7 @@ export class ChangeSettingsComponent implements OnInit {
         })
         .catch(error => {
           console.error('Error processing image: ', error);
-          // Handle the error appropriately
+          this.notifications.error(error, 'Unsupported Format use png or Jpg');
         });
     } else {
       this.newUserSettings.userPicture = null;
@@ -75,26 +98,25 @@ export class ChangeSettingsComponent implements OnInit {
 
   private getUser() {
     this.authService.getUser().subscribe({
-      next: (settings: UserSettingsDto) => {
-        this.originalUserSettings = settings;
-        this.settingsForm.controls['nickname'].setValue(settings.nickname);
-        this.loadUserPicture(settings.userPicture);
-        this.newUserSettings = new UpdateUserSettingsDto("", null);
-      },
-      error: error => {
-        console.error('Error loading user settings');
-        this.notifications.error('Error loading user settings');
+        next: (settings: UserSettingsDto) => {
+          this.originalUserSettings = settings;
+          this.settingsForm.controls['nickname'].setValue(settings.nickname);
+          this.loadUserPicture(settings.userPicture);
+          this.newUserSettings = new UpdateUserSettingsDto("", null);
+        },
+        error: error => {
 
-        this.error = true;
-        this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+          let errorObj = this.errorHandler.getErrorObject(error);
+          this.errorHandler.handleApiError(errorObj);
+
+        },
+        complete: () => {
+        }
       },
-      complete: () => {
-      }
-    });
+    );
   }
 
   loadUserPicture(userPictureArray: number[]) {
-    console.info('load user picture');
     if (userPictureArray === undefined) {
       console.info('user picture is empty');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.safePictureUrl);
@@ -106,7 +128,6 @@ export class ChangeSettingsComponent implements OnInit {
   }
 
   loadPreviewPicture() {
-    console.info('loadProfilePicture');
     if (this.newUserSettings.userPicture === null) {
       console.info('loadProfilePicture originalUserSettings');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.originalUserSettings.userPicture);
@@ -121,8 +142,7 @@ export class ChangeSettingsComponent implements OnInit {
     let somethingChanged = false;
     if (this.settingsForm.valid) {
       if (this.settingsForm.controls.nickname.value !== this.originalUserSettings.nickname) {
-        const nickname: string = this.settingsForm.controls.nickname.value;
-        this.newUserSettings.nickname = nickname;
+        this.newUserSettings.nickname = this.settingsForm.controls.nickname.value;
         somethingChanged = true;
       }
       if (this.newUserSettings.userPicture !== null) {
@@ -131,10 +151,9 @@ export class ChangeSettingsComponent implements OnInit {
       if (somethingChanged) {
         this.authService.updateUserSettings(this.newUserSettings).subscribe({
           next: () => {
-            console.log('User settings updated successfully');
             this.notifications.success('User settings updated successfully');
             this.getUser();
-            //TODO: add notifier for all the pictures
+            this.authService.triggerUpdate();
           },
           error: error => {
             console.error('Error updating user settings', error);

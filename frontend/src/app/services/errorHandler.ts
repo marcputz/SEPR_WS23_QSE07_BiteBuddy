@@ -1,8 +1,8 @@
 import {Injectable} from "@angular/core";
 import {ToastrService} from "ngx-toastr";
 import {ErrorDto} from "../dtos/errorDto";
-import {toNumber} from "lodash";
 import {Router} from "@angular/router";
+import {UserService} from "./user.service";
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,8 @@ import {Router} from "@angular/router";
 
 export class ErrorHandler {
 
-  constructor(protected router: Router, protected notifications: ToastrService) {}
+  constructor(protected router: Router,
+              protected notifications: ToastrService) {}
 
   getErrorObject(error: any): ErrorDto {
 
@@ -20,14 +21,11 @@ export class ErrorHandler {
     let reason: string;
 
     // set error status code
-    errorStatus = error.statusCode;
-    if (errorStatus == undefined) {
-      errorStatus = error.status;
-    }
+    errorStatus = error.status;
 
     // set error text
     errorText = error.statusText;
-    if (errorText == undefined) {
+    if (errorText == undefined || errorText == "OK") {
       errorText = this.statusCodeToStatusText(errorStatus);
     }
 
@@ -35,14 +33,14 @@ export class ErrorHandler {
       // error has a body
       let errorBody = error.error;
 
-      let errorJson = JSON.parse(errorBody);
-      if (errorJson["statusCode"] != undefined && errorJson["statusText"] != undefined) {
-        // this is a errorDto object
+      if (errorBody.statusCode != undefined && errorBody.statusText != undefined) {
+        // error dto was parsed correctly
 
-        errorStatus = errorJson["statusCode"];
-        errorText = errorJson["statusText"];
-        errorMessage = errorJson["statusDescription"];
-        reason = errorJson["reason"];
+        errorStatus = errorBody.statusCode;
+        errorText = errorBody.statusText;
+        errorMessage = errorBody.statusDescription;
+        reason = errorBody.reason;
+
       }
     }
 
@@ -57,8 +55,9 @@ export class ErrorHandler {
       case 400: // bad request
         this.notifications.warning("We couldn't process your request, as its format wasn't known to our servers. Please check your inputs and try again!");
         break;
-      case 401: // Unauthorized
+      case 401: // Unauthorized: logout at first then login again
         this.notifications.info("You were forcefully logged-out by the server, please log in again");
+        //Cannot make logout because of circular dependencies in the classes with userservice
         this.router.navigate(['login']);
         break;
       case 404: // not found
