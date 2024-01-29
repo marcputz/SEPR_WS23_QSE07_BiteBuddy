@@ -66,7 +66,7 @@ public class ProfileEndpoint {
     }
 
     /**
-     * Creates a profile
+     * Creates a profile.
      *
      * @param toCreateProfile contains the id and the creation information of the profile
      * @param headers {@link HttpHeaders} with the authentication information.
@@ -118,7 +118,7 @@ public class ProfileEndpoint {
     }
 
     /**
-     * Gets the details of an existing profile
+     * Gets the details of an existing profile.
      *
      * @param profileId the id of the requested profile
      * @param headers {@link HttpHeaders} with the authentication information.
@@ -137,7 +137,7 @@ public class ProfileEndpoint {
     }
 
     /**
-     * Edits an existing profile
+     * Edits an existing profile.
      *
      * @param profileDto contains the id and the edited information of the profile
      * @param headers {@link HttpHeaders} with the authentication information.
@@ -169,7 +169,7 @@ public class ProfileEndpoint {
     }
 
     /**
-     * Lets a profile rate a recipe
+     * Lets a profile rate a recipe.
      *
      * @param recipeRatingDto contains the id of the recipe to rate, the current user id (active profile is the one rating) and the rating (0-dislike, 1-like)
      * @param headers {@link HttpHeaders} with the authentication information.

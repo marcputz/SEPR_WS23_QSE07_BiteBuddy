@@ -48,7 +48,7 @@ public interface ProfileMapper {
     ProfileDetailDto profileToProfileDetailDto(Profile profile);
 
     /**
-     * Maps a {@link Set<Allergene>} of entities to an {@link ArrayList<AllergeneDto>} of DTOs.
+     * Maps a Set of {@link Allergene} to a List of {@link AllergeneDto}.
      *
      * @param allergens the Set of Allergene to map
      * @return the mapped Arraylist of AllergeneDto
@@ -57,7 +57,7 @@ public interface ProfileMapper {
     ArrayList<AllergeneDto> allergeneSetToAllergeneDtoList(Set<Allergene> allergens);
 
     /**
-     * Maps a {@link Set<Ingredient>} of entities to an {@link ArrayList<IngredientDto>} of DTOs.
+     * Maps a set of {@link Ingredient} to a list of {@link IngredientDto}.
      *
      * @param ingredients the Set of Ingredient to map
      * @return the mapped Arraylist of IngredientDto
