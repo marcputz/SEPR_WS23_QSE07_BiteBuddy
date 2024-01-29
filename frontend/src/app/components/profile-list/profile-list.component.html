@@ -34,8 +34,9 @@
           <div class="card h-100"> <!-- h-100 Cards expand to size of longest Card in line -->
             <div class="card-body">
               <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
-                <h5 *ngIf="profile.id === activeprofileId" class="card-title">Active: {{ profile.name }}</h5>
-                <h5 *ngIf="profile.id !== activeprofileId" class="card-title">{{ profile.name }}</h5>
+                <h5 class="card-title">{{ profile.name }}<br>
+                <span *ngIf="profile.id === activeprofileId" class="active-tag">Active</span>
+              </h5>
               </a>
               <p class="card-text"><strong>Restricted Allergens:</strong></p>
               <ul>
