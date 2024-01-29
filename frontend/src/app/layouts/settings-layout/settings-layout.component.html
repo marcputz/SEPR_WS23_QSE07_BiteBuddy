@@ -1,69 +1,72 @@
-<div class="container-fluid">
-  <div class="setting-layout">
-    <div class="row-cols-1">
-      <div class="profile-sidebar-wrapper">
-        <div class="profile-picture">
-          <img [src]="safePictureUrl" class="rounded-circle profile-img" alt="Account Image">
-        </div>
-        <div class="user-info">
-          <div class="username">
-            <h5>{{ this.accountUsername }}</h5>
+<main>
+  <div class="container-fluid">
+    <div class="setting-layout">
+      <div class="row-cols-1">
+        <div class="profile-sidebar-wrapper">
+          <div class="profile-picture">
+            <img [src]="safePictureUrl" class="rounded-circle profile-img" alt="Account Image">
           </div>
-          <div class="user-email">
-            <h6 *ngIf="this.accountEmail.length < 40"  id="sidebar-email">{{ this.accountEmail }}</h6>
+          <div class="user-info">
+            <div class="username">
+              <h5>{{ this.accountUsername }}</h5>
+            </div>
+            <div class="user-email">
+              <h6 *ngIf="this.accountEmail.length < 40" id="sidebar-email">{{ this.accountEmail }}</h6>
+            </div>
           </div>
-        </div>
-        <!-- Add links-->
-        <div class="link-sidebar">
-          <ul>
-            <li>
-              <a [routerLink]="['/settings/user']" class="bb-link" [class.active]="activeNavItem === 'user'">
-                <i class="bi bi-person"></i>
+          <!-- Add links-->
+          <div class="link-sidebar">
+            <ul>
+              <li>
+                <a [routerLink]="['/settings/user']" class="bb-link" [class.active]="activeNavItem === 'user'">
+                  <i class="bi bi-person"></i>
                   User Info
-              </a>
-            </li>
-            <li>
-              <a [routerLink]="['/settings/email']" class="bb-link link-email" [class.active]="activeNavItem === 'email'">
-                <i class="bi bi-envelope"></i>
-                Email
-              </a>
-            </li>
-            <li>
-              <a [routerLink]="['/settings/password']" class="bb-link" [class.active]="activeNavItem === 'password'">
-                <i class="bi bi-lock"></i>
-                Password
-              </a>
-            </li>
-          </ul>
-        </div>
-        <!--Buttons -->
-        <div class="container-fluid">
-          <div class="button-wrapper">
-            <button class="button-transparent" (click)="onClickDashboard()">
-              <div class="text-container">
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/settings/email']" class="bb-link link-email"
+                   [class.active]="activeNavItem === 'email'">
+                  <i class="bi bi-envelope"></i>
+                  Email
+                </a>
+              </li>
+              <li>
+                <a [routerLink]="['/settings/password']" class="bb-link" [class.active]="activeNavItem === 'password'">
+                  <i class="bi bi-lock"></i>
+                  Password
+                </a>
+              </li>
+            </ul>
+          </div>
+          <!--Buttons -->
+          <div class="container-fluid">
+            <div class="button-wrapper">
+              <button class="button-transparent" (click)="onClickDashboard()">
+                <div class="text-container">
               <span class="bb-text-inside-btn-transp">
                 <i class="bi bi-house"></i>
                 Dashboard
               </span>
-              </div>
-            </button>
-            <button class="button-transparent" (click)="onClickLogout()">
-              <div class="text-container">
+                </div>
+              </button>
+              <button class="button-transparent" (click)="onClickLogout()">
+                <div class="text-container">
               <span class="bb-text-inside-btn-transp">
                 <i class="bi bi-box-arrow-left"></i>
                 Logout
               </span>
-              </div>
-            </button>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- Content Container -->
-  <div class="bb-settings-layout-box">
-    <div class="row-cols-1 form-group">
-      <router-outlet></router-outlet>
+    <!-- Content Container -->
+    <div class="bb-settings-layout-box">
+      <div class="row-cols-1 form-group">
+        <router-outlet></router-outlet>
+      </div>
     </div>
   </div>
-</div>
+</main>
