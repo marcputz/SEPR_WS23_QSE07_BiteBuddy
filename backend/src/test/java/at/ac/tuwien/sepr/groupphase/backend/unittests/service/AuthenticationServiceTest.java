@@ -84,7 +84,7 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    void testLogin_WithTwoUsers_Returns() throws Exception {
+    void testLogin_WithTwoUsers_Returns() {
         LoginDto dto1 = new LoginDto()
             .setEmail(testuser.getEmail())
             .setPassword("password");

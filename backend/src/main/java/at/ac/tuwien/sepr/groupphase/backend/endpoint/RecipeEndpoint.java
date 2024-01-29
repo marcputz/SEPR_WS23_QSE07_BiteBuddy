@@ -5,7 +5,6 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.AuthenticationException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
@@ -125,8 +124,6 @@ public class RecipeEndpoint {
             HttpStatus status = HttpStatus.NOT_FOUND;
             logClientError(status, "Recipe to lookup not found:", e);
             throw new ResponseStatusException(status, e.getMessage(), e);
-        } catch (UserNotFoundException e) {
-            throw new RuntimeException(e);
         }
     }
 

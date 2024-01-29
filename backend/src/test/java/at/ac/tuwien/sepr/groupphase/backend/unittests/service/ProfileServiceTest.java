@@ -437,7 +437,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    public void editProfileWithInValidProfileIdReturnsNotNullException() throws ValidationException, NotFoundException {
+    public void editProfileWithInValidProfileIdReturnsNotNullException() throws Exception {
         ProfileDto testProfileDto = ProfileDto.ProfileDtoBuilder.aProfileDto()
             .withName("Profile User test")
             .withAllergens(List.of(
@@ -465,7 +465,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    public void deleteActiveProfileThrowsConflictException() throws ConflictException {
+    public void deleteActiveProfileThrowsConflictException() {
 
         assertThrows(ConflictException.class,
             () -> this.profileService.deleteProfile(profileId, testUserId2));

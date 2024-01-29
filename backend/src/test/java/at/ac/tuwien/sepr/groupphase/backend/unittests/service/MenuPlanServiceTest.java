@@ -208,12 +208,12 @@ public class MenuPlanServiceTest {
     }
 
     @Test
-    void testCreateMenuPlan_WithInvalidTimeframe_ThrowsValidationError() throws Exception {
+    void testCreateMenuPlan_WithInvalidTimeframe_ThrowsValidationError() {
         assertThrows(ValidationException.class, () -> service.createEmptyMenuPlan(user, profile, LocalDate.now(), LocalDate.now().minusDays(1)));
     }
 
     @Test
-    void testCreateMenuPlan_WithInvalidUser_ThrowsDataStoreError() throws Exception {
+    void testCreateMenuPlan_WithInvalidUser_ThrowsDataStoreError() {
         ApplicationUser u = new ApplicationUser();
         u.setId(Long.MAX_VALUE);
         u.setNickname("This user is never saved");
@@ -224,7 +224,7 @@ public class MenuPlanServiceTest {
     }
 
     @Test
-    void testCreateMenuPlan_WithInvalidProfile_ThrowsDataStoreError() throws Exception {
+    void testCreateMenuPlan_WithInvalidProfile_ThrowsDataStoreError() {
         Profile p = new Profile();
         p.setName("This profile is never saved");
         p.setUser(this.user);
@@ -585,8 +585,8 @@ public class MenuPlanServiceTest {
         assertEquals(2, inventory.available().size());
         assertEquals(1, inventory.missing().size());
 
-        InventoryIngredientDto rogueOne = inventory.missing().get(0);
-        rogueOne.setName("Rogue");
+        InventoryIngredientDto rogueOne = inventory.missing().get(0)
+            .setName("Rogue");
 
         MenuPlan finalPlan = plan;
         assertThrows(ValidationException.class, () -> this.service.updateInventoryIngredient(finalPlan.getUser(), rogueOne));

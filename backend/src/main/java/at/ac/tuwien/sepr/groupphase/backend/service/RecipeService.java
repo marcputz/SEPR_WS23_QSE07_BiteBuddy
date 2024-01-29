@@ -9,7 +9,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import at.ac.tuwien.sepr.groupphase.backend.exception.UserNotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
@@ -95,7 +94,7 @@ public interface RecipeService {
      * @throws NotFoundException if the recipe with the given ID does not exist in the persistent data store
      * @author Frederik Skiera
      */
-    RecipeDetailsDto getDetailedRecipe(long id) throws NotFoundException, UserNotFoundException;
+    RecipeDetailsDto getDetailedRecipe(long id) throws NotFoundException;
 
     /**
      * Finds the first 10 ingredients matching a name. It is not positional, upper/lower case-sensitive.
