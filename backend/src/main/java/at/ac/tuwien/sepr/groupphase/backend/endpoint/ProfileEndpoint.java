@@ -64,8 +64,8 @@ public class ProfileEndpoint {
     @ResponseStatus(HttpStatus.OK)
     public ProfileSearchResultDto searchProfiles(@Valid @RequestBody ProfileSearchDto searchParams, @RequestHeader HttpHeaders headers)
         throws AuthenticationException {
-        LOGGER.info("Received POST request on {}", BASE_PATH + "/search");
-        LOGGER.debug("Request body for POST:\n{}", searchParams);
+        LOGGER.trace("searchProfiles({},{})", searchParams, headers);
+
         this.authenticationService.verifyAuthenticated(headers);
         String authToken = this.authenticationService.getAuthToken(headers);
         Long currentUserId = AuthTokenUtils.getUserId(authToken);
@@ -87,10 +87,10 @@ public class ProfileEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     public ProfileDto createProfile(@Valid @RequestBody ProfileDto toCreateProfile, @RequestHeader HttpHeaders headers)
         throws ValidationException, AuthenticationException {
-        LOGGER.info("Received POST request on {}", BASE_PATH);
-        LOGGER.debug("Request body for POST:\n{}", toCreateProfile);
 
+        LOGGER.trace("createProfile({},{})", toCreateProfile, headers);
         this.authenticationService.verifyAuthenticated(headers);
+
         return profileService.saveProfile(toCreateProfile);
 
     }
@@ -106,8 +106,8 @@ public class ProfileEndpoint {
     @PostMapping("/copyToOwn/{profileId}")
     @ResponseStatus(HttpStatus.OK)
     public ProfileDetailDto copyProfile(@PathVariable Long profileId, @RequestHeader HttpHeaders headers) throws AuthenticationException {
-        LOGGER.info("Received POST request on {}", BASE_PATH + "/copyToOwn");
-        LOGGER.debug("Request body for POST:\n{}", profileId);
+        LOGGER.trace("copyProfile({},{})", profileId, headers);
+
         this.authenticationService.verifyAuthenticated(headers);
         String authToken = this.authenticationService.getAuthToken(headers);
         Long currentUserId = AuthTokenUtils.getUserId(authToken);
@@ -154,8 +154,8 @@ public class ProfileEndpoint {
     @ResponseStatus(HttpStatus.OK)
     public ProfileDetailDto getProfileDetails(@PathVariable long profileId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException {
-        LOGGER.info("Received Get request on {}", BASE_PATH);
-        LOGGER.debug("Request body for Get:\n{}", profileId);
+        LOGGER.trace("getProfileDetails({},{})", profileId, headers);
+
         this.authenticationService.verifyAuthenticated(headers);
         return profileService.getProfileDetails(profileId);
     }
@@ -175,8 +175,8 @@ public class ProfileEndpoint {
     @ResponseStatus(HttpStatus.OK)
     public ProfileDto editProfile(@RequestBody ProfileDto profileDto, @RequestHeader HttpHeaders headers)
         throws ValidationException, NotFoundException, AuthenticationException {
-        LOGGER.info("Received PUT request on {}", BASE_PATH);
-        LOGGER.debug("Request body for PUT:\n{}", profileDto);
+        LOGGER.trace("editProfile({},{})", profileDto, headers);
+
         this.authenticationService.verifyAuthenticated(headers);
         return profileService.editProfile(profileDto);
     }
@@ -185,8 +185,10 @@ public class ProfileEndpoint {
     @ResponseStatus(HttpStatus.OK)
     public void setActiveProfile(@PathVariable Long profileId, @RequestHeader HttpHeaders headers)
         throws AuthenticationException, ConflictException {
-        LOGGER.info("Received POST request to set active profile with ID {}", profileId);
+
+        LOGGER.trace("setActiveProfile({},{})", profileId, headers);
         this.authenticationService.verifyAuthenticated(headers);
+
         String authToken = this.authenticationService.getAuthToken(headers);
         Long currentUserId = AuthTokenUtils.getUserId(authToken);
 
@@ -207,8 +209,7 @@ public class ProfileEndpoint {
     @ResponseStatus(HttpStatus.CREATED)
     public void putRating(@Valid @RequestBody RecipeRatingDto recipeRatingDto, @RequestHeader HttpHeaders headers)
         throws ValidationException, NotFoundException, AuthenticationException {
-        LOGGER.info("Received PUT request on {}", BASE_PATH);
-        LOGGER.debug("Request body for PUT:\n{}", recipeRatingDto);
+        LOGGER.trace("putRating({},{})", recipeRatingDto, headers);
 
         this.authenticationService.verifyAuthenticated(headers);
         profileService.rateRecipe(recipeRatingDto);
@@ -228,8 +229,8 @@ public class ProfileEndpoint {
     @ResponseStatus(HttpStatus.OK)
     public RecipeRatingListsDto getRatingLists(@PathVariable long userId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException {
-        LOGGER.info("Received Get request on {}", BASE_PATH);
-        LOGGER.debug("Request body for Get:\n{}", userId);
+        LOGGER.trace("getRatingLists({},{})", userId, headers);
+
         this.authenticationService.verifyAuthenticated(headers);
         return profileService.getRatingLists(userId);
     }
@@ -249,8 +250,7 @@ public class ProfileEndpoint {
     @ResponseStatus(HttpStatus.OK)
     public ProfileDto delete(@PathVariable long profileId, @RequestHeader HttpHeaders headers)
         throws NotFoundException, AuthenticationException, ConflictException {
-        LOGGER.info("Received Delete request on {}", BASE_PATH);
-        LOGGER.debug("Request body for Delete:\n{}", profileId);
+        LOGGER.trace("delete({},{})", profileId, headers);
 
         this.authenticationService.verifyAuthenticated(headers);
         String authToken = this.authenticationService.getAuthToken(headers);

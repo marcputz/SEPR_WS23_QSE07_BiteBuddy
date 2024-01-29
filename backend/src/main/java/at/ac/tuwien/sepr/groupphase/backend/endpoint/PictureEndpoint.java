@@ -45,6 +45,14 @@ public class PictureEndpoint {
         this.authService = authService;
     }
 
+    /**
+     * Retrieves a picture by its ID.
+     *
+     * @param id the picture ID to get.
+     * @return the picture as its detail DTO.
+     * @throws NotFoundException if no picture with given ID was found.
+     * @author Marc Putz
+     */
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public PictureDto getPicture(@RequestParam long id) throws NotFoundException {
@@ -53,6 +61,16 @@ public class PictureEndpoint {
         return this.service.getByIdAsDto(id);
     }
 
+    /**
+     * Creates a new picture.
+     *
+     * @param headers the http headers of the request.
+     * @param pictureDto the data to process
+     * @return the newly created picture as its detail DTO.
+     * @throws AuthenticationException if the request isn't authenticated by a valid user.
+     * @throws DataStoreException if the data store cannot handle the data.
+     * @author Marc Putz
+     */
     @PutMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public PictureDto createPicture(@RequestHeader HttpHeaders headers, @RequestBody PictureDto pictureDto) throws AuthenticationException, DataStoreException {

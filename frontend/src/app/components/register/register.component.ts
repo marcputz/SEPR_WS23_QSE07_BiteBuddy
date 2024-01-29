@@ -12,6 +12,7 @@ import {Router} from "@angular/router";
 import {RegisterDto} from "../../dtos/registerDto";
 import {PasswordEncoder} from "../../utils/passwordEncoder";
 import {ToastrService} from "ngx-toastr";
+import {ErrorHandler} from "../../services/errorHandler";
 
 
 @Component({
@@ -38,6 +39,7 @@ export class RegisterComponent implements OnInit {
   constructor(private formBuilder: UntypedFormBuilder,
               private authService: UserService,
               private passwordEncoder: PasswordEncoder,
+              private errorHandler: ErrorHandler,
               private router: Router,
               private notification: ToastrService) {
     this.registerForm = this.formBuilder.group({
@@ -94,52 +96,26 @@ export class RegisterComponent implements OnInit {
     this.authService.registerUser(authRequest).subscribe({
       next: (data) => {
         console.log('Successfully registered user: ' + authRequest.email);
-        this.notification.success('You are successfully registered. You are redirect to login now');
+        this.notification.success('Redirecting to Login', 'You have successfully registered!');
         // Redirect to login page after 2 seconds
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
       },
       error: error => {
-        console.log('Could not register user due to:');
-        console.log(error);
-        this.error = true;
-        if (typeof error.error === 'object') {
-          this.errorMessage = error.error.error;
-        } else {
-          this.errorMessage = error.error;
-        }
-        let errorObject;
-        if (typeof error.error === 'object') {
-          errorObject = error.error;
-        } else {
-          errorObject = error;
-        }
 
-        let message: string = errorObject.error;
-        let status = errorObject.status;
+        let errorObj = this.errorHandler.getErrorObject(error);
 
-        switch (status) {
-          case 400:
-            if (message.indexOf("Invalid email format") >= 0) {
-              console.log('cas1:');
-              this.registerForm.controls['email'].setErrors({emailNotValid: true});
-              break;
-            }
-            if (message.indexOf("Email already exists") >= 0) {
-              console.log('cas1:');
-              this.registerForm.controls['email'].setErrors({emailAlreadyExists: true});
-              break;
-            }
-            if (message.indexOf("User with this Name already exists") >= 0) {
-              console.log('cas1:');
-              this.registerForm.controls['username'].setErrors({userAlreadyExists: true});
-              break;
-            }
+        switch (errorObj.status) {
+          case 409:
+            console.warn("Register failed: ", error);
+            this.notification.warning("An account already exists for this Email or Username");
+            break;
           default:
-            this.notification.error("Error while logging in, try again later.");
+            this.errorHandler.handleApiError(errorObj);
             break;
         }
+
       }
     });
   }

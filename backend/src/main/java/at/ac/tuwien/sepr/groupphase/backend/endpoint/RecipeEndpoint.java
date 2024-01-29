@@ -52,8 +52,7 @@ public class RecipeEndpoint {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     public RecipeSearchResultDto searchRecipes(@RequestBody RecipeSearchDto searchParams) {
-        LOGGER.info("POST " + BASE_PATH);
-        LOGGER.debug("request body: {}", searchParams);
+        LOGGER.trace("searchRecipes({})", searchParams);
         return this.recipeService.searchRecipes(searchParams);
     }
 
@@ -83,8 +82,8 @@ public class RecipeEndpoint {
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public void createRecipe(@RequestBody RecipeDetailsDto recipe, @RequestHeader HttpHeaders headers) {
-        LOGGER.info("POST " + BASE_PATH + "/create");
-        LOGGER.debug("request body: {}", recipe);
+        LOGGER.trace("createRecipe({},{})", recipe, headers);
+
         try {
             // checking for logged in and valid user
             this.authenticationService.verifyAuthenticated(headers);

@@ -727,7 +727,6 @@ public class JpaMenuPlanService implements MenuPlanService {
             try {
                 this.inventoryIngredientRepository.saveAll(basicInventory.values());
                 this.inventoryIngredientRepository.saveAll(detailedInventory.values());
-                LOGGER.debug("Creating inventory was successful");
             } catch (JDBCException | DataIntegrityViolationException e) {
                 throw new DataStoreException("Unable to create new MenuPlan entity", e);
             }
