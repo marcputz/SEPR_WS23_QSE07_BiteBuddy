@@ -16,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
 import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -35,8 +36,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,13 +55,15 @@ public class MenuPlanEndpoint {
     private final AuthenticationService authService;
     private final UserService userService;
     private final ProfileService profileService;
+    private final MenuPlanValidator menuPlanValidator;
 
     @Autowired
-    public MenuPlanEndpoint(MenuPlanService menuPlanService, UserService userService, ProfileService profileService, AuthenticationService authService) {
+    public MenuPlanEndpoint(MenuPlanService menuPlanService, UserService userService, ProfileService profileService, AuthenticationService authService, MenuPlanValidator menuPlanValidator) {
         this.service = menuPlanService;
         this.userService = userService;
         this.authService = authService;
         this.profileService = profileService;
+        this.menuPlanValidator = menuPlanValidator;
     }
 
     /**
@@ -112,13 +117,14 @@ public class MenuPlanEndpoint {
      * @return a detail dto of the found menu plan.
      * @throws AuthenticationException if the user cannot be authenticated.
      * @throws NotFoundException       if there is no menu plan which start and endDate encompass the given date
+     * @throws ValidationException     if the date is null
      * @author Anton Nather
      */
     @GetMapping("/forDate")
     @ResponseStatus(HttpStatus.OK)
     public MenuPlanDetailDto getMenuPlanOnDate(@RequestHeader HttpHeaders headers,
                                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date)
-        throws AuthenticationException, NotFoundException {
+        throws AuthenticationException, NotFoundException, ValidationException {
         LOGGER.trace("getMenuPlanOnDate({},{})", headers, date);
 
         authService.verifyAuthenticated(headers);
@@ -127,6 +133,9 @@ public class MenuPlanEndpoint {
         Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
         ApplicationUser thisUser = this.userService.getUserById(thisUserId);
 
+        if (date == null) {
+            throw new ValidationException("Date is null", new ArrayList<>());
+        }
         // generate menu plan
         return this.service.getMenuPlanForUserOnDateDetailDto(thisUser, date);
     }
@@ -161,18 +170,20 @@ public class MenuPlanEndpoint {
      * @param headers  the HTTP headers from the request.
      * @param menuPlan a MenuPlanUpdateRecipeDto to use for updating
      * @throws AuthenticationException if the user cannot be authenticated.
+     * @throws ValidationException     if the menu plan dto is not valid
      * @author Anton Nather
      */
     @PutMapping("/update")
     @ResponseStatus(HttpStatus.OK)
     public void updateRecipeInMenuPlan(@RequestHeader HttpHeaders headers, @RequestBody MenuPlanUpdateRecipeDto menuPlan)
-        throws AuthenticationException {
+        throws AuthenticationException, ValidationException {
         LOGGER.info("updateRecipe({},{})", headers, menuPlan);
 
         this.authService.verifyAuthenticated(headers);
 
         Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
         ApplicationUser thisUser = this.userService.getUserById(thisUserId);
+        menuPlanValidator.validateForUpdateOneRecipe(menuPlan);
 
         this.service.updateMenuPlanByChangingOneRecipe(thisUser, menuPlan);
     }

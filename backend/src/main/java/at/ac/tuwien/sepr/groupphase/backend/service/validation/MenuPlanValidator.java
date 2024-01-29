@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.validation;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdateRecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
@@ -12,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -200,6 +202,21 @@ public class MenuPlanValidator {
 
         if (!validationErrors.isEmpty()) {
             throw new ValidationException("Validation of menu plan for create failed", validationErrors);
+        }
+    }
+
+    public void validateForUpdateOneRecipe(MenuPlanUpdateRecipeDto menuplan) throws ValidationException {
+        LOGGER.trace("validateForUpdateOneRecipe({})", menuplan);
+        List<String> validationErrors = new ArrayList<>();
+
+        if (menuplan.getDay() >= 0) {
+            validationErrors.add("Day cannot be negative");
+        }
+        if (menuplan.getTimeslot() >= 0) {
+            validationErrors.add("Timeslot cannot be negative");
+        }
+        if (!validationErrors.isEmpty()) {
+            throw new ValidationException("Validation of menu plan for update failed", validationErrors);
         }
     }
 }
