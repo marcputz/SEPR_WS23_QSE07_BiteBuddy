@@ -209,10 +209,10 @@ public class MenuPlanValidator {
         LOGGER.trace("validateForUpdateOneRecipe({})", menuplan);
         List<String> validationErrors = new ArrayList<>();
 
-        if (menuplan.getDay() >= 0) {
+        if (menuplan.getDay() < 0) {
             validationErrors.add("Day cannot be negative");
         }
-        if (menuplan.getTimeslot() >= 0) {
+        if (menuplan.getTimeslot() < 0) {
             validationErrors.add("Timeslot cannot be negative");
         }
         if (!validationErrors.isEmpty()) {

@@ -7,7 +7,7 @@
                  *ngIf="isInputFocused['name'] || form.get('name').value">Profile name
           </label>
           <input type="text" name="name" formControlName="name"
-                 class="bb-input-textfield bb-input form-control"
+                 class="bb-input-textfield bb-input"
                  [class.bb-input-textfield-error]="submitted && form.controls.name.errors"
                  id="name"
                  value ={{previousProfileDetails.name}}
@@ -32,7 +32,7 @@
       </div>
     </div>
 
-        <div class="form-group">
+        <div class="form-group label-select">
           <label for="inputAllergens" class="label-select" *ngIf="changedAllergenes; else unchangedAllergens">
             What do you cannot or do not want to eat?
           </label>
@@ -48,9 +48,6 @@
               {{allergene.name}}
             </option>
           </select>
-          <div class="invalid-feedback">
-            Please select at least one allergene.
-          </div>
         </div>
 
 
@@ -70,9 +67,6 @@
               {{ingred.name}}
             </option>
           </select>
-          <div class="invalid-feedback">
-            Please select at least one ingredient.
-          </div>
         </div>
         <button type="submit"
                 name="submitButton"

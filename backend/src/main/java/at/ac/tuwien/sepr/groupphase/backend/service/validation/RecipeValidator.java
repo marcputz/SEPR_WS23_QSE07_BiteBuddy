@@ -72,6 +72,10 @@ public class RecipeValidator {
                     if (queriedResults.isEmpty()) {
                         conflictErrors.add("Ingredient " + ingredient.name() + " does not exist");
                     }
+
+                    if (ingredient.amount() <= 0) {
+                        validationErrors.add("Ingredients amount not valid, has to be greater than 0.");
+                    }
                 }
             } else {
                 validationErrors.add("Recipe needs at least one ingredient");

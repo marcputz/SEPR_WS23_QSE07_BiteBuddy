@@ -89,7 +89,14 @@ export class MenuPlanCreateComponent implements OnInit {
   }
 
   addIngredientToFridge(ingredient) {
-    this.createDto.fridge.push(ingredient.value)
+    if (ingredient.value.trim().length > 0) {
+      this.createDto.fridge.push(ingredient.value)
+    }
+  }
+
+  removeIngredient(ingredient) {
+    const indexToRemove = this.createDto.fridge.indexOf(ingredient);
+    this.createDto.fridge.splice(indexToRemove, 1);
   }
 
   formatIngredient(ingredient: String | null) {
