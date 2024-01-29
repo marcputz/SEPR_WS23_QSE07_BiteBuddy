@@ -69,7 +69,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public RecipeSearchResultDto searchRecipes(RecipeSearchDto searchParams) {
-        LOGGER.debug("search recipes");
+        LOGGER.trace("searchRecipes({})", searchParams);
 
         String name = "";
         int pageSelector = 0;
@@ -144,7 +144,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public void createRecipe(RecipeDetailsDto recipe, Long userId) throws ConflictException, ValidationException {
-        LOGGER.debug("createRecipe({}, {})", recipe, userId);
+        LOGGER.trace("createRecipe({}, {})", recipe, userId);
 
         // validate recipe
         this.validator.validateForCreate(recipe);
