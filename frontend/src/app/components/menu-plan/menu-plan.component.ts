@@ -83,6 +83,10 @@ export class MenuPlanComponent implements OnInit {
     this.service.getMenuPlans().subscribe({
       next: data => {
         this.menuplans = data;
+
+        if (this.menuplans?.length > 0) {
+          this.selectedStartDate = this.menuplans[this.menuplans.length - 1].fromTime;
+        }
       },
       error: err => {
         this.notification.error('Error fetching recipes', err)
