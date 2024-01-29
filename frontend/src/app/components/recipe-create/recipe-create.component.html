@@ -1,5 +1,5 @@
 <h1 style="text-align: center;">Create a recipe</h1>
-<div class="centered-container">
+<div class="centered-container" style="min-width: 400px;">
   <form #form="ngForm" [class.was-validated]="form.submitted" (ngSubmit)="onSubmit(form)" class="centered-container">
     <div class="row justify-content-center align-items-center">
       <div class="col">
@@ -80,7 +80,7 @@
                            min="0"
                            class="rounded-pill"
                            placeholder="100"
-                           style="width: 25%; text-align: center">
+                           style="width: 100%; text-align: center">
                   </td>
                   <td>
                     <select [(ngModel)]="ingredient.unit" name="ounce" class="form-select"
