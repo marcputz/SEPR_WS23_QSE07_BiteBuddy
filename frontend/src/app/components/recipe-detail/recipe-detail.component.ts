@@ -30,6 +30,7 @@ export class RecipeDetailComponent implements OnInit {
   }
 
   recipePicture: number[] = null;
+  recipePictureAlt: string | null = null;
 
   userId: number = -1;
   likes: number[] = [];
@@ -61,6 +62,7 @@ export class RecipeDetailComponent implements OnInit {
         this.pictureService.getPicture(this.recipeDetails.pictureId).subscribe({
           next: pictureDto => {
             this.recipePicture = pictureDto.data;
+            this.recipePictureAlt = pictureDto.description;
           },
           error: error => {
             console.error(error);

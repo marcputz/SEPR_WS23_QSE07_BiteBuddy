@@ -53,6 +53,7 @@
       <div class="col-md-6 col-lg-5 col-sm-4 col-xl-5 col-xxl-6">
         <div class="input-group">
           <select id="searchRecipeName" name="searchRecipeName"
+                  aria-label="Menu Plan Select"
                   class="form-select input-field"
                   [(ngModel)]="selectedStartDate"
                   (ngModelChange)="searchChanged()">
@@ -67,7 +68,7 @@
       <div class="col-md-3 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
         <div class="input-button">
           <button type="submit" (click)="showCreateDialog = true;" class="button-create button-transparent"
-                  aria-label="Add Recipe">
+                  aria-label="Add Recipe" role="button">
             <i class="bi bi-plus">New Menu Plan</i>
           </button>
         </div>
@@ -107,12 +108,12 @@
           <div class="btn-group d-flex align-items userinfo-buttons-space">
             <a
               (click)="rerollRecipe(content)"
-              aria-label="Reroll Recipe">
+              aria-label="Reroll Recipe" role="button">
               <i class="bi bi-arrow-clockwise"></i>
             </a>
             <a
               (click)="dislikeRecipe(content)"
-              aria-label="Dislike Recipe">
+              aria-label="Dislike Recipe" role="button">
               <i class="bi bi-hand-thumbs-down"></i>
             </a>
           </div>
