@@ -98,21 +98,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         profileValidator.validateForCreate(profileDto);
 
-        //check if the allergens correspond to the ones in the database
-        List<Allergene> allergenes = allergeneRepository.findAll();
-        for (AllergeneDto allergeneDto : profileDto.getAllergens()) {
-            if (allergenes.stream().noneMatch(allergene -> Objects.equals(allergene.getId(), allergeneDto.getId()))) {
-                throw new NotFoundException("Allergene with id " + allergeneDto.getId() + " does not exist");
-            }
-        }
-
-        //check if the ingredients correspond to the ones in the database
-        List<Ingredient> ingredients = ingredientRepository.findAll();
-        for (IngredientDto ingredientDto : profileDto.getIngredient()) {
-            if (!ingredients.contains(ingredientMapper.ingredientDtoToIngredient(ingredientDto))) {
-                throw new NotFoundException("Ingredient with id " + ingredientDto.getId() + " does not exist");
-            }
-        }
+        checkAllergensAndIngredientsExist(profileDto);
 
         Optional<ApplicationUser> user = userRepository.findById(profileDto.getUserId());
         if (user.isEmpty()) {
@@ -275,21 +261,7 @@ public class ProfileServiceImpl implements ProfileService {
             throw new NotFoundException("This profile does not exist in the database");
         }
 
-        //check if the allergens correspond to the ones in the database
-        List<Allergene> allergens = allergeneRepository.findAll();
-        for (AllergeneDto allergeneDto : profileDto.getAllergens()) {
-            if (allergens.stream().noneMatch(allergene -> allergene.getId().equals(allergeneDto.getId()))) {
-                throw new NotFoundException("Allergene with id " + allergeneDto.getId() + " does not exist");
-            }
-        }
-
-        //check if the ingredients correspond to the ones in the database
-        List<Ingredient> ingredients = ingredientRepository.findAll();
-        for (IngredientDto ingredientDto : profileDto.getIngredient()) {
-            if (!ingredients.contains(ingredientMapper.ingredientDtoToIngredient(ingredientDto))) {
-                throw new NotFoundException("Ingredient with id " + ingredientDto.getId() + " does not exist");
-            }
-        }
+        checkAllergensAndIngredientsExist(profileDto);
 
         Optional<ApplicationUser> user = userRepository.findById(profileDto.getUserId());
         if (user.isEmpty()) {
@@ -372,6 +344,25 @@ public class ProfileServiceImpl implements ProfileService {
         user.setActiveProfile(profile);
         userRepository.save(user);
         LOGGER.trace("Active profile for user ID {} set to profile ID {}", userId, profileId);
+    }
+
+    //checks if selected allergens and ingredients exist in the database (help for edit and create)
+    private void checkAllergensAndIngredientsExist(ProfileDto profileDto) {
+        //check if the allergens correspond to the ones in the database
+        List<Allergene> allergenes = allergeneRepository.findAll();
+        for (AllergeneDto allergeneDto : profileDto.getAllergens()) {
+            if (allergenes.stream().noneMatch(allergene -> Objects.equals(allergene.getId(), allergeneDto.getId()))) {
+                throw new NotFoundException("Allergene with id " + allergeneDto.getId() + " does not exist");
+            }
+        }
+
+        //check if the ingredients correspond to the ones in the database
+        List<Ingredient> ingredients = ingredientRepository.findAll();
+        for (IngredientDto ingredientDto : profileDto.getIngredient()) {
+            if (!ingredients.contains(ingredientMapper.ingredientDtoToIngredient(ingredientDto))) {
+                throw new NotFoundException("Ingredient with id " + ingredientDto.getId() + " does not exist");
+            }
+        }
     }
 
 
