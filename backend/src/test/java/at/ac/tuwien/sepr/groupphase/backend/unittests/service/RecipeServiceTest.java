@@ -232,7 +232,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    public void getAllAddedRecipes() throws Exception {
+    public void getAllAddedRecipes() {
         // creating request
         List<Recipe> allRecipes = this.recipeService.getAll();
 
@@ -248,7 +248,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    public void getFilteredRecipe() throws Exception {
+    public void getFilteredRecipe() {
         // creating request
         RecipeSearchResultDto searchedRecipes = this.recipeService.searchRecipes(new RecipeSearchDto(
             "", "1", 0, 21
@@ -265,7 +265,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    public void getCustomCreator() throws Exception {
+    public void getCustomCreator() {
         // creating request
         RecipeSearchResultDto searchedRecipes = this.recipeService.searchRecipes(new RecipeSearchDto(
             "", "2", 0, 21
@@ -309,7 +309,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    public void getRecipeDetailsOfNotExistingRecipe() throws Exception {
+    public void getRecipeDetailsOfNotExistingRecipe() {
 
         assertThrows(NotFoundException.class,
             () -> this.recipeService.getDetailedRecipe(-100L));
@@ -346,7 +346,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    public void createInValidRecipeNoImage() throws Exception {
+    public void createInValidRecipeNoImage() {
         ArrayList<RecipeIngredientDto> ingredients = new ArrayList<>();
         ingredients.add(new RecipeIngredientDto("Apple", 1f, null));
 

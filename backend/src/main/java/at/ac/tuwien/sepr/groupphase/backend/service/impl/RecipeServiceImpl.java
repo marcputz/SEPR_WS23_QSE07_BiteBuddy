@@ -286,7 +286,7 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public RecipeDetailsDto getDetailedRecipe(long id) throws NotFoundException {
+    public RecipeDetailsDto getDetailedRecipe(long id) {
         LOGGER.trace("details({})", id);
         Optional<Recipe> recipe = this.recipeRepository.findById(id);
         if (recipe.isEmpty()) {

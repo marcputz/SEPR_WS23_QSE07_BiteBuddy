@@ -22,7 +22,6 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.InventoryIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
@@ -48,7 +47,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Pattern;
 
 /**
  * JPA implementation of MenuPlanService interface.

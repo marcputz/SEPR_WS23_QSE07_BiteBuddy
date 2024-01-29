@@ -66,7 +66,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserByEmail_Successful() throws Exception {
+    public void testGetUserByEmail_Successful() {
         ApplicationUser user = userService.getUserByEmail("max.mustermann@test.at");
 
         assertAll(
@@ -87,7 +87,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetUserByNickname_Successful() throws Exception {
+    public void testGetUserByNickname_Successful() {
         ApplicationUser user = userService.getUserByNickname("maxmuster");
 
         assertAll(

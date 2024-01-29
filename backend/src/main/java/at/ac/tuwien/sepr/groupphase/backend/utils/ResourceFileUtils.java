@@ -32,7 +32,7 @@ public class ResourceFileUtils {
             : ResourceUtils.getFile(DEFAULT_CLASSPATH + folderPath + "/" + filename);
     }
 
-    public Resource getResourceLoader(ResourceLoader resourceLoader, String filename) throws FileNotFoundException {
+    public Resource getResourceLoader(ResourceLoader resourceLoader, String filename) {
         LOGGER.trace("getResourceLoader({})", filename);
         return loaderFolderPath.map(s -> resourceLoader.getResource(DEFAULT_CLASSPATH + s + "/" + filename)).orElse(null);
     }
