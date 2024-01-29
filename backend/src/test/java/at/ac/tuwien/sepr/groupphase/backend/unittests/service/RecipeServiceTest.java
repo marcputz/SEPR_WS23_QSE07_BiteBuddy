@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PictureDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredientDto;
@@ -12,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
@@ -21,6 +23,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PictureRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
@@ -36,10 +39,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -49,6 +57,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 public class RecipeServiceTest {
+    private static final String DEFAULT_PICTURE_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/RecipePictures";
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -72,6 +82,9 @@ public class RecipeServiceTest {
 
     @Autowired
     private IngredientRepository ingredientRepository;
+
+    @Autowired
+    private PictureRepository pictureRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -100,8 +113,13 @@ public class RecipeServiceTest {
         return this.authenticationService.loginUser(dto);
     }
 
+    public static byte[] readJpegFile(String filePath) throws IOException {
+        Path path = Paths.get(filePath);
+        return Files.readAllBytes(path);
+    }
+
     @BeforeEach
-    public void setup() {
+    public void setup() throws IOException {
         ApplicationUser user = new ApplicationUser();
         user.setNickname("testuser");
         user.setEmail("test@test");
@@ -110,6 +128,12 @@ public class RecipeServiceTest {
         this.userRepository.save(user);
 
         this.user = this.userRepository.findByNickname("testuser").get();
+
+        // adding picture
+        Picture pic = new Picture();
+        pic.setDescription("keine");
+        pic.setData(readJpegFile(DEFAULT_PICTURE_FOLDER + "/1.jpg"));
+        this.pictureRepository.save(pic);
 
         // creating ingredients
         // adding apple
@@ -132,12 +156,14 @@ public class RecipeServiceTest {
         recipe1.setCreatorId(-1L);
         recipe1.setInstructions("Instructions 1");
         recipe1.setName("recipe 1");
+        recipe1.setPictureId(1L);
         recipe1Id = recipeRepository.save(recipe1).getId();
 
         Recipe recipe2 = new Recipe();
         recipe2.setCreatorId(this.user.getId());
         recipe2.setInstructions("Instructions2");
         recipe2.setName("recipe 2");
+        recipe2.setPictureId(1L);
         recipe2Id = recipeRepository.save(recipe2).getId();
 
 
@@ -209,7 +235,6 @@ public class RecipeServiceTest {
     public void getAllAddedRecipes() throws Exception {
         // creating request
         List<Recipe> allRecipes = this.recipeService.getAll();
-
 
         // asserting test
         assertNotNull(allRecipes);
@@ -295,8 +320,11 @@ public class RecipeServiceTest {
         ArrayList<RecipeIngredientDto> ingredients = new ArrayList<>();
         ingredients.add(new RecipeIngredientDto("Apple", 1f, null));
 
+        // adding picture
+        byte[] pic = readJpegFile(DEFAULT_PICTURE_FOLDER + "/1.jpg");
+
         RecipeDetailsDto newRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
-            ingredients, new ArrayList<>(), null, null);
+            ingredients, new ArrayList<>(), null, pic);
 
         this.recipeService.createRecipe(newRecipe, user.getId());
 
@@ -318,12 +346,31 @@ public class RecipeServiceTest {
     }
 
     @Test
+    public void createInValidRecipeNoImage() throws Exception {
+        ArrayList<RecipeIngredientDto> ingredients = new ArrayList<>();
+        ingredients.add(new RecipeIngredientDto("Apple", 1f, null));
+
+        // adding picture
+        byte[] pic = null;
+
+        RecipeDetailsDto newRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
+            ingredients, new ArrayList<>(), null, pic);
+
+        assertThatExceptionOfType(ValidationException.class).isThrownBy(
+            () -> this.recipeService.createRecipe(newRecipe, user.getId())
+        );
+    }
+
+    @Test
     public void createInvalidRecipe() throws Exception {
         ArrayList<RecipeIngredientDto> ingredients = new ArrayList<>();
         ingredients.add(new RecipeIngredientDto("Chhhhhhhhhh", 1f, null));
 
+        // adding picture
+        byte[] pic = readJpegFile(DEFAULT_PICTURE_FOLDER + "/1.jpg");
+
         RecipeDetailsDto newRecipe = new RecipeDetailsDto(-1L, "Eine Prise Test", "egal", "Beschreibung",
-            ingredients, new ArrayList<>(), null, null);
+            ingredients, new ArrayList<>(), null, pic);
 
         assertThatExceptionOfType(ConflictException.class).isThrownBy(
             () -> this.recipeService.createRecipe(newRecipe, 1L)

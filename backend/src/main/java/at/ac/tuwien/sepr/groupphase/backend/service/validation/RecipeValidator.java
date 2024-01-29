@@ -15,7 +15,12 @@ import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.ByteArrayInputStream;
 
 @Component
 public class RecipeValidator {
@@ -30,11 +35,27 @@ public class RecipeValidator {
     @Autowired
     private IngredientRepository ingredientRepository;
 
+    public static boolean isValidImage(byte[] imageData) {
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
+            BufferedImage image = ImageIO.read(inputStream);
+            return image != null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     public void validateForCreate(RecipeDetailsDto recipe) throws ValidationException, ConflictException {
         List<String> validationErrors = new ArrayList<>();
         List<String> conflictErrors = new ArrayList<>();
 
         if (recipe != null) {
+            if (recipe.picture() != null && !isValidImage(recipe.picture())) {
+                validationErrors.add("Image has to be valid");
+            } else if (recipe.picture() == null) {
+                validationErrors.add("Image is required");
+            }
+
             if (recipe.name().trim().isEmpty()) {
                 validationErrors.add("Recipe Name cannot be empty");
             }

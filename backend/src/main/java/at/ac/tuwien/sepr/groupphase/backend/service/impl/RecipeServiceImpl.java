@@ -25,9 +25,11 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.PictureService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.RecipeValidator;
+import org.hibernate.JDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -151,12 +153,8 @@ public class RecipeServiceImpl implements RecipeService {
         // creating picture
         Long pictureId = null;
         if (recipe.picture() != null) {
-            try {
-                Picture pic = this.pictureService.createPicture(recipe.picture());
-                pictureId = pic.getId();
-            } catch (DataStoreException e) {
-                LOGGER.warn("Image sent was not valid");
-            }
+            Picture pic = this.pictureService.createPicture(recipe.picture());
+            pictureId = pic.getId();
         }
 
         ArrayList<String> conflictList = new ArrayList<>();
@@ -169,7 +167,12 @@ public class RecipeServiceImpl implements RecipeService {
         newRecipe.setInstructions(recipe.description());
         newRecipe.setIngredients(ingredients);
         newRecipe.setCreatorId(userId);
-        this.recipeRepository.save(newRecipe);
+
+        try {
+            this.recipeRepository.save(newRecipe);
+        } catch (JDBCException | DataIntegrityViolationException e) {
+            throw new DataStoreException("Unable to create new MenuPlan entity", e);
+        }
 
         // getting recipe id & checking if we can find the RecipeIngredients
         Recipe queriedRecipe = this.recipeRepository.findByNameContainingIgnoreCase(recipe.name()).get(0);
@@ -191,8 +194,13 @@ public class RecipeServiceImpl implements RecipeService {
                 ing.setIngredient(queriedResults.get(0));
                 ing.setRecipe(queriedRecipe);
                 ingredients.add(ing);
-                this.recipeIngredientDetailsRepository.save(r);
-                this.recipeIngredientRepository.save(ing);
+
+                try {
+                    this.recipeIngredientDetailsRepository.save(r);
+                    this.recipeIngredientRepository.save(ing);
+                } catch (JDBCException | DataIntegrityViolationException e) {
+                    throw new DataStoreException("Unable to create new MenuPlan entity", e);
+                }
             } else {
                 conflictList.add("Ingredient " + ingredient.name() + "does not exist");
             }

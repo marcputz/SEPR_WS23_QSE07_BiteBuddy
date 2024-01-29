@@ -48,6 +48,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 
 /**
  * JPA implementation of MenuPlanService interface.
@@ -70,7 +71,8 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     @Autowired
     public JpaMenuPlanService(MenuPlanRepository repository, RecipeService recipeService, IngredientService ingredientService, MenuPlanValidator validator,
-                              RecipeIngredientRepository recipeIngredientRepository, InventoryIngredientRepository inventoryIngredientRepository, UserService userService) {
+                              RecipeIngredientRepository recipeIngredientRepository, InventoryIngredientRepository inventoryIngredientRepository,
+                              UserService userService) {
         this.validator = validator;
         this.menuPlanRepository = repository;
         this.recipeService = recipeService;
@@ -629,10 +631,7 @@ public class JpaMenuPlanService implements MenuPlanService {
     public void createInventory(ApplicationUser user) {
         LOGGER.trace("createInventory({})", user);
 
-        // MenuPlan menuPlan = this.getMenuPlanForUserOnDate(user, LocalDate.now());
         MenuPlan menuPlan = null;
-
-        // TODO this is a workaround since getMenuPlanForUserOnDate is not implemented
         List<MenuPlan> menuPlans = this.getAllMenuPlansOfUserDuringTimeframe(user, LocalDate.now().minusDays(5), LocalDate.now());
 
         if (menuPlans.size() == 1) {
@@ -685,13 +684,20 @@ public class JpaMenuPlanService implements MenuPlanService {
                     }
 
                     // detailed does not exist
-                    if (!detailedInventory.containsKey(recipeIngredient.getAmount().getFridgeStringIdentifier())) {
+                    if (!detailedInventory.containsKey(recipeIngredient.getAmount().getFridgeStringIdentifier())
+                        && !(detailedInventory.containsKey(recipeIngredient.getAmount().getIngredient())
+                        && detailedInventory.get(recipeIngredient.getAmount().getIngredient()).getUnit() == null)) {
                         detailedInventory.put(recipeIngredient.getAmount().getFridgeStringIdentifier(),
                             new InventoryIngredient(recipeIngredient.getAmount().getIngredient(), menuPlan.getId(), recipeIngredient.getIngredient().getId(),
                                 recipeIngredient.getAmount().getIngredient(), nullFixer(recipeIngredient.getAmount().getAmount()), recipeIngredient.getAmount()
                                 .getUnit(), basicIngrededientExists));
                     } else {
-                        InventoryIngredient existingIngredient = detailedInventory.get(recipeIngredient.getAmount().getFridgeStringIdentifier());
+                        InventoryIngredient existingIngredient = detailedInventory.get(recipeIngredient.getAmount().getIngredient());
+
+                        if (existingIngredient == null) {
+                            existingIngredient = detailedInventory.get(recipeIngredient.getAmount().getFridgeStringIdentifier());
+                        }
+
                         // detailed same unit and ingredient --> combining them
                         if (detailedInventory.containsKey(recipeIngredient.getAmount().getFridgeStringIdentifier())) {
                             float combinedAmount = existingIngredient.getAmount();
@@ -714,15 +720,23 @@ public class JpaMenuPlanService implements MenuPlanService {
                                 new InventoryIngredient(recipeIngredient.getAmount().getIngredient(), menuPlan.getId(),
                                     recipeIngredient.getIngredient().getId(),
                                     recipeIngredient.getAmount().getIngredient(), nullFixer(recipeIngredient.getAmount().getAmount()),
-                                    recipeIngredient.getAmount()
-                                        .getUnit(), true));
+                                    recipeIngredient.getAmount().getUnit(), true));
+                        } else {
+                            detailedInventory.put(recipeIngredient.getAmount().getFridgeStringIdentifier(),
+                                new InventoryIngredient(recipeIngredient.getAmount().getIngredient(), menuPlan.getId(), recipeIngredient.getIngredient().getId(),
+                                    recipeIngredient.getAmount().getIngredient(), nullFixer(recipeIngredient.getAmount().getAmount()), recipeIngredient.getAmount()
+                                    .getUnit(), basicIngrededientExists));
                         }
                     }
                 }
             }
-            this.inventoryIngredientRepository.saveAll(basicInventory.values());
-            this.inventoryIngredientRepository.saveAll(detailedInventory.values());
-            LOGGER.debug("Creating inventory was successful");
+            try {
+                this.inventoryIngredientRepository.saveAll(basicInventory.values());
+                this.inventoryIngredientRepository.saveAll(detailedInventory.values());
+                LOGGER.debug("Creating inventory was successful");
+            } catch (JDBCException | DataIntegrityViolationException e) {
+                throw new DataStoreException("Unable to create new MenuPlan entity", e);
+            }
         }
     }
 
@@ -730,9 +744,6 @@ public class JpaMenuPlanService implements MenuPlanService {
     public InventoryListDto searchInventory(ApplicationUser user, boolean onlyValid) {
         LOGGER.trace("searchInventory({}, {})", user, onlyValid);
         if (onlyValid) {
-            // MenuPlan menuPlan = this.menuPlanService.getMenuPlanForUserOnDate(user, LocalDate.now());
-
-            // TODO this is a workaround since getMenuPlanForUserOnDate is not implemented
             MenuPlan menuPlan = null;
             List<MenuPlan> menuPlans = this.getAllMenuPlansOfUserDuringTimeframe(user, LocalDate.now().minusDays(5), LocalDate.now());
 

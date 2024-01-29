@@ -234,14 +234,14 @@ export class RecipeListComponent implements OnInit {
 
   createPagination() {
     function arange(size: number, start: number = 0): number[] {
-      return Array.from({ length: size }, (_, index) => start + index);
+      return Array.from({length: size}, (_, index) => start + index);
     }
 
     // when having less than 5 pages we only show available pages
     if (this.maxPages < 5) {
       this.pagesForPagination = arange(this.maxPages, 0);
     } else if (this.searchParams.page >= (this.maxPages - 3)) {
-      this.pagesForPagination = arange(5, (this.maxPages - 5))
+      this.pagesForPagination = arange(5, (this.maxPages - 5));
     } else {
       this.pagesForPagination = arange(5, Math.max(this.searchParams.page - 2, 0));
     }

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {InventoryListDto} from "../../dtos/InventoryListDto";
 import {InventoryIngredientDto} from "../../dtos/InventoryIngredientDto";
 import {ToastrService} from "ngx-toastr";
@@ -11,11 +11,25 @@ import {ErrorHandler} from "../../services/errorHandler";
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.scss']
 })
-export class InventoryComponent {
+export class InventoryComponent implements OnInit {
+  maxRows = 20;
+  maxRowsAvailable = 20;
   inventory: InventoryListDto = {
     missing: [],
     available: []
   }
+  showCreateDialog = false;
+
+  compareInventoryIngredients = (a: InventoryIngredientDto, b: InventoryIngredientDto): number => {
+    // Compare based on detailedName
+    const detailedNameComparison = (a.detailedNamed || '').localeCompare(b.detailedNamed || '');
+    if (detailedNameComparison !== 0) {
+      return detailedNameComparison;
+    }
+
+    // If detailedNamed is the same, compare based on name
+    return (a.name || '').localeCompare(b.name || '');
+  };
 
   constructor(
     private service: MenuPlanService,
@@ -25,26 +39,43 @@ export class InventoryComponent {
   ) {
   }
 
-  public createInventory() {
-    this.service.createInventory().subscribe({
-      next: value => {
-        this.notification.success("Created inventory")
-        this.reload()
-      }
-    });
-  }
-
-
   public getInventory() {
     this.service.getInventory().subscribe({
       next: value => {
         this.inventory = value;
-        this.notification.success("Loaded inventory successfully");
+
+        if (this.inventory !== null) {
+          if (this.inventory.missing !== null) {
+            this.inventory.missing.sort(this.compareInventoryIngredients);
+          } else {
+            this.inventory.missing = [];
+          }
+
+          if (this.inventory.available !== null) {
+            this.inventory.available.sort(this.compareInventoryIngredients);
+          } else {
+            this.inventory.available = [];
+          }
+
+          if (this.inventory.missing.length > 20) {
+            this.maxRows = this.inventory.missing.length / 2;
+          }
+
+          if (this.inventory.available.length > 20) {
+            this.maxRowsAvailable = this.inventory.available.length / 2;
+          }
+
+          this.notification.success("Loaded inventory successfully");
+        } else {
+          this.inventory = {
+            missing: [],
+            available: []
+          }
+        }
       },
       error: error => {
         let errorDto = this.errorHandler.getErrorObject(error);
         this.errorHandler.handleApiError(errorDto);
-
         console.error(error);
       }
     });
@@ -90,7 +121,8 @@ export class InventoryComponent {
       } else if (ingred.unit == null || ingred.amount == -1) {
         return ingred.name;
       } else {
-        return ingred.name + ", " + ingred.amount.toFixed(1) + " " + ingred.unit;
+        return (ingred.amount % 1 !== 0 ? ingred.amount.toFixed(1) : ingred.amount.toString()) + " "
+          + ingred.unit + ", " + ingred.name;
       }
     }
     return "";
@@ -103,4 +135,11 @@ export class InventoryComponent {
   public ngOnInit() {
     this.reload();
   }
+
+  onMenuPlanSubmit(): void {
+    this.showCreateDialog = false;
+    this.ngOnInit();
+  }
+
+  protected readonly Math = Math;
 }

@@ -1,0 +1,52 @@
+.bb-modal {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+
+  z-index: 99;
+  background-color: rgba(0,0,0, 0.7);
+}
+
+.bb-modal > .bb-modal-dialog {
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+
+  max-width: 500px;
+  width: 90%;
+  max-height: 800px;
+  height: 90%;
+
+  background-color: whitesmoke;
+  border-radius: 10px;
+
+  padding: 2rem;
+
+  text-align: center;
+  align-content: center;
+  align-items: center;
+
+  box-shadow: rgba(0,0,0, 0.15) 0px 0px 6px 6px;
+}
+
+.bb-modal > .bb-modal-dialog > form {
+  display: flex;
+  flex-direction: column;
+}
+
+.bb-dropdown {
+
+}
+
+.background-img {
+  width: 100%;
+  height: fit-content;
+  background: var(--app-background-color) url(/assets/images/background_w_circle.svg) !important;
+}

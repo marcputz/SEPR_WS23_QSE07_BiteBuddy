@@ -113,7 +113,7 @@ public class InventoryIngredient {
      * @return String which identifiers the ingredient.
      */
     public String getFridgeStringIdentifier() {
-        return detailedIngredientName + " " + (getUnit() != null ? getUnit().toString() : "");
+        return detailedIngredientName + (getUnit() != null ? getUnit().toString() : "");
     }
 
     @Override
