@@ -70,10 +70,6 @@ i {
   margin-bottom: 5%;
 }
 
-.button-transparent {
-  margin: 8% 0;
-}
-
 /* Media query for screens up to 1170px */
 @media screen and (max-width: 1170px) {
   .link-sidebar ul {
@@ -105,6 +101,6 @@ i {
 }
 
 .button-transparent {
-  width: 62%;
-  margin: 8% 19%;
+  width: 70%;
+  margin: 15% auto;
 }
