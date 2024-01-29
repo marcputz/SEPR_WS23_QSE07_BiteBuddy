@@ -17,7 +17,7 @@ public class ProfileDto {
 
     @JsonProperty("name")
     @NotNull(message = "Name must not be null")
-    @Size(max = 255, min = 1)
+    @Size(max = 255, min = 2)
     private String name;
 
     @JsonProperty("allergens")

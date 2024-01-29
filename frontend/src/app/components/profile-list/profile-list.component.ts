@@ -161,6 +161,21 @@ export class ProfileListComponent {
   }
 
   addToOwn(profileId: number) {
+    let profileName: string;
+    for (let profile of this.discoverProfiles) {
+      if (profile.id === profileId) {
+        profileName = profile.name;
+      }
+    }
+
+    for (let profile of this.ownProfiles) {
+      if (profile.name === profileName) {
+        console.warn("Unable to add profile: Profile with name '" + profileName + "' already exists");
+        this.notification.warning("You already have a profile with this name");
+        return;
+      }
+    }
+
     this.profileService.copyToOwn(profileId).subscribe({
       next:
         (newProfile: ProfileDetailDto) => {

@@ -436,7 +436,7 @@ public class ProfileEndpointTest {
         ProfileDto profileToCreate = new ProfileDto.ProfileDtoBuilder().withName("Love Food a lot").withAllergens(allergenes).withIngredient(ingredients).withUserId(testUserId).build();
         profileToCreate.setId(-100L);
 
-        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/profiles/editProfile/" + -100L)
+        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/profiles/edit/" + -100L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(profileToCreate))
                 .headers(headers)
@@ -445,6 +445,49 @@ public class ProfileEndpointTest {
             .andReturn();
 
     }
+
+    @Test
+    public void editProfileWithValidProfileDtoShouldEditProfile() throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", testUserAuthToken);
+
+        Allergene allergene1 = allergeneRepository.getReferenceById(allergeneId);
+        AllergeneDto allergeneDto = allergeneMapper.allergeneToAllergeneDto(allergene1);
+
+        ArrayList<AllergeneDto> allergenes = new ArrayList<>();
+        allergenes.add(allergeneDto);
+
+        Ingredient ingredient1 = ingredientRepository.getReferenceById(ingredientId);
+        IngredientDto ingredientDto = ingredientMapper.ingredientToIngredientDto(ingredient1);
+        ArrayList<IngredientDto> ingredients = new ArrayList<>();
+        ingredients.add(ingredientDto);
+
+        ProfileDto profileToCreate = new ProfileDto.ProfileDtoBuilder().withName("Latvian").withAllergens(allergenes).withIngredient(ingredients).withUserId(testUserId).build();
+        profileToCreate.setId(profileId);
+
+        MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/profiles/edit/" + profileId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(profileToCreate))
+                .headers(headers)
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        ProfileDto resultProfileDto = objectMapper.readValue(response.getContentAsString(), ProfileDto.class);
+
+        assertAll(
+            () -> assertNotNull(resultProfileDto, "edited profile should not be null"),
+            () -> assertEquals(testUserId, resultProfileDto.getUserId(), "User Id should be same as testUserId"),
+            () -> assertEquals(allergene1.getId(), resultProfileDto.getAllergens().get(0).getId()),
+            () -> assertEquals(ingredient1.getId(), resultProfileDto.getIngredient().get(0).getId()),
+            () -> assertEquals("Latvian", resultProfileDto.getName())
+        );
+
+    }
+
 
 
     @Test

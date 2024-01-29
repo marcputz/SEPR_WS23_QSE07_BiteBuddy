@@ -20,6 +20,8 @@ import {UserService} from "../../services/user.service";
   styleUrls: ['./menu-plan.component.scss']
 })
 export class MenuPlanComponent implements OnInit {
+
+  selectedStartDate: Date;
   fridge: string[];
   menuplan: MenuPlanDetailDto;
   searchday: string = new Date().toString();
@@ -124,7 +126,8 @@ export class MenuPlanComponent implements OnInit {
               this.recipeImageAlts.set(dto.recipe, pictureDto.description);
             },
             error: error => {
-              console.error(error);
+              let errorObj = this.errorHandler.getErrorObject(error);
+              this.errorHandler.handleApiError(errorObj);
             }
           });
         }

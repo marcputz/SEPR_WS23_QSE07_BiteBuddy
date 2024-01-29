@@ -6,12 +6,11 @@
     <app-menu-plan-create (submitClicked)="onMenuPlanSubmit()" style="width: 100%"></app-menu-plan-create>
   </div>
 </div>
-
+<!--
 <div class="container">
   <h1 style="text-align: center">My Menuplans</h1>
 </div>
 
-<!-- Check if menuplans has a size greater than or equal to 1 -->
 <div *ngIf="menuplans.length >= 1">
   <label for="menuplans" style="text-align: center; width: 100%">
     <span style="font-weight: bold;text-align: center;width: 100%">Which menuplan do you want to see?</span>
@@ -30,57 +29,56 @@
     </select>
   </div>
   <div class="row justify-content-center align-items-center">
-    <button (click)="this.showCreateDialog = true;" style="width: 20%; margin-bottom: 1rem;" class="bb-button">New Menu Plan</button>
+    <button (click)="this.showCreateDialog = true;" style="width: 20%; margin-bottom: 1rem;" class="bb-button">New Menu
+      Plan
+    </button>
   </div>
 </div>
 
-<!-- If menuplans has a size less than 1, show the message -->
 <div *ngIf="menuplans.length < 1" style="text-align: center; font-size: 18px; font-weight: bold; margin-top: 50 px;">
   <p>You have to add a Menuplan!
     <button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
 </div>
+-->
 
+<div class="row" style="margin: 2%">
+  <div class="row-form" style="width: 84%">
+    <div class="row row-title">
+      <!-- Title -->
+      <div class="col-md-6 col-lg-4 col-sm-4 col-xl-3 col-xxl-3">
+        <h1 class="bb-dialog-box-header title-margin">My Menuplans</h1>
+      </div>
 
-<!--
-<div class="container">
-  <div class="row">
-    <div class="col-md-auto p-3" *ngFor="let content of contents; let i = index">
-      <h3 *ngIf="(i+2) % maxTimeslots === 0" class="text-center">{{formatDateLocally(menuplan.fromTime, content.day)}} - lunch</h3>
-      <h3 *ngIf="(i+2) % maxTimeslots === 1" class="text-center">{{formatDateLocally(menuplan.fromTime, content.day)}} - dinner</h3>
-      <h3 *ngIf="(i+2) % maxTimeslots === 2" class="text-center">{{formatDateLocally(menuplan.fromTime, content.day)}} - breakfast</h3>
-      <div class="card border-primary">
-        <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail" [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
-        <h5 class="card-title m-1">{{content.recipe.name}}</h5>
-        <h5 class="card-title m-1">{{content.day + 1}}</h5>
-        <h5 class="card-title m-1">{{content.timeslot + 1}}</h5>
-        <p class="card-text m-1">Preview of the recipe, but currently not implemented</p>
-        <div class="row-cols-3">
-          <div class="btn-group">
-            <a class="btn btn-sm btn-primary"
-               [routerLink]="['/recipes', content.recipe.id]"
-               aria-label="Show recipe details">
-              <i class="bi bi-info-lg"></i>
-            </a>
-            <a class="btn btn-sm btn-success" (click)="likeRecipe(content)" aria-label="Like Recipe">
-              <i class="bi bi-arrow-clockwise"></i>
-            </a>
-            <a class="btn btn-sm btn-danger" (click)="dislikeRecipe(content)" aria-label="Dislike Recipe">
-              <i class="bi bi-hand-thumbs-down"></i>
-            </a>
-          </div>
+      <!-- Dropdown menu -->
+      <div class="col-md-6 col-lg-5 col-sm-4 col-xl-5 col-xxl-6">
+        <div class="input-group">
+          <select id="searchRecipeName" name="searchRecipeName"
+                  class="form-select input-field"
+                  [(ngModel)]="selectedStartDate"
+                  (ngModelChange)="searchChanged()">
+            <option value="" disabled selected>Select Start Date</option>
+            <option *ngFor="let menuplan of menuplans" [value]="menuplan.fromTime">
+              {{ menuplan.fromTime }} to {{ menuplan.untilTime }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
+        <div class="input-button">
+          <button type="submit" (click)="showCreateDialog = true;" class="button-create button-transparent"
+                  aria-label="Add Recipe">
+            <i class="bi bi-plus">New Menu Plan</i>
+          </button>
         </div>
       </div>
     </div>
   </div>
-</div>
--->
-
-
-<div class="row">
   <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6"
        *ngFor="let content of contents; let i = index">
     <div class="card recipe-card h-100">
-      <img [src]="getImageFor(content.recipe)" class="card-img-top rounded-top img-zoom" [alt]="getImageAltFor(content.recipe)">
+      <img [src]="getImageFor(content.recipe)" class="card-img-top rounded-top img-zoom"
+           [alt]="getImageAltFor(content.recipe)">
 
       <div class="card-body">
         <a class="card-title-link-disa" [routerLink]="['/recipes', content.recipe.id]">
@@ -124,4 +122,6 @@
     </div>
   </div>
 </div>
+
+
 

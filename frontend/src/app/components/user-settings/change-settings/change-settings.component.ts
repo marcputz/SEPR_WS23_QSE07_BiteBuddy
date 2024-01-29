@@ -118,10 +118,8 @@ export class ChangeSettingsComponent implements OnInit {
 
   loadUserPicture(userPictureArray: number[]) {
     if (userPictureArray === undefined) {
-      console.info('user picture is empty');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.safePictureUrl);
     } else {
-      console.info('user picture loaded');
       //this.loadPreviewPicture();
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(userPictureArray);
     }
@@ -129,10 +127,8 @@ export class ChangeSettingsComponent implements OnInit {
 
   loadPreviewPicture() {
     if (this.newUserSettings.userPicture === null) {
-      console.info('loadProfilePicture originalUserSettings');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.originalUserSettings.userPicture);
     } else {
-      console.info('loadProfilePicture newUserSettings');
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(btoa(String.fromCharCode.apply(null, new Uint8Array(this.newUserSettings.userPicture))));
     }
   }
@@ -164,10 +160,9 @@ export class ChangeSettingsComponent implements OnInit {
         });
       } else {
         this.notifications.success('No changes made');
-        console.log('No changes to User Settings');
       }
     } else {
-      console.log('Invalid input');
+      this.notifications.success('Invalid input');
     }
   }
 
