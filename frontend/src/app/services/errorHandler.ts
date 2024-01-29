@@ -11,7 +11,6 @@ import {UserService} from "./user.service";
 export class ErrorHandler {
 
   constructor(protected router: Router,
-              protected userService: UserService,
               protected notifications: ToastrService) {
 
     // setup toastr properly
@@ -62,7 +61,7 @@ export class ErrorHandler {
         this.notifications.warning("We couldn't process your request, as its format wasn't known to our servers. Please check your inputs and try again!");
         break;
       case 401: // Unauthorized: logout at first then login again
-        this.userService.logoutUser();
+        localStorage.removeItem('authToken');
         this.notifications.info("You were forcefully logged-out by the server, please log in again");
         //Cannot make logout because of circular dependencies in the classes with userservice
         this.router.navigate(['login']);
