@@ -30,6 +30,8 @@ export class MenuPlanLookupComponent implements OnInit {
   recipes: RecipeListDto[] = [];
   updateValue: MenuPlanUpdateRecipeDto;
   recipeImages: Map<RecipeListDto, number[]> = null;
+  recipeImageAlts: Map<RecipeListDto, string> = null;
+
 
 
   constructor(
@@ -69,7 +71,6 @@ export class MenuPlanLookupComponent implements OnInit {
   }
 
   onMenuPlanSubmit(): void {
-    // Your logic here
     console.log('Submit button clicked in app-menu-plan');
     this.showCreateDialog = false;
     this.ngOnInit();
@@ -87,7 +88,15 @@ export class MenuPlanLookupComponent implements OnInit {
 
   getImageFor(recipe: RecipeListDto) {
     if (this.recipeImages.has(recipe)) {
-      return this.recipeImages.get(recipe);
+      return this.sanitizeImage(this.recipeImages.get(recipe));
+    } else {
+      return this.sanitizer.bypassSecurityTrustUrl("assets/images/recipe_default.png");
+    }
+  }
+
+  getImageAltFor(recipe: RecipeListDto) {
+    if (this.recipeImageAlts.has(recipe)) {
+      return this.recipeImageAlts.get(recipe);
     } else {
       return "Recipe Image";
     }
@@ -108,10 +117,12 @@ export class MenuPlanLookupComponent implements OnInit {
         this.maxTimeslots = Math.max(...this.contents.map(content => content.timeslot)) + 1;
 
         this.recipeImages = new Map<RecipeListDto, number[]>();
+        this.recipeImageAlts = new Map<RecipeListDto, string>();
         for (let dto of this.contents) {
           this.pictureService.getPicture(dto.recipe.pictureId).subscribe({
             next: (pictureDto) => {
               this.recipeImages.set(dto.recipe, pictureDto.data);
+              this.recipeImageAlts.set(dto.recipe, pictureDto.description);
             },
             error: error => {
               console.error(error);
@@ -131,6 +142,7 @@ export class MenuPlanLookupComponent implements OnInit {
     const selectedMenuPlanValue = (event.target as HTMLSelectElement).value;
     this.searchday = selectedMenuPlanValue.replace(/^\d+/, '').replace(':', '').replace(/'/g, '');
     this.searchChanged();
+    this.ngOnInit();
   }
 
   searchChanged(): void {

@@ -80,8 +80,8 @@
   <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6"
        *ngFor="let content of contents; let i = index">
     <div class="card recipe-card h-100">
-      <img *ngIf="getImageFor(content.recipe) !== null" class="card-img-top img-thumbnail w-100"
-           [src]="sanitizeImage(getImageFor(content.recipe))" alt="Image of recipe">
+      <img [src]="getImageFor(content.recipe)" class="card-img-top rounded-top img-zoom" [alt]="getImageAltFor(content.recipe)">
+
       <div class="card-body">
         <a class="card-title-link-disa" [routerLink]="['/recipes', content.recipe.id]">
           <h5 class="card-title">{{ content.recipe.name }}</h5>
