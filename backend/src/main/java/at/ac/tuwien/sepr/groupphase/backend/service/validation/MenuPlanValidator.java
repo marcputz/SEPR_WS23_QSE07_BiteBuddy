@@ -30,14 +30,11 @@ import java.util.Set;
 public class MenuPlanValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    @Autowired
-    private IngredientRepository ingredientRepository;
-    @Autowired
-    private RecipeIngredientRepository recipeIngredientRepository;
-    @Autowired
-    private IngredientService ingredientService;
-    @Autowired
-    private RecipeService recipeService;
+    private final RecipeService recipeService;
+
+    public MenuPlanValidator(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
 
     public void validateForUpdate(MenuPlan menuplan) throws ValidationException {
         LOGGER.trace("validateForUpdate({})", menuplan);

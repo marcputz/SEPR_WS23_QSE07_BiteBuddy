@@ -26,16 +26,15 @@ import java.io.ByteArrayInputStream;
 public class RecipeValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Autowired
-    private RecipeIngredientRepository recipeIngredientRepository;
+    private final IngredientRepository ingredientRepository;
 
-    @Autowired
-    private RecipeRepository recipeRepository;
-
-    @Autowired
-    private IngredientRepository ingredientRepository;
+    public RecipeValidator(IngredientRepository ingredientRepository) {
+        this.ingredientRepository = ingredientRepository;
+    }
 
     public static boolean isValidImage(byte[] imageData) {
+        LOGGER.trace("isValidImage()");
+
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
             BufferedImage image = ImageIO.read(inputStream);
@@ -46,6 +45,8 @@ public class RecipeValidator {
     }
 
     public void validateForCreate(RecipeDetailsDto recipe) throws ValidationException, ConflictException {
+        LOGGER.trace("validateForCreate({})", recipe);
+
         List<String> validationErrors = new ArrayList<>();
         List<String> conflictErrors = new ArrayList<>();
 
