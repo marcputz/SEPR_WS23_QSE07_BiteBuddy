@@ -21,7 +21,7 @@ import {UserService} from "../../services/user.service";
 })
 export class MenuPlanComponent implements OnInit {
 
-  selectedStartDate: Date;
+  selectedStartDate: string;
   fridge: string[];
   menuplan: MenuPlanDetailDto;
   searchday: string = new Date().toString();
@@ -116,7 +116,7 @@ export class MenuPlanComponent implements OnInit {
           }
         });
         this.maxTimeslots = Math.max(...this.contents.map(content => content.timeslot)) + 1;
-
+        this.selectedStartDate = this.menuplan.fromTime;
         this.recipeImages = new Map<RecipeListDto, number[]>();
         this.recipeImageAlts = new Map<RecipeListDto, string>();
         for (let dto of this.contents) {
