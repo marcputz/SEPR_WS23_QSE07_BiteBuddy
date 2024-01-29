@@ -71,7 +71,6 @@ export class MenuPlanLookupComponent implements OnInit {
   }
 
   onMenuPlanSubmit(): void {
-    console.log('Submit button clicked in app-menu-plan');
     this.showCreateDialog = false;
     this.ngOnInit();
   }
@@ -150,9 +149,6 @@ export class MenuPlanLookupComponent implements OnInit {
   }
 
   rerollRecipe(c: MenuPlanContentDetailDto) {
-    // Call your like function logic here
-
-    console.log('Recipe liked!');
     this.updateValue = new class implements MenuPlanUpdateRecipeDto {
       day: number;
       menuPlanId: number;
@@ -164,15 +160,15 @@ export class MenuPlanLookupComponent implements OnInit {
     this.updateValue.menuPlanId = this.menuplan.id;
     this.updateValue.dislike = false;
     this.service.updateRecipeInMenuPlan(this.updateValue).subscribe({
+      next: response => {
+        this.getMenuPlan();
+      },
       error: err => {
-
+        // Handle the error case here
         let errorObj = this.errorHandler.getErrorObject(err);
         this.errorHandler.handleApiError(errorObj);
-
       }
-    })
-    this.getMenuPlan();
-    this.searchChanged();
+    });
   }
 
   dislikeRecipe(c: MenuPlanContentDetailDto) {
@@ -187,15 +183,15 @@ export class MenuPlanLookupComponent implements OnInit {
     this.updateValue.menuPlanId = this.menuplan.id;
     this.updateValue.dislike = true;
     this.service.updateRecipeInMenuPlan(this.updateValue).subscribe({
+      next: response => {
+        this.getMenuPlan();
+      },
       error: err => {
-
+        // Handle the error case here
         let errorObj = this.errorHandler.getErrorObject(err);
         this.errorHandler.handleApiError(errorObj);
-
       }
-    })
-    this.getMenuPlan();
-    this.searchChanged();
+    });
   }
 
   sanitizeImage(imageBytes: any): SafeUrl {
