@@ -59,7 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @EnableWebMvc
 @WebAppConfiguration
-@ActiveProfiles("generateData")
+@ActiveProfiles("test")
 public class RecipesEndpointTest {
     private static final String DEFAULT_PICTURE_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/RecipePictures";
 
