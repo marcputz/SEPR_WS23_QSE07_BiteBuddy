@@ -64,8 +64,6 @@ export class InventoryComponent implements OnInit {
           if (this.inventory.available.length > 20) {
             this.maxRowsAvailable = this.inventory.available.length / 2;
           }
-
-          this.notification.success("Loaded inventory successfully");
         } else {
           this.inventory = {
             missing: [],

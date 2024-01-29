@@ -40,6 +40,7 @@
             Select new Allergens if change is needed!
           </label></ng-template>
           <select multiple class="form-select"
+                  aria-label="Select Allergens"
                   id = "inputAllergens"
                   formControlName="allergens"
                   (change) = "onChangeAllergenes()">
