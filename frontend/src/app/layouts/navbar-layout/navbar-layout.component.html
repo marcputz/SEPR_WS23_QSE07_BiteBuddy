@@ -15,16 +15,7 @@
       <ul class="navbar-nav me-auto">
         <!-- Main Navbar Item with Down Icon -->
         <li class="nav-item">
-          <a class="nav-link bb-link" (click)="toggleSecondaryNavbar('recipes')">
-            Recipes
-            <i
-              [ngClass]="{'bi bi-chevron-down': !showSecondaryNavbar['recipes'], 'bi bi-chevron-up': showSecondaryNavbar['recipes']}"></i>
-          </a>
-          <!-- Secondary Navbar (Initially Hidden) -->
-          <div *ngIf="showSecondaryNavbar['recipes']" class="secondary-navbar glassy-background">
-            <a class="nav-link bb-link first-item" href="#">Discover recipes</a>
-            <a class="nav-link bb-link" href="#">History</a>
-          </div>
+          <a [routerLink]="['/recipes']" class="nav-link bb-link">Recipes</a>
         </li>
         <li class="nav-item">
           <a [routerLink]="['/menuplan']" class="nav-link bb-link">Menu Plan</a>
