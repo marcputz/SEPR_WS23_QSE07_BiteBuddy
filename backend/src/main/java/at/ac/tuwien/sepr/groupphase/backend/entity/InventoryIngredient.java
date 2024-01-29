@@ -23,13 +23,10 @@ public class InventoryIngredient {
     @Column(nullable = false)
     private Long basicIngredientId;
 
-    @Column(nullable = true)
     private String detailedIngredientName;
 
-    @Column(nullable = true)
     private Float amount;
 
-    @Column(nullable = true)
     private FoodUnit unit;
 
     @Column(nullable = false)

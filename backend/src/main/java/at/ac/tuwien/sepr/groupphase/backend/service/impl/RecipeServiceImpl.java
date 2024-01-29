@@ -325,10 +325,8 @@ public class RecipeServiceImpl implements RecipeService {
                     creatorName = creator.getNickname();
                 }
 
-                RecipeDetailsDto detailsDto =
-                    new RecipeDetailsDto(id, recipe.get().getName(), creatorName, recipe.get().getInstructions(), newIngredients, allergens,
+                return new RecipeDetailsDto(id, recipe.get().getName(), creatorName, recipe.get().getInstructions(), newIngredients, allergens,
                         recipe.get().getPictureId(), null);
-                return detailsDto;
             }
         }
 

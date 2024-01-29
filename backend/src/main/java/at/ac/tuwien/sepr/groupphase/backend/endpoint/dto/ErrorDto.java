@@ -61,6 +61,26 @@ public class ErrorDto {
         return reason;
     }
 
+    public ErrorDto setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+        return this;
+    }
+
+    public ErrorDto setStatusText(String statusText) {
+        this.statusText = statusText;
+        return this;
+    }
+
+    public ErrorDto setStatusDescription(String statusDescription) {
+        this.statusDescription = statusDescription;
+        return this;
+    }
+
+    public ErrorDto setReason(String reason) {
+        this.reason = reason;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

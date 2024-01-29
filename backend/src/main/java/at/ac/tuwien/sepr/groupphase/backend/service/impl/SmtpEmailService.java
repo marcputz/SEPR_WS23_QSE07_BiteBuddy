@@ -29,7 +29,7 @@ public class SmtpEmailService implements EmailService {
     }
 
     @Override
-    public boolean sendEmail(String recipient, String mailSubject, String mailContent, boolean contentIsHtml) throws MessagingException {
+    public void sendEmail(String recipient, String mailSubject, String mailContent, boolean contentIsHtml) throws MessagingException {
 
         String smtpHost = config.getEmail().getSmtp().getHost();
         int smtpPort = config.getEmail().getSmtp().getPort();
@@ -66,8 +66,6 @@ public class SmtpEmailService implements EmailService {
         message.setContent(multipart);
 
         Transport.send(message);
-
-        return true;
     }
 
 }

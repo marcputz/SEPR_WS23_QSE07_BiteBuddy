@@ -259,10 +259,7 @@ public class ProfileServiceImpl implements ProfileService {
             profile = profileOptional.get();
         }
 
-        ProfileDetailDto profileDetails = profileMapper.profileToProfileDetailDto(profile);
-
-
-        return profileDetails;
+        return profileMapper.profileToProfileDetailDto(profile);
     }
 
     @Override

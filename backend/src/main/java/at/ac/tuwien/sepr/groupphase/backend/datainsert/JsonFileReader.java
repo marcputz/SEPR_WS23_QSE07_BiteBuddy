@@ -264,11 +264,8 @@ public class JsonFileReader {
 
         // Check if the pattern matches the input
         if (matcher.matches()) {
-            // Extract remaining string
-            String remainingString = matcher.group(3);
-
-            // Return the remaining string
-            return remainingString;
+            // Extract and return remaining string
+            return matcher.group(3);
         } else {
             // Handle the case where the input doesn't match the expected format
             throw new IllegalArgumentException("Invalid input format. Expected m/n.");
@@ -304,8 +301,7 @@ public class JsonFileReader {
             String numericPart = matcher.group(1);
             String unitPart = matcher.group(2);
 
-            Float numericValue = (float) parseNumericPart(numericPart);
-            return numericValue;
+            return (float) parseNumericPart(numericPart);
         } else {
             // Return some default value or handle the case where the pattern doesn't match
             return 0.0F;
