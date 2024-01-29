@@ -63,14 +63,4 @@ public class Ingredient {
             + '}';
     }
 
-
-
-    /*public Set<RecipeIngredient> getRecipeIngredients() {
-        return recipeIngredients;
-    }
-
-    public Ingredient setRecipeIngredients(Set<RecipeIngredient> recipeIngredients) {
-        this.recipeIngredients = recipeIngredients;
-        return this;
-    } */
 }

@@ -132,7 +132,7 @@ public class JpaUserService implements UserService {
 
         user.setNickname(newNickname);
 
-        byte[] newPicture = dto.getUserPicture() == null || dto.getUserPicture().length <= 0
+        byte[] newPicture = dto.getUserPicture() == null || dto.getUserPicture().length == 0
             ? user.getUserPicture()
             : dto.getUserPicture();
 

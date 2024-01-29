@@ -257,7 +257,7 @@ public class MenuPlanEndpointTest {
 
     public String authenticate() throws Exception {
         LoginDto dto = new LoginDto();
-        dto.setEmail("test@test");
+        dto.setEmail(this.user.getEmail());
         dto.setPassword("password");
         return this.authService.loginUser(dto);
     }

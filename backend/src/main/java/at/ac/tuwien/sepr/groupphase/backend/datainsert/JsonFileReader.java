@@ -111,8 +111,8 @@ public class JsonFileReader {
                 for (AllergeneIngredientString allergeneIngredient : allergeneIngredients) {
                     AllergeneIngredient a = new AllergeneIngredient();
                     a.setId(allergeneIngredient.getId());
-                    a.setAllergene(allergeneRepository.getById(allergeneIngredient.getAllergene()));
-                    a.setIngredient(ingredientRepository.getById(allergeneIngredient.getIngredient()));
+                    a.setAllergene(allergeneRepository.findById(allergeneIngredient.getAllergene()).orElse(null));
+                    a.setIngredient(ingredientRepository.findById(allergeneIngredient.getIngredient()).orElse(null));
                     allergeneIngredientRepository.save(a);
                 }
             }
@@ -120,8 +120,8 @@ public class JsonFileReader {
                 for (RecipeIngredientString recipeIngredientString : recipeIngredients) {
                     RecipeIngredient r = new RecipeIngredient();
                     r.setId(recipeIngredientString.getId());
-                    r.setRecipe(recipeRepository.getById(recipeIngredientString.getRecipe()));
-                    r.setIngredient(ingredientRepository.getById(recipeIngredientString.getIngredient()));
+                    r.setRecipe(recipeRepository.findById(recipeIngredientString.getRecipe()).orElse(null));
+                    r.setIngredient(ingredientRepository.findById(recipeIngredientString.getIngredient()).orElse(null));
                     String detailsString = recipeIngredientString.getAmount();
                     RecipeIngredientDetails r1 = setRecipeIngredientDetails(detailsString);
                     recipeIngredientDetailsRepository.save(r1);
@@ -162,17 +162,6 @@ public class JsonFileReader {
             }
 
             */
-            // get all the pictures from the recipes and save them in RecipePictures
-
-
-            // ------------------ the following would do the pictures --------------------------------------
-
-            /*for (long i = 1; i < 4; i++) {
-                byte[] picture = recipeRepository.getById(i).getPicture();
-                Path path2 = Paths.get(DEFAULT_PICTURE_FOLDER + "/" + i + "saved.png");
-                LOGGER.info("Path where picture is saved: " + path2);
-                Files.write(path2, picture);
-            } */
 
         } catch (IOException e) {
             LOGGER.error("Error reading JSON file", e);

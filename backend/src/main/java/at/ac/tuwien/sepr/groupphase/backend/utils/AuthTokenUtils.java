@@ -87,7 +87,7 @@ public class AuthTokenUtils {
             .setAudience("BiteBuddy-App")
             .expiration(expiration)
             .issuedAt(now)
-            .id(Long.valueOf(userId).toString())
+            .id(Long.toString(userId))
             .claim("username", nickname)
             .claim("email", email)
             .compact();
