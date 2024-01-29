@@ -78,7 +78,6 @@ export class MenuPlanLookupComponent implements OnInit {
     this.service.getMenuPlans().subscribe({
       next: data => {
         this.menuplans = data;
-        console.log("plans available plans: " + data.length);
       },
       error: err => {
         this.notification.error('Error fetching recipes', err)
@@ -95,7 +94,6 @@ export class MenuPlanLookupComponent implements OnInit {
   }
 
   getMenuPlan() {
-    console.log("before sending getMenuPlan date: " + this.searchday);
     this.service.getMenuPlanForDay(this.searchday).subscribe({
       next: data => {
         this.menuplan = data;
@@ -122,7 +120,9 @@ export class MenuPlanLookupComponent implements OnInit {
         }
       },
       error: err => {
-        this.notification.error('Error fetching recipes for 1 menuplan', err)
+
+        let errorObj = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorObj);
       }
     })
   }
@@ -152,11 +152,11 @@ export class MenuPlanLookupComponent implements OnInit {
     this.updateValue.menuPlanId = this.menuplan.id;
     this.updateValue.dislike = false;
     this.service.updateRecipeInMenuPlan(this.updateValue).subscribe({
-      next: data => {
-        console.log("plans available plans: ");
-      },
       error: err => {
-        this.notification.error('Error fetching recipes', err)
+
+        let errorObj = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorObj);
+
       }
     })
     this.getMenuPlan();
@@ -175,11 +175,11 @@ export class MenuPlanLookupComponent implements OnInit {
     this.updateValue.menuPlanId = this.menuplan.id;
     this.updateValue.dislike = true;
     this.service.updateRecipeInMenuPlan(this.updateValue).subscribe({
-      next: data => {
-        console.log("plans available plans: ");
-      },
       error: err => {
-        this.notification.error('Error fetching recipes', err)
+
+        let errorObj = this.errorHandler.getErrorObject(err);
+        this.errorHandler.handleApiError(errorObj);
+
       }
     })
     this.getMenuPlan();
@@ -202,7 +202,6 @@ export class MenuPlanLookupComponent implements OnInit {
   }
 
   formatDateLocally(inputDate: string, plusDays: number): string {
-    console.log("inputdate: "  + inputDate);
     const months = [
       'January', 'February', 'March', 'April',
       'May', 'June', 'July', 'August',
