@@ -1,14 +1,30 @@
-<h1>Inventory for current menu plan</h1>
+<h1 *ngIf="!this.showCreateDialog" style="text-align: center">Grocery shopping list</h1>
 
 <main>
-  <div class="container-fluid">
-    <div class="row mx-2">
-      <div class="col-lg-auto">
+  <div *ngIf="this.showCreateDialog" class="bb-modal" tabindex="-1">
+    <div class="bb-modal-dialog" style="width: 100%;height: 100%">
+      <a style="text-align: start; width: 100%;" class="bb-link" (click)="this.showCreateDialog = false;"><i
+        class="bi-x"></i>Close</a>
+      <h2 style="margin-bottom: 1.5rem; text-align: center; width: 100%;">New Menu Plan</h2>
+      <app-menu-plan-create (submitClicked)="onMenuPlanSubmit()" style="width: 100%"></app-menu-plan-create>
+    </div>
+  </div>
+
+  <div *ngIf="(this.inventory.missing?.length + this.inventory.available?.length) === 0"
+       style="text-align: center; font-size: 18px; font-weight: bold; margin-top: 50px;">
+    <p>You have to add a Menuplan!
+      <button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
+  </div>
+
+  <div class="container-fluid" *ngIf="(this.inventory.missing?.length + this.inventory.available?.length) > 0">
+    <div *ngIf="this.inventory.missing.length === 0" style="text-align: center;margin-bottom: 1.5rem;margin-top: 1.5rem"><b>No missing ingredients</b></div>
+    <div *ngIf="this.inventory.available.length === 0" style="text-align: center;margin-bottom: 1.5rem;margin-top: 1.5rem"><b>No available ingredients</b></div>
+    <div class="row mx-2 align-content-center justify-content-center">
+      <div class="col-lg-auto" *ngIf="this.inventory.missing.length > 0">
         <!-- Table of ingredients which are not already bought -->
-        <!-- TODO Maybe use 2 cols, otherwise the list is very long ... -->
         <div class="card">
           <div class="card-header mx-2" style="text-align: center">
-            <b>{{inventory.missing?.length}} ingredients missing for recipes</b>
+            <b>{{ inventory.missing?.length }} ingredients missing for recipes</b>
           </div>
           <div class="card-body">
             <div class="row">
@@ -32,13 +48,16 @@
                 </table>
               </div>
               <!-- adding second if we have more than maxRows -->
-              <div class="col" *ngIf="inventory.missing?.length > maxRows">
+              <div class="col d-none d-md-block" *ngIf="inventory.missing?.length > maxRows">
                 <table class="table">
                   <thead>
-                  <tr><th>Ingredient</th></tr>
+                  <tr>
+                    <th>Ingredient</th>
+                  </tr>
                   </thead>
                   <tbody>
-                  <tr *ngFor="let inv of inventory.missing | slice:maxRows:inventory.missing.length" class="center-td">
+                  <tr *ngFor="let inv of inventory.missing | slice:maxRows:inventory.missing.length"
+                      class="center-td">
                     <td><i *ngIf="inv.inventoryStatus === false" class="bi bi-square mx-2"
                            (click)="markAsChecked(inv)"></i>
                     </td>
@@ -56,7 +75,7 @@
         <!-- Table of ingredients which are already bought -->
         <div *ngIf="inventory.available?.length > 0" class="card">
           <div class="card-header" style="align-content: center">
-            <b>{{inventory.available?.length}} Already bought for recipes</b>
+            <b>{{ inventory.available?.length }} Ingredients already bought for recipes</b>
           </div>
           <div class="card-body">
             <div class="row">
@@ -69,8 +88,9 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr *ngFor="let inv of inventory.available | slice:0:Math.min(inventory.available.length, maxRowsAvailable)"
-                      class="center-td">
+                  <tr
+                    *ngFor="let inv of inventory.available | slice:0:Math.min(inventory.available.length, maxRowsAvailable)"
+                    class="center-td">
                     <td><i *ngIf="inv.inventoryStatus === true" class="bi bi-check-square mx-2"
                            (click)="markAsUnchecked(inv)"></i>
                     </td>
@@ -84,10 +104,13 @@
               <div class="col" *ngIf="inventory.available?.length > maxRowsAvailable">
                 <table class="table">
                   <thead>
-                  <tr><th>Ingredient</th></tr>
+                  <tr>
+                    <th>Ingredient</th>
+                  </tr>
                   </thead>
                   <tbody>
-                  <tr *ngFor="let inv of inventory.available | slice:maxRowsAvailable:inventory.available.length" class="center-td">
+                  <tr *ngFor="let inv of inventory.available | slice:maxRowsAvailable:inventory.available.length"
+                      class="center-td">
                     <td><i *ngIf="inv.inventoryStatus === true" class="bi bi-check-square mx-2"
                            (click)="markAsUnchecked(inv)"></i>
                     </td>

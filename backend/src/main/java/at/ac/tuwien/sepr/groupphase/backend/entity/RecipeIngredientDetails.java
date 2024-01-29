@@ -86,7 +86,7 @@ public class RecipeIngredientDetails {
      * @return String which identifies this Ingredient.
      */
     public String getFridgeStringIdentifier() {
-        return ingredient + " " + (getUnit() != null ? getUnit().toString() : "");
+        return ingredient + (getUnit() != null ? getUnit().toString() : "");
     }
 
     @Override

@@ -18,6 +18,18 @@ export class InventoryComponent implements OnInit {
     missing: [],
     available: []
   }
+  showCreateDialog = false;
+
+  compareInventoryIngredients = (a: InventoryIngredientDto, b: InventoryIngredientDto): number => {
+    // Compare based on detailedName
+    const detailedNameComparison = (a.detailedNamed || '').localeCompare(b.detailedNamed || '');
+    if (detailedNameComparison !== 0) {
+      return detailedNameComparison;
+    }
+
+    // If detailedNamed is the same, compare based on name
+    return (a.name || '').localeCompare(b.name || '');
+  };
 
   constructor(
     private service: MenuPlanService,
@@ -27,35 +39,43 @@ export class InventoryComponent implements OnInit {
   ) {
   }
 
-  public createInventory() {
-    this.service.createInventory().subscribe({
-      next: value => {
-        this.notification.success("Created inventory")
-        this.reload()
-      }
-    });
-  }
-
-
   public getInventory() {
     this.service.getInventory().subscribe({
       next: value => {
         this.inventory = value;
 
-        if (this.inventory.missing.length > 20) {
-          this.maxRows = this.inventory.missing.length / 2;
-        }
+        if (this.inventory !== null) {
+          if (this.inventory.missing !== null) {
+            this.inventory.missing.sort(this.compareInventoryIngredients);
+          } else {
+            this.inventory.missing = [];
+          }
 
-        if (this.inventory.available.length > 20) {
-          this.maxRowsAvailable = this.inventory.available.length / 2;
-        }
+          if (this.inventory.available !== null) {
+            this.inventory.available.sort(this.compareInventoryIngredients);
+          } else {
+            this.inventory.available = [];
+          }
 
-        this.notification.success("Loaded inventory successfully");
+          if (this.inventory.missing.length > 20) {
+            this.maxRows = this.inventory.missing.length / 2;
+          }
+
+          if (this.inventory.available.length > 20) {
+            this.maxRowsAvailable = this.inventory.available.length / 2;
+          }
+
+          this.notification.success("Loaded inventory successfully");
+        } else {
+          this.inventory = {
+            missing: [],
+            available: []
+          }
+        }
       },
       error: error => {
         let errorDto = this.errorHandler.getErrorObject(error);
         this.errorHandler.handleApiError(errorDto);
-
         console.error(error);
       }
     });
@@ -114,6 +134,11 @@ export class InventoryComponent implements OnInit {
 
   public ngOnInit() {
     this.reload();
+  }
+
+  onMenuPlanSubmit(): void {
+    this.showCreateDialog = false;
+    this.ngOnInit();
   }
 
   protected readonly Math = Math;
