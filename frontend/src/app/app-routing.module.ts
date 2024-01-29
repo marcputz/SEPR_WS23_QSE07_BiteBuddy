@@ -18,7 +18,7 @@ import {SettingsLayoutComponent} from "./layouts/settings-layout/settings-layout
 import {RecipeCreateComponent} from "./components/recipe-create/recipe-create.component";
 import {ProfileComponent} from "./components/dialogs/profile/profile.component";
 import {InventoryComponent} from "./components/inventory/inventory.component";
-import {MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
+import {MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
 import {NavbarLayoutComponent} from "./layouts/navbar-layout/navbar-layout.component";
 import {ProfileListComponent} from './components/profile-list/profile-list.component';
 import {ProfileEditComponent} from "./components/profile-edit/profile-edit.component";
@@ -66,11 +66,11 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'menuplanLookup',
+    path: 'menuplan',
     canActivate: mapToCanActivate([AuthGuard]),
     component: NavbarLayoutComponent, // Use the same NavbarLayoutComponent for the layout
     children: [
-      {path: '', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanLookupComponent}
+      {path: '', canActivate: mapToCanActivate([AuthGuard]), component: MenuPlanComponent}
     ]
   },
   {

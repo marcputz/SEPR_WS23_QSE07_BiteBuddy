@@ -16,10 +16,10 @@ import {UserService} from "../../services/user.service";
 
 @Component({
   selector: 'app-menu-plan-lookup',
-  templateUrl: './menu-plan-lookup.component.html',
-  styleUrls: ['./menu-plan-lookup.component.scss']
+  templateUrl: './menu-plan.component.html',
+  styleUrls: ['./menu-plan.component.scss']
 })
-export class MenuPlanLookupComponent implements OnInit {
+export class MenuPlanComponent implements OnInit {
   fridge: string[];
   menuplan: MenuPlanDetailDto;
   searchday: string = new Date().toString();

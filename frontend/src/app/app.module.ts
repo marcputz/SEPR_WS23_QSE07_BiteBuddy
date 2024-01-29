@@ -29,7 +29,7 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
 import { ProfileComponent } from './components/dialogs/profile/profile.component';
 import { MenuPlanCreateComponent } from './components/menu-plan-create/menu-plan-create-component';
 import { InventoryComponent } from './components/inventory/inventory.component';
-import { MenuPlanLookupComponent} from "./components/menu-plan-lookup/menu-plan-lookup.component";
+import { MenuPlanComponent} from "./components/menu-plan/menu-plan.component";
 import { NavbarLayoutComponent } from './layouts/navbar-layout/navbar-layout.component';
 import { ProfileListComponent } from './components/profile-list/profile-list.component';
 import { ProfileEditComponent } from './components/profile-edit/profile-edit.component';
@@ -58,7 +58,7 @@ import { ProfileDetailsComponent } from './components/profile-details/profile-de
     ProfileComponent,
     MenuPlanCreateComponent,
     InventoryComponent,
-    MenuPlanLookupComponent,
+    MenuPlanComponent,
     NavbarLayoutComponent,
     ProfileListComponent,
     ProfileEditComponent,
