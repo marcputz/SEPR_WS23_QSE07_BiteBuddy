@@ -24,6 +24,7 @@
         <tbody>
         <tr *ngFor="let ingredient of createDto.fridge">
           <td><p style="margin-left: 2rem;">{{ ingredient }}</p></td>
+          <td><i class="bi bi-trash3" (click)="removeIngredient(ingredient)"></i></td>
         </tr>
         </tbody>
       </table>
