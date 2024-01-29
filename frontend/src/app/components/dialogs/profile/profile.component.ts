@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {ToastrService} from "ngx-toastr";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
@@ -10,6 +10,7 @@ import {IngredientService} from "../../../services/ingredient.service";
 import {AllergensService} from "../../../services/allergens.service";
 import {UserService} from "../../../services/user.service";
 import {UserSettingsDto} from "../../../dtos/userSettingsDto";
+import {ErrorHandler} from "../../../services/errorHandler";
 import {Observable} from "rxjs";
 import {RecipeDetailsDto} from "../../../dtos/recipe";
 
@@ -41,7 +42,8 @@ export class ProfileComponent {
       private router: Router,
       private route: ActivatedRoute,
       private notification: ToastrService,
-      private authService: UserService
+      private authService: UserService,
+      private errorHandler: ErrorHandler
   ) {
       // Initialize the form in the constructor
       this.form = this.fb.group({
@@ -59,9 +61,8 @@ export class ProfileComponent {
             console.log(this.allergens)
             },
             error: error => {
-              console.error('Error retrieving all allergens', error);
-              const errorMessage = error?.message || 'Unknown error occured';
-              this.notification.error(`Error retrieving all allergens: ${errorMessage}`);
+              let errorObj = this.errorHandler.getErrorObject(error);
+              this.errorHandler.handleApiError(errorObj);
           }
     });
 
@@ -72,9 +73,8 @@ export class ProfileComponent {
          console.log(this.ingredient)
        },
        error: error => {
-          console.error('Error retrieving all ingredient', error);
-          const errorMessage = error?.message || 'Unknown error occured';
-          this.notification.error(`Error retrieving all ingredient: ${errorMessage}`);
+         let errorObj = this.errorHandler.getErrorObject(error);
+         this.errorHandler.handleApiError(errorObj);
        }
     });
   }
@@ -89,7 +89,6 @@ export class ProfileComponent {
               this.user = settings;
               this.profile.userId = settings.id;
               console.log(settings);
-              console.log(this.profile)
               this.service.create(this.profile)
                 .subscribe({
                   next: data => {
@@ -97,9 +96,8 @@ export class ProfileComponent {
                     this.router.navigate(['/recipes']);
                   },
                   error: error => {
-                    console.error('Error creating profile', error);
-                    const errorMessage = error?.message || 'Unknown error occured';
-                    this.notification.error(`Error creating profile: ${errorMessage}`);
+                    let errorObj = this.errorHandler.getErrorObject(error);
+                    this.errorHandler.handleApiError(errorObj);
                   }
                 });
             },

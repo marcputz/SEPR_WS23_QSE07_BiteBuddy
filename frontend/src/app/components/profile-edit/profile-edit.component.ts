@@ -67,15 +67,13 @@ export class ProfileEditComponent {
     this.service.getProfileDetails(Number(routeParams.get('id'))).subscribe({
       next: profileDetails => {
         this.previousProfileDetails = profileDetails;
-        console.log(this.previousProfileDetails)
         this.form.controls['name'].setValue(this.previousProfileDetails.name);
         this.form.controls['allergens'].setValue(this.previousProfileDetails.allergens);
         this.form.controls['ingredient'].setValue(this.previousProfileDetails.ingredients);
       },
       error: error => {
-        console.error('Error retrieving profile information', error);
-        const errorMessage = error?.message || 'Unknown error occured';
-        this.notification.error(`Error retrieving profile information: ${errorMessage}`);
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
       }
     }
     );
@@ -83,12 +81,10 @@ export class ProfileEditComponent {
     this.allergensService.getAllAllergens().subscribe({
       next: allergens => {
         this.allergens = allergens;
-        console.log(this.allergens)
       },
       error: error => {
-        console.error('Error retrieving all allergens', error);
-        const errorMessage = error?.message || 'Unknown error occured';
-        this.notification.error(`Error retrieving all allergens: ${errorMessage}`);
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
       }
     });
 
@@ -96,12 +92,10 @@ export class ProfileEditComponent {
     this.ingredientService.getAllIngredients().subscribe({
       next: ingredient => {
         this.ingredient = ingredient;
-        console.log(this.ingredient)
       },
       error: error => {
-        console.error('Error retrieving all ingredient', error);
-        const errorMessage = error?.message || 'Unknown error occured';
-        this.notification.error(`Error retrieving all ingredient: ${errorMessage}`);
+        let errorObj = this.errorHandler.getErrorObject(error);
+        this.errorHandler.handleApiError(errorObj);
       }
     });
   }
@@ -124,22 +118,14 @@ export class ProfileEditComponent {
                 this.router.navigate(['/profiles']);
               },
               error: error => {
-                console.error('Error editing profile', error);
-                const errorMessage = error?.message || 'Unknown error occured';
-                this.notification.error(`Error creating profile: ${errorMessage}`);
+                let errorObj = this.errorHandler.getErrorObject(error);
+                this.errorHandler.handleApiError(errorObj);
               }
             });
         },
         error => {
-          console.error('Error getting user settings', error);
-          const errorMessage = error?.error || 'Unknown error occurred';
-
           let errorObj = this.errorHandler.getErrorObject(error);
-
-          if (error.status === 401) {
-            // Handle logout logic, e.g., redirect to login page
-            this.errorHandler.handleApiError(errorObj);
-          }
+          this.errorHandler.handleApiError(errorObj);
         }
       );
 
