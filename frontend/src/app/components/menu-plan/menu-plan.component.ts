@@ -49,7 +49,10 @@ export class MenuPlanComponent implements OnInit {
 
   ngOnInit() {
     this.updateValue = null;
-    this.searchday = new Date().toString();
+    if(this.selectedStartDate == null){
+      this.selectedStartDate = new Date().toString();
+    }
+    this.searchday = this.selectedStartDate;
     this.getMenuPlans();
     this.getMenuPlan();
     this.searchChangedObservable
@@ -104,7 +107,7 @@ export class MenuPlanComponent implements OnInit {
   }
 
   getMenuPlan() {
-    this.service.getMenuPlanForDay(this.searchday).subscribe({
+    this.service.getMenuPlanForDay(this.selectedStartDate).subscribe({
       next: data => {
         this.menuplan = data;
         this.contents = [...data.contents];

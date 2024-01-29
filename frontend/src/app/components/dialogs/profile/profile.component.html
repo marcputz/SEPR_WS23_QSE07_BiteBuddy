@@ -1,65 +1,68 @@
-<h2 class="bb-dialog-box-header">{{ title }}</h2>
-<div class="row-cols-1 register-form">
-  <!-- Profile Input Form -->
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="inputName" class="bb-transition-label"
-             *ngIf="isInputFocused['name'] || form.get('name').value">Profile name</label>
-      <input type="text" name="name" formControlName="name"
-             class="bb-input-textfield bb-input"
-             [class.bb-input-textfield-error]="submitted && form.controls.name.errors"
-             id="inputName"
-             aria-describedby="nameHelp"
-             placeholder="Profile name"
-             (focus)="isInputFocused['name'] = true"
-             (blur)="this.updateInputFocus('name')"
-             [ngClass]="{'filled-input': form.get('name').value !== ''}"
-             required >
-      <div *ngIf="submitted && form.controls.name.errors" class="bb-input-error">
-        <small class="form-text text-danger" *ngIf="form.controls.name.errors.required">
-          Profile name is required
-        </small>
-        <small class="form-text text-danger" *ngIf="form.controls.name.errors.profileNameGiven">
-          Profile name already given, please choose another profile name.
-        </small>
-        <small class="form-text text-danger" *ngIf="form.controls.name.errors.maxLength">
-          Profile name too long, please choose a profile name max. 255 characters long.
-        </small>
-        <small class="form-text text-danger" *ngIf="form.controls.name.errors.minLength">
-          Profile name too short, please enter a name at least 3 characters long.
-        </small>
+<main>
+  <h2 class="bb-dialog-box-header">{{ title }}</h2>
+  <div class="row-cols-1 register-form">
+    <!-- Profile Input Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="inputName" class="bb-transition-label"
+               *ngIf="isInputFocused['name'] || form.get('name').value">Profile name</label>
+        <input type="text" name="name" formControlName="name"
+               class="bb-input-textfield bb-input"
+               [class.bb-input-textfield-error]="submitted && form.controls.name.errors"
+               id="inputName"
+               aria-describedby="nameHelp"
+               placeholder="Profile name"
+               (focus)="isInputFocused['name'] = true"
+               (blur)="this.updateInputFocus('name')"
+               [ngClass]="{'filled-input': form.get('name').value !== ''}"
+               required>
+        <div *ngIf="submitted && form.controls.name.errors" class="bb-input-error">
+          <small class="form-text text-danger" *ngIf="form.controls.name.errors.required">
+            Profile name is required
+          </small>
+          <small class="form-text text-danger" *ngIf="form.controls.name.errors.profileNameGiven">
+            Profile name already given, please choose another profile name.
+          </small>
+          <small class="form-text text-danger" *ngIf="form.controls.name.errors.maxLength">
+            Profile name too long, please choose a profile name max. 255 characters long.
+          </small>
+          <small class="form-text text-danger" *ngIf="form.controls.name.errors.minLength">
+            Profile name too short, please enter a name at least 3 characters long.
+          </small>
+        </div>
       </div>
-    </div>
 
-    <div class="form-group label-select">
-      <label for="inputAllergens">
-        What do you cannot or do not want to eat?
-      </label>
-      <select multiple class="form-select"
-              id = "inputAllergens"
-              formControlName="allergens">
-        <option *ngFor="let allergene of allergens"
-                [value]="allergene">
-          {{allergene.name}}
-        </option>
-      </select>
-    </div>
+      <div class="form-group label-select">
+        <label for="inputAllergens">
+          What do you cannot or do not want to eat?
+        </label>
+        <select multiple class="form-select"
+                id="inputAllergens"
+                formControlName="allergens">
+          <option *ngFor="let allergene of allergens"
+                  [value]="allergene">
+            {{allergene.name}}
+          </option>
+        </select>
+      </div>
 
-    <div class="form-group label-select">
-      <label for="inputIngredient">
-        What do you like to eat?
-      </label>
-      <select multiple class="form-select"
-              id ="inputIngredient"
-              formControlName="ingredient">
-        <option *ngFor="let ingred of ingredient"
-                [value]="ingred">
-          {{ingred.name}}
-        </option>
-      </select>
-    </div>
-    <button type="submit"
-            name="submitButton"
-            class="button-full bb-form-button">Start</button>
-  </form>
-</div>
+      <div class="form-group label-select">
+        <label for="inputIngredient">
+          What do you like to eat?
+        </label>
+        <select multiple class="form-select"
+                id="inputIngredient"
+                formControlName="ingredient">
+          <option *ngFor="let ingred of ingredient"
+                  [value]="ingred">
+            {{ingred.name}}
+          </option>
+        </select>
+      </div>
+      <button type="submit"
+              name="submitButton"
+              class="button-full bb-form-button">Start
+      </button>
+    </form>
+  </div>
+</main>

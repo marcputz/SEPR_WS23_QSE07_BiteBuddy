@@ -1,99 +1,103 @@
-<div class="container-fluid">
-  <div class="row-form">
-    <div class="row row-title">
-      <!-- Title -->
-      <div class="col-md-2 col-lg-5 col-sm-4 col-xl-4 col-xxl-3">
-        <h1 class="bb-dialog-box-header title-margin">Discover Recipes</h1>
-      </div>
-      <!-- Search bar -->
-      <div class="col-md-5 col-lg-5 col-sm-4 col-xl-5 col-xxl-6">
-        <div class="input-group">
-          <input type="text" id="searchRecipeName" name="searchRecipeName"
-                 class="form-control input-field"
-                 placeholder="Search recipes..."
-                 [(ngModel)]="searchParams.name"
-                 (ngModelChange)="searchChanged()">
+<main>
+  <div class="container-fluid">
+    <div class="row-form">
+      <div class="row row-title">
+        <!-- Title -->
+        <div class="col-md-2 col-lg-5 col-sm-4 col-xl-4 col-xxl-3">
+          <h1 class="bb-dialog-box-header title-margin">Discover Recipes</h1>
         </div>
-      </div>
-      <div class="col-md-4 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
-        <div class="input-button">
-          <button type="submit" [routerLink]="['/recipes/create']" class="button-create button-transparent"
-                  aria-label="Add Recipe">
-            <i class="bi bi-plus">
-              Add recipe
-            </i>
-          </button>
-        </div>
-      </div>
-    </div>
-    <!-- Card layout -->
-    <div class="row">
-      <div *ngIf="this.recipes === null || this.recipes.length <= 0" style="text-align: center; width: 100%;">
-        <p style="color: rgba(0,0,0, 0.8);">No Recipes found</p>
-      </div>
-      <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6" *ngFor="let recipe of recipes">
-        <div class="card recipe-card">
-          <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
-            <img [src]="getImageFor(recipe)" class="card-img-top rounded-top img-zoom" [alt]="getImageAltFor(recipe)">
-          </a><br>
-          <div class="card-body">
-            <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
-              <h5 class="card-title">{{ recipe.name }}</h5>
-            </a><br>
-            <div class="user-info d-flex align-items-center">
-              <!-- user name add here -->
-              <img src="assets/icons/user_default.png" class="rounded-circle user-icon" alt="User Icon">
-              <div class="user-details ms-3">
-                <p class="user-name">{{recipe.creator}}</p>
-                <!-- <button class="btn btn-primary btn-add-to-list">+ Add to List</button> -->
-              </div>
-              <div></div>
-              <div class="btn-group d-flex align-items userinfo-buttons-space">
-                <a
-                  (click)="rateRecipe(recipe.id, 1)"
-                  aria-label="Like Recipe" role="button">
-                  <i *ngIf="likes.includes(recipe.id); else notFilledUp" class="bi bi-hand-thumbs-up-fill like-dislike"></i>
-                  <ng-template #notFilledUp><i class="bi bi-hand-thumbs-up like-dislike"></i></ng-template>
-                </a>
-                <a
-                  (click)="rateRecipe(recipe.id, 0)"
-                  aria-label="Dislike Recipe">
-                  <i *ngIf="dislikes.includes(recipe.id); else notFilledDown" class="bi bi-hand-thumbs-down-fill like-dislike"></i>
-                  <ng-template #notFilledDown><i class="bi bi-hand-thumbs-down like-dislike"></i></ng-template>
-                </a>
-              </div>
-              <div></div>
-            </div>
+        <!-- Search bar -->
+        <div class="col-md-5 col-lg-5 col-sm-4 col-xl-5 col-xxl-6">
+          <div class="input-group">
+            <input type="text" id="searchRecipeName" name="searchRecipeName"
+                   class="form-control input-field"
+                   placeholder="Search recipes..."
+                   [(ngModel)]="searchParams.name"
+                   (ngModelChange)="searchChanged()">
           </div>
-
+        </div>
+        <div class="col-md-4 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
+          <div class="input-button">
+            <button type="submit" [routerLink]="['/recipes/create']" class="button-create button-transparent"
+                    aria-label="Add Recipe">
+              <i class="bi bi-plus">
+                Add recipe
+              </i>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+      <!-- Card layout -->
+      <div class="row">
+        <div *ngIf="this.recipes === null || this.recipes.length <= 0" style="text-align: center; width: 100%;">
+          <p style="color: rgba(0,0,0, 0.8);">No Recipes found</p>
+        </div>
+        <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6" *ngFor="let recipe of recipes">
+          <div class="card recipe-card">
+            <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
+              <img [src]="getImageFor(recipe)" class="card-img-top rounded-top img-zoom" [alt]="getImageAltFor(recipe)">
+            </a><br>
+            <div class="card-body">
+              <a class="card-title-link-disa" [routerLink]="['/recipes', recipe.id]">
+                <h5 class="card-title">{{ recipe.name }}</h5>
+              </a><br>
+              <div class="user-info d-flex align-items-center">
+                <!-- user name add here -->
+                <img src="assets/icons/user_default.png" class="rounded-circle user-icon" alt="User Icon">
+                <div class="user-details ms-3">
+                  <p class="user-name">{{recipe.creator}}</p>
+                  <!-- <button class="btn btn-primary btn-add-to-list">+ Add to List</button> -->
+                </div>
+                <div></div>
+                <div class="btn-group d-flex align-items userinfo-buttons-space">
+                  <a
+                    (click)="rateRecipe(recipe.id, 1)"
+                    aria-label="Like Recipe" role="button">
+                    <i *ngIf="likes.includes(recipe.id); else notFilledUp"
+                       class="bi bi-hand-thumbs-up-fill like-dislike"></i>
+                    <ng-template #notFilledUp><i class="bi bi-hand-thumbs-up like-dislike"></i></ng-template>
+                  </a>
+                  <a
+                    (click)="rateRecipe(recipe.id, 0)"
+                    aria-label="Dislike Recipe">
+                    <i *ngIf="dislikes.includes(recipe.id); else notFilledDown"
+                       class="bi bi-hand-thumbs-down-fill like-dislike"></i>
+                    <ng-template #notFilledDown><i class="bi bi-hand-thumbs-down like-dislike"></i></ng-template>
+                  </a>
+                </div>
+                <div></div>
+              </div>
+            </div>
 
-    <div class="row justify-content-center" *ngIf="this.recipes !== null && this.recipes.length > 1">
-      <div class="col-md-auto">
-        <div class="container">
-          <ul class="pagination mb-4 mt-4">
-            <li class="page-item" [class.disabled]="this.searchParams.page === 0">
-              <a class="page-link" (click)="pageChanger(0)" aria-label="First" role="button">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
+          </div>
+        </div>
+      </div>
 
-            <li class="page-item" *ngFor="let page of pagesForPagination">
-              <a *ngIf="page !== searchParams.page" class="page-link" (click)="pageChanger(page)">{{ page + 1 }}</a>
-              <a *ngIf="page === searchParams.page" class="page-link active"
-                 (click)="pageChanger(page)">{{ page + 1 }}</a>
-            </li>
+      <div class="row justify-content-center" *ngIf="this.recipes !== null && this.recipes.length > 1">
+        <div class="col-md-auto">
+          <div class="container">
+            <ul class="pagination mb-4 mt-4">
+              <li class="page-item" [class.disabled]="this.searchParams.page === 0">
+                <a class="page-link" (click)="pageChanger(0)" aria-label="First" role="button">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
 
-            <li class="page-item" [class.disabled]="this.searchParams.page === maxPages - 1">
-              <a class="page-link" (click)="pageChanger(maxPages - 1)" aria-label="Last" role="button">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          </ul>
+              <li class="page-item" *ngFor="let page of pagesForPagination">
+                <a *ngIf="page !== searchParams.page" class="page-link" (click)="pageChanger(page)">{{ page + 1 }}</a>
+                <a *ngIf="page === searchParams.page" class="page-link active"
+                   (click)="pageChanger(page)">{{ page + 1 }}</a>
+              </li>
+
+              <li class="page-item" [class.disabled]="this.searchParams.page === maxPages - 1">
+                <a class="page-link" (click)="pageChanger(maxPages - 1)" aria-label="Last" role="button">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</main>

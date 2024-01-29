@@ -1,117 +1,118 @@
-<h1 class="display-1">Profile Details</h1>
-
-<form #form="ngForm" >
-  <div class="row">
-    <div class="center">
-      <div class="profile-name">
-        {{profileDetails.name}}
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="start-additional-info">
-      <div class="mb-2 col-lg-10">
-        <div class="row">
-          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-            Allergenes:
-          </label>
-          <div class="col-md-10 col-lg-8"
-          >
-            <ng-container *ngFor="let allergene of profileDetails.allergens">
-              <div class="model">
-                {{allergene.name}}
-              </div>
-            </ng-container>
-          </div>
+<main>
+  <h1 class="display-1">Profile Details</h1>
+  <form #form="ngForm">
+    <div class="row">
+      <div class="center">
+        <div class="profile-name">
+          {{profileDetails.name}}
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="start-additional-info">
-      <div class="mb-2 col-lg-10">
-        <div class="row">
-          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-            Ingredients:
-          </label>
-          <div class="col-md-10 col-lg-8"
-          >
-            <ng-container *ngFor="let ingredient of profileDetails.ingredients">
-              <div class="model" >
-                {{ingredient.name}}
-              </div>
-            </ng-container>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="start-additional-info">
-      <div class="mb-2 col-lg-10">
-        <div class="row">
-          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-            Liked Recipes:
-          </label>
-          <div class="col-md-10 col-lg-8"
-               *ngIf="profileDetails.liked.length !== 0; else noLikedList"
-          >
-            <ng-container *ngFor="let recipe of profileDetails.liked">
-              <div class="model">
-                {{recipe.name}}
-              </div>
-            </ng-container>
-          </div>
-          <ng-template #noLikedList>
-            <div class="col-md-10 col-lg-8">
-              No liked recipes
+    <div class="row">
+      <div class="start-additional-info">
+        <div class="mb-2 col-lg-10">
+          <div class="row">
+            <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+              Allergenes:
+            </label>
+            <div class="col-md-10 col-lg-8"
+            >
+              <ng-container *ngFor="let allergene of profileDetails.allergens">
+                <div class="model">
+                  {{allergene.name}}
+                </div>
+              </ng-container>
             </div>
-          </ng-template>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="start-additional-info">
+    <div class="row">
+      <div class="start-additional-info">
+        <div class="mb-2 col-lg-10">
+          <div class="row">
+            <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+              Ingredients:
+            </label>
+            <div class="col-md-10 col-lg-8"
+            >
+              <ng-container *ngFor="let ingredient of profileDetails.ingredients">
+                <div class="model">
+                  {{ingredient.name}}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="start-additional-info">
+        <div class="mb-2 col-lg-10">
+          <div class="row">
+            <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+              Liked Recipes:
+            </label>
+            <div class="col-md-10 col-lg-8"
+                 *ngIf="profileDetails.liked.length !== 0; else noLikedList"
+            >
+              <ng-container *ngFor="let recipe of profileDetails.liked">
+                <div class="model">
+                  {{recipe.name}}
+                </div>
+              </ng-container>
+            </div>
+            <ng-template #noLikedList>
+              <div class="col-md-10 col-lg-8">
+                No liked recipes
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="start-additional-info">
+        <div class="mb-2 col-lg-10">
+          <div class="row">
+            <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+              Disliked recipes:
+            </label>
+            <div class="col-md-10 col-lg-8"
+                 *ngIf="profileDetails.disliked.length !== 0; else noDislikedList"
+            >
+              <ng-container *ngFor="let recipe of profileDetails.disliked">
+                <div class="model">
+                  {{recipe.name}}
+                </div>
+              </ng-container>
+            </div>
+            <ng-template #noDislikedList>
+              <div class="col-md-10 col-lg-8">
+                No disliked recipes
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="mb-2 col-lg-10">
         <div class="row">
           <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-            Disliked recipes:
+            Creator:
           </label>
           <div class="col-md-10 col-lg-8"
-               *ngIf="profileDetails.disliked.length !== 0; else noDislikedList"
           >
-            <ng-container *ngFor="let recipe of profileDetails.disliked">
-              <div class="model">
-                {{recipe.name}}
-              </div>
-            </ng-container>
+            {{profileDetails.user}}
           </div>
-          <ng-template #noDislikedList>
-            <div class="col-md-10 col-lg-8">
-              No disliked recipes
-            </div>
-          </ng-template>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="row">
-    <div class="mb-2 col-lg-10">
-      <div class="row">
-        <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-          Creator:
-        </label>
-        <div class="col-md-10 col-lg-8"
-        >
-          {{profileDetails.user}}
-        </div>
-      </div>
-    </div>
-  </div>
-</form>
+  </form>
+</main>

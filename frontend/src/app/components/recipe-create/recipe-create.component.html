@@ -1,124 +1,128 @@
-<h1 style="text-align: center; margin-top: 1rem; margin-bottom: 1.2rem;">Create a recipe</h1>
-<div class="centered-container" style="width: 92%; margin: 0 4%; min-width: 420px;">
-  <form #form="ngForm" [class.was-validated]="form.submitted" (ngSubmit)="onSubmit(form)" style="width: 99%; max-width: 600px;" class="centered-container">
-    <div class="row justify-content-center align-items-center">
-      <div class="col">
-        <label for="image">Image:</label>
-        <input type="file"
-               id="image"
-               name="image"
-               accept="image/jpeg"
-               (change)="onPictureChange($event)"
-               required
-        >
+<main>
+  <h1 style="text-align: center; margin-top: 1rem; margin-bottom: 1.2rem;">Create a recipe</h1>
+  <div class="centered-container" style="width: 92%; margin: 0 4%; min-width: 420px;">
+    <form #form="ngForm" [class.was-validated]="form.submitted" (ngSubmit)="onSubmit(form)"
+          style="width: 99%; max-width: 600px;" class="centered-container">
+      <div class="row justify-content-center align-items-center">
+        <div class="col">
+          <label for="image">Image:</label>
+          <input type="file"
+                 id="image"
+                 name="image"
+                 accept="image/jpeg"
+                 (change)="onPictureChange($event)"
+                 required
+          >
+        </div>
       </div>
-    </div>
 
-    <!-- Sometimes it works, sometime it does not, really depends on the png file....-->
-    <img *ngIf="safePictureUrl !== null" [src]="safePictureUrl" alt="Selected Picture" class="img-thumbnail">
+      <!-- Sometimes it works, sometime it does not, really depends on the png file....-->
+      <img *ngIf="safePictureUrl !== null" [src]="safePictureUrl" alt="Selected Picture" class="img-thumbnail">
 
-    <div class="row justify-content-center align-items-center">
-      <div class="col">
-        <!-- Title Input -->
-        <label for="title" class="p-2" style="font-weight: bold">Title: </label>
-        <input type="text"
-               class="rounded-pill"
-               style="width: 250px; text-align: center"
-               id="title"
-               name="title"
-               placeholder="Cheeseburger"
-               required
-               [(ngModel)]="recipe.name"
-        >
+      <div class="row justify-content-center align-items-center">
+        <div class="col">
+          <!-- Title Input -->
+          <label for="title" class="p-2" style="font-weight: bold">Title: </label>
+          <input type="text"
+                 class="rounded-pill"
+                 style="width: 250px; text-align: center"
+                 id="title"
+                 name="title"
+                 placeholder="Cheeseburger"
+                 required
+                 [(ngModel)]="recipe.name"
+          >
+        </div>
       </div>
-    </div>
 
 
-    <div class="row mb-3">
-      <div class="row justify-content-center">
-        <div class="col-12">
-          <div class="card" style="min-width: 400px;">
-            <div class="card-header" style="text-align: center; font-weight: bold">Recipe Ingredients</div>
-            <div class="card-body">
-              <div class="align-items-center" style="width: 100%; display: flex; flex-direction: row;">
-                <div class="" style="position: relative; width: 100%;">
-                  <app-autocomplete
-                    #ingredientInput
-                    id="ingredients"
-                    name="ingredients"
-                    class="rounded-pill"
-                    textInputClass="input"
-                    valueNeedsToMatchSuggestion="true"
-                    [(ngModel)]="ingredient"
-                    [formatModel]="formatIngredient"
-                    [suggestions]="ingredientSuggestions"
-                  ></app-autocomplete>
+      <div class="row mb-3">
+        <div class="row justify-content-center">
+          <div class="col-12">
+            <div class="card" style="min-width: 400px;">
+              <div class="card-header" style="text-align: center; font-weight: bold">Recipe Ingredients</div>
+              <div class="card-body">
+                <div class="align-items-center" style="width: 100%; display: flex; flex-direction: row;">
+                  <div class="" style="position: relative; width: 100%;">
+                    <app-autocomplete
+                      #ingredientInput
+                      id="ingredients"
+                      name="ingredients"
+                      class="rounded-pill"
+                      textInputClass="input"
+                      valueNeedsToMatchSuggestion="true"
+                      [(ngModel)]="ingredient"
+                      [formatModel]="formatIngredient"
+                      [suggestions]="ingredientSuggestions"
+                    ></app-autocomplete>
+                  </div>
+                  <div class="">
+                    <button (click)="addIngredient(ingredientInput)" class="bb-button"
+                            style="min-width: 110px; margin-left: 1.2rem;">
+                      <i class="bi-plus-square"></i>
+                      Add
+                    </button>
+                  </div>
                 </div>
-                <div class="" >
-                  <button (click)="addIngredient(ingredientInput)" class="bb-button" style="min-width: 110px; margin-left: 1.2rem;">
-                    <i class="bi-plus-square"></i>
-                    Add
-                  </button>
-                </div>
+                <table class="table">
+                  <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Unit</th>
+                    <th></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let ingredient of recipe.ingredients">
+                    <td>{{ ingredient.name }}</td>
+                    <td>
+                      <input [(ngModel)]="ingredient.amount"
+                             name="{{ingredient.amount}}"
+                             type="number"
+                             min="0"
+                             class="rounded-pill"
+                             placeholder="100"
+                             style="width: 100%; text-align: center">
+                    </td>
+                    <td>
+                      <select [(ngModel)]="ingredient.unit" name="ounce" class="form-select"
+                              aria-label="Select a unit" style="width: min-content">
+                        <option selected>cup</option>
+                        <option value="cup">cup</option>
+                        <option value="tablespoon">tablespoon</option>
+                        <option value="tablespoon">teaspoon</option>
+                        <option value="ounce">ounce</option>
+                        <option value="clove">clove</option>
+                        <option value="pound">pound</option>
+                        <option value="bunch">bunch</option>
+                        <option value="pinch">pinch</option>
+                        <option value="slices">slices</option>
+                      </select>
+                    </td>
+                    <td><i class="bi bi-x-circle" (click)="removeIngredient(ingredient)" style="color:red"></i></td>
+                  </tr>
+                  </tbody>
+                </table>
               </div>
-              <table class="table">
-                <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Amount</th>
-                  <th>Unit</th>
-                  <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let ingredient of recipe.ingredients">
-                  <td>{{ ingredient.name }}</td>
-                  <td>
-                    <input [(ngModel)]="ingredient.amount"
-                           name="{{ingredient.amount}}"
-                           type="number"
-                           min="0"
-                           class="rounded-pill"
-                           placeholder="100"
-                           style="width: 100%; text-align: center">
-                  </td>
-                  <td>
-                    <select [(ngModel)]="ingredient.unit" name="ounce" class="form-select"
-                            aria-label="Select a unit" style="width: min-content">
-                      <option selected>cup</option>
-                      <option value="cup">cup</option>
-                      <option value="tablespoon">tablespoon</option>
-                      <option value="tablespoon">teaspoon</option>
-                      <option value="ounce">ounce</option>
-                      <option value="clove">clove</option>
-                      <option value="pound">pound</option>
-                      <option value="bunch">bunch</option>
-                      <option value="pinch">pinch</option>
-                      <option value="slices">slices</option>
-                    </select>
-                  </td>
-                  <td><i class="bi bi-x-circle" (click)="removeIngredient(ingredient)" style="color:red"></i></td>
-                </tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="" style="display: flex; flex-direction: column;">
-      <label for="description">Description:</label>
-      <textarea id="description"
-                name="description"
-                style="margin-bottom: 1.5rem;"
-                [(ngModel)]="recipe.description"
-                required
-      ></textarea>
-      <!-- Submit Button -->
-      <div class="">
-        <input type="submit" class="bb-button" value="Create Recipe" (click)="onButtonClick()">
+      <div class="" style="display: flex; flex-direction: column;">
+        <label for="description">Description:</label>
+        <textarea id="description"
+                  name="description"
+                  style="margin-bottom: 1.5rem;"
+                  [(ngModel)]="recipe.description"
+                  required
+        ></textarea>
+        <!-- Submit Button -->
+        <div class="">
+          <input type="submit" class="bb-button" value="Create Recipe" (click)="onButtonClick()">
+        </div>
       </div>
-    </div>
-  </form>
-</div>
+    </form>
+  </div>
+</main>
