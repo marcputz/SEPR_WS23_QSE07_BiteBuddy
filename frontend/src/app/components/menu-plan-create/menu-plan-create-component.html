@@ -4,7 +4,8 @@
       <label for="profileDropdown"><b>Select a Profile:</b></label>
       <select name="profileDropdown" [(ngModel)]="selectedProfile" id="profileDropdown" class="bb-dropdown"
               style="margin-bottom: 10px; width: 100%;">
-        <option *ngFor="let profile of userProfiles" [value]="profile.id">{{ profile.name }}</option>
+        <option selected="selected" *ngIf="userProfiles?.length > 0" [value]="userProfiles[0].id">{{ userProfiles[0].name }}</option>
+        <option *ngFor="let profile of userProfiles | slice:1:userProfiles.length" [value]="profile.id">{{ profile.name }}</option>
       </select>
     </form>
     <button (click)="onClickGenerate()" class="bb-button"><i class="bi-database-fill-add"
