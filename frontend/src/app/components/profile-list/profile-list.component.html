@@ -17,10 +17,9 @@
         <!-- Create Profile Button -->
         <div class="col-md-4 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
           <div class="input-button">
-            <button class="button-create button-transparent" [routerLink]="['/profile']" aria-label="Create Profile">
-              <i class="bi bi-plus">
+            <button class="bb-button" [routerLink]="['/profile']" aria-label="Create Profile" style="white-space: nowrap;">
+              <i class="bi bi-plus-circle" style="margin-right: 0.4rem;"></i>
                 Create Profile
-              </i>
             </button>
           </div>
         </div>
@@ -70,13 +69,11 @@
               </ul>
             </div>
             <div class="buttons-flex mt-auto m-3">
-              <button class="button-transparent"
+              <button class="button-transparent" style="margin-right: 1rem; height: 100%;"
                       [routerLink]="['/profiles/edit', profile.id]">
-                  <span class="bb-text-inside-btn-transp">
                 Edit
-              </span>
               </button>
-              <button *ngIf="profile.id !== activeprofileId" class="button-transparent d-flex"
+              <button *ngIf="profile.id !== activeprofileId" class="button-transparent d-flex" style="margin-right: 1rem;"
                       (click)="setActiveProfile(profile.id, profile.name)">
                 Activate
               </button>

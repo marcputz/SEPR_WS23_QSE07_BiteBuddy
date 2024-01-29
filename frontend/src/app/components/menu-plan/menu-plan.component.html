@@ -13,7 +13,7 @@
       <div class="row row-title">
         <!-- Title -->
         <div class="col-md-6 col-lg-4 col-sm-4 col-xl-3 col-xxl-3">
-          <h1 class="bb-dialog-box-header title-margin">My Menuplans</h1>
+          <h1 class="bb-dialog-box-header title-margin">Menu Plans</h1>
         </div>
 
         <!-- Dropdown menu -->
@@ -34,14 +34,23 @@
 
         <div class="col-md-3 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
           <div class="input-button">
-            <button type="submit" (click)="showCreateDialog = true;" class="button-create button-transparent"
-                    aria-label="Generate Menu Plan" role="button">
-              <i class="bi bi-plus">New Menu Plan</i>
+            <button type="submit" (click)="showCreateDialog = true;" class="bb-button"
+                    aria-label="Generate Menu Plan"
+                    role="button"
+                    style="white-space: nowrap;">
+              <i class="bi bi-plus-circle" style="margin-right: 0.4rem;"></i>
+              New Menu Plan
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- container to show if no content available -->
+    <div *ngIf="contents === undefined || contents.length == 0" style="width: 100%; text-align: center;">
+        <b style="color: rgba(0,0,0, 0.8);">You haven't created any menu plans yet</b><br>
+    </div>
+
     <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6"
          *ngFor="let content of contents; let i = index">
       <div class="card recipe-card h-100">
