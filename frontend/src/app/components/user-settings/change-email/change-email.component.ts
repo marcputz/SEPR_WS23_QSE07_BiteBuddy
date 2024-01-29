@@ -19,7 +19,7 @@ export class ChangeEmailComponent implements OnInit {
   error = false;
   errorMessage = 'Something went wrong, no user settings found. Check if your backend is connected';
 
-  isInputFocused: {[key: string]: boolean } = {};
+  isInputFocused: { [key: string]: boolean } = {};
   showPasswords: boolean = false;
 
   originalUserSettings: UserSettingsDto;
@@ -49,7 +49,7 @@ export class ChangeEmailComponent implements OnInit {
         console.error('Error loading user settings', error);
         this.notifications.error('Error loading user settings, try again');
         this.error = true;
-       //TODO: not working when server down this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
+        //TODO: not working when server down this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
       },
       complete: () => {
       }
@@ -71,6 +71,7 @@ export class ChangeEmailComponent implements OnInit {
           console.log('User settings updated successfully');
           this.notifications.success('Email updated successfully');
           this.getUser();
+          this.authService.triggerUpdate();
           this.submitted = false;
           this.settingsForm.controls['currentPassword'].setValue('');
         },
