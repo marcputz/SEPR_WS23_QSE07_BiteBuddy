@@ -11,5 +11,4 @@ import java.util.Set;
 public interface AllergeneRepository extends JpaRepository<Allergene, Long> {
     Set<Allergene> findAllByAllergeneIngredientsIngredientId(long l);
 
-    List<Allergene> findAll();
 }

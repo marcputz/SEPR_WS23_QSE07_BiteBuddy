@@ -18,8 +18,6 @@ public interface MenuPlanRepository extends JpaRepository<MenuPlan, Long> {
     @Transactional
     void deleteAllByUser(ApplicationUser user);
 
-    Optional<MenuPlan> findById(Long id);
-
     List<MenuPlan> getAllByUser(ApplicationUser user);
 
     @Query("select m from MenuPlan m where m.user = :user and ((m.fromDate between :fromDate and :untilDate) or (m.untilDate between :fromDate and :untilDate))")

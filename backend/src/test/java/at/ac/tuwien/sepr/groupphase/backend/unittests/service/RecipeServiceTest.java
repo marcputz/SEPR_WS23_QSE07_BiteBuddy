@@ -116,7 +116,7 @@ public class RecipeServiceTest {
     }
 
     @BeforeEach
-    public void setup() throws IOException {
+    public void setup() throws Exception {
         ApplicationUser user = new ApplicationUser();
         user.setNickname("testuser");
         user.setEmail("test@test");
@@ -124,7 +124,7 @@ public class RecipeServiceTest {
 
         this.userRepository.save(user);
 
-        this.user = this.userRepository.findByNickname("testuser").get();
+        this.user = this.userRepository.findByNickname("testuser").orElseThrow(NotFoundException::new);
 
         // adding picture
         Picture pic = new Picture();

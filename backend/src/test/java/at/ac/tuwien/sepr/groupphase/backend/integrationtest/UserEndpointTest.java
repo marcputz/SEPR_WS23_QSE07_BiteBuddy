@@ -431,8 +431,6 @@ public class UserEndpointTest {
 
         String authToken = registerResult.getResponse().getContentAsString();
         assertNotNull(authToken);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", authToken);
 
         UserRegisterDto registerDto2 = new UserRegisterDto();
         registerDto2.setName("testName");

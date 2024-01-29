@@ -214,7 +214,7 @@ public class JpaMenuPlanService implements MenuPlanService {
                 Recipe selectedRecipe = null;
 
                 // determine which recipe list to use
-                List<Recipe> recipeList = null;
+                List<Recipe> recipeList;
                 boolean useOwnedRecipes = ThreadLocalRandom.current().nextDouble(0.0, 1.0) < chanceOwnedRecipeSelected;
                 boolean useLikedRecipes = ThreadLocalRandom.current().nextDouble(0.0, 1.0) < chanceLikedRecipeSelected;
                 boolean usePreferredRecipes = ThreadLocalRandom.current().nextDouble(0.0, 1.0) < chancePreferredRecipeSelected;
@@ -738,7 +738,7 @@ public class JpaMenuPlanService implements MenuPlanService {
     public InventoryListDto searchInventory(ApplicationUser user, boolean onlyValid) {
         LOGGER.trace("searchInventory({}, {})", user, onlyValid);
         if (onlyValid) {
-            MenuPlan menuPlan = null;
+            MenuPlan menuPlan;
             List<MenuPlan> menuPlans = this.getAllMenuPlansOfUserDuringTimeframe(user, LocalDate.now().minusDays(5), LocalDate.now());
 
             if (menuPlans.size() == 1) {
@@ -785,7 +785,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         LOGGER.trace("updateInventoryIngredient({}, {})", user, updatedIngredientDto);
         this.validator.validateInventoryIngredientForUpdate(updatedIngredientDto, searchInventory(updatedIngredientDto.getMenuPlanId()));
 
-        InventoryIngredient toSave = this.inventoryIngredientRepository.findById(updatedIngredientDto.getId()).get();
+        InventoryIngredient toSave = this.inventoryIngredientRepository.findById(updatedIngredientDto.getId()).orElseThrow(() -> new NotFoundException("Could not find inventory ingredient by ID"));
         toSave.setInventoryStatus(updatedIngredientDto.isInventoryStatus());
         this.inventoryIngredientRepository.save(toSave);
     }

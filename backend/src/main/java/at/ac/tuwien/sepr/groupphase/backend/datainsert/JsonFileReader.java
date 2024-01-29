@@ -173,19 +173,19 @@ public class JsonFileReader {
         Float amount = null;
         FoodUnit foodUnit = null;
         String describer;
-        if (!startsWithNumber(s)) {
-            //amount = null;
-        } else if (startsWithOunce(s)) {
-            amount = extractNumbersIfStartsWithOunce(s);
-            remainingString = extractStringAfterNumericValueBrackets(s);
-            remainingString = removeFirstWord(remainingString);
-            foodUnit = FoodUnit.ounce;
-        } else if (startsWithFraction(s)) {
-            amount = parseFraction(s);
-            remainingString = getRemainingStringAfterFraction(s);
-        } else {
-            amount = extractNumericValueBeforeUnit(s);
-            remainingString = extractStringAfterNumericValueNormal(s);
+        if (startsWithNumber(s)) {
+            if (startsWithOunce(s)) {
+                amount = extractNumbersIfStartsWithOunce(s);
+                remainingString = extractStringAfterNumericValueBrackets(s);
+                remainingString = removeFirstWord(remainingString);
+                foodUnit = FoodUnit.ounce;
+            } else if (startsWithFraction(s)) {
+                amount = parseFraction(s);
+                remainingString = getRemainingStringAfterFraction(s);
+            } else {
+                amount = extractNumericValueBeforeUnit(s);
+                remainingString = extractStringAfterNumericValueNormal(s);
+            }
         }
         remainingString = removeTextInParentheses(remainingString);
         describer = extractSubstringAfterComma(remainingString);

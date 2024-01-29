@@ -69,7 +69,7 @@ public class FileKeyService implements KeyService {
     }
 
     private void initKeyFolder() {
-        File keyFolderFile = null;
+        File keyFolderFile;
 
         LOGGER.trace("initKeyFolder()");
         try {
