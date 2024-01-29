@@ -15,7 +15,7 @@
     </div>
 
     <!-- Sometimes it works, sometime it does not, really depends on the png file....-->
-    <img *ngIf="this.recipePicture" [src]="sanitizeImage(recipePicture)" alt="Selected Picture" class="img-thumbnail">
+    <img *ngIf="safePictureUrl !== null" [src]="safePictureUrl" alt="Selected Picture" class="img-thumbnail">
 
     <div class="row justify-content-center align-items-center">
       <div class="col">
