@@ -33,12 +33,14 @@
           <!-- Card for each profile -->
           <div class="card h-100"> <!-- h-100 Cards expand to size of longest Card in line -->
             <div class="card-body">
-              <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
-                <h5 class="card-title">{{ profile.name }}<br>
+              <div style="display: flex; flex-direction: row; padding-bottom: 0.8rem; border-bottom: rgba(0,0,0, 0.1) solid 1px;">
+                <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
+                  <h5 class="card-title" style="margin-bottom: 0;">{{ profile.name }}</h5>
+                </a>
+                <span class="mx-auto"></span>
                 <span *ngIf="profile.id === activeprofileId" class="active-tag">Active</span>
-              </h5>
-              </a>
-              <p class="card-text"><strong>Restricted Allergens:</strong></p>
+              </div>
+              <p class="card-text" style="margin-top: 0.6rem;"><strong>Restricted Allergens:</strong></p>
               <ul>
                 <ng-container *ngFor="let allergen of profile.allergens; let i = index">
                   <li *ngIf="i < 3">{{ allergen.name }}</li>
@@ -143,9 +145,9 @@
           <div class="card h-100"> <!-- Cards expand to size of longest Card in line -->
             <div class="card-body">
               <a class="card-title-link-disa" [routerLink]="['/profiles', profile.id]">
-                <h5 class="card-title">{{ profile.name }}</h5>
+                <h5 class="card-title" style="border-bottom: rgba(0,0,0, 0.1) solid 1px; padding-bottom: 0.6rem;">{{ profile.name }}</h5>
               </a>
-              <div class="card-subtitle text-muted">
+              <div class="card-subtitle text-muted" style="margin-top: 0.9rem;">
                   <span>Created by:
                     <img [ngSrc]="getPictureUrl(profile.userPicture)" width="35" height="35" style="margin-right: 5px;"
                          alt="Profile Image">
