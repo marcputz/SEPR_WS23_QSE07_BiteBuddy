@@ -6,16 +6,11 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

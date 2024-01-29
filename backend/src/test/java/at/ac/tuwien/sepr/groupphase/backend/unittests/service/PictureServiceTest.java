@@ -1,8 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PictureDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ProfileSearchResultDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PictureRepository;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;

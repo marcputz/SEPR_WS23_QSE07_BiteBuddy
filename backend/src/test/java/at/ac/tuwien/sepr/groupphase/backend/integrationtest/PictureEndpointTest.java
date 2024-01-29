@@ -3,10 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.integrationtest;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PictureDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PictureRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
@@ -28,11 +26,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

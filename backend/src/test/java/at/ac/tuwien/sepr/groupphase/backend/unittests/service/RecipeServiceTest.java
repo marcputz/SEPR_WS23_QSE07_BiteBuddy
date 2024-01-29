@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PictureDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.authentication.LoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeDetailsDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeIngredientDto;
@@ -31,14 +30,12 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;

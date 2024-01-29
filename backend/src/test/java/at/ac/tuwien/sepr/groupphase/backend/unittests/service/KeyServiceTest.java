@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
-import at.ac.tuwien.sepr.groupphase.backend.basetest.TestData;
 import at.ac.tuwien.sepr.groupphase.backend.service.KeyService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.junit.jupiter.api.Assertions;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
