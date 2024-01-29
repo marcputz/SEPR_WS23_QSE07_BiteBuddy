@@ -55,6 +55,7 @@ public class ProfileValidator {
      * Validate the ratings rating integer.
      *
      * @param rating the rating to validate
+     * @throws ValidationException if the rating is invalid
      */
     public void validateRating(int rating) throws ValidationException {
         LOGGER.trace("validateRating({})", rating);
@@ -74,6 +75,7 @@ public class ProfileValidator {
      *
      * @param currentUser the current User of the application
      * @param profile the currently used profile
+     * @throws ConflictException if the profile there is a conflict with already existing data (profile is active profile, profile does not belong to active user)
      * @author Thomas Hellweger
      */
     public void validateDelete(ApplicationUser currentUser, Profile profile) throws ConflictException {
@@ -85,7 +87,7 @@ public class ProfileValidator {
         }
 
         if (!Objects.equals(profile.getUser().getId(), currentUser.getId())) {
-            conflictErrors.add("The active profile does not belong to the active user");
+            conflictErrors.add("The profile does not belong to the active user");
         }
 
         if (!conflictErrors.isEmpty()) {
