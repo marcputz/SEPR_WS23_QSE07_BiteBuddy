@@ -52,6 +52,14 @@ public class ProfileEndpoint {
         this.userService = userService;
     }
 
+    /**
+     * Searches all profiles who match the search parameters
+     *
+     * @param searchParams {@link ProfileSearchDto} contains the search information for the profile search
+     * @param headers {@link HttpHeaders} with the authentication information.
+     * @throws AuthenticationException if no user is logged in.
+     * @author Alexander Pollek
+     */
     @PostMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public ProfileSearchResultDto searchProfiles(@Valid @RequestBody ProfileSearchDto searchParams, @RequestHeader HttpHeaders headers)
@@ -68,7 +76,7 @@ public class ProfileEndpoint {
     /**
      * Creates a profile.
      *
-     * @param toCreateProfile contains the id and the creation information of the profile
+     * @param toCreateProfile contains the id and the creation information of the profile.
      * @param headers {@link HttpHeaders} with the authentication information.
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException       if the profile, it's user, one of its allergens or one of its liked ingredients do not exist in the database.
@@ -87,7 +95,14 @@ public class ProfileEndpoint {
 
     }
 
-
+    /**
+     * Searches all profiles who match the search parameters
+     *
+     * @param profileId {@link ProfileSearchDto} contains the id of the profile to copy.
+     * @param headers {@link HttpHeaders} with the authentication information.
+     * @throws AuthenticationException if no user is logged in.
+     * @author Alexander Pollek
+     */
     @PostMapping("/copyToOwn/{profileId}")
     @ResponseStatus(HttpStatus.OK)
     public ProfileDetailDto copyProfile(@PathVariable Long profileId, @RequestHeader HttpHeaders headers) throws AuthenticationException {
@@ -99,6 +114,14 @@ public class ProfileEndpoint {
         return profileService.copyToUser(profileId, currentUserId);
     }
 
+    /**
+     * Returns all profiles of a certain user.
+     *
+     * @param headers {@link HttpHeaders} with the authentication information.
+     * @return {@link List<ProfileListDto>} of the found profiles.
+     * @throws AuthenticationException if no user is logged in.
+     * @author Marc Putz
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ProfileListDto> getAllForUser(@RequestHeader HttpHeaders headers) throws AuthenticationException {
@@ -122,6 +145,7 @@ public class ProfileEndpoint {
      *
      * @param profileId the id of the requested profile
      * @param headers {@link HttpHeaders} with the authentication information.
+     * @return {@link ProfileDetailDto} of the requested profile.
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException if the profile does not exist in the database.
      * @author Thomas Hellweger
@@ -141,6 +165,7 @@ public class ProfileEndpoint {
      *
      * @param profileDto contains the id and the edited information of the profile
      * @param headers {@link HttpHeaders} with the authentication information.
+     * @return {@link ProfileDto} of the edited profile.
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException       if the profile or it's user do not exist in the database.
      * @throws ValidationException     if the edited data is not valid for editing.
