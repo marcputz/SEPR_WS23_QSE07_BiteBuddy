@@ -1,5 +1,5 @@
+<main>
 <h1 class="display-1">Recipe Details</h1>
-
 <form #form="ngForm" >
   <div class="row">
     <div class="center">
@@ -16,7 +16,7 @@
     <div class="center">
       <img *ngIf="recipePicture !== null"
            [src]="sanitizeImage(recipePicture)"
-           [alt]="recipePictureAlt != null ? recipePictureAlt : 'Recipe Picture'"
+           [alt]="recipePictureAlt !== null ? recipePictureAlt : 'Recipe Picture'"
            class="img-thumbnail">
     </div>
   </div>
@@ -96,3 +96,4 @@
     </div>
   </div>
 </form>
+</main>

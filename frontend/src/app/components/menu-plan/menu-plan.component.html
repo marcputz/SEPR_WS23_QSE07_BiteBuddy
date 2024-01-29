@@ -1,128 +1,95 @@
-<div *ngIf="this.showCreateDialog" class="bb-modal" tabindex="-1">
-  <div class="bb-modal-dialog" style="width: 100%;height: 100%">
-    <a style="text-align: start; width: 100%;" class="bb-link" (click)="this.showCreateDialog = false;"><i
-      class="bi-x"></i>Close</a>
-    <h2 style="margin-bottom: 1.5rem; text-align: center; width: 100%;">New Menu Plan</h2>
-    <app-menu-plan-create (submitClicked)="onMenuPlanSubmit()" style="width: 100%"></app-menu-plan-create>
+<main>
+  <div *ngIf="this.showCreateDialog" class="bb-modal" tabindex="-1">
+    <div class="bb-modal-dialog" style="width: 100%;height: 100%">
+      <a style="text-align: start; width: 100%;" class="bb-link" (click)="this.showCreateDialog = false;"><i
+        class="bi-x"></i>Close</a>
+      <h2 style="margin-bottom: 1.5rem; text-align: center; width: 100%;">New Menu Plan</h2>
+      <app-menu-plan-create (submitClicked)="onMenuPlanSubmit()" style="width: 100%"></app-menu-plan-create>
+    </div>
   </div>
-</div>
-<!--
-<div class="container">
-  <h1 style="text-align: center">My Menuplans</h1>
-</div>
 
-<div *ngIf="menuplans.length >= 1">
-  <label for="menuplans" style="text-align: center; width: 100%">
-    <span style="font-weight: bold;text-align: center;width: 100%">Which menuplan do you want to see?</span>
-    <span class="required-asterisk">*</span>
-  </label>
-  <div class="row justify-content-center align-items-center">
-    <select multiple class="form-select custom-select"
-            id="menuplans"
-            style="font-weight: bold;width: 20%; text-align: center;"
-            formControlName="menuplans"
-            (change)="onMenuPlanSelected($event)"
-            required>
-      <option *ngFor="let m of menuplans" [value]="m.fromTime">
-        {{ m.fromTime }} to {{ m.untilTime }}
-      </option>
-    </select>
-  </div>
-  <div class="row justify-content-center align-items-center">
-    <button (click)="this.showCreateDialog = true;" style="width: 20%; margin-bottom: 1rem;" class="bb-button">New Menu
-      Plan
-    </button>
-  </div>
-</div>
-
-<div *ngIf="menuplans.length < 1" style="text-align: center; font-size: 18px; font-weight: bold; margin-top: 50 px;">
-  <p>You have to add a Menuplan!
-    <button (click)="this.showCreateDialog = true;">Add Menu Plan</button>
-</div>
--->
-
-<div class="row" style="margin: 2%">
-  <div class="row-form" style="width: 84%">
-    <div class="row row-title">
-      <!-- Title -->
-      <div class="col-md-6 col-lg-4 col-sm-4 col-xl-3 col-xxl-3">
-        <h1 class="bb-dialog-box-header title-margin">My Menuplans</h1>
-      </div>
-
-      <!-- Dropdown menu -->
-      <div class="col-md-6 col-lg-5 col-sm-4 col-xl-5 col-xxl-6">
-        <div class="input-group">
-          <select id="chooseMenuplan" name="chooseMenuplan"
-                  aria-label="Menu Plan Select"
-                  class="form-select input-field"
-                  [(ngModel)]="selectedStartDate"
-                  (ngModelChange)="searchChanged()">
-            <option value="" disabled selected>Select Start Date</option>
-            <option *ngFor="let menuplan of menuplans" [value]="menuplan.fromTime">
-              {{ menuplan.fromTime }} to {{ menuplan.untilTime }}
-            </option>
-          </select>
+  <div class="row" style="margin: 2%">
+    <div class="row-form" style="width: 84%">
+      <div class="row row-title">
+        <!-- Title -->
+        <div class="col-md-6 col-lg-4 col-sm-4 col-xl-3 col-xxl-3">
+          <h1 class="bb-dialog-box-header title-margin">My Menuplans</h1>
         </div>
-      </div>
 
-      <div class="col-md-3 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
-        <div class="input-button">
-          <button type="submit" (click)="showCreateDialog = true;" class="button-create button-transparent"
-                  aria-label="Generate Menu Plan" role="button">
-            <i class="bi bi-plus">New Menu Plan</i>
-          </button>
+        <!-- Dropdown menu -->
+        <div class="col-md-6 col-lg-5 col-sm-4 col-xl-5 col-xxl-6">
+          <div class="input-group">
+            <select id="chooseMenuplan" name="chooseMenuplan"
+                    aria-label="Menu Plan Select"
+                    class="form-select input-field"
+                    [(ngModel)]="selectedStartDate"
+                    (ngModelChange)="searchChanged()">
+              <option value="" disabled selected>Select Start Date</option>
+              <option *ngFor="let menuplan of menuplans" [value]="menuplan.fromTime">
+                {{ menuplan.fromTime }} to {{ menuplan.untilTime }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-lg-2 col-sm-4 col-xl-3 col-xxl-3">
+          <div class="input-button">
+            <button type="submit" (click)="showCreateDialog = true;" class="button-create button-transparent"
+                    aria-label="Generate Menu Plan" role="button">
+              <i class="bi bi-plus">New Menu Plan</i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6"
-       *ngFor="let content of contents; let i = index">
-    <div class="card recipe-card h-100">
-      <img [src]="getImageFor(content.recipe)" class="card-img-top rounded-top img-zoom"
-           [alt]="getImageAltFor(content.recipe)">
+    <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6"
+         *ngFor="let content of contents; let i = index">
+      <div class="card recipe-card h-100">
+        <img [src]="getImageFor(content.recipe)" class="card-img-top rounded-top img-zoom"
+             [alt]="getImageAltFor(content.recipe)">
 
-      <div class="card-body">
-        <a class="card-title-link-disa" [routerLink]="['/recipes', content.recipe.id]">
-          <h5 class="card-title">{{ content.recipe.name }}</h5>
-        </a><br>
-        <p class="card-text">
-          <ng-container *ngIf="(i+2) % maxTimeslots === 0; else dinnerBlock">
-            {{ formatDateLocally(menuplan.fromTime, content.day) }} - lunch
-          </ng-container>
-          <ng-template #dinnerBlock>
-            <ng-container *ngIf="(i+2) % maxTimeslots === 1; else breakfastBlock">
-              {{ formatDateLocally(menuplan.fromTime, content.day) }} - dinner
+        <div class="card-body">
+          <a class="card-title-link-disa" [routerLink]="['/recipes', content.recipe.id]">
+            <h5 class="card-title">{{ content.recipe.name }}</h5>
+          </a><br>
+          <p class="card-text">
+            <ng-container *ngIf="(i+2) % maxTimeslots === 0; else dinnerBlock">
+              {{ formatDateLocally(menuplan.fromTime, content.day) }} - lunch
             </ng-container>
-            <ng-template #breakfastBlock>
-              {{ formatDateLocally(menuplan.fromTime, content.day) }} - breakfast
+            <ng-template #dinnerBlock>
+              <ng-container *ngIf="(i+2) % maxTimeslots === 1; else breakfastBlock">
+                {{ formatDateLocally(menuplan.fromTime, content.day) }} - dinner
+              </ng-container>
+              <ng-template #breakfastBlock>
+                {{ formatDateLocally(menuplan.fromTime, content.day) }} - breakfast
+              </ng-template>
             </ng-template>
-          </ng-template>
-        </p>
-        <div class="user-info d-flex align-items-center">
-          <!-- user name add here -->
-          <img src="assets/icons/user_default.png" class="rounded-circle user-icon" alt="User Icon">
-          <div class="user-details ms-3">
-            <p class="user-name">{{content.recipe.creator}}</p>
+          </p>
+          <div class="user-info d-flex align-items-center">
+            <!-- user name add here -->
+            <img src="assets/icons/user_default.png" class="rounded-circle user-icon" alt="User Icon">
+            <div class="user-details ms-3">
+              <p class="user-name">{{content.recipe.creator}}</p>
+            </div>
+            <div></div>
+            <div class="btn-group d-flex align-items userinfo-buttons-space">
+              <a
+                (click)="rerollRecipe(content)"
+                aria-label="Reroll Recipe" role="button">
+                <i class="bi bi-arrow-clockwise"></i>
+              </a>
+              <a
+                (click)="dislikeRecipe(content)"
+                aria-label="Dislike Recipe" role="button">
+                <i class="bi bi-hand-thumbs-down"></i>
+              </a>
+            </div>
+            <div></div>
           </div>
-          <div></div>
-          <div class="btn-group d-flex align-items userinfo-buttons-space">
-            <a
-              (click)="rerollRecipe(content)"
-              aria-label="Reroll Recipe" role="button">
-              <i class="bi bi-arrow-clockwise"></i>
-            </a>
-            <a
-              (click)="dislikeRecipe(content)"
-              aria-label="Dislike Recipe" role="button">
-              <i class="bi bi-hand-thumbs-down"></i>
-            </a>
-          </div>
-          <div></div>
         </div>
       </div>
     </div>
   </div>
-</div>
-
+</main>
 
 
