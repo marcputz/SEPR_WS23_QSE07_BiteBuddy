@@ -1,6 +1,6 @@
-<h1 style="text-align: center;">Create a recipe</h1>
-<div class="centered-container" style="min-width: 400px;">
-  <form #form="ngForm" [class.was-validated]="form.submitted" (ngSubmit)="onSubmit(form)" class="centered-container">
+<h1 style="text-align: center; margin-top: 1rem; margin-bottom: 1.2rem;">Create a recipe</h1>
+<div class="centered-container" style="width: 92%; margin: 0 4%; min-width: 420px;">
+  <form #form="ngForm" [class.was-validated]="form.submitted" (ngSubmit)="onSubmit(form)" style="width: 99%; max-width: 600px;" class="centered-container">
     <div class="row justify-content-center align-items-center">
       <div class="col">
         <label for="image">Image:</label>
@@ -40,8 +40,8 @@
           <div class="card" style="min-width: 400px;">
             <div class="card-header" style="text-align: center; font-weight: bold">Recipe Ingredients</div>
             <div class="card-body">
-              <div class="row align-items-center">
-                <div class="col" style="position: relative;">
+              <div class="align-items-center" style="width: 100%; display: flex; flex-direction: row;">
+                <div class="" style="position: relative; width: 100%;">
                   <app-autocomplete
                     #ingredientInput
                     id="ingredients"
@@ -54,8 +54,8 @@
                     [suggestions]="ingredientSuggestions"
                   ></app-autocomplete>
                 </div>
-                <div class="col">
-                  <button (click)="addIngredient(ingredientInput)" class="btn btn-success rounded-pill">
+                <div class="" >
+                  <button (click)="addIngredient(ingredientInput)" class="bb-button" style="min-width: 110px; margin-left: 1.2rem;">
                     <i class="bi-plus-square"></i>
                     Add
                   </button>
@@ -107,17 +107,17 @@
       </div>
     </div>
 
-    <div class="row">
+    <div class="" style="display: flex; flex-direction: column;">
       <label for="description">Description:</label>
       <textarea id="description"
                 name="description"
+                style="margin-bottom: 1.5rem;"
                 [(ngModel)]="recipe.description"
                 required
       ></textarea>
-      <br>
       <!-- Submit Button -->
-      <div class="col-3">
-        <input type="submit" value="Create Recipe" (click)="onButtonClick()">
+      <div class="">
+        <input type="submit" class="bb-button" value="Create Recipe" (click)="onButtonClick()">
       </div>
     </div>
   </form>
