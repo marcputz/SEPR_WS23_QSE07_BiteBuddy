@@ -120,8 +120,8 @@ public class MenuPlanEndpointTest {
     @Autowired
     private PictureRepository pictureRepository;
 
-    private ApplicationUser user;
     private Profile profile;
+    private ApplicationUser user;
 
     public static byte[] readJpegFile(String filePath) throws IOException {
         Path path = Paths.get(filePath);
@@ -225,11 +225,12 @@ public class MenuPlanEndpointTest {
 
     @BeforeEach
     public void setupUsers() {
-        ApplicationUser user = new ApplicationUser();
-        user.setId(1L);
-        user.setNickname("testuser");
-        user.setEmail("test@test");
-        user.setPasswordEncoded(PasswordEncoder.encode("password", "test@test"));
+
+        ApplicationUser user = new ApplicationUser()
+            .setId(1L)
+            .setNickname("testuser")
+            .setEmail("test@test")
+            .setPasswordEncoded(PasswordEncoder.encode("password", "test@test"));
 
         this.user = this.userRepository.save(user);
 

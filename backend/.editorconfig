@@ -9,5 +9,5 @@ indent_style = space
 indent_size = 4
 tab_width = 4
 
-[{*.yml, *.yaml, *.json, *.sql}]
+[{*.yml,*.yaml,*.json,*.sql}]
 indent_size = 2

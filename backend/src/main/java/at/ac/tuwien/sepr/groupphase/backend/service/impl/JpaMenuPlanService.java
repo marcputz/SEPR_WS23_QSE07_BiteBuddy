@@ -65,19 +65,20 @@ public class JpaMenuPlanService implements MenuPlanService {
     private final RecipeService recipeService;
     private final IngredientService ingredientService;
     private final UserService userService;
-    private final RecipeIngredientRepository recipeIngredientRepository;
     private final MenuPlanRepository menuPlanRepository;
     private final InventoryIngredientRepository inventoryIngredientRepository;
 
     @Autowired
-    public JpaMenuPlanService(MenuPlanRepository repository, RecipeService recipeService, IngredientService ingredientService, MenuPlanValidator validator,
-                              RecipeIngredientRepository recipeIngredientRepository, InventoryIngredientRepository inventoryIngredientRepository,
+    public JpaMenuPlanService(MenuPlanRepository repository,
+                              RecipeService recipeService,
+                              IngredientService ingredientService,
+                              MenuPlanValidator validator,
+                              InventoryIngredientRepository inventoryIngredientRepository,
                               UserService userService) {
         this.validator = validator;
         this.menuPlanRepository = repository;
         this.recipeService = recipeService;
         this.ingredientService = ingredientService;
-        this.recipeIngredientRepository = recipeIngredientRepository;
         this.inventoryIngredientRepository = inventoryIngredientRepository;
         this.userService = userService;
     }

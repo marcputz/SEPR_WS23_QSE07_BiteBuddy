@@ -29,13 +29,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -49,8 +47,6 @@ public class MenuPlanServiceTest {
 
     @Autowired
     MenuPlanService service;
-
-    private ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
 
     @Autowired
     private RecipeRepository recipeRepository;
@@ -84,12 +80,6 @@ public class MenuPlanServiceTest {
 
     private ApplicationUser user;
     private Profile profile;
-
-    @BeforeEach
-    void setupMapper() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
-    }
 
     @BeforeEach
     public void setupRecipes() {

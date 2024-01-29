@@ -32,18 +32,13 @@ import java.util.Optional;
 public class FileKeyService implements KeyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final FilePathsProperties filePathsProperties;
-
     private final String keyFolder;
     private final String privateKeyFilename;
     private final String publicKeyFilename;
 
-    private File keyFolderFile = null;
-
     private ResourceFileUtils resourceFileUtils;
 
     public FileKeyService(FilePathsProperties filePathsProperties) {
-        this.filePathsProperties = filePathsProperties;
 
         this.keyFolder = filePathsProperties.getKeySecurityFolder();
         this.privateKeyFilename = filePathsProperties.getPrivateKeyFilename();
@@ -74,12 +69,14 @@ public class FileKeyService implements KeyService {
     }
 
     private void initKeyFolder() {
+        File keyFolderFile = null;
+
         LOGGER.trace("initKeyFolder()");
         try {
             resourceFileUtils = new ResourceFileUtils(keyFolder, Optional.empty());
-            this.keyFolderFile = resourceFileUtils.getResourceFile(null);
+            keyFolderFile = resourceFileUtils.getResourceFile(null);
 
-            LOGGER.debug("Using key folder at {}", this.keyFolderFile.getAbsolutePath());
+            LOGGER.debug("Using key folder at {}", keyFolderFile.getAbsolutePath());
 
             if (!keyFolderFile.exists()) {
                 throw new IllegalArgumentException("Key folder does not exist or is NULL value");

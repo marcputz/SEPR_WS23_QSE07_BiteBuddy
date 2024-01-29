@@ -12,11 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final AuthenticationService authService;
-
-    public WebConfig(AuthenticationService service) {
-        this.authService = service;
-    }
+    public WebConfig() {}
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

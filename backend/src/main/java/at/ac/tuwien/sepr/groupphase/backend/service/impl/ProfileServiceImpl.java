@@ -278,9 +278,9 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         //check if the allergens correspond to the ones in the database
-        List<Allergene> allergenes = allergeneRepository.findAll();
+        List<Allergene> allergens = allergeneRepository.findAll();
         for (AllergeneDto allergeneDto : profileDto.getAllergens()) {
-            if (allergenes.stream().noneMatch(allergene -> allergene.getId() == allergeneDto.getId())) {
+            if (allergens.stream().noneMatch(allergene -> allergene.getId() == allergeneDto.getId())) {
                 throw new NotFoundException("Allergene with id " + allergeneDto.getId() + " does not exist");
             }
         }
