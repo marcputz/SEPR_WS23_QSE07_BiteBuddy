@@ -2,8 +2,12 @@ package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.datainsert.JsonFileReader;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
@@ -16,6 +20,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepositor
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRatingRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +28,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,6 +50,7 @@ public class DataGenerator {
     private final PasswordResetRequestRepository passwordResetRepository;
     private final RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
     private final PictureRepository pictureRepository;
+    private final MenuPlanService menuPlanService;
 
     public DataGenerator(UserRepository userRepository,
                          MenuPlanRepository menuPlanRepository,
@@ -56,7 +63,8 @@ public class DataGenerator {
                          RecipeRatingRepository recipeRatingRepository,
                          PasswordResetRequestRepository passwordResetRepository,
                          RecipeIngredientDetailsRepository recipeIngredientDetailsRepository,
-                         PictureRepository pictureRepository) {
+                         PictureRepository pictureRepository,
+                         MenuPlanService menuPlanService) {
         this.userRepository = userRepository;
         this.menuPlanRepository = menuPlanRepository;
         this.recipeRepository = recipeRepository;
@@ -69,6 +77,7 @@ public class DataGenerator {
         this.passwordResetRepository = passwordResetRepository;
         this.recipeIngredientDetailsRepository = recipeIngredientDetailsRepository;
         this.pictureRepository = pictureRepository;
+        this.menuPlanService = menuPlanService;
     }
 
     @PostConstruct
@@ -146,5 +155,38 @@ public class DataGenerator {
         profile = profileRepository.save(profile3);
         user2.setActiveProfile(profile);
         userRepository.save(user2);
+
+        MenuPlan menuPlan = new MenuPlan();
+        LocalDate startDate = LocalDate.of(2022, 1, 1);
+        LocalDate endDate = LocalDate.of(2022, 1, 7);
+        try {
+            menuPlan = menuPlanService.createEmptyMenuPlan(user1, profile1, startDate, endDate);
+        } catch (ConflictException e) {
+            LOGGER.info("conflictException during generation");
+        } catch (ValidationException e) {
+            LOGGER.info("validationException during generation");
+        }
+        try {
+            menuPlanService.generateContent(menuPlan);
+        } catch (ConflictException e) {
+            LOGGER.info("conflictException during generation");
+        }
+
+        MenuPlan menuPlan2 = new MenuPlan();
+        LocalDate startDate2 = LocalDate.of(2023, 1, 1);
+        LocalDate endDate2 = LocalDate.of(2023, 1, 7);
+        try {
+            menuPlan2 = menuPlanService.createEmptyMenuPlan(user1, profile1, startDate2, endDate2);
+        } catch (ConflictException e) {
+            LOGGER.info("conflictException during generation");
+        } catch (ValidationException e) {
+            LOGGER.info("validationException during generation");
+        }
+        try {
+            MenuPlanDetailDto dto = menuPlanService.generateContent(menuPlan2);
+            System.out.println(dto);
+        } catch (ConflictException e) {
+            LOGGER.info("conflictException during generation");
+        }
     }
 }
