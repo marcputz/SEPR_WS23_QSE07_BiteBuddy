@@ -1,99 +1,101 @@
 <main>
-<h1 class="display-1">Recipe Details</h1>
-<form #form="ngForm" >
-  <div class="row">
-    <div class="center">
-      <div class="recipe-name">
-        {{recipeDetails.name}}
+  <h1 class="display-1">Recipe Details</h1>
+  <form #form="ngForm">
+    <div class="row">
+      <div class="center">
+        <div class="recipe-name">
+          {{recipeDetails.name}}
+        </div>
+        <i class="bi bi-hand-thumbs-up like"
+           *ngIf="rating === 1"></i>
+        <i class="bi bi-hand-thumbs-down dislike"
+           *ngIf="rating === 0"></i>
       </div>
-      <i class="bi bi-hand-thumbs-up like"
-         *ngIf="rating === 1"></i>
-      <i class="bi bi-hand-thumbs-down dislike"
-         *ngIf="rating === 0"></i>
     </div>
-  </div>
-  <div class="row">
-    <div class="center">
-      <img *ngIf="recipePicture !== null"
-           [src]="sanitizeImage(recipePicture)"
-           [alt]="recipePictureAlt !== null ? recipePictureAlt : 'Recipe Picture'"
-           class="img-thumbnail">
+    <div class="row">
+      <div class="center">
+        <img *ngIf="recipePicture !== null"
+             [src]="sanitizeImage(recipePicture)"
+             [alt]="recipePictureAlt !== null ? recipePictureAlt : 'Recipe Picture'"
+             class="img-thumbnail">
+      </div>
     </div>
-  </div>
 
-  <div class="row">
-    <div class="start-additional-info">
-    <div class="mb-2 col-lg-10">
-      <div class="row">
-        <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-          Ingredients:
-        </label>
-        <div class="col-md-10 col-lg-8"
-        >
-          <ng-container *ngFor="let ingredient of recipeDetails.ingredients">
-            <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit !== null">
-              {{roundToTwoDecimals(ingredient.amount) + " " + ingredient.unit + " " + ingredient.name  }}
+    <div class="row">
+      <div class="start-additional-info">
+        <div class="mb-2 col-lg-10">
+          <div class="row">
+            <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+              Ingredients:
+            </label>
+            <div class="col-form-label col-md-10 col-lg-8"
+            >
+              <ng-container *ngFor="let ingredient of recipeDetails.ingredients">
+                <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit !== null">
+                  {{roundToTwoDecimals(ingredient.amount) + " " + ingredient.unit + " " + ingredient.name  }}
+                </div>
+                <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit === null">
+                  {{roundToTwoDecimals(ingredient.amount) + " " + ingredient.name}}
+                </div>
+                <div class="model" *ngIf="ingredient.amount === null && ingredient.unit === null">
+                  {{ingredient.name}}
+                </div>
+              </ng-container>
             </div>
-            <div class="model" *ngIf="ingredient.amount !== null && ingredient.unit === null">
-              {{roundToTwoDecimals(ingredient.amount) + " " + ingredient.name}}
-            </div>
-            <div class="model" *ngIf="ingredient.amount === null && ingredient.unit === null">
-              {{ingredient.name}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="mb-2 col-lg-10">
+        <div class="row">
+          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+            Instructions:
+          </label>
+          <div class="col-md-10 col-lg-8 col-form-label"
+          >
+            {{recipeDetails.description}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="mb-2 col-lg-10">
+        <div class="row">
+          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+            Allergens:
+          </label>
+          <div class="col-md-10 col-lg-8 col-form-label"
+          >
+            <ng-container *ngIf="recipeDetails.allergens !== null">
+              <div class="model"
+                   *ngFor="let allergene of recipeDetails.allergens">
+                {{allergene}}
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="mb-2 col-lg-10">
+        <div class="row">
+          <ng-container *ngIf="rating !== -1">
+            <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+              Rating:
+            </label>
+            <div class="col-md-10 col-lg-8 col-form-label">
+              {{ratingStatus}}
             </div>
           </ng-container>
-        </div>
-      </div>
-    </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="mb-2 col-lg-10">
-      <div class="row">
-        <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-          Instructions:
-        </label>
-        <div class="col-md-10 col-lg-8"
-        >
-          {{recipeDetails.description}}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="mb-2 col-lg-10">
-      <div class="row">
-        <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-          Allergens:
-        </label>
-        <div class="col-md-10 col-lg-8"
-        >
-          <ng-container *ngIf="recipeDetails.allergens !== null">
-            <div class="model"
-                 *ngFor="let allergene of recipeDetails.allergens">
-              {{allergene}}
-            </div>
+          <ng-container *ngIf="rating === -1">
+            <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
+              Currently not rated
+            </label>
           </ng-container>
+
         </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="mb-2 col-lg-10">
-      <div class="row">
-        <ng-container *ngIf="rating !== -1">
-          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-            Rating:
-          </label>
-          {{ratingStatus}}
-        </ng-container>
-        <ng-container *ngIf="rating === -1">
-          <label class="col-form-label text-md-end text-muted col-md-2 col-lg-4">
-            Currently not rated
-          </label>
-        </ng-container>
-
-      </div>
-    </div>
-  </div>
-</form>
+  </form>
 </main>
