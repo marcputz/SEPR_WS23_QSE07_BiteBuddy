@@ -68,7 +68,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public ProfileSearchResultDto searchProfiles(ProfileSearchDto searchParams, Long currentUserId) {
-        LOGGER.trace("search profiles({}, [])", searchParams, currentUserId);
+        LOGGER.trace("search profiles({}, {})", searchParams, currentUserId);
 
         String name = (searchParams.name() != null && !searchParams.name().trim().isEmpty()) ? searchParams.name() : "";
 

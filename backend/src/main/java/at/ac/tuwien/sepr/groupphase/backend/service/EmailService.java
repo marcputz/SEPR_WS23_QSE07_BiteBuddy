@@ -14,7 +14,6 @@ public interface EmailService {
      * @param mailSubject the mail's subject line
      * @param mailContent the mail's content
      * @param contentIsHtml if {@code true}, mailContent is in HTML format, if {@code false}, emailContent is plain text
-     * @return {@code true} if the email was sent successfully, {@code false} if something went wrong
      * @throws MessagingException if the email could not be sent
      */
     void sendEmail(String recipient, String mailSubject, String mailContent, boolean contentIsHtml) throws MessagingException;

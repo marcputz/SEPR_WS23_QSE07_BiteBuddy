@@ -146,7 +146,7 @@ public class AuthenticationService {
      *
      * @param authToken the authentication token to check
      * @author Marc Putz
-     * @returns {@code true}, if authenticated. {@code false}, if no session found
+     * @return {@code true}, if authenticated. {@code false}, if no session found
      */
     public boolean isAuthenticated(String authToken) {
         return SessionManager.getInstance().getUserFromAuthToken(authToken) != null;
