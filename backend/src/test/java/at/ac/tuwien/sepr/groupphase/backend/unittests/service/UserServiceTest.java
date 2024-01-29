@@ -81,9 +81,7 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserByEmail_NotFound_ThrowsNotFoundException() {
-        assertThrows(NotFoundException.class, () -> {
-            userService.getUserByEmail("test@shouldnotexist.at");
-        });
+        assertThrows(NotFoundException.class, () -> userService.getUserByEmail("test@shouldnotexist.at"));
     }
 
     @Test
@@ -102,9 +100,7 @@ public class UserServiceTest {
 
     @Test
     public void testGetUserByNickname_NotFound_ThrowsNotFoundException() {
-        assertThrows(NotFoundException.class, () -> {
-            userService.getUserByNickname("shouldNotExist");
-        });
+        assertThrows(NotFoundException.class, () -> userService.getUserByNickname("shouldNotExist"));
     }
 
     @Test
@@ -131,9 +127,7 @@ public class UserServiceTest {
             .setPasswordEncoded("test1234")
             .setNickname("nonexistentNickname");
 
-        assertThrows(NotFoundException.class, () -> {
-            userService.updateUser(nonExistentUser);
-        });
+        assertThrows(NotFoundException.class, () -> userService.updateUser(nonExistentUser));
     }
 
     @Test

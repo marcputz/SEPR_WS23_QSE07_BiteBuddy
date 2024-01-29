@@ -368,7 +368,7 @@ public class JsonFileReader {
         Pattern pattern = Pattern.compile("\\([^)]+\\)");
         Matcher matcher = pattern.matcher(input);
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         while (matcher.find()) {
             matcher.appendReplacement(result, "");
         }

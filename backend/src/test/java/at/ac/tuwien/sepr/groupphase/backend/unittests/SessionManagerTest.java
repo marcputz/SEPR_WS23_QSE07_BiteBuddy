@@ -36,9 +36,7 @@ public class SessionManagerTest {
 
     @Test
     public void testStartSession_WithNoToken_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            SessionManager.getInstance().startUserSession(testuser.getId(), null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> SessionManager.getInstance().startUserSession(testuser.getId(), null));
     }
 
     @Test
