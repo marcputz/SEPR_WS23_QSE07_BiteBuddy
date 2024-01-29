@@ -6,6 +6,7 @@ import {PasswordEncoder} from '../../../utils/passwordEncoder';
 import {Router} from '@angular/router';
 import {UpdateAuthenticationSettingsDto} from '../../../dtos/updateAuthenticationSettingsDto';
 import {ToastrService} from 'ngx-toastr';
+import {ErrorHandler} from '../../../services/errorHandler';
 
 @Component({
   selector: 'app-change-email',
@@ -17,14 +18,13 @@ export class ChangeEmailComponent implements OnInit {
   settingsForm: UntypedFormGroup;
   submitted = false;
   error = false;
-  errorMessage = 'Something went wrong, no user settings found. Check if your backend is connected';
 
   isInputFocused: { [key: string]: boolean } = {};
   showPasswords: boolean = false;
 
   originalUserSettings: UserSettingsDto;
 
-  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService, private errorHandler: ErrorHandler) {
     this.settingsForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
       currentPassword: ['', [Validators.required, Validators.minLength(8)]]
@@ -76,14 +76,18 @@ export class ChangeEmailComponent implements OnInit {
           this.settingsForm.controls['currentPassword'].setValue('');
         },
         error: error => {
-          console.error('Error updating Email', error);
-          let errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
-          this.notifications.error(errorMessage, 'Error updating Email: ');
-          if (errorMessage.indexOf("Password not valid") >= 0) {
+          let errorObj = this.errorHandler.getErrorObject(error);
+
+          if (errorObj.status == 401) {
+            // unauthorized -> invalid credentials
+            console.warn("Invalid Credentials");
+            this.notifications.warning("Wrong password");
             this.settingsForm.controls['currentPassword'].setErrors({valid: true});
-          }
-          if (errorMessage.indexOf("is already in use") >= 0) {
+          } else if (errorObj.statusDescription.indexOf("is already in use") >= 0) {
             this.settingsForm.controls['email'].setErrors({valid: true});
+            this.errorHandler.handleApiError(errorObj);
+          } else {
+            this.errorHandler.handleApiError(errorObj);
           }
         }
       });

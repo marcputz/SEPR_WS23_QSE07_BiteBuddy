@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {UntypedFormBuilder, UntypedFormGroup, Validators} from '@angular/forms';
-import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {UserService} from '../../../services/user.service';
 import {PasswordEncoder} from '../../../utils/passwordEncoder';
 import {Router} from '@angular/router';
 import {UpdateAuthenticationSettingsDto} from '../../../dtos/updateAuthenticationSettingsDto';
 import {ToastrService} from 'ngx-toastr';
+import {ErrorHandler} from '../../../services/errorHandler';
 
 @Component({
   selector: 'app-change-password',
@@ -13,20 +13,18 @@ import {ToastrService} from 'ngx-toastr';
   styleUrls: ['./change-password.component.scss']
 })
 export class ChangePasswordComponent implements OnInit {
-
   settingsForm: UntypedFormGroup;
   submitted = false;
   error = false;
-  errorMessage = 'Something went wrong, no user settings found. Check if your backend is connected';
 
-  isInputFocused: {[key: string]: boolean } = {};
+  isInputFocused: { [key: string]: boolean } = {};
   showPasswords: boolean = false;
   showPassword1: boolean = false;
   showPassword2: boolean = false;
+  authError: boolean;
 
-  originalUserSettings: UserSettingsDto;
-
-  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService) {
+  constructor(private formBuilder: UntypedFormBuilder, private authService: UserService, private passwordEncoder: PasswordEncoder, private router: Router, private notifications: ToastrService, private errorHandler: ErrorHandler,
+  ) {
     this.settingsForm = this.formBuilder.group({
       currentPassword: ['', [Validators.required, Validators.minLength(8)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
@@ -34,28 +32,11 @@ export class ChangePasswordComponent implements OnInit {
     });
   }
 
+  ngOnInit(): void {
+  }
+
   vanishError() {
     this.error = false;
-  }
-
-  ngOnInit(): void {
-    this.getUser();
-  }
-
-  private getUser() {
-    this.authService.getUser().subscribe({
-      next: (settings: UserSettingsDto) => {
-        this.originalUserSettings = settings;
-      },
-      error: error => {
-        console.error('Error loading user settings', error);
-        this.notifications.error('Error loading user settings, try again');
-        this.error = true;
-        //TODO: not working when server down this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
-      },
-      complete: () => {
-      }
-    });
   }
 
   public updateUserSettings() {
@@ -78,9 +59,16 @@ export class ChangePasswordComponent implements OnInit {
           this.settingsForm.controls['password2'].setValue('');
         },
         error: error => {
-          console.error('Error updating Password', error);
-          let errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
-          this.notifications.error(errorMessage, 'Error updating Password: ');
+          let errorObj = this.errorHandler.getErrorObject(error);
+
+          if (errorObj.status == 401) {
+            // unauthorized -> invalid credentials
+            console.warn("Invalid Credentials");
+            this.authError = true;
+            this.notifications.warning("Wrong password");
+          } else {
+            this.errorHandler.handleApiError(errorObj);
+          }
         }
       });
     } else if (this.settingsForm.controls.password.value !== this.settingsForm.controls.password2.value) {
@@ -94,6 +82,7 @@ export class ChangePasswordComponent implements OnInit {
       this.notifications.error('Invalid input');
     }
   }
+
   togglePasswordVisibility() {
     this.showPasswords = !this.showPasswords;
   }
@@ -105,6 +94,7 @@ export class ChangePasswordComponent implements OnInit {
   togglePasswordVisibility2() {
     this.showPassword2 = !this.showPassword2;
   }
+
   /**
    * Update the input focus flag in order to show/hide the label on the input field
    */

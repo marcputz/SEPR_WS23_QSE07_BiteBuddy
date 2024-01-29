@@ -9,7 +9,6 @@ import {
 } from '@angular/forms';
 import {UserSettingsDto} from '../../../dtos/userSettingsDto';
 import {UserService} from '../../../services/user.service';
-import {Router} from '@angular/router';
 import {ToastrService} from 'ngx-toastr';
 import {UpdateUserSettingsDto} from '../../../dtos/updateUserSettingsDto';
 import {SafeUrl} from '@angular/platform-browser';
@@ -33,14 +32,12 @@ export class ChangeSettingsComponent implements OnInit {
   originalUserSettings: UserSettingsDto;
   newUserSettings: UpdateUserSettingsDto = new UpdateUserSettingsDto("", null);
 
-  pictureSelected: File = null;
   safePictureUrl: SafeUrl = '/assets/icons/user_default.png';
 
   constructor(
     private formBuilder: UntypedFormBuilder,
     private authService: UserService,
     private errorHandler: ErrorHandler,
-    private router: Router,
     private notifications: ToastrService,
     private imageHandler: ImageHandler
   ) {
@@ -48,7 +45,6 @@ export class ChangeSettingsComponent implements OnInit {
       nickname: ['', [Validators.required, this.trimmedMinLength(3), Validators.maxLength(255)]]
     });
   }
-
 
   trimmedMinLength(minLength: number): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -61,11 +57,6 @@ export class ChangeSettingsComponent implements OnInit {
         }
       } : null;
     };
-  }
-
-
-  vanishError() {
-    this.error = false;
   }
 
   ngOnInit() {
@@ -89,7 +80,6 @@ export class ChangeSettingsComponent implements OnInit {
     }
   }
 
-
   @ViewChild('fileInput') fileInput: ElementRef;
 
   triggerFileInput() {
@@ -105,10 +95,8 @@ export class ChangeSettingsComponent implements OnInit {
           this.newUserSettings = new UpdateUserSettingsDto("", null);
         },
         error: error => {
-
           let errorObj = this.errorHandler.getErrorObject(error);
           this.errorHandler.handleApiError(errorObj);
-
         },
         complete: () => {
         }
@@ -120,7 +108,6 @@ export class ChangeSettingsComponent implements OnInit {
     if (userPictureArray === undefined) {
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(this.safePictureUrl);
     } else {
-      //this.loadPreviewPicture();
       this.safePictureUrl = this.imageHandler.sanitizeUserImage(userPictureArray);
     }
   }
