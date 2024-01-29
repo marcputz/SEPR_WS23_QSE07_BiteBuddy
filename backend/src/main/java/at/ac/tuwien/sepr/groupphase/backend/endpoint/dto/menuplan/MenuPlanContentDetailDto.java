@@ -5,11 +5,21 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
 import java.util.Objects;
 
 public class MenuPlanContentDetailDto {
+    private String creator;
     private int day;
     private int timeslot;
     private RecipeListDto recipe;
 
     /* GETTERS and SETTERS */
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public MenuPlanContentDetailDto setCreator(String creator) {
+        this.creator = creator;
+        return this;
+    }
 
     public int getDay() {
         return day;

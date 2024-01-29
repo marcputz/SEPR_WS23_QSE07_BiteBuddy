@@ -26,6 +26,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepositor
 import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.JDBCException;
@@ -62,19 +63,21 @@ public class JpaMenuPlanService implements MenuPlanService {
 
     private final RecipeService recipeService;
     private final IngredientService ingredientService;
+    private final UserService userService;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final MenuPlanRepository menuPlanRepository;
     private final InventoryIngredientRepository inventoryIngredientRepository;
 
     @Autowired
     public JpaMenuPlanService(MenuPlanRepository repository, RecipeService recipeService, IngredientService ingredientService, MenuPlanValidator validator,
-                              RecipeIngredientRepository recipeIngredientRepository, InventoryIngredientRepository inventoryIngredientRepository) {
+                              RecipeIngredientRepository recipeIngredientRepository, InventoryIngredientRepository inventoryIngredientRepository, UserService userService) {
         this.validator = validator;
         this.menuPlanRepository = repository;
         this.recipeService = recipeService;
         this.ingredientService = ingredientService;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.inventoryIngredientRepository = inventoryIngredientRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -544,11 +547,18 @@ public class JpaMenuPlanService implements MenuPlanService {
      */
     private MenuPlanContentDetailDto convertContentToDetailDto(MenuPlanContent c) {
         Recipe r = c.getRecipe();
-        RecipeListDto recipeListDto = new RecipeListDto("", r.getName(), r.getId(), r.getPictureId());
+
+        String creatorName = "BiteBuddy";
+        if (r.getCreatorId() >= 0) {
+            ApplicationUser creator = this.userService.getUserById(r.getCreatorId());
+            creatorName = creator.getNickname();
+        }
+        RecipeListDto recipeListDto = new RecipeListDto(creatorName, r.getName(), r.getId(), r.getPictureId());
 
         return new MenuPlanContentDetailDto()
             .setDay(c.getDayIdx())
             .setTimeslot(c.getTimeslot())
+            .setCreator(creatorName)
             .setRecipe(recipeListDto);
 
     }
