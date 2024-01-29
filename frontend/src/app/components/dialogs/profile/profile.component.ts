@@ -57,8 +57,7 @@ export class ProfileComponent {
       //get all the list of allergens
       this.allergensService.getAllAllergens().subscribe({
           next: allergens => {
-            this.allergens = allergens;
-            console.log(this.allergens)
+            this.allergens = allergens
             },
             error: error => {
               let errorObj = this.errorHandler.getErrorObject(error);
@@ -70,7 +69,6 @@ export class ProfileComponent {
     this.ingredientService.getAllIngredients().subscribe({
        next: ingredient => {
          this.ingredient = ingredient;
-         console.log(this.ingredient)
        },
        error: error => {
          let errorObj = this.errorHandler.getErrorObject(error);
@@ -101,6 +99,10 @@ export class ProfileComponent {
                   }
                 });
             },
+            error => {
+              let errorObj = this.errorHandler.getErrorObject(error);
+              this.errorHandler.handleApiError(errorObj);
+            }
           );
 
         }

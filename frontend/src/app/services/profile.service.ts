@@ -38,12 +38,6 @@ export class ProfileService {
     return this.http.post<ProfileDto>(
       this.baseUri,
       profile
-    ).pipe(
-      catchError(error => {
-        const formattedError = this.errorFormatterService.format(error);
-        console.error('Error occurred:', formattedError); // Optional: log the formatted error
-        return throwError(() => new Error(formattedError)) // Re-throw the error so you can handle it in your components
-      })
     );
   }
 
