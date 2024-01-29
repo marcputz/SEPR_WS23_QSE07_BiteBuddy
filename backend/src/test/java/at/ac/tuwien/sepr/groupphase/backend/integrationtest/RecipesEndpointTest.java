@@ -11,12 +11,14 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PictureRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
@@ -38,6 +40,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +61,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @ActiveProfiles("generateData")
 public class RecipesEndpointTest {
+    private static final String DEFAULT_PICTURE_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/RecipePictures";
+
     @Autowired
     private WebApplicationContext webAppContext;
     private MockMvc mockMvc;
@@ -62,6 +72,9 @@ public class RecipesEndpointTest {
 
     @Autowired
     private RecipeRepository recipeRepository;
+
+    @Autowired
+    private PictureRepository pictureRepository;
 
     @Autowired
     private RecipeIngredientRepository recipeIngredientRepository;
@@ -98,6 +111,7 @@ public class RecipesEndpointTest {
     private long rd2Id;
     private ApplicationUser user;
     private long testUserId;
+    private String base64Picture = null;
 
 
     @BeforeEach
@@ -118,9 +132,26 @@ public class RecipesEndpointTest {
         return this.authenticationService.loginUser(dto);
     }
 
+    public static byte[] readJpegFile(String filePath) throws IOException {
+        Path path = Paths.get(filePath);
+        return Files.readAllBytes(path);
+    }
+
+    public static String convertToBase64(byte[] byteArray) {
+        return Base64.getEncoder().encodeToString(byteArray);
+    }
+
     @BeforeEach
-    public void setup() {
+    public void setup() throws IOException {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webAppContext).build();
+
+        // adding picture
+        Picture pic = new Picture();
+        pic.setDescription("keine");
+        pic.setData(readJpegFile(DEFAULT_PICTURE_FOLDER + "/1.jpg"));
+        this.pictureRepository.save(pic);
+
+        this.base64Picture = Base64.getEncoder().encodeToString(readJpegFile(DEFAULT_PICTURE_FOLDER + "/1.jpg"));
 
         // creating ingredients
         // adding apple
@@ -208,21 +239,6 @@ public class RecipesEndpointTest {
 
     @AfterEach
     public void afterEach() {
-        // recipeIngredientRepository.deleteById(recipeIngredient1Id);
-        // recipeIngredientRepository.deleteById(recipeIngredient2Id);
-        //
-        // recipeIngredientDetailsRepository.deleteById(rd1Id);
-        // recipeIngredientDetailsRepository.deleteById(rd2Id);
-        //
-        // allergeneIngredientRepository.deleteById(allergeneIngredient1Id);
-        // allergeneRepository.deleteById(allergene1Id);
-        //
-        // ingredientRepository.deleteById(ingredient1Id);
-        // ingredientRepository.deleteById(ingredient2Id);
-        // ingredientRepository.deleteById(ingredient3Id);
-        //
-        // recipeRepository.deleteById(recipe1Id);
-        // recipeRepository.deleteById(recipe2Id);
         recipeIngredientRepository.deleteAll();
         recipeIngredientDetailsRepository.deleteAll();
         allergeneIngredientRepository.deleteAll();
@@ -351,26 +367,28 @@ public class RecipesEndpointTest {
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         requestHeaders.set("Authorization", authenticate());
 
+        String jsonPayload = """
+            {
+                "id": -1,
+                "name": "Eine Prise Test",
+                "description": "Man nehme einen Test",
+                "ingredients": [
+                    {
+                        "name": "Apple",
+                        "amount": 1,
+                        "unit": "pound"
+                    }
+                ],
+                "allergens": [],
+                "picture": "%s"
+            }
+            """.formatted(base64Picture);
+
         mockMvc
             .perform(MockMvcRequestBuilders
                 .post("/api/v1/recipes/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "id": -1,
-                    "name": "Eine Prise Test",
-                    "description": "Man nehme einen Test",
-                    "ingredients": [
-                        {
-                            "name": "Apple",
-                            "amount": 1,
-                            "unit": "pound"
-                        }
-                    ],
-                    "allergens": [],
-                    "picture": ""
-                    }
-                    """)
+                .content(jsonPayload)
                 .headers(requestHeaders)
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().isCreated());
@@ -419,26 +437,28 @@ public class RecipesEndpointTest {
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         requestHeaders.set("Authorization", "nichts");
 
+        String jsonPayload = """
+            {
+            "id": -1,
+            "name": "Eine Prise Test",
+            "description": "Man nehme einen Test",
+            "ingredients": [
+                {
+                    "name": "Apple",
+                    "amount": 1,
+                    "unit": "pound"
+                }
+            ],
+            "allergens": [],
+            "picture": "%s"
+            }
+            """.formatted(this.base64Picture);
+
         mockMvc
             .perform(MockMvcRequestBuilders
                 .post("/api/v1/recipes/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                    "id": -1,
-                    "name": "Eine Prise Test",
-                    "description": "Man nehme einen Test",
-                    "ingredients": [
-                        {
-                            "name": "Apple",
-                            "amount": 1,
-                            "unit": "pound"
-                        }
-                    ],
-                    "allergens": [],
-                    "picture": ""
-                    }
-                    """)
+                .content(jsonPayload)
                 .headers(requestHeaders)
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().isUnauthorized());
@@ -452,11 +472,7 @@ public class RecipesEndpointTest {
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         requestHeaders.set("Authorization", authenticate());
 
-        mockMvc
-            .perform(MockMvcRequestBuilders
-                .post("/api/v1/recipes/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        String jsonPayload = """
                     {
                     "id": -1,
                     "name": "Eine Prise Test",
@@ -469,9 +485,15 @@ public class RecipesEndpointTest {
                         }
                     ],
                     "allergens": [],
-                    "picture": ""
+                    "picture": "%s"
                     }
-                    """)
+                    """.formatted(this.base64Picture);
+
+        mockMvc
+            .perform(MockMvcRequestBuilders
+                .post("/api/v1/recipes/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload)
                 .headers(requestHeaders)
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().isConflict());
@@ -486,9 +508,9 @@ public class RecipesEndpointTest {
                     "name": "Eine Prise falscher Test",
                     "description": "Man nehme einen Test 1313üaääw",
                     "ingredients": [],
-                    "picture": ""
+                    "picture": "%s"
                     }
-                    """)
+                    """.formatted(base64Picture))
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().is4xxClientError());
 
@@ -502,9 +524,35 @@ public class RecipesEndpointTest {
                     "name": "Eine Prise Testwefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                     "description": "Man nehme einen Test 1313üaääw",
                     "ingredients": [],
+                    "picture": "%s"
+                    }
+                    """.formatted(base64Picture))
+                .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(status().is4xxClientError());
+
+        // creating request without picture
+        jsonPayload = """
+                    {
+                    "id": -1,
+                    "name": "Eine Prise Test",
+                    "description": "Man nehme einen Test",
+                    "ingredients": [
+                        {
+                            "name": "Appsadasdasdle",
+                            "amount": 1,
+                            "unit": "pound"
+                        }
+                    ],
+                    "allergens": [],
                     "picture": ""
                     }
-                    """)
+                    """;
+        mockMvc
+            .perform(MockMvcRequestBuilders
+                .post("/api/v1/recipes/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload)
+                .headers(requestHeaders)
                 .accept(MediaType.APPLICATION_JSON)
             ).andExpect(status().is4xxClientError());
     }

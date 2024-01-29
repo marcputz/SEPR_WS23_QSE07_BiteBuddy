@@ -11,6 +11,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.AllergeneIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Picture;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
@@ -19,6 +20,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneIngredientReposi
 import at.ac.tuwien.sepr.groupphase.backend.repository.AllergeneRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PictureRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ProfileRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientDetailsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepository;
@@ -47,6 +49,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,6 +77,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public class MenuPlanEndpointTest {
+    private static final String DEFAULT_PICTURE_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/RecipePictures";
 
     @Autowired
     private WebApplicationContext webAppContext;
@@ -109,8 +117,16 @@ public class MenuPlanEndpointTest {
     @Autowired
     private MenuPlanRepository menuPlanRepository;
 
+    @Autowired
+    private PictureRepository pictureRepository;
+
     private ApplicationUser user;
     private Profile profile;
+
+    public static byte[] readJpegFile(String filePath) throws IOException {
+        Path path = Paths.get(filePath);
+        return Files.readAllBytes(path);
+    }
 
     @BeforeEach
     void setupMapper() {
@@ -119,8 +135,14 @@ public class MenuPlanEndpointTest {
     }
 
     @BeforeEach
-    public void setupRecipes() {
+    public void setupRecipes() throws IOException {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webAppContext).build();
+
+        // adding picture
+        Picture pic = new Picture();
+        pic.setDescription("keine");
+        pic.setData(readJpegFile(DEFAULT_PICTURE_FOLDER + "/1.jpg"));
+        this.pictureRepository.save(pic);
 
         // creating ingredients
         // adding apple
@@ -146,6 +168,7 @@ public class MenuPlanEndpointTest {
             Recipe r = new Recipe();
             r.setName("Recipe " + i);
             r.setInstructions("Recipe Instructions " + i);
+            r.setPictureId(1L);
             recipes.add(recipeRepository.save(r));
         }
 

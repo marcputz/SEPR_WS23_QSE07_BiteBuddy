@@ -30,7 +30,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class ProfileEndpointTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final String DEFAULT_PICTURE_FOLDER = (new File("")).getAbsolutePath() + "/src/main/resources/RecipePictures";
 
     @Autowired
     private MockMvc mockMvc;
@@ -65,6 +71,8 @@ public class ProfileEndpointTest {
     @Autowired
     private ProfileRepository profileRepository;
     @Autowired
+    private PictureRepository pictureRepository;
+    @Autowired
     private AllergeneIngredientRepository allergeneIngredientRepository;
     @Autowired
     private AuthenticationService authenticationService;
@@ -78,8 +86,19 @@ public class ProfileEndpointTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    public static byte[] readJpegFile(String filePath) throws IOException {
+        Path path = Paths.get(filePath);
+        return Files.readAllBytes(path);
+    }
+
     @BeforeEach
     public void generateTestData() throws Exception {
+        // adding picture
+        Picture pic = new Picture();
+        pic.setDescription("keine");
+        pic.setData(readJpegFile(DEFAULT_PICTURE_FOLDER + "/1.jpg"));
+        this.pictureRepository.save(pic);
+
         AllergeneDto allergeneDto = AllergeneDto.AllergeneDtoBuilder.anAllergeneDto().withId(1L).withName("Gluten").build();
         Allergene savedAllergene = allergeneRepository.save(allergeneMapper.allergeneDtoToAllergene(allergeneDto));
         allergeneId = savedAllergene.getId();
@@ -94,6 +113,7 @@ public class ProfileEndpointTest {
         recipe1.setInstructions("Instructions 1");
         recipe1.setName("recipe 1");
         recipe1.setId(1L);
+        recipe1.setPictureId(1L);
         recipeId = recipeRepository.save(recipe1).getId();
 
         String testUserPassword = "test";
