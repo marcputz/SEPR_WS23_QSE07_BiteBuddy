@@ -31,6 +31,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeIngredientRepositor
 import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
+import org.aspectj.weaver.ast.Not;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -328,6 +329,20 @@ public class ProfileServiceTest {
             () -> profileService.saveProfile(testProfileDto));
     }
 
+    public void createProfileWithInvalidNameThrowValidationException() {
+        ProfileDto testProfileDto = ProfileDto.ProfileDtoBuilder.aProfileDto()
+            .withName("       ")
+            .withAllergens(List.of(
+                AllergeneDto.AllergeneDtoBuilder.anAllergeneDto().withId(1L).withName("Gluten").build())
+            )
+            .withIngredient(List.of(
+                IngredientDto.IngredientDtoBuilder.anIngredientDto().withId(4L).withName("Rice").build())
+            ).withUserId(testUserId).build();
+
+        assertThrows(ValidationException.class,
+            () -> profileService.saveProfile(testProfileDto));
+    }
+
     @Test
     public void copyToUser_ShouldCopyProfile_WhenProfileAndUserExist() {
         Long existingProfileId = profileId;
@@ -387,6 +402,20 @@ public class ProfileServiceTest {
     }
 
     @Test
+    public void rateRecipeWithNotExistingRecipeThrowNotFoundException() throws NotFoundException {
+        RecipeRatingDto recipeRatingDto = new RecipeRatingDto(-100L, testUserId, 1);
+        assertThrows(NotFoundException.class,
+            () -> profileService.rateRecipe(recipeRatingDto));
+    }
+
+    @Test
+    public void rateRecipeWithNotExistingUserThrowNotFoundException() throws NotFoundException {
+        RecipeRatingDto recipeRatingDto = new RecipeRatingDto(recipe1Id, -100L, 1);
+        assertThrows(NotFoundException.class,
+            () -> profileService.rateRecipe(recipeRatingDto));
+    }
+
+    @Test
     public void getRatingListsOfExistingProfileReturnsRatingListsOfProfile() {
         RecipeRatingListsDto ratingLists = profileService.getRatingLists(testUserId);
 
@@ -400,7 +429,6 @@ public class ProfileServiceTest {
 
     @Test
     public void getRatingListsOfNonExistingProfileThrowsNotFoundException() {
-        profileService.getRatingLists(testUserId2);
 
         assertThrows(NotFoundException.class,
             () -> profileService.getRatingLists(-1));
@@ -472,7 +500,7 @@ public class ProfileServiceTest {
     }
 
     @Test
-    public void deleteProfileNotExistingProfile() {
+    public void deleteNotExistingProfile() {
         assertThrows(NotFoundException.class,
             () -> profileService.deleteProfile(-1L, testUserId));
     }
