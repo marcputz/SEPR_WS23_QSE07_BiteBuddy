@@ -108,6 +108,13 @@ public class RecipeEndpoint {
         }
     }
 
+    /**
+     * Gets the details of an existing recipe.
+     *
+     * @param id id of the searched for recipe.
+     * @return {@link RecipeDetailsDto} of matching recipe.
+     * @author Thomas Hellweger
+     */
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public RecipeDetailsDto getDetailedRecipe(@PathVariable long id) {

@@ -74,6 +74,7 @@ public class ProfileValidator {
      *
      * @param currentUser the current User of the application
      * @param profile the currently used profile
+     * @author Thomas Hellweger
      */
     public void validateDelete(ApplicationUser currentUser, Profile profile) throws ConflictException {
         LOGGER.trace("validateDelete({}),({})", currentUser, profile);

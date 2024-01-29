@@ -426,6 +426,7 @@ public class ProfileEndpointTest {
 
     }
 
+
     @Test
     public void getProfileDetailsOfExistingProfile() throws Exception {
         HttpHeaders headers = new HttpHeaders();

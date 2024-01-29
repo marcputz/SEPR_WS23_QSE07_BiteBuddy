@@ -11,12 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
-import java.sql.SQLException;
-import java.util.function.Supplier;
 
 /**
  * JPA implementation of Picture Service.

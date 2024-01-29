@@ -57,6 +57,7 @@
             Liked Recipes:
           </label>
           <div class="col-md-10 col-lg-8"
+               *ngIf="profileDetails.liked.length !== 0; else noLikedList"
           >
             <ng-container *ngFor="let recipe of profileDetails.liked">
               <div class="model">
@@ -64,6 +65,11 @@
               </div>
             </ng-container>
           </div>
+          <ng-template #noLikedList>
+            <div class="col-md-10 col-lg-8">
+              No liked recipes
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
@@ -77,6 +83,7 @@
             Disliked recipes:
           </label>
           <div class="col-md-10 col-lg-8"
+               *ngIf="profileDetails.disliked.length !== 0; else noDislikedList"
           >
             <ng-container *ngFor="let recipe of profileDetails.disliked">
               <div class="model">
@@ -84,6 +91,11 @@
               </div>
             </ng-container>
           </div>
+          <ng-template #noDislikedList>
+            <div class="col-md-10 col-lg-8">
+              No disliked recipes
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>

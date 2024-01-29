@@ -68,10 +68,12 @@ public class ProfileEndpoint {
     /**
      * Creates a profile
      *
-     * @param toCreateProfile contains the id and the create information of the profile
+     * @param toCreateProfile contains the id and the creation information of the profile
+     * @param headers {@link HttpHeaders} with the authentication information.
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException       if the profile, it's user, one of its allergens or one of its liked ingredients do not exist in the database.
      * @throws ValidationException     if the edited data is not valid for editing.
+     * @author Thomas Hellweger
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -88,7 +90,7 @@ public class ProfileEndpoint {
 
     @PostMapping("/copyToOwn/{profileId}")
     @ResponseStatus(HttpStatus.OK)
-    public ProfileDetailDto post(@PathVariable Long profileId, @RequestHeader HttpHeaders headers) throws AuthenticationException {
+    public ProfileDetailDto copyProfile(@PathVariable Long profileId, @RequestHeader HttpHeaders headers) throws AuthenticationException {
         LOGGER.info("Received POST request on {}", BASE_PATH + "/copyToOwn");
         LOGGER.debug("Request body for POST:\n{}", profileId);
         this.authenticationService.verifyAuthenticated(headers);
@@ -119,8 +121,10 @@ public class ProfileEndpoint {
      * Gets the details of an existing profile
      *
      * @param profileId the id of the requested profile
+     * @param headers {@link HttpHeaders} with the authentication information.
      * @throws AuthenticationException if no user is logged in.
-     * @throws NotFoundException       if the profile does not exist in the database.
+     * @throws NotFoundException if the profile does not exist in the database.
+     * @author Thomas Hellweger
      */
     @GetMapping("/{profileId}")
     @ResponseStatus(HttpStatus.OK)
@@ -136,9 +140,11 @@ public class ProfileEndpoint {
      * Edits an existing profile
      *
      * @param profileDto contains the id and the edited information of the profile
+     * @param headers {@link HttpHeaders} with the authentication information.
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException       if the profile or it's user do not exist in the database.
      * @throws ValidationException     if the edited data is not valid for editing.
+     * @author Thomas Hellweger
      */
     @PutMapping("/edit/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -166,9 +172,11 @@ public class ProfileEndpoint {
      * Lets a profile rate a recipe
      *
      * @param recipeRatingDto contains the id of the recipe to rate, the current user id (active profile is the one rating) and the rating (0-dislike, 1-like)
+     * @param headers {@link HttpHeaders} with the authentication information.
      * @throws AuthenticationException if no user is logged in.
-     * @throws NotFoundException       if the user or the recipe do not exist in the database and if the user does not have an active profile.
-     * @throws ValidationException     if the rating value is not 0 or 1.
+     * @throws NotFoundException if the user or the recipe do not exist in the database and if the user does not have an active profile.
+     * @throws ValidationException if the rating value is not 0 or 1.
+     * @author Thomas Hellweger
      */
     @PutMapping("/rating/{RecipeId}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -185,9 +193,11 @@ public class ProfileEndpoint {
      * Gets a list of the liked and disliked recipes of a profile.
      *
      * @param userId the id of the profile which wants the liked and disliked lists
+     * @param headers {@link HttpHeaders} with the authentication information.
      * @return returns a list of the liked- and a list of the disliked recipes.
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException       if the profile containing the lists does not exist.
+     * @author Thomas Hellweger
      */
     @GetMapping("/rating/{userId}")
     @ResponseStatus(HttpStatus.OK)
@@ -203,10 +213,12 @@ public class ProfileEndpoint {
      * Deletes an existing profile.
      *
      * @param profileId id of profile to delete.
+     * @param headers {@link HttpHeaders} with the authentication information.
      * @return returns a ProfileDto which contains the delete profile's data.
      * @throws AuthenticationException if no user is logged in.
      * @throws NotFoundException       if the profile to delete does not exist in the database.
      * @throws ConflictException       if the user wants to delete the active profile or the current profile does not belong to the current user.
+     * @author Thomas Hellweger
      */
     @DeleteMapping("/deleteProfile/{profileId}")
     @ResponseStatus(HttpStatus.OK)
