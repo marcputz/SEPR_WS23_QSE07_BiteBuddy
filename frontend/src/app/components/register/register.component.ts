@@ -94,7 +94,7 @@ export class RegisterComponent implements OnInit {
     this.authService.registerUser(authRequest).subscribe({
       next: (data) => {
         console.log('Successfully registered user: ' + authRequest.email);
-        this.notification.success('You are successfully registered. You are redirect to login now');
+        this.notification.success('Redirecting to Login', 'You have successfully registered!');
         // Redirect to login page after 2 seconds
         setTimeout(() => {
           this.router.navigate(['/login']);

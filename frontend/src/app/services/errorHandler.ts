@@ -2,7 +2,6 @@ import {Injectable} from "@angular/core";
 import {ToastrService} from "ngx-toastr";
 import {ErrorDto} from "../dtos/errorDto";
 import {Router} from "@angular/router";
-import {UserService} from "./user.service";
 
 @Injectable({
   providedIn: 'root'
