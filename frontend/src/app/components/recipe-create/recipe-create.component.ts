@@ -12,6 +12,7 @@ import {IngredientService} from "../../services/ingredient.service";
 
 import {UserService} from "../../services/user.service";
 import {ErrorHandler} from "../../services/errorHandler";
+import {ImageHandler} from "../../utils/imageHandler";
 
 @Component({
   selector: 'app-recipe-create',
@@ -27,9 +28,10 @@ export class RecipeCreateComponent implements OnInit {
     id: null,
     ingredients: [],
     allergens: [],
-    picture: null,
+    picture: [],
   }
   recipePicture: number[] = null;
+  safePictureUrl = null;
   pictureSelected: File = null;
   submitButtonClicked = false;
 
@@ -40,7 +42,8 @@ export class RecipeCreateComponent implements OnInit {
     private router: Router,
     private notification: ToastrService,
     private errorHandler: ErrorHandler,
-    private userService: UserService
+    private userService: UserService,
+    private imageHandler: ImageHandler
   ) {
   }
 
@@ -59,35 +62,29 @@ export class RecipeCreateComponent implements OnInit {
     })
   }
 
-
-  onPictureChange(event) {
-    this.pictureSelected = event.target.files[0];
-
-    let reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result as string;
-      // Convert the base64 string to a Uint8Array
-      const arrayBuffer = this.base64ToArrayBuffer(base64String);
-
-      // Convert the ArrayBuffer to an array of numbers (uint8)
-      const byteArray = Array.from(new Uint8Array(arrayBuffer));
-
-      this.recipePicture = byteArray;
-      this.recipe.picture = this.recipePicture;
+  public loadPreviewPicture() {
+    if (this.recipe.picture === null) {
+      this.safePictureUrl = this.imageHandler.sanitizeRecipeImage(this.recipe.picture);
+    } else {
+      this.safePictureUrl = this.imageHandler.sanitizeRecipeImage(btoa(
+        String.fromCharCode.apply(null, new Uint8Array(this.recipe.picture))));
     }
-    reader.readAsDataURL(this.pictureSelected);
+
+    return this.safePictureUrl;
   }
 
-  private base64ToArrayBuffer(base64: string): ArrayBuffer {
-    const binaryString = atob(base64.split(',')[1]);
-    const length = binaryString.length;
-    const bytes = new Uint8Array(length);
-
-    for (let i = 0; i < length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+  onPictureChange(event) {
+    if (event.target.files.length > 0) {
+      this.imageHandler.prepareRecipePicture(event.target.files[0])
+        .then((imageBytes: number[]) => {
+          this.recipe.picture = imageBytes;
+          this.loadPreviewPicture();
+        })
+        .catch(error => {
+          console.error('Error processing image: ', error);
+          this.notification.error(error, 'Unsupported Format use png or Jpg');
+        });
     }
-
-    return bytes.buffer;
   }
 
   onSubmit(form): void {
@@ -124,24 +121,6 @@ export class RecipeCreateComponent implements OnInit {
       this.recipe.ingredients.push(ingredient);
     } else {
       console.warn("Invalid Ingredient: ", ingredient?.name);
-    }
-  }
-
-  sanitizeImage(imageBytes: any): SafeUrl {
-    // imageBytes = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
-
-    imageBytes = String.fromCharCode.apply(null, new Uint8Array(imageBytes));
-    imageBytes = btoa(imageBytes);
-
-    try {
-      if (!imageBytes || imageBytes.length === 0) {
-        throw new Error('Empty or undefined imageBytes');
-      }
-      const dataUrl = `data:image/jpeg;base64,${imageBytes}`;
-      return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
-    } catch (error) {
-      console.error('Error sanitizing image:', error);
-      return this.sanitizer.bypassSecurityTrustUrl(''); // Return a safe, empty URL or handle the error accordingly
     }
   }
 

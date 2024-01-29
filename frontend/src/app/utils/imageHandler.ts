@@ -63,6 +63,37 @@ export class ImageHandler {
     });
   }
 
+  prepareRecipePicture (imgFile: any) {
+    return new Promise((resolve, reject) => {
+      let reader = new FileReader();
+
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+
+        // Create an image element
+        let img = new Image();
+        img.onload = () => {
+          // Convert the base64 string to a Uint8Array
+          const arrayBuffer = this.base64ToArrayBuffer(base64String);
+          const imageBytes = Array.from(new Uint8Array(arrayBuffer));
+
+          resolve(imageBytes);
+        };
+
+        img.onerror = () => {
+          reject(new Error('Error in loading image'));
+        };
+
+        img.src = base64String;
+      };
+
+      reader.onerror = () => {
+        reject(new Error('Error in reading file'));
+      };
+
+      reader.readAsDataURL(imgFile);
+    });
+  }
 
   private base64ToArrayBuffer(base64: string): ArrayBuffer {
     const binaryString = atob(base64.split(',')[1]);
@@ -87,6 +118,19 @@ export class ImageHandler {
     } catch (error) {
       console.error('Error sanitizing image:', error);
       return '/assets/icons/user_default.png'; // Return default Icon
+    }
+  }
+
+  sanitizeRecipeImage(imageBytes: any): SafeUrl {
+    try {
+      if (!imageBytes || imageBytes.length === 0) {
+        return '/assets/images/recipe_default.png'; // Return default Icon
+      }
+      const dataUrl = `data:image/jpeg;base64,${imageBytes}`;
+      return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
+    } catch (error) {
+      console.error('Error sanitizing image:', error);
+      return '/assets/images/recipe_default.png'; // Return default Icon
     }
   }
 }

@@ -43,29 +43,23 @@ export class SettingsLayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-      // retrieve user account info
-      this.accountUsername = this.authService.getTokenUsername(this.authService.getToken());
-      if (this.accountUsername == undefined) {
-        console.warn("Could not retrieve username from authentication token");
-        this.notification.error("Could not retrieve username");
-        this.accountUsername = "Username";
-      }
-      this.accountEmail = this.authService.getTokenEmail(this.authService.getToken());
-    if (this.accountEmail == undefined) {
-      console.warn("Could not retrieve email from authentication token");
-      this.notification.error("Could not retrieve email");
-      this.accountEmail = "Email";
-    }
-
     // get active child via route
     this.router.events.subscribe((e) => {
       if (e instanceof NavigationEnd) {
         // route changed
         switch (e.url) {
-          case '/settings/user': this.setActiveNavItem('user'); break;
-          case '/settings/email': this.setActiveNavItem('email'); break;
-          case '/settings/password': this.setActiveNavItem('password'); break;
-          default: this.setActiveNavItem(e.url.substring(e.url.lastIndexOf(('/')) + 1, e.url.length)); break;
+          case '/settings/user':
+            this.setActiveNavItem('user');
+            break;
+          case '/settings/email':
+            this.setActiveNavItem('email');
+            break;
+          case '/settings/password':
+            this.setActiveNavItem('password');
+            break;
+          default:
+            this.setActiveNavItem(e.url.substring(e.url.lastIndexOf(('/')) + 1, e.url.length));
+            break;
         }
       }
     });
@@ -107,11 +101,22 @@ export class SettingsLayoutComponent implements OnInit, OnDestroy {
     this.authService.getUser().subscribe({
       next: (userSettingsDto: UserSettingsDto) => {
         this.loadUserPicture(userSettingsDto.userPicture);
+        this.accountUsername = userSettingsDto.nickname;
+        this.accountEmail = userSettingsDto.email;
       },
       error: error => {
         console.error('Error loading user infos');
         this.notification.error('Error loading user infos');
-
+        if (this.accountUsername == undefined) {
+          console.warn("Could not retrieve username from authentication token");
+          this.notification.error("Could not retrieve username");
+          this.accountUsername = "Username";
+        }
+        if (this.accountEmail == undefined) {
+          console.warn("Could not retrieve email from authentication token");
+          this.notification.error("Could not retrieve email");
+          this.accountEmail = "Email";
+        }
         this.error = true;
         this.errorMessage = typeof error.error === 'object' ? error.error.error : error.error;
       },
