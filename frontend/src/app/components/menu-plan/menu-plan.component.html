@@ -23,6 +23,7 @@
                     aria-label="Menu Plan Select"
                     class="form-select input-field"
                     [(ngModel)]="selectedStartDate"
+                    [disabled]="menuplans.length === 0"
                     (ngModelChange)="searchChanged()">
               <option value="" disabled selected>Select Start Date</option>
               <option *ngFor="let menuplan of menuplans" [value]="menuplan.fromTime">
