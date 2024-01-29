@@ -180,6 +180,7 @@ public class MenuPlanValidator {
                 for (InventoryIngredientDto existing : currentInventory.missing()) {
                     if (existing.equals(inverseIngredientDto)) {
                         foundIngredient = true;
+                        break;
                     }
                 }
             }
@@ -189,6 +190,7 @@ public class MenuPlanValidator {
                 for (InventoryIngredientDto existing : currentInventory.available()) {
                     if (existing.equals(inverseIngredientDto)) {
                         foundIngredient = true;
+                        break;
                     }
                 }
             }

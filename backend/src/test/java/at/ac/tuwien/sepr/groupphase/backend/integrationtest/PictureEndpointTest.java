@@ -48,7 +48,7 @@ public class PictureEndpointTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+    private final ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
 
     @Autowired
     protected PictureRepository repository;

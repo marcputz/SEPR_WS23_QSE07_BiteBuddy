@@ -70,7 +70,7 @@ public class LogFilter extends OncePerRequestFilter {
         var logStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         if (response != null) {
             logStatus = response.getStatus();
-            MDC.put("status", "" + logStatus);
+            MDC.put("status", String.valueOf(logStatus));
             b.append(" status=").append(logStatus);
         } else {
             b.append(" NO RESPONSE");

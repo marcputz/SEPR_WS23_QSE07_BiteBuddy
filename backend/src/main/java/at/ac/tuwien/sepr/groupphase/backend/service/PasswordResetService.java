@@ -22,7 +22,7 @@ public interface PasswordResetService {
      * @throws MessagingException If the email service cannot send an email to the user
      * @author Marc Putz
      */
-    public void requestPasswordReset(String email) throws NotFoundException, MessagingException;
+    void requestPasswordReset(String email) throws NotFoundException, MessagingException;
 
     /**
      * Performs a password reset with the user data given in the DTO object.
@@ -33,5 +33,5 @@ public interface PasswordResetService {
      * @throws ValidationException if the DTO contains invalid password data
      * @author Marc Putz
      */
-    public void resetPassword(ResetPasswordDto dto) throws AuthenticationException, ValidationException;
+    void resetPassword(ResetPasswordDto dto) throws AuthenticationException, ValidationException;
 }

@@ -31,7 +31,7 @@ public class AuthTokenUtils {
     private static KeyService keyService;
 
     public AuthTokenUtils(KeyService keyService) {
-        this.keyService = keyService;
+        AuthTokenUtils.keyService = keyService;
     }
 
     /**

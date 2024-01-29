@@ -123,7 +123,7 @@ public class JpaMenuPlanService implements MenuPlanService {
         Set<MenuPlanContentDetailDto> contents = getContentsOfMenuPlanAsDetailDto(menuPlan);
         menuPlanDetailDto.setUserId(user.getId()).setContents(contents).setFromTime(menuPlan.getFromDate());
         menuPlanDetailDto.setUntilTime(menuPlan.getUntilDate()).setId(menuPlan.getId());
-        LOGGER.info("get menuplan: " + menuPlanDetailDto.toString());
+        LOGGER.info("get menuplan: " + menuPlanDetailDto);
         return menuPlanDetailDto;
     }
 
@@ -678,10 +678,7 @@ public class JpaMenuPlanService implements MenuPlanService {
 
                     // basic ingredient exist -> we mark everything as already bought,
                     // but we need to check if we can sum them up
-                    boolean basicIngrededientExists = false;
-                    if (basicInventory.containsKey(recipeIngredient.getIngredient().getId())) {
-                        basicIngrededientExists = true;
-                    }
+                    boolean basicIngrededientExists = basicInventory.containsKey(recipeIngredient.getIngredient().getId());
 
                     // detailed does not exist
                     if (!detailedInventory.containsKey(recipeIngredient.getAmount().getFridgeStringIdentifier())

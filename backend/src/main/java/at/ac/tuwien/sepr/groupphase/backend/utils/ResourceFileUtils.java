@@ -17,8 +17,8 @@ public class ResourceFileUtils {
 
     private static final String DEFAULT_CLASSPATH = "classpath:";
 
-    private String folderPath;
-    private Optional<String> loaderFolderPath;
+    private final String folderPath;
+    private final Optional<String> loaderFolderPath;
 
     public ResourceFileUtils(String folderPath, Optional<String> loaderFolderPath) {
         this.folderPath = folderPath;

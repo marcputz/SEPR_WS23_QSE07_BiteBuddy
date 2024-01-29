@@ -34,9 +34,9 @@ public class FileKeyService implements KeyService {
 
     private final FilePathsProperties filePathsProperties;
 
-    private String keyFolder;
-    private String privateKeyFilename;
-    private String publicKeyFilename;
+    private final String keyFolder;
+    private final String privateKeyFilename;
+    private final String publicKeyFilename;
 
     private File keyFolderFile = null;
 

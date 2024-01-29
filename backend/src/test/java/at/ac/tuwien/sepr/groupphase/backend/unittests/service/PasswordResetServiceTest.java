@@ -38,7 +38,7 @@ public class PasswordResetServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    private ApplicationUser testuser = new ApplicationUser()
+    private final ApplicationUser testuser = new ApplicationUser()
         .setEmail("test@test.org")
         .setNickname("testuser_passwordresetservice")
         .setPasswordEncoded(PasswordEncoder.encode("password", "test@test.org"));

@@ -322,7 +322,7 @@ public class RecipesEndpointTest {
             .andReturn().getResponse().getContentAsByteArray();
 
         // mapping
-        RecipeDetailsDto recipeDetails = objectMapper.readerFor(RecipeDetailsDto.class).<RecipeDetailsDto>readValue(body);
+        RecipeDetailsDto recipeDetails = objectMapper.readerFor(RecipeDetailsDto.class).readValue(body);
 
         // asserting test
         assertNotNull(recipeDetails);

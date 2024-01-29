@@ -16,7 +16,7 @@ public interface KeyService {
      * @author Marc Putz
      * @return application's RSA private key.
      */
-    public RSAPrivateKey getPrivateKey();
+    RSAPrivateKey getPrivateKey();
 
     /**
      * Retrieves the application's public key.
@@ -24,6 +24,6 @@ public interface KeyService {
      * @author Marc Putz
      * @return application's RSA public key.
      */
-    public RSAPublicKey getPublicKey();
+    RSAPublicKey getPublicKey();
 
 }

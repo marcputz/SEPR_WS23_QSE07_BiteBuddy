@@ -35,7 +35,7 @@ public class RecipeEndpoint {
     public static final String BASE_PATH = "/api/v1/recipes";
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final RecipeService recipeService;
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
     @Autowired
     public RecipeEndpoint(RecipeService recipeService, AuthenticationService authenticationService) {

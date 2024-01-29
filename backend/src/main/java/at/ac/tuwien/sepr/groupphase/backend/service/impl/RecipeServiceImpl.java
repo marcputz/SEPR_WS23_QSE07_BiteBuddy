@@ -45,14 +45,14 @@ import java.util.Set;
 @Service
 public class RecipeServiceImpl implements RecipeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private RecipeRepository recipeRepository;
-    private RecipeIngredientRepository recipeIngredientRepository;
-    private RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
-    private AllergeneIngredientRepository allergeneIngredientRepository;
-    private RecipeValidator validator;
-    private IngredientServiceImpl ingredientService;
-    private JpaUserService userService;
-    private PictureService pictureService;
+    private final RecipeRepository recipeRepository;
+    private final RecipeIngredientRepository recipeIngredientRepository;
+    private final RecipeIngredientDetailsRepository recipeIngredientDetailsRepository;
+    private final AllergeneIngredientRepository allergeneIngredientRepository;
+    private final RecipeValidator validator;
+    private final IngredientServiceImpl ingredientService;
+    private final JpaUserService userService;
+    private final PictureService pictureService;
 
     @Autowired
     public RecipeServiceImpl(RecipeRepository recipeRepository, RecipeIngredientRepository recipeIngredientRepository,
