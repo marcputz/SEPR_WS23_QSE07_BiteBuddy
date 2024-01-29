@@ -65,7 +65,7 @@ public class MenuPlanEndpoint {
      * REST endpoint to generate a menu plan.
      *
      * @param headers the HTTP headers from the request.
-     * @param dto     the create dto to use for menu plan generation.
+     * @param dto     a MenuPlanCreateDto to use for menu plan generation.
      * @return a detail dto of the created and generated menu plan.
      * @throws AuthenticationException if the user cannot be authenticated.
      * @throws ConflictException       if the data given by the user is in conflict with the current state of the system.

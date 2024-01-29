@@ -29,7 +29,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
-     * Handles {@link NotFoundException}s occuring in REST endpoints.
+     * Handles {@link NotFoundException}s occurring in REST endpoints.
      *
      * @param ex      the exception.
      * @param request the request where the exception occurred.
@@ -60,11 +60,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Handles {@link jakarta.mail.MessagingException}s occuring in REST endpoints.
+     * Handles {@link jakarta.mail.MessagingException}s occurring in REST endpoints.
      *
      * @param ex      the exception
      * @param request the request where the exception occurred
-     * @return a RepsonseEntity to send back to the client
+     * @return a ResponseEntity to send back to the client
      * @author Marc Putz
      */
     @ExceptionHandler(value = {MessagingException.class})

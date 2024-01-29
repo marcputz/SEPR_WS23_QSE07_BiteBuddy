@@ -135,7 +135,7 @@ public class JsonFileReader {
             /*
             //The following shows the functionality of the DB, works if uncommented
 
-            // get all informations from recipeId to ingredientId to AllergeneId
+            // get all information from recipeId to ingredientId to AllergeneId
             LOGGER.info("get all information only from RecipeID");
             Recipe recipe1 = recipeRepository.getById(3L);
             LOGGER.info(recipe1.toString());

@@ -25,13 +25,13 @@ public class SessionManagerTest {
         .setId(1L)
         .setNickname("maxmuster")
         .setEmail("max.mustermann@test.at");
-    private final String testuserAuthtoken = AuthTokenUtils.createToken(testuser);
+    private final String testUserAuthToken = AuthTokenUtils.createToken(testuser);
 
     @Order(1)
     @Test
     public void testStartAndStopSession_WithValidData_Returns() {
-        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
-        assertTrue(SessionManager.getInstance().stopUserSession(testuserAuthtoken));
+        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testUserAuthToken));
+        assertTrue(SessionManager.getInstance().stopUserSession(testUserAuthToken));
     }
 
     @Test
@@ -49,11 +49,11 @@ public class SessionManagerTest {
 
     @Test
     public void testGetUser_FromStartedSession_Returns() {
-        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
-        assertEquals(testuser.getId(), SessionManager.getInstance().getUserFromAuthToken(testuserAuthtoken));
+        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testUserAuthToken));
+        assertEquals(testuser.getId(), SessionManager.getInstance().getUserFromAuthToken(testUserAuthToken));
 
         // cleanup
-        SessionManager.getInstance().stopUserSession(testuserAuthtoken);
+        SessionManager.getInstance().stopUserSession(testUserAuthToken);
     }
 
     @Test
@@ -64,11 +64,11 @@ public class SessionManagerTest {
 
     @Test
     public void testGetAuthToken_FromStartedSession_Returns() {
-        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testuserAuthtoken));
-        assertEquals(testuserAuthtoken, SessionManager.getInstance().getAuthTokenForUser(testuser.getId()));
+        assertTrue(SessionManager.getInstance().startUserSession(testuser.getId(), testUserAuthToken));
+        assertEquals(testUserAuthToken, SessionManager.getInstance().getAuthTokenForUser(testuser.getId()));
 
         // cleanup
-        SessionManager.getInstance().stopUserSession(testuserAuthtoken);
+        SessionManager.getInstance().stopUserSession(testUserAuthToken);
     }
 
     @Test

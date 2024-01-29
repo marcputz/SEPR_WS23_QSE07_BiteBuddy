@@ -156,7 +156,7 @@ public class AuthTokenUtils {
      * @throws IllegalArgumentException if authToken is NULL, empty or only whitespace
      */
     private static Jws<Claims> parseToken(String authToken) {
-        LOGGER.trace("parsetoken({})", authToken);
+        LOGGER.trace("parseToken({})", authToken);
 
         // Remove prefix
         authToken = authToken.substring(TOKEN_PREFIX.length());

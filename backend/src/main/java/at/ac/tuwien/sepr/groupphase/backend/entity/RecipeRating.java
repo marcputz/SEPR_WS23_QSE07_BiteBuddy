@@ -52,11 +52,11 @@ public class RecipeRating {
         return recipe;
     }
 
-    public void setRaiting(int raiting) {
-        this.rating = raiting;
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
-    public int getRaiting() {
+    public int getRating() {
         return rating;
     }
 
@@ -82,21 +82,21 @@ public class RecipeRating {
     @Override
     public String toString() {
         if (rating == 0) {
-            return "RecipeRaiting{"
+            return "RecipeRating{"
                 + "id=" + id
                 + "recipe=" + recipe
                 + "user=" + user
                 + "rating=" + "disliked"
                 + '}';
         } else if (rating == 1) {
-            return "RecipeRaiting{"
+            return "RecipeRating{"
                 + "id=" + id
                 + "recipe=" + recipe
                 + "user=" + user
                 + "rating=" + "liked"
                 + '}';
         }
-        return "RecipeRaiting{"
+        return "RecipeRating{"
             + "id=" + id
             + "recipe=" + recipe
             + "user=" + user

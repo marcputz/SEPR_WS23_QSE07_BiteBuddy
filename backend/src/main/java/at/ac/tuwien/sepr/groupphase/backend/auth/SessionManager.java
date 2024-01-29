@@ -91,7 +91,7 @@ public final class SessionManager {
     }
 
     /**
-     * Retrives the corresponding user of an authentication token.
+     * Retrieves the corresponding user of an authentication token.
      *
      * @param authToken the authentication token of the user
      * @return the ID of the corresponding user, NULL if no session registered

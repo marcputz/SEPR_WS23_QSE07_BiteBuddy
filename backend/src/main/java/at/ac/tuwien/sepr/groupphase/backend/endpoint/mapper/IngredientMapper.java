@@ -35,7 +35,7 @@ public interface IngredientMapper {
      * Maps a list of {@link Ingredient} entities to a list of {@link IngredientDto} DTOs.
      *
      * @param ingredients the ingredients to map
-     * @return the mapped ingredientDtos
+     * @return the mapped ingredientDTOs
      */
     @Named("ingredientToListAllIngredientDtos")
     List<IngredientDto> ingredientToListAllIngredientDtos(List<Ingredient> ingredients);

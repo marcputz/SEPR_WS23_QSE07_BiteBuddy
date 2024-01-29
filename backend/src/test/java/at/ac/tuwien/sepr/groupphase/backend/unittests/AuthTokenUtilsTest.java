@@ -17,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 public class AuthTokenUtilsTest {
 
-    private final ApplicationUser testuser = new ApplicationUser()
+    private final ApplicationUser testUser = new ApplicationUser()
         .setId(1L)
         .setNickname("maxmuster")
         .setEmail("max.mustermann@test.at");
 
     @Test
     public void testCreateToken_WithValidData_Returns() throws Exception {
-        String authToken = AuthTokenUtils.createToken(testuser.getId(), testuser.getNickname(), testuser.getEmail());
+        String authToken = AuthTokenUtils.createToken(testUser.getId(), testUser.getNickname(), testUser.getEmail());
         assertTrue(AuthTokenUtils.isValid(authToken));
     }
 
@@ -44,7 +44,7 @@ public class AuthTokenUtilsTest {
 
     @Test
     public void testGetExpirationDate_WithValidToken_Returns() {
-        String authToken = AuthTokenUtils.createToken(testuser.getId(), testuser.getNickname(), testuser.getEmail());
+        String authToken = AuthTokenUtils.createToken(testUser.getId(), testUser.getNickname(), testUser.getEmail());
         Assertions.assertNotNull(AuthTokenUtils.getExpirationDate(authToken));
     }
 

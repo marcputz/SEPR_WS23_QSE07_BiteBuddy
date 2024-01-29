@@ -55,7 +55,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
      * Updates the recipe ingredients which are used.
      *
      * @param id          of the recipe we want to update.
-     * @param ingredients Set of {@link RecipeIngredient} we want inside of the recipe.
+     * @param ingredients Set of {@link RecipeIngredient}s we want inside the recipe.
      * @author Frederik Skiera
      */
     @Transactional

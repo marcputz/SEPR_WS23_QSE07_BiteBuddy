@@ -19,7 +19,7 @@ public interface PasswordResetService {
      *
      * @param email the email of the user to request a password change
      * @throws NotFoundException If the email specified does not match a user in the data store
-     * @throws MessagingException If the email service cannot send an email to the user
+     * @throws MessagingException If the email service cannot send an email.
      * @author Marc Putz
      */
     void requestPasswordReset(String email) throws NotFoundException, MessagingException;
