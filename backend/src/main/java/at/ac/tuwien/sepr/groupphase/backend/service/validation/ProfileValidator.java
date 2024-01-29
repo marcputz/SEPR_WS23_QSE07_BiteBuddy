@@ -32,7 +32,7 @@ public class ProfileValidator {
         validateUsername(profile, validationErrors);
 
         if (!validationErrors.isEmpty()) {
-            throw new ValidationException("Validation of horse for update failed", validationErrors);
+            throw new ValidationException("Validation of profile for update failed", validationErrors);
         }
     }
 
