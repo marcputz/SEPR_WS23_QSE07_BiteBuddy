@@ -86,23 +86,12 @@
   color: var(--button-background-color);
 }
 
-.recipe-card {
-  width: fit-content;
-  height: fit-content;
-  border-radius: 12px;
-  border: none;
-}
-
 img {
   height: 15rem;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
 
-.recipe-card:hover {
-  transform: scale(0.8);
-  transition: transform 0.4s ease;
-}
 
 .pagination {
   align-self: center;
@@ -145,10 +134,31 @@ img {
   transition: all 0.3s;
 }
 
-.card:hover {
-  transform: scale(1.1);
+.card-body {
+  min-height: 9.5rem;
+  max-height: fit-content;
 }
 
+.recipe-card {
+  height: fit-content;
+  border-radius: 12px;
+  border: none;
+}
+
+.recipe-card:hover {
+  transform: scale(1.1);
+  transition: transform 0.5s ease;
+
+.card-title-link-disa {
+  color: var(--bs-card-title-color);
+  text-decoration: none;
+}
+
+.card-title-link-disa:hover {
+  color: var(--bs-card-title-color);
+  text-decoration: underline;
+}
+}
 .userinfo-buttons-space {
   margin-left: auto;
 }
