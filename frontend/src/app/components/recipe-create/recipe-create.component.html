@@ -14,6 +14,9 @@
                  required
           >
         </div>
+        <div *ngIf="!validImage">
+          <small class="text-danger">Image required</small>
+        </div>
       </div>
 
       <img *ngIf="safePictureUrl !== null" [src]="safePictureUrl" alt="Selected Picture" class="img-thumbnail">
@@ -30,7 +33,11 @@
                  placeholder="Cheeseburger"
                  required
                  [(ngModel)]="recipe.name"
+                 (change)="validTitle = true"
           >
+        </div>
+        <div *ngIf="!validTitle" style="margin-top: -10px">
+          <small class="text-danger">Title required</small>
         </div>
       </div>
 
@@ -107,6 +114,9 @@
           </div>
         </div>
       </div>
+      <div *ngIf="!validIngredients" style="margin-top: -10px">
+        <small class="text-danger">At least one ingredient required</small>
+      </div>
 
       <div class="" style="display: flex; flex-direction: column;">
         <label for="description">Description:</label>
@@ -114,8 +124,14 @@
                   name="description"
                   style="margin-bottom: 1.5rem;"
                   [(ngModel)]="recipe.description"
+                  (change)="validDescription = true"
                   required
         ></textarea>
+
+        <div *ngIf="!validDescription" style="margin-top: -10px">
+          <small class="text-danger">Description required</small>
+        </div>
+
         <!-- Submit Button -->
         <div class="">
           <input type="submit" class="bb-button" value="Create Recipe" (click)="onButtonClick()">

@@ -29,6 +29,10 @@ export class RecipeCreateComponent implements OnInit {
 
   safePictureUrl = null;
   submitButtonClicked = false;
+  validImage = true;
+  validTitle = true;
+  validDescription = true;
+  validIngredients = true;
 
   constructor(
     private service: RecipeService,
@@ -70,10 +74,13 @@ export class RecipeCreateComponent implements OnInit {
 
   onPictureChange(event) {
     if (event.target.files.length > 0) {
+      this.safePictureUrl = event.target.files[0];
+
       this.imageHandler.prepareRecipePicture(event.target.files[0])
         .then((imageBytes: number[]) => {
           this.recipe.picture = imageBytes;
           this.loadPreviewPicture();
+          this.validImage = true;
         })
         .catch(error => {
           console.error('Error processing image: ', error);
@@ -92,8 +99,31 @@ export class RecipeCreateComponent implements OnInit {
         error: error => {
           let errorObj = this.errorHandler.getErrorObject(error);
           this.errorHandler.handleApiError(errorObj);
+          this.submitButtonClicked = false;
         }
       });
+    }
+
+    if (this.submitButtonClicked) {
+      // validations
+      if (this.recipe.picture === null || this.recipe.picture.length == 0) {
+        this.validImage = false;
+      }
+
+      if (this.recipe.name.trim().length == 0) {
+        this.validTitle = false;
+      }
+
+      if (this.recipe.description.trim().length == 0) {
+        this.validDescription = false;
+      }
+
+      if (this.recipe.ingredients !== null) {
+        if (this.recipe.ingredients.length == 0) {
+          this.validIngredients = false;
+        }
+      }
+      this.submitButtonClicked = false;
     }
   }
 
@@ -106,6 +136,7 @@ export class RecipeCreateComponent implements OnInit {
   }
 
   addIngredient(ingredientInput) {
+    this.validIngredients = true;
     let ingredient: RecipeIngredientDto = {
       name: ingredientInput.value,
       amount: 100,

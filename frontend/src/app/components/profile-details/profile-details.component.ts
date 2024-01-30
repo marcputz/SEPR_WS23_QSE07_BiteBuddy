@@ -42,7 +42,6 @@ export class ProfileDetailsComponent {
     this.service.getProfileDetails(this.profileDetails.id).subscribe(
       (profileDetails: ProfileDetailDto) => {
         this.profileDetails = profileDetails;
-        console.log(profileDetails);
       },
     );
   }
