@@ -2,13 +2,13 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanContentDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdateRecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.InventoryIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
@@ -16,7 +16,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.entity.idclasses.MenuPlanContentId;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -24,10 +23,11 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.InventoryIngredientRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MenuPlanRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
-import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
+import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import at.ac.tuwien.sepr.groupphase.backend.service.RecipeService;
+import at.ac.tuwien.sepr.groupphase.backend.service.IngredientService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.JDBCException;
@@ -67,6 +67,8 @@ public class JpaMenuPlanService implements MenuPlanService {
     private final UserService userService;
     private final MenuPlanRepository menuPlanRepository;
     private final InventoryIngredientRepository inventoryIngredientRepository;
+    private final MenuPlanValidator menuPlanValidator;
+    private final ProfileService profileService;
 
     @Autowired
     public JpaMenuPlanService(MenuPlanRepository repository,
@@ -74,13 +76,17 @@ public class JpaMenuPlanService implements MenuPlanService {
                               IngredientService ingredientService,
                               MenuPlanValidator validator,
                               InventoryIngredientRepository inventoryIngredientRepository,
-                              UserService userService) {
+                              UserService userService,
+                              MenuPlanValidator menuPlanValidator,
+                              ProfileService profileService) {
         this.validator = validator;
         this.menuPlanRepository = repository;
         this.recipeService = recipeService;
         this.ingredientService = ingredientService;
         this.inventoryIngredientRepository = inventoryIngredientRepository;
         this.userService = userService;
+        this.menuPlanValidator = menuPlanValidator;
+        this.profileService = profileService;
     }
 
     @Override
@@ -382,14 +388,15 @@ public class JpaMenuPlanService implements MenuPlanService {
 
 
     @Override
-    public MenuPlan updateMenuPlanByChangingOneRecipe(ApplicationUser user, MenuPlanUpdateRecipeDto updateDto) {
-
+    public MenuPlan updateMenuPlanByChangingOneRecipe(ApplicationUser user, MenuPlanUpdateRecipeDto updateDto) throws ValidationException {
         // the menuplan only has 1 Content which is the one to be changed
         LOGGER.trace("updateMenuPlanByChangingOneRecepy({},{})", user, updateDto);
-
+        menuPlanValidator.validateForUpdateOneRecipe(updateDto);
         MenuPlan oldPlan = this.getById(updateDto.getMenuPlanId());
+        MenuPlanContent oldContent = new MenuPlanContent();
         for (MenuPlanContent content : oldPlan.getContent()) {
             if (content.getDayIdx() == updateDto.getDay() && content.getTimeslot() == updateDto.getTimeslot()) {
+                oldContent.setRecipe(content.getRecipe());
                 Set<Allergene> allergenes = user.getActiveProfile().getAllergens();
                 List<Recipe> recipes = recipeService.getAllWithoutAllergens(allergenes);
                 Random random = new Random();
@@ -405,8 +412,10 @@ public class JpaMenuPlanService implements MenuPlanService {
                 content.setRecipe(randomRecipe);
                 LOGGER.trace("before dislike");
                 if (updateDto.isDislike()) {
+                    RecipeRatingDto ratingDto = new RecipeRatingDto(oldContent.getRecipe().getId(), user.getId(), 0);
+                    profileService.rateRecipe(ratingDto);
                     Set<Recipe> disliked = user.getActiveProfile().getDisliked();
-                    disliked.add(content.getRecipe());
+                    disliked.add(oldContent.getRecipe());
                     user.getActiveProfile().setDisliked(disliked);
                 }
             }

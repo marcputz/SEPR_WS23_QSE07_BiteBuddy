@@ -16,7 +16,6 @@ import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.validation.MenuPlanValidator;
 import at.ac.tuwien.sepr.groupphase.backend.utils.AuthTokenUtils;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -55,15 +54,13 @@ public class MenuPlanEndpoint {
     private final AuthenticationService authService;
     private final UserService userService;
     private final ProfileService profileService;
-    private final MenuPlanValidator menuPlanValidator;
 
     @Autowired
-    public MenuPlanEndpoint(MenuPlanService menuPlanService, UserService userService, ProfileService profileService, AuthenticationService authService, MenuPlanValidator menuPlanValidator) {
+    public MenuPlanEndpoint(MenuPlanService menuPlanService, UserService userService, ProfileService profileService, AuthenticationService authService) {
         this.service = menuPlanService;
         this.userService = userService;
         this.authService = authService;
         this.profileService = profileService;
-        this.menuPlanValidator = menuPlanValidator;
     }
 
     /**
@@ -137,7 +134,8 @@ public class MenuPlanEndpoint {
             throw new ValidationException("Date is null", new ArrayList<>());
         }
         // generate menu plan
-        return this.service.getMenuPlanForUserOnDateDetailDto(thisUser, date);
+        MenuPlanDetailDto menuPlanDetailDto = this.service.getMenuPlanForUserOnDateDetailDto(thisUser, date);
+        return menuPlanDetailDto;
     }
 
     /**
@@ -183,7 +181,6 @@ public class MenuPlanEndpoint {
 
         Long thisUserId = AuthTokenUtils.getUserId(authService.getAuthToken(headers));
         ApplicationUser thisUser = this.userService.getUserById(thisUserId);
-        menuPlanValidator.validateForUpdateOneRecipe(menuPlan);
 
         this.service.updateMenuPlanByChangingOneRecipe(thisUser, menuPlan);
     }
