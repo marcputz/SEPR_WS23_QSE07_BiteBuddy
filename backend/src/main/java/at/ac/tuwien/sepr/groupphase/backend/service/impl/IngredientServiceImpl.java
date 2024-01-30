@@ -55,9 +55,12 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public List<String> getNamesMatching(String name) {
         List<Ingredient> matchingOnes = this.getByNameMatching(name);
+        List<Ingredient> filteredIngredients = matchingOnes.stream()
+            .filter(ingredient -> !ingredient.getName().contains("Filler"))
+            .toList();
         List<String> result = new ArrayList<>();
 
-        for (Ingredient ing : matchingOnes) {
+        for (Ingredient ing : filteredIngredients) {
             result.add(ing.getName());
 
             if (result.size() >= 10) {
