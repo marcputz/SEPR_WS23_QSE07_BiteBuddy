@@ -121,6 +121,12 @@ export class RecipeCreateComponent implements OnInit {
       if (this.recipe.ingredients !== null) {
         if (this.recipe.ingredients.length == 0) {
           this.validIngredients = false;
+        } else {
+          for (let ing of this.recipe.ingredients) {
+            if (ing.amount <= 0) {
+              this.validIngredients = false;
+            }
+          }
         }
       }
       this.submitButtonClicked = false;

@@ -195,7 +195,7 @@ export class RecipeListComponent implements OnInit {
         this.profileService.createRating(this.recipeRating)
           .subscribe({
               next: data => {
-                this.notification.success("Successfully rated new recipe!");
+                // this.notification.success("Successfully rated new recipe!");
                 this.authService.getUser().subscribe(
                   (settings: UserSettingsDto) => {
                     this.profileService.getRatingLists(settings.id)

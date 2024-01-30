@@ -632,7 +632,11 @@ public class JpaMenuPlanService implements MenuPlanService {
             }
         }
 
-        this.inventoryIngredientRepository.saveAll(newInventory);
+        try {
+            this.inventoryIngredientRepository.saveAll(newInventory);
+        } catch (JDBCException | DataIntegrityViolationException e) {
+            throw new DataStoreException("Unable to create inventory ingredients", e);
+        }
     }
 
     /**

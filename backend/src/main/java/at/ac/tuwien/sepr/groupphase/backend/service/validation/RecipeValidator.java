@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.IngredientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
