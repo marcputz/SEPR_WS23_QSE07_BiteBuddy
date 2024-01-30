@@ -132,7 +132,7 @@ public class DataGenerator {
 
         at.ac.tuwien.sepr.groupphase.backend.entity.Profile profile1 = new at.ac.tuwien.sepr.groupphase.backend.entity.Profile();
         profile1.setUser(user1);
-        profile1.setName("Musterprofil 1");
+        profile1.setName("Profil ohne Eier");
         profile1.setAllergens(allergens1);
         var profile = profileRepository.save(profile1);
         user1.setActiveProfile(profile);
@@ -140,7 +140,7 @@ public class DataGenerator {
 
         at.ac.tuwien.sepr.groupphase.backend.entity.Profile profile2 = new at.ac.tuwien.sepr.groupphase.backend.entity.Profile();
         profile2.setUser(user1);
-        profile2.setName("Musterprofil 2");
+        profile2.setName("Mir schmeckt alles :)");
         profileRepository.save(profile2);
 
         ApplicationUser user2 = new ApplicationUser().setId(-2L).setEmail("mail@marcputz.at")
@@ -150,7 +150,7 @@ public class DataGenerator {
 
         at.ac.tuwien.sepr.groupphase.backend.entity.Profile profile3 = new at.ac.tuwien.sepr.groupphase.backend.entity.Profile();
         profile3.setUser(user2);
-        profile3.setName("Testprofil 1");
+        profile3.setName("Ich mag auch keine Eier");
         profile3.setAllergens(allergens1);
         profile = profileRepository.save(profile3);
         user2.setActiveProfile(profile);
