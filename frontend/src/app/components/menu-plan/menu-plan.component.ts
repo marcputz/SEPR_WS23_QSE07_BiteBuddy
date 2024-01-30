@@ -86,6 +86,7 @@ export class MenuPlanComponent implements OnInit {
 
         if (this.menuplans?.length > 0) {
           this.selectedStartDate = this.menuplans[this.menuplans.length - 1].fromTime;
+          this.getMenuPlan();
         }
       },
       error: err => {
