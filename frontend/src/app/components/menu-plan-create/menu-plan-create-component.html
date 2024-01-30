@@ -17,22 +17,22 @@
     <div class="" style="display: flex; flex-direction: row;">
       <div class="card" style="width: 100%">
         <div class="card-header" style="text-align: center"><b>Fridge</b></div>
-        <table class="table" style="text-align: start; padding-left: 5px">
+        <table class="table" style="text-align: start; padding-left: 5px; margin-bottom: 0;">
           <thead>
-          <tr>
-            <td><b style="margin-left: 2rem;">Ingredient Name</b></td>
+          <tr style="border-bottom: rgb(222, 226, 230) solid 1px;">
+            <td style="width: 100%; border: none;"><b style="margin-left: 2rem;">Ingredient Name</b></td>
           </tr>
           </thead>
           <tbody>
           <tr *ngFor="let ingredient of createDto.fridge">
-            <td><p style="margin-left: 2rem;">{{ ingredient }}</p></td>
+            <td><p style="margin-left: 2rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">{{ ingredient }}</p></td>
             <td><i class="bi bi-trash3" (click)="removeIngredient(ingredient)"></i></td>
           </tr>
           </tbody>
         </table>
 
-        <div class="justify-content-center align-items-center" style="display: flex; flex-direction: row">
-          <div style="width: 50%;">
+        <div class="justify-content-center align-items-center" style="display: flex; flex-direction: row; padding: 1rem; 1rem;">
+          <div style="width: 100%; margin-right: 1rem;">
             <app-autocomplete
               #ingredientInput
               id="ingredients"
@@ -45,8 +45,8 @@
               [suggestions]="ingredientSuggestions"
             ></app-autocomplete>
           </div>
-          <div>
-            <button (click)="addIngredientToFridge(ingredientInput)" class="btn btn-success rounded-pill">
+          <div style="min-width: 5.5rem;">
+            <button (click)="addIngredientToFridge(ingredientInput)" style="width: 100%; margin-right: 1rem;" class="btn btn-success rounded-pill">
               <i class="bi-plus-square"></i> Add
             </button>
           </div>
