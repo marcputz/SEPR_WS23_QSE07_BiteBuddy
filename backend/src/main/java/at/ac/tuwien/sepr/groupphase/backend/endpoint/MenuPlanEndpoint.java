@@ -110,7 +110,7 @@ public class MenuPlanEndpoint {
 
 
     /**
-     * REST endpoint to find a menu plan which start and endDate encompass the given date
+     * REST endpoint to find a menu plan which start and endDate encompass the given date.
      *
      * @param headers the HTTP headers from the request.
      * @param date    a LocalDate to use for finding a menu plan.
@@ -141,7 +141,7 @@ public class MenuPlanEndpoint {
     }
 
     /**
-     * REST endpoint to return information about all menu plans of the current user
+     * REST endpoint to return information about all menu plans of the current user.
      *
      * @param headers the HTTP headers from the request.
      * @return a List of menu plan detail dtos of this user.
@@ -165,7 +165,7 @@ public class MenuPlanEndpoint {
     }
 
     /**
-     * REST endpoint to update one Recipe in a menuplan of the current user
+     * REST endpoint to update one Recipe in a menuplan of the current user.
      *
      * @param headers  the HTTP headers from the request.
      * @param menuPlan a MenuPlanUpdateRecipeDto to use for updating

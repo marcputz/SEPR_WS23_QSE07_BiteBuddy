@@ -53,7 +53,7 @@ public class ProfileEndpoint {
     }
 
     /**
-     * Searches all profiles who match the search parameters
+     * Searches all profiles who match the search parameters.
      *
      * @param searchParams {@link ProfileSearchDto} contains the search information for the profile search
      * @param headers {@link HttpHeaders} with the authentication information.
@@ -96,7 +96,7 @@ public class ProfileEndpoint {
     }
 
     /**
-     * Searches all profiles who match the search parameters
+     * Searches all profiles who match the search parameters.
      *
      * @param profileId {@link ProfileSearchDto} contains the id of the profile to copy.
      * @param headers {@link HttpHeaders} with the authentication information.
@@ -118,7 +118,7 @@ public class ProfileEndpoint {
      * Returns all profiles of a certain user.
      *
      * @param headers {@link HttpHeaders} with the authentication information.
-     * @return {@link List<ProfileListDto>} of the found profiles.
+     * @return a list of {@link ProfileListDto} of the found profiles.
      * @throws AuthenticationException if no user is logged in.
      * @author Marc Putz
      */
