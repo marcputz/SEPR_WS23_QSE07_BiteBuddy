@@ -11,8 +11,6 @@ import {AllergensService} from "../../../services/allergens.service";
 import {UserService} from "../../../services/user.service";
 import {UserSettingsDto} from "../../../dtos/userSettingsDto";
 import {ErrorHandler} from "../../../services/errorHandler";
-import {Observable} from "rxjs";
-import {RecipeDetailsDto} from "../../../dtos/recipe";
 
 @Component({
   selector: 'app-profile',
@@ -31,7 +29,6 @@ export class ProfileComponent {
   ingredient: IngredientDto[] = [];
 
   user: UserSettingsDto = {} as UserSettingsDto;
-  userId: number = 1;
 
   form: FormGroup;
   constructor(

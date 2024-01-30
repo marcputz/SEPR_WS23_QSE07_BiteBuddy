@@ -1,8 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from "../../services/user.service";
-import {ActivatedRoute, NavigationEnd, Router, RouterState} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
-import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
+import {BreakpointObserver} from "@angular/cdk/layout";
 import {SafeUrl} from "@angular/platform-browser";
 import {ImageHandler} from "../../utils/imageHandler";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";

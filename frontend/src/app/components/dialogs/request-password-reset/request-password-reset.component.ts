@@ -3,7 +3,6 @@ import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {UserService} from "../../../services/user.service";
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {Router} from "@angular/router";
-import {isBoolean} from "lodash";
 import {ToastrService} from "ngx-toastr";
 import {ErrorHandler} from "../../../services/errorHandler";
 
@@ -21,8 +20,6 @@ export class RequestPasswordResetComponent implements OnInit {
   protected requestSuccess: boolean = false;
 
   protected email: string | null;
-
-  protected errorMessage: string | null;
 
   isInputFocused: {[key: string]: boolean } = {};
 

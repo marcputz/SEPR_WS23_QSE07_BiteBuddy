@@ -8,11 +8,10 @@ import {UserService} from '../services/user.service';
 export class AuthGuard  {
 
   constructor(private userService: UserService,
-              private router: Router,
-              private activatedRoute: ActivatedRoute) {}
+              private router: Router) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    var wantedRoute = state.url;
+    let wantedRoute = state.url;
 
     if (this.userService.isLoggedIn()) {
       if (wantedRoute == '/') {

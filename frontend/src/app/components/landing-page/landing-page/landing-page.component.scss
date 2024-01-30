@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   gap: 80px;
-  padding: 151px 78px 0px;
+  padding: 151px 78px 0;
   position: relative;
   flex-direction: row;
   align-content: center;
@@ -132,7 +132,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0px 24px;
+  padding: 0 24px;
   position: relative;
   flex: 0 0 auto;
   all: unset;
@@ -327,7 +327,7 @@
   .div-community-2 {
     flex-direction: column;
     align-items: stretch;
-    gap: 0px;
+    gap: 0;
   }
 }
 .column-community {
@@ -335,7 +335,7 @@
   flex-direction: column;
   line-height: normal;
   width: 41%;
-  margin-left: 0px;
+  margin-left: 0;
 }
 @media (max-width: 991px) {
   .column-community {
@@ -442,7 +442,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0px 16px;
+  padding: 0 16px;
   position: relative;
   flex: 0 0 auto;
   color: white;
@@ -467,8 +467,8 @@
 .div-community-8 {
   justify-content: space-between;
   border-radius: 8px;
-  box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.07),
-  0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.07),
+  0 1px 3px 0 rgba(0, 0, 0, 0.1);
   background-color: #594338;
   display: flex;
   gap: 16px;

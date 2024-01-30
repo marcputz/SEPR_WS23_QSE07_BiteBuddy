@@ -11,7 +11,6 @@ import {ProfileService} from "../../services/profile.service";
 import {ErrorFormatterService} from "../../services/error-formatter.service";
 import {Router} from "@angular/router";
 import {PictureService} from "../../services/picture.service";
-import {PictureDto} from "../../dtos/pictureDto";
 import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
@@ -92,8 +91,6 @@ export class RecipeListComponent implements OnInit {
           });
       },
       error => {
-        console.error('Error getting user settings', error);
-        const errorMessage = error?.error || 'Unknown error occurred';
 
         let errorObj = this.errorHandler.getErrorObject(error);
 
@@ -175,7 +172,6 @@ export class RecipeListComponent implements OnInit {
           // throw new Error('Empty or undefined imageBytes');
         }
 
-        const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
         const dataUrl = `data:image/jpg;base64,${imageBytes}`;
         return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
       } catch (error) {

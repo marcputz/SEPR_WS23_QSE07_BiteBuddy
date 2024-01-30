@@ -35,10 +35,6 @@ export class ChangePasswordComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  vanishError() {
-    this.error = false;
-  }
-
   public updateUserSettings() {
     this.submitted = true;
     if (this.settingsForm.valid && (this.settingsForm.controls.password.value && this.settingsForm.controls.password.value === this.settingsForm.controls.password2.value)) {

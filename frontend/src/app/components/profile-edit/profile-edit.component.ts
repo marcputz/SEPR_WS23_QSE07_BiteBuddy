@@ -10,8 +10,6 @@ import {IngredientService} from "../../services/ingredient.service";
 import {AllergensService} from "../../services/allergens.service";
 import {UserService} from "../../services/user.service";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
-import {Observable} from "rxjs";
-import {RecipeDetailsDto} from "../../dtos/recipe";
 import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({

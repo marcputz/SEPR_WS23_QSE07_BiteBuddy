@@ -6,7 +6,6 @@ import {LoginDto} from '../../../dtos/loginDto';
 import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {ToastrService} from "ngx-toastr";
 import {ErrorHandler} from "../../../services/errorHandler";
-import {ErrorDto} from "../../../dtos/errorDto";
 
 @Component({
   selector: 'app-login',
@@ -20,9 +19,6 @@ export class LoginComponent implements OnInit {
   submitted = false;
 
   showPasswords: boolean = false;
-
-  errorEmailNotFound: boolean = false;
-  errorPasswordWrong: boolean = false;
 
   isInputFocused: {[key: string]: boolean } = {};
 

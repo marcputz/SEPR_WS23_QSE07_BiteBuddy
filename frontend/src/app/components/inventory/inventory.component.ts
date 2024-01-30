@@ -86,9 +86,6 @@ export class InventoryComponent implements OnInit {
     this.inventory.available.push(inv);
 
     this.service.updateInventoryIngredient(inv).subscribe({
-      next: data => {
-
-      },
       error: err => {
         let errorDto = this.errorHandler.getErrorObject(err);
         this.errorHandler.handleApiError(errorDto);
@@ -103,8 +100,6 @@ export class InventoryComponent implements OnInit {
     inv.inventoryStatus = false;
 
     this.service.updateInventoryIngredient(inv).subscribe({
-      next: data => {
-      },
       error: err => {
         let errorDto = this.errorHandler.getErrorObject(err);
         this.errorHandler.handleApiError(errorDto);

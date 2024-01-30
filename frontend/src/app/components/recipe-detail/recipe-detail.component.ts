@@ -6,9 +6,7 @@ import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {UserService} from "../../services/user.service";
 import {ProfileService} from "../../services/profile.service";
 import {UserSettingsDto} from "../../dtos/userSettingsDto";
-import {CheckRatingDto} from "../../dtos/profileDto";
 import {PictureService} from "../../services/picture.service";
-import {PictureDto} from "../../dtos/pictureDto";
 import {ErrorHandler} from "../../services/errorHandler";
 
 @Component({
@@ -91,8 +89,6 @@ export class RecipeDetailComponent implements OnInit {
           );
       },
       error => {
-        console.error('Error getting user settings', error);
-        const errorMessage = error?.error || 'Unknown error occurred';
 
         let errorObj = this.errorHandler.getErrorObject(error);
 

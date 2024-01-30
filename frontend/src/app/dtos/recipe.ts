@@ -1,5 +1,3 @@
-import {PictureDto} from "./pictureDto";
-
 export interface RecipeSearch {
   creator?: string;
   name?: string;

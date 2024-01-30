@@ -27,7 +27,6 @@ export class NavbarLayoutComponent implements OnInit {
   safePictureUrl: SafeUrl = '/assets/icons/user_default.png';
 
   error = false;
-  errorMessage = '';
 
   constructor(private authService: UserService,
               private errorHandler: ErrorHandler,
@@ -62,7 +61,7 @@ export class NavbarLayoutComponent implements OnInit {
       error: error => {
 
         let errorObj = this.errorHandler.getErrorObject(error);
-        this.errorHandler.handleApiError(error);
+        this.errorHandler.handleApiError(errorObj);
 
       },
       complete: () => {

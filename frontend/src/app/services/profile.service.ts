@@ -8,7 +8,7 @@ import {
   ProfileSearch,
   ProfileListDto
 } from "../dtos/profileDto";
-import {catchError, Observable, throwError} from "rxjs";
+import {Observable} from "rxjs";
 import {ErrorFormatterService} from './error-formatter.service';
 import {Globals} from "../global/globals";
 import {RecipeRatingListsDto} from "../dtos/recipe";
@@ -21,8 +21,7 @@ export class ProfileService {
 
   constructor(
     private globals: Globals,
-    private http: HttpClient,
-    private errorFormatterService: ErrorFormatterService,
+    private http: HttpClient
   ) {
   }
 

@@ -1,10 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {
-  AbstractControl, FormGroup,
+  FormGroup,
   UntypedFormBuilder,
   UntypedFormGroup,
-  ValidationErrors,
-  ValidatorFn,
   Validators
 } from "@angular/forms";
 import {UserService} from "../../../services/user.service";
@@ -12,7 +10,7 @@ import {PasswordEncoder} from "../../../utils/passwordEncoder";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ResetPasswordDto} from "../../../dtos/resetPasswordDto";
 import {ToastrService} from "ngx-toastr";
-import {split, toNumber} from "lodash";
+import {toNumber} from "lodash";
 import {ErrorHandler} from "../../../services/errorHandler";
 
 @Component({
@@ -60,11 +58,7 @@ export class PasswordResetComponent implements OnInit {
     /* check URL parameters */
 
     // check request ID
-    if (this.requestId == undefined) {
-      this.requestIdValid = false;
-    } else {
-      this.requestIdValid = true;
-    }
+    this.requestIdValid = this.requestId != undefined;
 
     // parse and check date
     this.expDateValid = false;

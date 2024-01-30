@@ -9,8 +9,6 @@ import {IngredientDto} from "../dtos/ingredientDto";
     providedIn: 'root'
 })
 export class IngredientService {
-    httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
-
     baseUri = this.globals.backendUri + '/ingredients';
 
     constructor(

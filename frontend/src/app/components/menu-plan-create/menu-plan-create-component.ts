@@ -18,8 +18,6 @@ import {ErrorHandler} from "../../services/errorHandler";
 export class MenuPlanCreateComponent implements OnInit {
 
   @Output() submitClicked: EventEmitter<any> = new EventEmitter();
-  protected generateRequest: string | null = null;
-  protected generateResponse: string | null = null;
 
   protected fromDate: string | null = "2024-01-17";
   protected untilDate: string | null = "2024-01-23";

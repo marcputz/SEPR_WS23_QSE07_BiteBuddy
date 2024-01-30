@@ -3,8 +3,6 @@ import {HttpClient} from "@angular/common/http";
 import {Globals} from "../global/globals";
 import {Observable} from "rxjs";
 import {PictureDto} from "../dtos/pictureDto";
-import {MenuPlanDetailDto} from "../dtos/menuplan/menuPlanDetailDto";
-import {SafeUrl} from "@angular/platform-browser";
 
 @Injectable({
   providedIn: 'root'
@@ -24,12 +22,10 @@ export class PictureService {
     }
 
     if (this.pictureCache.has(id)) {
-      let observable: Observable<PictureDto> = new Observable(observer => {
+      return new Observable(observer => {
         observer.next(this.pictureCache.get(id));
         observer.complete();
-      })
-
-      return observable;
+      });
 
     } else {
       let observable: Observable<PictureDto> = this.httpClient.get<PictureDto>(`${this.baseUri}?id=` + id);

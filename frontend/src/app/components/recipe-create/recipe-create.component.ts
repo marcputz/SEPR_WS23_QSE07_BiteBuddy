@@ -1,18 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {RecipeService} from "../../services/recipe.service";
-import {RecipeDetailsDto, RecipeDto, RecipeIngredientDto} from "../../dtos/recipe";
-import {Observable, of} from "rxjs";
-import {values} from "lodash";
-import {read} from "@popperjs/core";
-import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
+import {RecipeDetailsDto, RecipeIngredientDto} from "../../dtos/recipe";
+import {DomSanitizer} from "@angular/platform-browser";
 import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
-import {ErrorFormatterService} from "../../services/error-formatter.service";
 import {IngredientService} from "../../services/ingredient.service";
-
 import {UserService} from "../../services/user.service";
 import {ErrorHandler} from "../../services/errorHandler";
 import {ImageHandler} from "../../utils/imageHandler";
+import {of} from "rxjs";
 
 @Component({
   selector: 'app-recipe-create',
@@ -30,9 +26,8 @@ export class RecipeCreateComponent implements OnInit {
     allergens: [],
     picture: [],
   }
-  recipePicture: number[] = null;
+
   safePictureUrl = null;
-  pictureSelected: File = null;
   submitButtonClicked = false;
 
   constructor(

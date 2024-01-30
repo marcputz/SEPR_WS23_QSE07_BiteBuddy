@@ -212,7 +212,6 @@ export class MenuPlanComponent implements OnInit {
         throw new Error('Empty or undefined imageBytes');
       }
 
-      const base64Image = btoa(String.fromCharCode.apply(null, new Uint8Array(imageBytes)));
       const dataUrl = `data:image/png;base64,${imageBytes}`;
       return this.sanitizer.bypassSecurityTrustUrl(dataUrl);
     } catch (error) {

@@ -24,7 +24,7 @@ export class ErrorFormatterService {
         /* Use Angular's DomSanitizer to strip dangerous parts out of the HTML
          * before putting it into the error message.
          * Toastr already does this, but it can't hurt to do here too,
-         * in case the library every fails to do it.
+         * in case the library ever fails.
          */
         const sanE = this.domSanitizer.sanitize(SecurityContext.HTML, e);
         message += ` ${sanE},`;

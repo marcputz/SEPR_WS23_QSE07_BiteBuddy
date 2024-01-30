@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {ErrorFormatterService} from "./error-formatter.service";
 import {AllergeneDto} from "../dtos/allergeneDto";
 import {catchError, Observable, throwError} from "rxjs";
@@ -9,7 +9,6 @@ import {Globals} from '../global/globals';
     providedIn: 'root'
 })
 export class AllergensService {
-    httpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
 
     baseUri = this.globals.backendUri + '/allergens';
 

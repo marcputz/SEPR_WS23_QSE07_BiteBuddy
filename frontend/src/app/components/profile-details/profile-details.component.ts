@@ -33,7 +33,6 @@ export class ProfileDetailsComponent {
     private service: ProfileService,
     private router: Router,
     private route: ActivatedRoute,
-    private sanitizer: DomSanitizer
   ) {
 
   }

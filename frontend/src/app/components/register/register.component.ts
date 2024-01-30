@@ -27,8 +27,6 @@ export class RegisterComponent implements OnInit {
   submitted = false;
   // Error flag
   error = false;
-  errorMessage = '';
-  errorMailAlreadyExists: boolean = false;
   errorPasswordsNotSame: boolean = false;
 
   isInputFocused: { [key: string]: boolean } = {};
@@ -118,13 +116,6 @@ export class RegisterComponent implements OnInit {
 
       }
     });
-  }
-
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
-  vanishError() {
-    this.error = false;
   }
 
   ngOnInit() {

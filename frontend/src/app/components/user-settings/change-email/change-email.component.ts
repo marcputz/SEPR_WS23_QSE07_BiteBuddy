@@ -31,10 +31,6 @@ export class ChangeEmailComponent implements OnInit {
     });
   }
 
-  vanishError() {
-    this.error = false;
-  }
-
   ngOnInit() {
     this.getUser();
   }

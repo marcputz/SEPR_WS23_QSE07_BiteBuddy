@@ -1,4 +1,3 @@
-import {InventoryIngredientDto} from "../InventoryIngredientDto";
 
 export interface MenuPlanCreateDto {
   profileId: number;

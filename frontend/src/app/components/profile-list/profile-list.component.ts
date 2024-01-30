@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {
-  ProfileDetailDto, ProfileDto,
+  ProfileDetailDto,
   ProfileSearch,
   ProfileSearchResultDto
 } from '../../dtos/profileDto';
@@ -32,7 +32,6 @@ export class ProfileListComponent {
   ownProfiles: ProfileDetailDto[];
 
   discoverMaxPages: number = 5;
-  discoverUserName = "";
   discoverSearchParams: ProfileSearch;
   discoverSearchResult: ProfileSearchResultDto;
   discoverProfiles: ProfileDetailDto[];
