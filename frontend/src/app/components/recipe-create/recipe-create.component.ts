@@ -82,7 +82,7 @@ export class RecipeCreateComponent implements OnInit {
         })
         .catch(error => {
           console.error('Error processing image: ', error);
-          this.notification.error(error, 'Unsupported Format use png or Jpg');
+          this.notification.error('Unsupported Format, please use small jpg files');
         });
     }
   }

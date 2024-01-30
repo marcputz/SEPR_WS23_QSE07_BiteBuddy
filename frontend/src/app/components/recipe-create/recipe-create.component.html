@@ -16,7 +16,6 @@
         </div>
       </div>
 
-      <!-- Sometimes it works, sometime it does not, really depends on the png file....-->
       <img *ngIf="safePictureUrl !== null" [src]="safePictureUrl" alt="Selected Picture" class="img-thumbnail">
 
       <div class="row justify-content-center align-items-center">
@@ -34,7 +33,6 @@
           >
         </div>
       </div>
-
 
       <div class="row mb-3">
         <div class="row justify-content-center">
@@ -83,7 +81,7 @@
                              min="0"
                              class="rounded-pill"
                              placeholder="100"
-                             style="width: 100%; text-align: center">
+                             style="width: 50%; text-align: center">
                     </td>
                     <td>
                       <select [(ngModel)]="ingredient.unit" name="ounce" class="form-select"

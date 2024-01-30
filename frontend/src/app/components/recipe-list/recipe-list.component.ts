@@ -111,6 +111,14 @@ export class RecipeListComponent implements OnInit {
   }
 
   reloadRecipes() {
+    // trimming before searching but only at the beginning
+    for (let i = 0; i < this.searchParams.name.length; i++) {
+      if (this.searchParams.name[i] !== " ") {
+        this.searchParams.name = this.searchParams.name.slice(i, this.searchParams.name.length);
+        break;
+      }
+    }
+
     this.service.search(this.searchParams).subscribe({
       next: data => {
         this.searchResponse = data;
@@ -211,7 +219,6 @@ export class RecipeListComponent implements OnInit {
                 );
               },
               error: error => {
-
                 let errorObj = this.errorHandler.getErrorObject(error);
 
                 switch (errorObj.status) {

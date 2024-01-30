@@ -46,6 +46,13 @@ export class MenuPlanCreateComponent implements OnInit {
   ngOnInit() {
     this.profileService.getAllProfilesOfUser().subscribe(response => {
       this.userProfiles = response;
+
+      // preselect a profile
+      if (this.userProfiles !== null) {
+        if (this.userProfiles.length > 0) {
+          this.selectedProfile = this.userProfiles[0].userId;
+        }
+      }
     });
   }
 
