@@ -63,7 +63,7 @@ export class ProfileListComponent {
       name: '', // default value or empty string
       creator: '', // default value or empty string
       page: 0, // default starting page
-      entriesPerPage: 12, // default number of entries per page
+      entriesPerPage: 100, // default number of entries per page
       ownProfiles: true
     };
     this.discoverSearchParams = {
