@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdate
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.recipe.RecipeListDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Allergene;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.FoodUnit;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ingredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.InventoryIngredient;
 import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlan;
@@ -15,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.MenuPlanContent;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Profile;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Recipe;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredient;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RecipeIngredientDetails;
 import at.ac.tuwien.sepr.groupphase.backend.entity.idclasses.MenuPlanContentId;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -410,7 +412,16 @@ public class JpaMenuPlanService implements MenuPlanService {
             }
         }
 
-        menuPlanRepository.save(oldPlan);
+        try {
+            menuPlanRepository.save(oldPlan);
+
+            // creating fridge again
+            this.clearInventoryForReRoll(user);
+            this.createInventory(user);
+        } catch (JDBCException | DataIntegrityViolationException e) {
+            throw new DataStoreException("Unable to create new MenuPlan entity", e);
+        }
+
         return oldPlan;
     }
 
@@ -624,6 +635,30 @@ public class JpaMenuPlanService implements MenuPlanService {
         this.inventoryIngredientRepository.saveAll(newInventory);
     }
 
+    /**
+     * Clears the missing inventory of all inventory ingredients for current menu plan.
+     * We do not clear the fridge, since it might be reused.
+     * For this feature the user has to create a menu plan which he likes before going shopping, and not afterward.
+     *
+     * @param user {@link ApplicationUser} for which we want to clear the inventory for.
+     * @author Frederik Skiera
+     */
+    private void clearInventoryForReRoll(ApplicationUser user) {
+        LOGGER.trace("clearInventoryForReRoll({})", user);
+
+        MenuPlan menuPlan = null;
+        List<MenuPlan> menuPlans = this.getAllMenuPlansOfUserDuringTimeframe(user, LocalDate.now().minusDays(5), LocalDate.now());
+
+        if (menuPlans.size() == 1) {
+            menuPlan = menuPlans.get(0);
+        }
+
+        if (menuPlan != null) {
+            List<InventoryIngredient> missingInFridge = this.inventoryIngredientRepository.findAllByMenuPlanIdAndInventoryStatus(menuPlan.getId(), false);
+            this.inventoryIngredientRepository.deleteAll(missingInFridge);
+        }
+    }
+
     @Override
     public void createInventory(ApplicationUser user) {
         LOGGER.trace("createInventory({})", user);
@@ -636,9 +671,6 @@ public class JpaMenuPlanService implements MenuPlanService {
         }
 
         if (menuPlan != null) {
-            HashMap<Long, InventoryIngredient> newNewInventory = new HashMap<>();
-            ArrayList<InventoryIngredient> newInventory = new ArrayList<>();
-
             HashMap<String, InventoryIngredient> detailedInventory = new HashMap<>();
             HashMap<Long, InventoryIngredient> basicInventory = new HashMap<>();
 
@@ -717,9 +749,11 @@ public class JpaMenuPlanService implements MenuPlanService {
                                     recipeIngredient.getAmount().getUnit(), true));
                         } else {
                             detailedInventory.put(recipeIngredient.getAmount().getFridgeStringIdentifier(),
-                                new InventoryIngredient(recipeIngredient.getAmount().getIngredient(), menuPlan.getId(), recipeIngredient.getIngredient().getId(),
-                                    recipeIngredient.getAmount().getIngredient(), nullFixer(recipeIngredient.getAmount().getAmount()), recipeIngredient.getAmount()
-                                    .getUnit(), basicIngrededientExists));
+                                new InventoryIngredient(recipeIngredient.getAmount().getIngredient(), menuPlan.getId(),
+                                    recipeIngredient.getIngredient().getId(),
+                                    recipeIngredient.getAmount().getIngredient(), nullFixer(recipeIngredient.getAmount().getAmount()),
+                                    recipeIngredient.getAmount()
+                                        .getUnit(), basicIngrededientExists));
                         }
                     }
                 }
@@ -784,7 +818,8 @@ public class JpaMenuPlanService implements MenuPlanService {
         LOGGER.trace("updateInventoryIngredient({}, {})", user, updatedIngredientDto);
         this.validator.validateInventoryIngredientForUpdate(updatedIngredientDto, searchInventory(updatedIngredientDto.getMenuPlanId()));
 
-        InventoryIngredient toSave = this.inventoryIngredientRepository.findById(updatedIngredientDto.getId()).orElseThrow(() -> new NotFoundException("Could not find inventory ingredient by ID"));
+        InventoryIngredient toSave = this.inventoryIngredientRepository.findById(updatedIngredientDto.getId())
+            .orElseThrow(() -> new NotFoundException("Could not find inventory ingredient by ID"));
         toSave.setInventoryStatus(updatedIngredientDto.isInventoryStatus());
         this.inventoryIngredientRepository.save(toSave);
     }

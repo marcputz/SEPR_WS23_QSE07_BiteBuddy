@@ -18,6 +18,16 @@ public interface InventoryIngredientRepository extends JpaRepository<InventoryIn
     List<InventoryIngredient> findAllByMenuPlanId(long id);
 
     /**
+     * Finds all ingredients which are used in a specific menu plan.
+     *
+     * @param id     of the specific Menu Plan.
+     * @param status status of the ingredients we want to search for.
+     * @return List of {@link InventoryIngredient}.
+     * @author Frederik Skiera
+     */
+    List<InventoryIngredient> findAllByMenuPlanIdAndInventoryStatus(long id, boolean status);
+
+    /**
      * Gets all ingredients which are available for a specific menu plan.
      *
      * @param menuplanId of the specific menu plan.
