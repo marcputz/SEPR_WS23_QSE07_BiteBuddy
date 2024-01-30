@@ -3,6 +3,9 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 import at.ac.tuwien.sepr.groupphase.backend.auth.PasswordEncoder;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryIngredientDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.InventoryListDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.RecipeRatingListsDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.menuplan.MenuPlanUpdateRecipeDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.*;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.DataStoreException;
@@ -18,6 +21,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RecipeRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.AuthenticationService;
 import at.ac.tuwien.sepr.groupphase.backend.service.MenuPlanService;
+import at.ac.tuwien.sepr.groupphase.backend.service.ProfileService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,17 +30,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -69,6 +70,10 @@ public class MenuPlanServiceTest {
 
     @Autowired
     private ProfileRepository profileRepository;
+
+    @Autowired
+    private ProfileService profileService;
+
 
     @Autowired
     private AuthenticationService authService;
@@ -167,18 +172,23 @@ public class MenuPlanServiceTest {
         user.setNickname("testuser");
         user.setEmail("test@test");
         user.setPasswordEncoded(PasswordEncoder.encode("password", "test@test"));
-
         this.user = this.userRepository.save(user);
 
         Profile profile = new Profile();
         profile.setName("Testprofil 1");
         profile.setUser(this.user);
 
+        user.setActiveProfile(profile);
         this.profile = this.profileRepository.save(profile);
+        this.user = this.userRepository.save(user);
+
     }
 
     @AfterEach
     public void afterEach() {
+        this.user = this.user.setActiveProfile(null);
+        this.user = this.userRepository.save(user);
+
         menuPlanRepository.deleteAll();
 
         profileRepository.deleteAll();
@@ -262,6 +272,109 @@ public class MenuPlanServiceTest {
     }
 
     @Test
+    void testUpdateMenuPlanByChangingOneRecipe() throws Exception {
+        user.setActiveProfile(profile);
+        MenuPlan saveReturn = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+        service.generateContent(saveReturn);
+
+        final MenuPlan plan = service.getById(saveReturn.getId());
+        MenuPlanContent toChange = new MenuPlanContent();
+        for (MenuPlanContent content : plan.getContent()) {
+            if (content.getDayIdx() == 1 && content.getTimeslot() == 1) {
+                toChange = content;
+                break;
+            }
+        }
+
+        MenuPlanUpdateRecipeDto menuPlanUpdateRecipeDto = new MenuPlanUpdateRecipeDto();
+        menuPlanUpdateRecipeDto.setMenuPlanId(Math.toIntExact(plan.getId()));
+        menuPlanUpdateRecipeDto.setDay(toChange.getDayIdx());
+        menuPlanUpdateRecipeDto.setTimeslot(toChange.getTimeslot());
+        menuPlanUpdateRecipeDto.setDislike(false);
+
+        MenuPlan returnedMenuplan = service.updateMenuPlanByChangingOneRecipe(user, menuPlanUpdateRecipeDto);
+        MenuPlanContent returnedContent = new MenuPlanContent();
+        for (MenuPlanContent content : returnedMenuplan.getContent()) {
+            if (content.getDayIdx() == 1 && content.getTimeslot() == 1) {
+                returnedContent = content;
+                break;
+            }
+        }
+
+        MenuPlanContent finalToChange = toChange;
+        MenuPlanContent finalReturnedContent = returnedContent;
+        assertAll(
+            () -> assertEquals(finalToChange.getDayIdx(), finalReturnedContent.getDayIdx()),
+            () -> assertEquals(finalToChange.getTimeslot(), finalReturnedContent.getTimeslot()),
+            () -> assertEquals(finalToChange.getMenuplan(), finalReturnedContent.getMenuplan()),
+            () -> assertNotEquals(finalToChange.getRecipe(), finalReturnedContent.getRecipe())
+        );
+    }
+
+    @Test
+    void testUpdateMenuPlanByChangingOneRecipe_WithSetDislikeTrue_DislikesRecipeInProfile() throws Exception {
+        user.setActiveProfile(profile);
+        MenuPlan saveReturn = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+        service.generateContent(saveReturn);
+
+        final MenuPlan plan = service.getById(saveReturn.getId());
+        MenuPlanContent toChange = new MenuPlanContent();
+        Recipe myRecipe = new Recipe();
+        for (MenuPlanContent content : plan.getContent()) {
+            if (content.getDayIdx() == 1 && content.getTimeslot() == 1) {
+                myRecipe = content.getRecipe();
+                toChange = content;
+                break;
+            }
+        }
+
+        RecipeRatingDto ratingDto = new RecipeRatingDto(myRecipe.getId(), user.getId(), 1);
+        profileService.rateRecipe(ratingDto);
+
+        // re-roll recipe with disliking
+        MenuPlanUpdateRecipeDto menuPlanUpdateRecipeDto = new MenuPlanUpdateRecipeDto();
+        menuPlanUpdateRecipeDto.setMenuPlanId(Math.toIntExact(plan.getId()));
+        menuPlanUpdateRecipeDto.setDay(toChange.getDayIdx());
+        menuPlanUpdateRecipeDto.setTimeslot(toChange.getTimeslot());
+        menuPlanUpdateRecipeDto.setDislike(true);
+
+        service.updateMenuPlanByChangingOneRecipe(user, menuPlanUpdateRecipeDto);
+
+        RecipeRatingListsDto returnedRating = profileService.getRatingLists(user.getId());
+        List<Long> likes = returnedRating.likes();
+        List<Long> dislikes = returnedRating.dislikes();
+        Recipe finalMyRecipe = myRecipe;
+        assertAll(
+            () -> assertFalse(likes.contains(finalMyRecipe.getId())),
+            () -> assertTrue(dislikes.contains(finalMyRecipe.getId()))
+        );
+    }
+
+    @Test
+    void testUpdateMenuPlanByChangingOneRecipe_withWrongDayIndex_throwsValidationException() throws Exception {
+        user.setActiveProfile(profile);
+        MenuPlan saveReturn = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
+        service.generateContent(saveReturn);
+
+        final MenuPlan plan = service.getById(saveReturn.getId());
+        MenuPlanContent toChange = new MenuPlanContent();
+        for (MenuPlanContent content : plan.getContent()) {
+            if (content.getDayIdx() == 1 && content.getTimeslot() == 1) {
+                toChange = content;
+                break;
+            }
+        }
+
+        MenuPlanUpdateRecipeDto menuPlanUpdateRecipeDto = new MenuPlanUpdateRecipeDto();
+        menuPlanUpdateRecipeDto.setMenuPlanId(Math.toIntExact(plan.getId()));
+        menuPlanUpdateRecipeDto.setDay(-1);
+        menuPlanUpdateRecipeDto.setTimeslot(toChange.getTimeslot());
+        menuPlanUpdateRecipeDto.setDislike(false);
+
+        assertThrows(ValidationException.class, () -> this.service.updateMenuPlanByChangingOneRecipe(user, menuPlanUpdateRecipeDto));
+    }
+
+    @Test
     void testCreateFridgeSuccessful() throws Exception {
         MenuPlan plan = service.createEmptyMenuPlan(user, profile, LocalDate.now().minusDays(6), LocalDate.now());
 
@@ -326,7 +439,7 @@ public class MenuPlanServiceTest {
         InventoryListDto inventory = this.service.searchInventory(plan.getId());
         assertEquals(2, inventory.available().size());
 
-        assertEquals(4.5f,inventory.available().get(1).getAmount());
+        assertEquals(4.5f, inventory.available().get(1).getAmount());
     }
 
     @Test
@@ -437,7 +550,7 @@ public class MenuPlanServiceTest {
         InventoryListDto inventory = this.service.searchInventory(plan.getId());
         assertEquals(2, inventory.available().size());
         assertEquals(1, inventory.missing().size());
-        assertEquals(4.5f,inventory.available().get(1).getAmount());
+        assertEquals(4.5f, inventory.available().get(1).getAmount());
     }
 
     @Test

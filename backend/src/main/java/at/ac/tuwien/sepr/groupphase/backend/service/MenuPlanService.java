@@ -151,7 +151,7 @@ public interface MenuPlanService {
      * @throws DataStoreException if the data store is unable to process the request.
      * @author Anton Nather
      */
-    MenuPlan updateMenuPlanByChangingOneRecipe(ApplicationUser user, MenuPlanUpdateRecipeDto menuPlan);
+    MenuPlan updateMenuPlanByChangingOneRecipe(ApplicationUser user, MenuPlanUpdateRecipeDto menuPlan) throws ValidationException;
 
     /**
      * Gets a list of all recipes contained in a menu plan.
