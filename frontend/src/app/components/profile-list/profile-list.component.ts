@@ -222,7 +222,6 @@ export class ProfileListComponent {
     if (userPictureArray === undefined) {
       return this.imageHandler.sanitizeUserImage('/assets/icons/user_default.png');
     } else {
-      //this.loadPreviewPicture();
       return this.imageHandler.sanitizeUserImage(userPictureArray);
     }
   }
