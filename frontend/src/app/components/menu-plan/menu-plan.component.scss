@@ -195,4 +195,19 @@ img {
     color: red;
     margin-left: 3px;
   }
+
+  .card-title-link-disa {
+    color: var(--bs-card-title-color);
+    text-decoration: none;
+  }
+
+  .card-title-link-disa:hover {
+    color: var(--bs-card-title-color);
+    text-decoration: underline;
+  }
+
+  .size-icons {
+    cursor: pointer;
+    font-size: 1.5rem;
+  }
 }

@@ -49,15 +49,16 @@
 
     <!-- container to show if no content available -->
     <div *ngIf="contents === undefined || contents.length === 0" style="width: 100%; text-align: center;">
-        <b style="color: rgba(0,0,0, 0.8);">You haven't created any menu plans yet</b><br>
+      <b style="color: rgba(0,0,0, 0.8);">You haven't created any menu plans yet</b><br>
     </div>
 
     <div class="col-12 col-sm-6 col-md-3 col-lg-4 col-xl-3 col-xxl-2 mb-4 row-gap-6"
          *ngFor="let content of contents; let i = index">
       <div class="card recipe-card h-100">
-        <img [src]="getImageFor(content.recipe)" class="card-img-top rounded-top img-zoom"
-             [alt]="getImageAltFor(content.recipe)">
-
+        <a class="card-title-link-disa" [routerLink]="['/recipes', content.recipe.id]">
+          <img [src]="getImageFor(content.recipe)" class="card-img-top rounded-top img-zoom"
+               [alt]="getImageAltFor(content.recipe)">
+        </a><br>
         <div class="card-body">
           <a class="card-title-link-disa" [routerLink]="['/recipes', content.recipe.id]">
             <h5 class="card-title">{{ content.recipe.name }}</h5>
@@ -86,12 +87,12 @@
               <a
                 (click)="rerollRecipe(content)"
                 aria-label="Reroll Recipe" role="button">
-                <i class="bi bi-arrow-clockwise"></i>
+                <i class="bi bi-arrow-clockwise size-icons"></i>
               </a>
               <a
                 (click)="dislikeRecipe(content)"
                 aria-label="Dislike Recipe" role="button">
-                <i class="bi bi-hand-thumbs-down"></i>
+                <i class="bi bi-hand-thumbs-down size-icons"></i>
               </a>
             </div>
             <div></div>
