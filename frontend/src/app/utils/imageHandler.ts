@@ -73,8 +73,23 @@ export class ImageHandler {
         // Create an image element
         let img = new Image();
         img.onload = () => {
+          // Create a canvas element
+          let canvas = document.createElement('canvas');
+          let ctx = canvas.getContext('2d');
+
+          // Set canvas size
+          const size = 500;
+          canvas.width = size;
+          canvas.height = size;
+
+          // Draw the image onto the canvas, resizing it
+          ctx.drawImage(img, 0, 0, size, size);
+
+          // Convert the canvas content to a base64 string
+          const base64CroppedImg = canvas.toDataURL('image/jpeg');
+
           // Convert the base64 string to a Uint8Array
-          const arrayBuffer = this.base64ToArrayBuffer(base64String);
+          const arrayBuffer = this.base64ToArrayBuffer(base64CroppedImg);
           const imageBytes = Array.from(new Uint8Array(arrayBuffer));
 
           resolve(imageBytes);
